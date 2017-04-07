@@ -17,6 +17,8 @@ protected:
     virtual void BeginPlay() override;
 	
 private:
+    TArray<AActor*> SelectedActors;
+
     UFUNCTION()
     void OnLeftMouseButtonReleased();
 };
