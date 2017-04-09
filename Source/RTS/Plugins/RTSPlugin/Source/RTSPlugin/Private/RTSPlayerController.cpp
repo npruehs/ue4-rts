@@ -10,6 +10,7 @@
 
 #include "Engine/Engine.h"
 
+
 void ARTSPlayerController::BeginPlay()
 {
     APlayerController::BeginPlay();
@@ -25,6 +26,13 @@ void ARTSPlayerController::BeginPlay()
 
 void ARTSPlayerController::OnLeftMouseButtonReleased()
 {
+    UWorld* World = GetWorld();
+
+    if (!World)
+    {
+        return;
+    }
+
     // Get local player viewport.
     ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
 
@@ -52,13 +60,15 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
     FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
     TArray<FHitResult> HitResults;
 
-    GetWorld()->LineTraceMultiByObjectType(
+    World->LineTraceMultiByObjectType(
         HitResults,
         WorldOrigin,
         WorldOrigin + WorldDirection * HitResultTraceDistance,
         Params);
 
     // Check results.
+    SelectedActors.Empty();
+
     for (auto& HitResult : HitResults)
     {
         // Check if hit any actor.
@@ -76,9 +86,16 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
         }
 
         // Select single actor.
-        SelectedActors.Empty();
         SelectedActors.Add(HitResult.Actor.Get());
 
         GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, HitResult.Actor->GetName());
+
+        // Notify listeners.
+        NotifyOnSelectionChanged(SelectedActors);
     }
+}
+
+void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)
+{
+    ReceiveOnSelectionChanged(Selection);
 }
