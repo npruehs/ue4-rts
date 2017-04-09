@@ -87,12 +87,11 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
 
         // Select single actor.
         SelectedActors.Add(HitResult.Actor.Get());
-
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, HitResult.Actor->GetName());
-
-        // Notify listeners.
-        NotifyOnSelectionChanged(SelectedActors);
+        break;
     }
+
+    // Notify listeners.
+    NotifyOnSelectionChanged(SelectedActors);
 }
 
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)
