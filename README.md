@@ -14,3 +14,12 @@
 ## Enabling Selection
 
 * Add SelectableComponents to everything selectable.
+
+## Camera Setup
+
+* Create a RTSPlayerPawn blueprint.
+* Add a RTSCamera component.
+* Set the Rotation of the RTSCamera component as desired (e.g. X = 0, Y = 270, Z = 0).
+* Set the (RTS) Camera Distance of the RTSCamera component as desired (e.g. 600).
+* Use the RTSPlayerPawn as default pawn in your game mode.
+
