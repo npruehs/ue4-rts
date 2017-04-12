@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "RTSPlayerController.h"
 
-#include "SelectableComponent.h"
+#include "RTSSelectableComponent.h"
 #include "RTSCameraBoundsVolume.h"
 #include "Components/InputComponent.h"
 #include "Engine/LocalPlayer.h"
@@ -89,7 +89,7 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
         }
 
         // Check if hit selectable actor.
-        auto SelectableComponent = HitResult.Actor->FindComponentByClass<USelectableComponent>();
+        auto SelectableComponent = HitResult.Actor->FindComponentByClass<URTSSelectableComponent>();
 
         if (!SelectableComponent)
         {

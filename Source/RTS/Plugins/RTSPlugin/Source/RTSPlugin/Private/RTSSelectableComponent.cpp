@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CoreMinimal.h"
-#include "SelectableComponent.h"
+#include "RTSSelectableComponent.h"
 
 
 // Sets default values for this component's properties
-USelectableComponent::USelectableComponent()
+URTSSelectableComponent::URTSSelectableComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -16,7 +16,7 @@ USelectableComponent::USelectableComponent()
 
 
 // Called when the game starts
-void USelectableComponent::BeginPlay()
+void URTSSelectableComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -26,7 +26,7 @@ void USelectableComponent::BeginPlay()
 
 
 // Called every frame
-void USelectableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void URTSSelectableComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 

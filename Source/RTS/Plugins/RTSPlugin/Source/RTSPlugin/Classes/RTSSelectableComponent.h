@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 #include "Components/ActorComponent.h"
-#include "SelectableComponent.generated.h"
+#include "RTSSelectableComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class USelectableComponent : public UActorComponent
+class URTSSelectableComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	USelectableComponent();
+	URTSSelectableComponent();
 
 protected:
 	// Called when the game starts
