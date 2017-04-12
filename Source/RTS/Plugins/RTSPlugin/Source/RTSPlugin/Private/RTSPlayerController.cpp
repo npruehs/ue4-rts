@@ -4,11 +4,13 @@
 #include "RTSPlayerController.h"
 
 #include "SelectableComponent.h"
+#include "RTSCameraBoundsVolume.h"
 #include "Components/InputComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "Engine/Engine.h"
+#include "EngineUtils.h"
 
 
 void ARTSPlayerController::BeginPlay()
@@ -24,6 +26,13 @@ void ARTSPlayerController::BeginPlay()
     InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::OnLeftMouseButtonReleased);
     InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::OnMoveCameraLeftRight);
     InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::OnMoveCameraUpDown);
+
+    // Get camera bounds.
+    for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+    {
+        CameraBoundsVolume = *ActorItr;
+        break;
+    }
 }
 
 void ARTSPlayerController::OnLeftMouseButtonReleased()
@@ -159,5 +168,10 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
     FVector Location = PlayerPawn->GetActorLocation();
     Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue;
     Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue;
-    PlayerPawn->SetActorLocation(Location);
+
+    // Enforce camera bounds.
+    if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))
+    {
+        PlayerPawn->SetActorLocation(Location);
+    }
 }

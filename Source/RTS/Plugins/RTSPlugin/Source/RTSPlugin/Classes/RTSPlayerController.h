@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/CameraBlockingVolume.h"
 #include "RTSPlayerController.generated.h"
 
+class ARTSCameraBoundsVolume;
 
 UCLASS()
 class ARTSPlayerController : public APlayerController
@@ -38,6 +40,8 @@ private:
 
     float CameraLeftRightAxisValue;
     float CameraUpDownAxisValue;
+
+    ARTSCameraBoundsVolume* CameraBoundsVolume;
 
     UFUNCTION()
     void OnLeftMouseButtonReleased();
