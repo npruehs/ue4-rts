@@ -22,6 +22,8 @@ void ARTSPlayerController::BeginPlay()
 
     // Bind actions.
     InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::OnLeftMouseButtonReleased);
+    InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::OnMoveCameraLeftRight);
+    InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::OnMoveCameraUpDown);
 }
 
 void ARTSPlayerController::OnLeftMouseButtonReleased()
@@ -94,7 +96,37 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
     NotifyOnSelectionChanged(SelectedActors);
 }
 
+void ARTSPlayerController::OnMoveCameraLeftRight(float Value)
+{
+    CameraLeftRightAxisValue = Value;
+}
+
+void ARTSPlayerController::OnMoveCameraUpDown(float Value)
+{
+    CameraUpDownAxisValue = Value;
+}
+
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)
 {
     ReceiveOnSelectionChanged(Selection);
+}
+
+void ARTSPlayerController::PlayerTick(float DeltaTime)
+{
+    APlayerController::PlayerTick(DeltaTime);
+
+    APawn* PlayerPawn = GetPawn();
+
+    if (!PlayerPawn)
+    {
+        return;
+    }
+
+    // Apply input.
+    FVector Location = PlayerPawn->GetActorLocation();
+    Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue;
+    Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue;
+    PlayerPawn->SetActorLocation(Location);
+
+    // if (GetMousePosition(out x, out y))
 }

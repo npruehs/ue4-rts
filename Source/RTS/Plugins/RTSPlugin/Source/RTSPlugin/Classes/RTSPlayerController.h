@@ -14,6 +14,13 @@ class ARTSPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
+    UPROPERTY(EditAnywhere, Category = "RTS Camera")
+    float CameraSpeed;
+
+    UPROPERTY(EditAnywhere, Category = "RTS Camera")
+    float CameraScrollThreshold;
+
+
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
 
@@ -21,6 +28,7 @@ public:
     UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnSelectionChanged"), Category = "RTS")
     void ReceiveOnSelectionChanged(const TArray<AActor*>& Selection);
 
+    virtual void PlayerTick(float DeltaTime) override;
 
 protected:
     virtual void BeginPlay() override;
@@ -28,6 +36,12 @@ protected:
 private:
     TArray<AActor*> SelectedActors;
 
+    float CameraLeftRightAxisValue;
+    float CameraUpDownAxisValue;
+
     UFUNCTION()
     void OnLeftMouseButtonReleased();
+
+    void OnMoveCameraLeftRight(float Value);
+    void OnMoveCameraUpDown(float Value);
 };
