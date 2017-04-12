@@ -122,11 +122,42 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
         return;
     }
 
+    // Get mouse input.
+    float MouseX;
+    float MouseY;
+
+    const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+
+    const float ScrollBorderRight = ViewportSize.X - CameraScrollThreshold;
+    const float ScrollBorderTop = ViewportSize.Y - CameraScrollThreshold;
+
+    if (GetMousePosition(MouseX, MouseY))
+    {
+        if (MouseX <= CameraScrollThreshold)
+        {
+            CameraLeftRightAxisValue -= 1 - (MouseX / CameraScrollThreshold);
+        }
+        else if (MouseX >= ScrollBorderRight)
+        {
+            CameraLeftRightAxisValue += (MouseX - ScrollBorderRight) / CameraScrollThreshold;
+        }
+
+        if (MouseY <= CameraScrollThreshold)
+        {
+            CameraUpDownAxisValue += 1 - (MouseY / CameraScrollThreshold);
+        }
+        else if (MouseY >= ScrollBorderTop)
+        {
+            CameraUpDownAxisValue -= (MouseY - ScrollBorderTop) / CameraScrollThreshold;
+        }
+    }
+
     // Apply input.
+    CameraLeftRightAxisValue = FMath::Clamp(CameraLeftRightAxisValue, -1.0f, +1.0f);
+    CameraUpDownAxisValue = FMath::Clamp(CameraUpDownAxisValue, -1.0f, +1.0f);
+    
     FVector Location = PlayerPawn->GetActorLocation();
     Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue;
     Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue;
     PlayerPawn->SetActorLocation(Location);
-
-    // if (GetMousePosition(out x, out y))
 }
