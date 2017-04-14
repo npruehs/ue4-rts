@@ -1,4 +1,5 @@
 #include "CoreMinimal.h"
+#include "RTSPluginPrivatePCH.h"
 #include "Modules/ModuleManager.h"
 #include "RTSPlugin.h"
 
@@ -15,3 +16,5 @@ void FRTSPlugin::ShutdownModule()
 }
 
 IMPLEMENT_MODULE(FRTSPlugin, RTSPlugin)
+
+DEFINE_LOG_CATEGORY(RTSLog);
