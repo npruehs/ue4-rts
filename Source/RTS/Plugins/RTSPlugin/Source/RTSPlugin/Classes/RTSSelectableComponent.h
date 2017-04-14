@@ -1,8 +1,9 @@
 #pragma once
 
 #include "RTSPluginPrivatePCH.h"
-#include "UObject/ObjectMacros.h"
+
 #include "Components/ActorComponent.h"
+
 #include "RTSSelectableComponent.generated.h"
 
 

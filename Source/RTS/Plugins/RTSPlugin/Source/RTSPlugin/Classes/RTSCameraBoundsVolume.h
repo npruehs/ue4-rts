@@ -1,8 +1,9 @@
 #pragma once
 
 #include "RTSPluginPrivatePCH.h"
-#include "UObject/ObjectMacros.h"
+
 #include "GameFramework/Volume.h"
+
 #include "RTSCameraBoundsVolume.generated.h"
 
 
