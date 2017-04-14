@@ -1,4 +1,4 @@
-#include "CoreMinimal.h"
+#include "RTSPluginPrivatePCH.h"
 #include "RTSCameraBoundsVolume.h"
 #include "Components/BrushComponent.h"
 
