@@ -31,6 +31,11 @@ void ARTSPlayerController::BeginPlay()
         CameraBoundsVolume = *ActorItr;
         break;
     }
+
+    if (!CameraBoundsVolume)
+    {
+        UE_LOG(RTSLog, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
+    }
 }
 
 void ARTSPlayerController::OnLeftMouseButtonReleased()
@@ -96,6 +101,8 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
 
         // Select single actor.
         SelectedActors.Add(HitResult.Actor.Get());
+
+        UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
         break;
     }
 
