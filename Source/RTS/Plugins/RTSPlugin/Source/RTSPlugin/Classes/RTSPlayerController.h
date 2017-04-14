@@ -15,10 +15,10 @@ class ARTSPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-    UPROPERTY(EditAnywhere, Category = "RTS Camera")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     float CameraSpeed;
 
-    UPROPERTY(EditAnywhere, Category = "RTS Camera")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     float CameraScrollThreshold;
 
 
@@ -26,7 +26,7 @@ public:
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
 
     /** Event when the set of selected actors of this player has changed. */
-    UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnSelectionChanged"), Category = "RTS")
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
     void ReceiveOnSelectionChanged(const TArray<AActor*>& Selection);
 
     virtual void PlayerTick(float DeltaTime) override;

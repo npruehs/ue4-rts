@@ -7,7 +7,7 @@
 #include "RTSSelectableComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(meta=(BlueprintSpawnableComponent))
 class URTSSelectableComponent : public UActorComponent
 {
 	GENERATED_BODY()
