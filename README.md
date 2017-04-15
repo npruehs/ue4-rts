@@ -31,5 +31,5 @@
 
 1. Bind the axis MoveCameraLeftRight (e.g. to Left and Right keys).
 1. Bind the axis MoveCameraUpDown (e.g. to Up and Down keys).
-1. At your RTSPlayerController, set the CameraSpeed (e.g. to 20).
+1. At your RTSPlayerController, set the CameraSpeed (e.g. to 500).
 1. At your RTSPlayerController, set the CameraScrollThreshold (e.g. to 10).
