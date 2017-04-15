@@ -20,9 +20,9 @@ void ARTSPlayerController::BeginPlay()
     APlayerController::bEnableMouseOverEvents = true;
 
     // Bind actions.
-    InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::OnLeftMouseButtonReleased);
-    InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::OnMoveCameraLeftRight);
-    InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::OnMoveCameraUpDown);
+    InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::SelectActor);
+    InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
+    InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
 
     // Get camera bounds.
     for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -37,7 +37,7 @@ void ARTSPlayerController::BeginPlay()
     }
 }
 
-void ARTSPlayerController::OnLeftMouseButtonReleased()
+void ARTSPlayerController::SelectActor()
 {
     UWorld* World = GetWorld();
 
@@ -109,12 +109,12 @@ void ARTSPlayerController::OnLeftMouseButtonReleased()
     NotifyOnSelectionChanged(SelectedActors);
 }
 
-void ARTSPlayerController::OnMoveCameraLeftRight(float Value)
+void ARTSPlayerController::MoveCameraLeftRight(float Value)
 {
     CameraLeftRightAxisValue = Value;
 }
 
-void ARTSPlayerController::OnMoveCameraUpDown(float Value)
+void ARTSPlayerController::MoveCameraUpDown(float Value)
 {
     CameraUpDownAxisValue = Value;
 }
@@ -170,8 +170,8 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
     CameraUpDownAxisValue = FMath::Clamp(CameraUpDownAxisValue, -1.0f, +1.0f);
     
     FVector Location = PlayerPawn->GetActorLocation();
-    Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue;
-    Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue;
+    Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
+    Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
 
     // Enforce camera bounds.
     if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))
