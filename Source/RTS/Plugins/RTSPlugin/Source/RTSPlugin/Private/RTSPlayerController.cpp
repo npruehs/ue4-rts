@@ -12,7 +12,7 @@
 
 void ARTSPlayerController::BeginPlay()
 {
-    APlayerController::BeginPlay();
+    Super::BeginPlay();
 
     // Enable mouse input.
     APlayerController::bShowMouseCursor = true;
@@ -126,7 +126,7 @@ void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selec
 
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
-    APlayerController::PlayerTick(DeltaTime);
+    Super::PlayerTick(DeltaTime);
 
     APawn* PlayerPawn = GetPawn();
 
