@@ -9,4 +9,7 @@ void ARTSCharacterAIController::BeginPlay()
     // Make AI use assigned blackboard.
     UBlackboardComponent* BlackboardComponent;
     UseBlackboard(CharacterBlackboardAsset, BlackboardComponent);
+
+    // Run behavior tree.
+    RunBehaviorTree(CharacterBehaviorTreeAsset);
 }

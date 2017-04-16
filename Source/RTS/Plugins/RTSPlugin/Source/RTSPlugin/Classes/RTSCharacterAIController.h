@@ -16,6 +16,10 @@ class ARTSCharacterAIController : public AAIController
     GENERATED_BODY()
 
 public:
+    /** Behavior tree to use for driving the character AI. */
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
+    UBehaviorTree* CharacterBehaviorTreeAsset;
+
     /** Blackboard to use for holding all data relevant to the character AI. */
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
     UBlackboardData* CharacterBlackboardAsset;
