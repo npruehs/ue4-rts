@@ -10,6 +10,7 @@
 
 1. Add PlayerStarts to the map.
 1. Add RTSCameraBoundsVolume to the map.
+1. Add a NavMeshBoundsVolume to the map, and build Navigation. You may press P to review your results in the viewport.
 
 ## Enabling Selection
 
