@@ -26,9 +26,15 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     int CameraScrollThreshold;
 
+    /** Event when an actor has received a move order. */
+    virtual void NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation);
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
+
+    /** Event when an actor has received a move order. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
+    void ReceiveOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocatio);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
@@ -52,6 +58,17 @@ private:
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
 
+
+    /** Casts a ray from the current pointer position and collects the results. */
+    bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
+
+    /** Automatically issues the most reasonable order for the current pointer position. */
+    UFUNCTION()
+    void IssueOrder();
+
+    /** Orders all selected units to move to the specified location. */
+    UFUNCTION(BlueprintCallable)
+    void IssueMoveOrder(const FVector& TargetLocation);
 
     /** Applies horizontal axis input to camera movement. */
     void MoveCameraLeftRight(float Value);
