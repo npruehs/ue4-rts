@@ -134,6 +134,10 @@ void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 
         // Issue move order.
         PawnController->IssueMoveOrder(TargetLocation);
+        UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
+
+        // Notify listeners.
+        NotifyOnIssuedMoveOrder(SelectedActor, TargetLocation);
     }
 }
 
@@ -185,6 +189,11 @@ void ARTSPlayerController::MoveCameraLeftRight(float Value)
 void ARTSPlayerController::MoveCameraUpDown(float Value)
 {
     CameraUpDownAxisValue = Value;
+}
+
+void ARTSPlayerController::NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation)
+{
+    ReceiveOnIssuedMoveOrder(Actor, TargetLocation);
 }
 
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)
