@@ -5,6 +5,9 @@
 1. Create a player controller deriving from RTSPlayerController.
 1. Create a game mode using that player controller. Compile and save.
 1. Use the new game mode in the world settings.
+1. Create a controller deriving from RTSCharacterAIController.
+1. Set the Character Behavior Tree Asset of the new controller to RTSCharacterBehaviorTree.
+1. Set the Character Blackboard Asset of the new controller to RTSCharacterBlackboard.
 
 ## Creating Maps
 
@@ -34,3 +37,10 @@
 1. Bind the axis MoveCameraUpDown (e.g. to Up and Down keys).
 1. At your RTSPlayerController, set the CameraSpeed (e.g. to 500).
 1. At your RTSPlayerController, set the CameraScrollThreshold (e.g. to 10).
+
+## Adding Units
+
+1. Create a new Character blueprint.
+1. Set skeletal mesh, position, rotation, animation and capsule size as usual.
+1. Set pawn AI controller class to your RTSCharacterAIController.
+1. Add a SelectableComponent.

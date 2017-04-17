@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSCharacterAIController.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
+
 
 void ARTSCharacterAIController::BeginPlay()
 {
@@ -12,4 +14,9 @@ void ARTSCharacterAIController::BeginPlay()
 
     // Run behavior tree.
     RunBehaviorTree(CharacterBehaviorTreeAsset);
+}
+
+void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
+{
+    Blackboard->SetValueAsVector("TargetLocation", Location);
 }

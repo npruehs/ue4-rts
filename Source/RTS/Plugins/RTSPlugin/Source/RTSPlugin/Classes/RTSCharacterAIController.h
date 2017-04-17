@@ -24,6 +24,11 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
     UBlackboardData* CharacterBlackboardAsset;
 
+
+    /** Makes the pawn move towards the specified location. */
+    UFUNCTION(BlueprintCallable)
+    void IssueMoveOrder(const FVector& Location);
+
 protected:
     virtual void BeginPlay() override;
 

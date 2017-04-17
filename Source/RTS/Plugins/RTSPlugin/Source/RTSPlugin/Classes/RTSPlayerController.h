@@ -53,6 +53,17 @@ private:
     TArray<AActor*> SelectedActors;
 
 
+    /** Casts a ray from the current pointer position and collects the results. */
+    bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
+
+    /** Automatically issues the most reasonable order for the current pointer position. */
+    UFUNCTION()
+    void IssueOrder();
+
+    /** Orders all selected units to move to the specified location. */
+    UFUNCTION(BlueprintCallable)
+    void IssueMoveOrder(const FVector& TargetLocation);
+
     /** Applies horizontal axis input to camera movement. */
     void MoveCameraLeftRight(float Value);
 
