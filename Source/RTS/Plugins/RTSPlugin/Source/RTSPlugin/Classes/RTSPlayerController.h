@@ -26,6 +26,9 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     int CameraScrollThreshold;
 
+	/** Event when an actor has received an attack order. */
+	virtual void NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target);
+
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation);
 
@@ -34,6 +37,10 @@ public:
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
+
+	/** Event when an actor has received an attack order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
+	void ReceiveOnIssuedAttackOrder(AActor* Actor, AActor* Target);
 
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
@@ -74,6 +81,10 @@ private:
     UFUNCTION()
     void IssueOrder();
 
+	/** Orders all selected units to attack the specified unit. */
+	UFUNCTION(BlueprintCallable)
+	void IssueAttackOrder(AActor* Target);
+
     /** Orders all selected units to move to the specified location. */
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& TargetLocation);
@@ -81,6 +92,10 @@ private:
 	/** Orders all selected units to stop all current actions. */
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();
+
+	/** Orders the passed unit to attack the specified unit. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
 
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)

@@ -17,6 +17,11 @@ void ARTSCharacterAIController::BeginPlay()
     RunBehaviorTree(CharacterBehaviorTreeAsset);
 }
 
+void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
+{
+	IssueMoveOrder(Target->GetActorLocation());
+}
+
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
     // Update blackboard.

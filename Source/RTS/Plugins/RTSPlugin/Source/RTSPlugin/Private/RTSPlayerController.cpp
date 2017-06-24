@@ -7,6 +7,8 @@
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "RTSAttackComponent.h"
+#include "RTSAttackableComponent.h"
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacterAIController.h"
 #include "RTSSelectableComponent.h"
@@ -109,13 +111,80 @@ void ARTSPlayerController::IssueOrder()
     {
         if (HitResult.Actor != nullptr)
         {
-            continue;
+			// Check if hit attackable actor.
+			auto AttackableComponent = HitResult.Actor->FindComponentByClass<URTSAttackableComponent>();
+
+			if (!AttackableComponent)
+			{
+				continue;
+			}
+			else
+			{
+				// Issue attack order.
+				IssueAttackOrder(HitResult.Actor.Get());
+				return;
+			}
         }
 
         // Issue move order.
         IssueMoveOrder(HitResult.Location);
         return;
     }
+}
+
+void ARTSPlayerController::IssueAttackOrder(AActor* Target)
+{
+	// Issue attack orders.
+	for (auto SelectedActor : SelectedActors)
+	{
+		// Verify pawn and owner.
+		auto SelectedPawn = Cast<APawn>(SelectedActor);
+
+		if (!SelectedPawn)
+		{
+			continue;
+		}
+
+		if (SelectedPawn->GetOwner() != this)
+		{
+			continue;
+		}
+
+		if (SelectedPawn->FindComponentByClass<URTSAttackComponent>() == nullptr)
+		{
+			continue;
+		}
+
+		// Send attack order to server.
+		ServerIssueAttackOrder(SelectedPawn, Target);
+		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
+
+		// Notify listeners.
+		NotifyOnIssuedAttackOrder(SelectedActor, Target);
+	}
+}
+
+void ARTSPlayerController::ServerIssueAttackOrder_Implementation(APawn* OrderedPawn, AActor* Target)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue attack order.
+	PawnController->IssueAttackOrder(Target);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to attack %s."), *OrderedPawn->GetName(), *Target->GetName());
+
+	// Notify listeners.
+	NotifyOnIssuedAttackOrder(OrderedPawn, Target);
+}
+
+bool ARTSPlayerController::ServerIssueAttackOrder_Validate(APawn* OrderedPawn, AActor* Target)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
 }
 
 void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
@@ -266,6 +335,11 @@ void ARTSPlayerController::MoveCameraLeftRight(float Value)
 void ARTSPlayerController::MoveCameraUpDown(float Value)
 {
     CameraUpDownAxisValue = Value;
+}
+
+void ARTSPlayerController::NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target)
+{
+	ReceiveOnIssuedAttackOrder(Actor, Target);
 }
 
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation)
