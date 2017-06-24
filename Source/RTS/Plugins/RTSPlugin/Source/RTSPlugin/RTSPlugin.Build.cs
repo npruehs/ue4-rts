@@ -2,7 +2,8 @@ namespace UnrealBuildTool.Rules
 {
 	public class RTSPlugin : ModuleRules
 	{
-		public RTSPlugin(TargetInfo Target)
+		public RTSPlugin(ReadOnlyTargetRules Target)
+            : base(Target)
 		{
             PrivateIncludePaths.AddRange(
                 new string[]
