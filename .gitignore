@@ -65,3 +65,4 @@ Source/RTS/Intermediate/
 Source/RTS/Saved/
 Source/RTS/Plugins/RTSPlugin/Binaries/
 Source/RTS/Plugins/RTSPlugin/Intermediate/
+Source/RTS/DerivedDataCache/
