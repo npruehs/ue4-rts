@@ -29,12 +29,19 @@ public:
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation);
 
+	/** Event when an actor has received a stop order. */
+	virtual void NotifyOnIssuedStopOrder(AActor* Actor);
+
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
 
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
-    void ReceiveOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocatio);
+    void ReceiveOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation);
+
+	/** Event when an actor has received a stop order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedStopOrder"))
+	void ReceiveOnIssuedStopOrder(AActor* Actor);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
@@ -71,9 +78,17 @@ private:
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& TargetLocation);
 
+	/** Orders all selected units to stop all current actions. */
+	UFUNCTION(BlueprintCallable)
+	void IssueStopOrder();
+
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
+
+	/** Orders the passed unit to stop all current actions. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueStopOrder(APawn* OrderedPawn);
 
     /** Applies horizontal axis input to camera movement. */
     void MoveCameraLeftRight(float Value);

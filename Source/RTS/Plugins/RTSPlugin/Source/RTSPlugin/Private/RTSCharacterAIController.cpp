@@ -29,3 +29,16 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
         BehaviorTreeComponent->RestartTree();
     }
 }
+
+void ARTSCharacterAIController::IssueStopOrder()
+{
+	// Update blackboard.
+	Blackboard->ClearValue("TargetLocation");
+
+	// Stop any current orders and start over.
+	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if (BehaviorTreeComponent)
+	{
+		BehaviorTreeComponent->RestartTree();
+	}
+}
