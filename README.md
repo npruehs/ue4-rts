@@ -44,3 +44,4 @@
 1. Set skeletal mesh, position, rotation, animation and capsule size as usual.
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
+1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
