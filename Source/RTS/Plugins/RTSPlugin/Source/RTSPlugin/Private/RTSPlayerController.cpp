@@ -29,6 +29,7 @@ void ARTSPlayerController::SetupInputComponent()
 	// Bind actions.
 	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::SelectActor);
 	InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
+	InputComponent->BindAction("IssueStopOrder", IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
 	InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
 
@@ -122,7 +123,7 @@ void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
     // Issue move orders.
     for (auto SelectedActor : SelectedActors)
     {
-        // Get RTS AI Controller.
+        // Verify pawn and owner.
         auto SelectedPawn = Cast<APawn>(SelectedActor);
 
         if (!SelectedPawn)
@@ -144,6 +145,33 @@ void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
     }
 }
 
+void ARTSPlayerController::IssueStopOrder()
+{
+	// Issue stop orders.
+	for (auto SelectedActor : SelectedActors)
+	{
+		// Verify pawn and owner.
+		auto SelectedPawn = Cast<APawn>(SelectedActor);
+
+		if (!SelectedPawn)
+		{
+			continue;
+		}
+
+		if (SelectedPawn->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Send stop order to server.
+		ServerIssueStopOrder(SelectedPawn);
+		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
+
+		// Notify listeners.
+		NotifyOnIssuedStopOrder(SelectedActor);
+	}
+}
+
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
 	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
@@ -162,6 +190,29 @@ void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPaw
 }
 
 bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
+}
+
+void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue stop order.
+	PawnController->IssueStopOrder();
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
+
+	// Notify listeners.
+	NotifyOnIssuedStopOrder(OrderedPawn);
+}
+
+bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
 {
 	// Verify owner to prevent cheating.
 	return OrderedPawn->GetOwner() == this;
@@ -220,6 +271,11 @@ void ARTSPlayerController::MoveCameraUpDown(float Value)
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation)
 {
     ReceiveOnIssuedMoveOrder(Actor, TargetLocation);
+}
+
+void ARTSPlayerController::NotifyOnIssuedStopOrder(AActor* Actor)
+{
+	ReceiveOnIssuedStopOrder(Actor);
 }
 
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)

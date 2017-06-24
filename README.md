@@ -45,3 +45,7 @@
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
+
+## Enabling Unit Orders
+
+1. Bind the action IssueStopOrder (e.g. to the S key).

@@ -29,6 +29,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& Location);
 
+	/** Makes the pawn stop all actions immediately. */
+	UFUNCTION(BlueprintCallable)
+	void IssueStopOrder();
+
 protected:
     virtual void BeginPlay() override;
 
