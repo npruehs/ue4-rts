@@ -71,6 +71,10 @@ private:
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& TargetLocation);
 
+	/** Orders the passed unit to move to the specified location. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
+
     /** Applies horizontal axis input to camera movement. */
     void MoveCameraLeftRight(float Value);
 

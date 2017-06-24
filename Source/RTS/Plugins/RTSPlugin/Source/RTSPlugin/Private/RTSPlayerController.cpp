@@ -130,20 +130,41 @@ void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
             continue;
         }
 
-        auto PawnController = Cast<ARTSCharacterAIController>(SelectedPawn->GetController());
+		if (SelectedPawn->GetOwner() != this)
+		{
+			continue;
+		}
 
-        if (!PawnController)
-        {
-            continue;
-        }
-
-        // Issue move order.
-        PawnController->IssueMoveOrder(TargetLocation);
-        UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
+		// Send move order to server.
+		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
+        UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
 
         // Notify listeners.
         NotifyOnIssuedMoveOrder(SelectedActor, TargetLocation);
     }
+}
+
+void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue move order.
+	PawnController->IssueMoveOrder(TargetLocation);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
+
+	// Notify listeners.
+	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
+}
+
+bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
 }
 
 void ARTSPlayerController::SelectActor()
