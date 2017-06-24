@@ -14,30 +14,35 @@
 
 void ARTSPlayerController::BeginPlay()
 {
-    Super::BeginPlay();
+    Super::BeginPlay();  
+}
 
-    // Enable mouse input.
-    APlayerController::bShowMouseCursor = true;
-    APlayerController::bEnableClickEvents = true;
-    APlayerController::bEnableMouseOverEvents = true;
+void ARTSPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
 
-    // Bind actions.
-    InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::SelectActor);
-    InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
-    InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
-    InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
+	// Enable mouse input.
+	APlayerController::bShowMouseCursor = true;
+	APlayerController::bEnableClickEvents = true;
+	APlayerController::bEnableMouseOverEvents = true;
 
-    // Get camera bounds.
-    for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-    {
-        CameraBoundsVolume = *ActorItr;
-        break;
-    }
+	// Bind actions.
+	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::SelectActor);
+	InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
+	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
+	InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
 
-    if (!CameraBoundsVolume)
-    {
-        UE_LOG(RTSLog, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
-    }
+	// Get camera bounds.
+	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		CameraBoundsVolume = *ActorItr;
+		break;
+	}
+
+	if (!CameraBoundsVolume)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
+	}
 }
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)

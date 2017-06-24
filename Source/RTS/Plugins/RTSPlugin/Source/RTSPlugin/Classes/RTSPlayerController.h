@@ -44,7 +44,8 @@ public:
 
 protected:
     virtual void BeginPlay() override;
-	
+	virtual void SetupInputComponent() override;
+
 private:
     /** Volume that restricts the camera movement of this player. */
     ARTSCameraBoundsVolume* CameraBoundsVolume;
