@@ -10,6 +10,7 @@
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
 #include "RTSCameraBoundsVolume.h"
+#include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSSelectableComponent.h"
 
@@ -57,6 +58,13 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 
 	// Notify listeners.
 	NotifyOnActorOwnerChanged(Actor);
+
+	ARTSCharacter* Character = Cast<ARTSCharacter>(Actor);
+
+	if (Character)
+	{
+		Character->NotifyOnOwnerChanged(this);
+	}
 }
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)

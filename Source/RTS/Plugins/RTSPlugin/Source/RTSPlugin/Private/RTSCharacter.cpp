@@ -125,6 +125,11 @@ void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
 	ReceiveOnKilled(PreviousOwner);
 }
 
+void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
+{
+	ReceiveOnOwnerChanged(NewOwner);
+}
+
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)
 {
 	ReceiveOnUsedAttack(Attack, Target);

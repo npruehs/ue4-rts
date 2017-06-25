@@ -30,6 +30,9 @@ public:
 	/** Event when the character has been killed. */
 	virtual void NotifyOnKilled(AController* PreviousOwner);
 
+	/** Event when the character is owned by a different player. */
+	virtual void NotifyOnOwnerChanged(AController* NewOwner);
+
 	/** Event when a character has used an attack. */
 	virtual void NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target);
 
@@ -44,6 +47,10 @@ public:
 	/** Event when the character has been killed. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnKilled"))
 	void ReceiveOnKilled(AController* PreviousOwner);
+
+	/** Event when the character is owned by a different player. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnOwnerChanged"))
+	void ReceiveOnOwnerChanged(AController* NewOwner);
 
 	/** Event when a character has used an attack. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnUsedAttack"))
