@@ -6,7 +6,7 @@
 
 
 USTRUCT(BlueprintType)
-struct FAttackData
+struct FRTSAttackData
 {
 	GENERATED_USTRUCT_BODY()
 

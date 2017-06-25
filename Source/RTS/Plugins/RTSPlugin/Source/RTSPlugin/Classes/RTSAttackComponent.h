@@ -21,5 +21,5 @@ class URTSAttackComponent : public UActorComponent
 public:
 	/** Attacks available for the actor. Different attacks might be used at different ranges, or against different types of targets. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<FAttackData> Attacks;
+	TArray<FRTSAttackData> Attacks;
 };
