@@ -45,13 +45,18 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
+	float OldHealth = HealthComponent->CurrentHealth;
 	HealthComponent->CurrentHealth -= Damage;
-	
+	float NewHealth = HealthComponent->CurrentHealth;
+
 	UE_LOG(RTSLog, Log, TEXT("Character %s has taken %f damage from %s, reducing health to %f."),
 		*GetName(),
 		Damage,
 		*DamageCauser->GetName(),
 		HealthComponent->CurrentHealth);
+
+	// Notify listeners.
+	NotifyOnHealthChanged(OldHealth, NewHealth);
 
 	// Check if we've just died.
 	if (HealthComponent->CurrentHealth <= 0)
@@ -89,7 +94,7 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 	}
 
 	// Use attack.
-	UE_LOG(RTSLog, Log, TEXT("Actor %s attacks %s."), *GetName(), *Target->GetName());
+	UE_LOG(RTSLog, Log, TEXT("Character %s attacks %s."), *GetName(), *Target->GetName());
 
 	const FRTSAttackData& Attack = AttackComponent->Attacks[0];
 	Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), GetController(), this);
@@ -101,12 +106,17 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 	NotifyOnUsedAttack(Attack, Target);
 }
 
-void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)
-{
-	ReceiveOnUsedAttack(Attack, Target);
-}
-
 void ARTSCharacter::NotifyOnCooldownReady()
 {
 	ReceiveOnCooldownReady();
+}
+
+void ARTSCharacter::NotifyOnHealthChanged(float OldHealth, float NewHealth)
+{
+	ReceiveOnHealthChanged(OldHealth, NewHealth);
+}
+
+void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)
+{
+	ReceiveOnUsedAttack(Attack, Target);
 }
