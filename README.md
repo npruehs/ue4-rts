@@ -40,7 +40,7 @@
 
 ## Adding Units
 
-1. Create a new Character blueprint.
+1. Create a new RTSCharacter blueprint.
 1. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual.
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
@@ -49,3 +49,12 @@
 ## Enabling Unit Orders
 
 1. Bind the action IssueStopOrder (e.g. to the S key).
+
+## Setup Up Attacks
+
+1. Add the RTSAttackableComponent and RTSHealthComponent to any actors that can be attacked.
+1. Set the Current Health and Maximum Health properties of the RTSHealthComponent for these actors.
+1. Add the RTSAttackComponent to any actors than can attack.
+1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage and Range.
+
+_Setting the Damage Type is optional. Remaining Cooldown is handled by the framework and just exposed for scripting purposes._
