@@ -25,6 +25,10 @@ public:
     UBlackboardData* CharacterBlackboardAsset;
 
 
+	/** Makes the pawn attack the specified target. */
+	UFUNCTION(BlueprintCallable)
+	void IssueAttackOrder(AActor* Target);
+
     /** Makes the pawn move towards the specified location. */
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& Location);
