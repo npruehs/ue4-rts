@@ -22,6 +22,14 @@ void ARTSCharacter::Tick(float DeltaSeconds)
 	if (AttackComponent && AttackComponent->RemainingCooldown > 0)
 	{
 		AttackComponent->RemainingCooldown -= DeltaSeconds;
+
+		if (AttackComponent->RemainingCooldown <= 0)
+		{
+			UE_LOG(RTSLog, Log, TEXT("Character %s attack is ready again."), *GetName());
+
+			// Notify listeners.
+			NotifyOnCooldownReady();
+		}
 	}
 }
 
@@ -96,4 +104,9 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)
 {
 	ReceiveOnUsedAttack(Attack, Target);
+}
+
+void ARTSCharacter::NotifyOnCooldownReady()
+{
+	ReceiveOnCooldownReady();
 }
