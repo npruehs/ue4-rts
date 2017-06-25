@@ -3,7 +3,7 @@
 ## Setting Up The Framewok
 
 1. Create a player controller deriving from RTSPlayerController.
-1. Create a game mode using that player controller. Compile and save.
+1. Create a game mode deriving from RTSGameMode using that player controller. Compile and save.
 1. Use the new game mode in the world settings.
 1. Create a controller deriving from RTSCharacterAIController.
 1. Set the Character Behavior Tree Asset of the new controller to RTSCharacterBehaviorTree.
@@ -48,6 +48,7 @@
 
 ## Enabling Unit Orders
 
+1. Bind the action IssueOrder (e.g. to the right mouse button). This will enable typical smart orders, such as moving when right-clicking ground, and attacking when right-clicking enemies.
 1. Bind the action IssueStopOrder (e.g. to the S key).
 
 ## Setup Up Attacks
@@ -58,3 +59,8 @@
 1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage and Range.
 
 _Setting the Damage Type is optional. Remaining Cooldown is handled by the framework and just exposed for scripting purposes._
+
+## Setup Victory Conditions
+
+1. Set the Initial Actors for your RTSGameMode. This will spawn initial units for each player at their player start.
+1. Optionally, set the Defeat Condition Actor type for your RTSGameMode. This will check whether any actors of the specified type exist for a player whenever he or she loses a unit. If no actor of the specified type remains, the player is defeated. Note that it is up to you to define how defeated players should be handled, e.g. whether you've making a 1v1, FFA or team game.
