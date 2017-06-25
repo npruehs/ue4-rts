@@ -1,7 +1,10 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSCharacter.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "RTSAttackComponent.h"
+#include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
 
 
@@ -45,8 +48,20 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	// Check if we've just died.
 	if (HealthComponent->CurrentHealth <= 0)
 	{
+		// Get owner before destruction.
+		AController* Owner = Cast<AController>(GetOwner());
+
+		// Destroy this actor.
 		Destroy();
 		UE_LOG(RTSLog, Log, TEXT("Character %s has been killed."), *GetName());
+
+		// Notify game mode.
+		ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+		if (GameMode != nullptr)
+		{
+			GameMode->NotifyOnCharacterKilled(this, Owner);
+		}
 	}
 
 	return ActualDamage;
@@ -66,10 +81,10 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 	}
 
 	// Use attack.
+	UE_LOG(RTSLog, Log, TEXT("Actor %s attacks %s."), *GetName(), *Target->GetName());
+
 	const FRTSAttackData& Attack = AttackComponent->Attacks[0];
 	Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), GetController(), this);
-
-	UE_LOG(RTSLog, Log, TEXT("Actor %s attacked %s."), *GetName(), *Target->GetName());
 
 	// Start cooldown timer.
 	AttackComponent->RemainingCooldown = Attack.Cooldown;

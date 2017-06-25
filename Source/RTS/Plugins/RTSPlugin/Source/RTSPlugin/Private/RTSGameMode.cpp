@@ -4,6 +4,8 @@
 #include "Engine/World.h"
 #include "GameFramework/GameModeBase.h"
 
+#include "RTSCharacter.h"
+
 
 void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot)
 {
@@ -48,4 +50,30 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 			UE_LOG(RTSLog, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *NewPlayer->GetName(), *SpawnLocation.ToString());
 		}
 	}
+}
+
+void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController* Owner)
+{
+	if (DefeatConditionActor == nullptr)
+	{
+		return;
+	}
+
+	AController* OwningPlayer = Cast<AController>(Owner);
+
+	if (OwningPlayer == nullptr)
+	{
+		return;
+	}
+
+	// Check if any required actors are still alive.
+	for (AActor* OwnedActor : OwningPlayer->Children)
+	{
+		if (OwnedActor->GetClass() == DefeatConditionActor)
+		{
+			return;
+		}
+	}
+
+	UE_LOG(RTSLog, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *OwningPlayer->GetName(), *DefeatConditionActor->GetName());
 }

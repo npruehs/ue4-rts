@@ -6,6 +6,10 @@
 
 #include "RTSGameMode.generated.h"
 
+
+class ARTSCharacter;
+
+
 /**
 * Game mode with RTS features, such as spawning initial units for each player.
 */
@@ -19,6 +23,14 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	TArray<TSubclassOf<AActor>> InitialActors;
 
+	/** Optional type of actor that is required for a player to be alive. As soon as no actor of the specified type is alive, the player is defeated. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	TSubclassOf<AActor> DefeatConditionActor;
+
 
 	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
+
+
+	/** Event when a character has been killed. */
+	virtual void NotifyOnCharacterKilled(ARTSCharacter* Character, AController* Owner);
 };
