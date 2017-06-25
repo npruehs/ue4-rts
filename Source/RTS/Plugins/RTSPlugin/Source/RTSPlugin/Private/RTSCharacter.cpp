@@ -61,12 +61,13 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	// Check if we've just died.
 	if (HealthComponent->CurrentHealth <= 0)
 	{
+		UE_LOG(RTSLog, Log, TEXT("Character %s has been killed."), *GetName());
+
 		// Get owner before destruction.
 		AController* Owner = Cast<AController>(GetOwner());
 
 		// Destroy this actor.
 		Destroy();
-		UE_LOG(RTSLog, Log, TEXT("Character %s has been killed."), *GetName());
 
 		// Notify game mode.
 		ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -75,6 +76,9 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		{
 			GameMode->NotifyOnCharacterKilled(this, Owner);
 		}
+
+		// Notify listeners.
+		NotifyOnKilled(Owner);
 	}
 
 	return ActualDamage;
@@ -114,6 +118,11 @@ void ARTSCharacter::NotifyOnCooldownReady()
 void ARTSCharacter::NotifyOnHealthChanged(float OldHealth, float NewHealth)
 {
 	ReceiveOnHealthChanged(OldHealth, NewHealth);
+}
+
+void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
+{
+	ReceiveOnKilled(PreviousOwner);
 }
 
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)

@@ -26,6 +26,9 @@ public:
 
 	/** Event when the current health of the character has changed. */
 	virtual void NotifyOnHealthChanged(float OldHealth, float NewHealth);
+	
+	/** Event when the character has been killed. */
+	virtual void NotifyOnKilled(AController* PreviousOwner);
 
 	/** Event when a character has used an attack. */
 	virtual void NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target);
@@ -37,6 +40,10 @@ public:
 	/** Event when the current health of the character has changed. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnHealthChanged"))
 	void ReceiveOnHealthChanged(float OldHealth, float NewHealth);
+
+	/** Event when the character has been killed. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnKilled"))
+	void ReceiveOnKilled(AController* PreviousOwner);
 
 	/** Event when a character has used an attack. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnUsedAttack"))
