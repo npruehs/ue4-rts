@@ -22,6 +22,14 @@ void ARTSCharacter::Tick(float DeltaSeconds)
 	if (AttackComponent && AttackComponent->RemainingCooldown > 0)
 	{
 		AttackComponent->RemainingCooldown -= DeltaSeconds;
+
+		if (AttackComponent->RemainingCooldown <= 0)
+		{
+			UE_LOG(RTSLog, Log, TEXT("Character %s attack is ready again."), *GetName());
+
+			// Notify listeners.
+			NotifyOnCooldownReady();
+		}
 	}
 }
 
@@ -37,23 +45,29 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
+	float OldHealth = HealthComponent->CurrentHealth;
 	HealthComponent->CurrentHealth -= Damage;
-	
+	float NewHealth = HealthComponent->CurrentHealth;
+
 	UE_LOG(RTSLog, Log, TEXT("Character %s has taken %f damage from %s, reducing health to %f."),
 		*GetName(),
 		Damage,
 		*DamageCauser->GetName(),
 		HealthComponent->CurrentHealth);
 
+	// Notify listeners.
+	NotifyOnHealthChanged(OldHealth, NewHealth);
+
 	// Check if we've just died.
 	if (HealthComponent->CurrentHealth <= 0)
 	{
+		UE_LOG(RTSLog, Log, TEXT("Character %s has been killed."), *GetName());
+
 		// Get owner before destruction.
 		AController* Owner = Cast<AController>(GetOwner());
 
 		// Destroy this actor.
 		Destroy();
-		UE_LOG(RTSLog, Log, TEXT("Character %s has been killed."), *GetName());
 
 		// Notify game mode.
 		ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -62,6 +76,9 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		{
 			GameMode->NotifyOnCharacterKilled(this, Owner);
 		}
+
+		// Notify listeners.
+		NotifyOnKilled(Owner);
 	}
 
 	return ActualDamage;
@@ -81,7 +98,7 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 	}
 
 	// Use attack.
-	UE_LOG(RTSLog, Log, TEXT("Actor %s attacks %s."), *GetName(), *Target->GetName());
+	UE_LOG(RTSLog, Log, TEXT("Character %s attacks %s."), *GetName(), *Target->GetName());
 
 	const FRTSAttackData& Attack = AttackComponent->Attacks[0];
 	Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), GetController(), this);
@@ -91,6 +108,26 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 
 	// Notify listeners.
 	NotifyOnUsedAttack(Attack, Target);
+}
+
+void ARTSCharacter::NotifyOnCooldownReady()
+{
+	ReceiveOnCooldownReady();
+}
+
+void ARTSCharacter::NotifyOnHealthChanged(float OldHealth, float NewHealth)
+{
+	ReceiveOnHealthChanged(OldHealth, NewHealth);
+}
+
+void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
+{
+	ReceiveOnKilled(PreviousOwner);
+}
+
+void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
+{
+	ReceiveOnOwnerChanged(NewOwner);
 }
 
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)

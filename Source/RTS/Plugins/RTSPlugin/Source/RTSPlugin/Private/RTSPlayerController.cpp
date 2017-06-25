@@ -10,6 +10,7 @@
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
 #include "RTSCameraBoundsVolume.h"
+#include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSSelectableComponent.h"
 
@@ -45,6 +46,24 @@ void ARTSPlayerController::SetupInputComponent()
 	if (!CameraBoundsVolume)
 	{
 		UE_LOG(RTSLog, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
+	}
+}
+
+void ARTSPlayerController::TransferOwnership(AActor* Actor)
+{
+	// Set owning player.
+	Actor->SetOwner(this);
+
+	UE_LOG(RTSLog, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
+
+	// Notify listeners.
+	NotifyOnActorOwnerChanged(Actor);
+
+	ARTSCharacter* Character = Cast<ARTSCharacter>(Actor);
+
+	if (Character)
+	{
+		Character->NotifyOnOwnerChanged(this);
 	}
 }
 
@@ -335,6 +354,11 @@ void ARTSPlayerController::MoveCameraLeftRight(float Value)
 void ARTSPlayerController::MoveCameraUpDown(float Value)
 {
     CameraUpDownAxisValue = Value;
+}
+
+void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
+{
+	ReceiveOnActorOwnerChanged(Actor);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target)

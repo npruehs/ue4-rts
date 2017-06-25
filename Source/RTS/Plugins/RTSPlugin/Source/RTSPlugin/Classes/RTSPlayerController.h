@@ -26,6 +26,13 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     int CameraScrollThreshold;
 
+
+	virtual void PlayerTick(float DeltaTime) override;
+
+	
+	/** Event when this player is now owning the specified actor. */
+	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
+
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target);
 
@@ -37,6 +44,10 @@ public:
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
+
+	/** Event when this player is now owning the specified actor. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Ownership", meta = (DisplayName = "OnActorOwnerChanged"))
+	void ReceiveOnActorOwnerChanged(AActor* Actor);
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
@@ -54,7 +65,10 @@ public:
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
     void ReceiveOnSelectionChanged(const TArray<AActor*>& Selection);
 
-    virtual void PlayerTick(float DeltaTime) override;
+
+	/** Sets this player as the owner of the specified actor. */
+	UFUNCTION(BlueprintCallable)
+	void TransferOwnership(AActor* Actor);
 
 protected:
     virtual void BeginPlay() override;

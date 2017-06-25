@@ -5,6 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 
 #include "RTSCharacter.h"
+#include "RTSPlayerController.h"
 
 
 void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot)
@@ -41,13 +42,14 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 
 		// Spawn actor.
 		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ActorClass, SpawnTransform, SpawnInfo);
+		ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(NewPlayer);
 
-		if (SpawnedActor)
+		if (SpawnedActor && PlayerController)
 		{
-			// Set owning player.
-			SpawnedActor->SetOwner(NewPlayer);
-
 			UE_LOG(RTSLog, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *NewPlayer->GetName(), *SpawnLocation.ToString());
+
+			// Set owning player.
+			PlayerController->TransferOwnership(SpawnedActor);
 		}
 	}
 }
@@ -59,7 +61,7 @@ void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController
 		return;
 	}
 
-	AController* OwningPlayer = Cast<AController>(Owner);
+	APlayerController* OwningPlayer = Cast<APlayerController>(Owner);
 
 	if (OwningPlayer == nullptr)
 	{
@@ -76,4 +78,12 @@ void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController
 	}
 
 	UE_LOG(RTSLog, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *OwningPlayer->GetName(), *DefeatConditionActor->GetName());
+
+	// Notify listeners.
+	NotifyOnPlayerDefeated(OwningPlayer);
+}
+
+void ARTSGameMode::NotifyOnPlayerDefeated(APlayerController* Player)
+{
+	ReceiveOnPlayerDefeated(Player);
 }
