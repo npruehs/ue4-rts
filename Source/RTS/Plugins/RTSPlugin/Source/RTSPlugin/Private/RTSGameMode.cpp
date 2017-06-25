@@ -5,6 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 
 #include "RTSCharacter.h"
+#include "RTSPlayerController.h"
 
 
 void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot)
@@ -41,13 +42,14 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 
 		// Spawn actor.
 		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ActorClass, SpawnTransform, SpawnInfo);
+		ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(NewPlayer);
 
-		if (SpawnedActor)
+		if (SpawnedActor && PlayerController)
 		{
-			// Set owning player.
-			SpawnedActor->SetOwner(NewPlayer);
-
 			UE_LOG(RTSLog, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *NewPlayer->GetName(), *SpawnLocation.ToString());
+
+			// Set owning player.
+			PlayerController->TransferOwnership(SpawnedActor);
 		}
 	}
 }

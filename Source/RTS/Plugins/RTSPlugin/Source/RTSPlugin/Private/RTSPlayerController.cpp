@@ -48,6 +48,17 @@ void ARTSPlayerController::SetupInputComponent()
 	}
 }
 
+void ARTSPlayerController::TransferOwnership(AActor* Actor)
+{
+	// Set owning player.
+	Actor->SetOwner(this);
+
+	UE_LOG(RTSLog, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
+
+	// Notify listeners.
+	NotifyOnActorOwnerChanged(Actor);
+}
+
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)
 {
     UWorld* World = GetWorld();
@@ -335,6 +346,11 @@ void ARTSPlayerController::MoveCameraLeftRight(float Value)
 void ARTSPlayerController::MoveCameraUpDown(float Value)
 {
     CameraUpDownAxisValue = Value;
+}
+
+void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
+{
+	ReceiveOnActorOwnerChanged(Actor);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target)
