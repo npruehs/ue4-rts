@@ -61,7 +61,7 @@ void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController
 		return;
 	}
 
-	AController* OwningPlayer = Cast<AController>(Owner);
+	APlayerController* OwningPlayer = Cast<APlayerController>(Owner);
 
 	if (OwningPlayer == nullptr)
 	{
@@ -78,4 +78,12 @@ void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController
 	}
 
 	UE_LOG(RTSLog, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *OwningPlayer->GetName(), *DefeatConditionActor->GetName());
+
+	// Notify listeners.
+	NotifyOnPlayerDefeated(OwningPlayer);
+}
+
+void ARTSGameMode::NotifyOnPlayerDefeated(APlayerController* Player)
+{
+	ReceiveOnPlayerDefeated(Player);
 }

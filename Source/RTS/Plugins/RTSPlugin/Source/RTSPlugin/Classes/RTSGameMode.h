@@ -33,4 +33,11 @@ public:
 
 	/** Event when a character has been killed. */
 	virtual void NotifyOnCharacterKilled(ARTSCharacter* Character, AController* Owner);
+
+	/** Event when a player has been defeated. */
+	virtual void NotifyOnPlayerDefeated(APlayerController* Player);
+
+	/** Event when a player has been defeated. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnPlayerDefeated"))
+	void ReceiveOnPlayerDefeated(APlayerController* Player);
 };
