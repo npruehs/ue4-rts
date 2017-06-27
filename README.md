@@ -128,5 +128,5 @@ Finally, [open a pull request](https://help.github.com/articles/creating-a-pull-
 
 Real-Time Strategy Plugin for Unreal Engine 4 is dual-licensed:
 
-* everything beneatch Source\RTS\Content\StarterContent is governed by the [Unreal® Engine End User License Agreement](https://www.unrealengine.com/eula) 
+* everything beneath Source\RTS\Content\StarterContent is governed by the [Unreal® Engine End User License Agreement](https://www.unrealengine.com/eula) 
 * everything else is released under the [MIT License](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE)
