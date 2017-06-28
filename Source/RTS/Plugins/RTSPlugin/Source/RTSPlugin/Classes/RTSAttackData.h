@@ -2,6 +2,8 @@
 
 #include "RTSPluginPrivatePCH.h"
 
+#include "RTSProjectile.h"
+
 #include "RTSAttackData.generated.h"
 
 
@@ -26,4 +28,8 @@ public:
 	/** Range of this attack, in cm. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
 	float Range;
+
+	/** Type of the projectile to spawn. If not set, damage will be dealt instantly. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
+	TSubclassOf<class ARTSProjectile> ProjectileType;
 };

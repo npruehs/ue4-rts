@@ -6,6 +6,7 @@
 #include "RTSAttackComponent.h"
 #include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
+#include "RTSProjectile.h"
 
 
 void ARTSCharacter::BeginPlay()
@@ -101,13 +102,44 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 	UE_LOG(RTSLog, Log, TEXT("Character %s attacks %s."), *GetName(), *Target->GetName());
 
 	const FRTSAttackData& Attack = AttackComponent->Attacks[0];
-	Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), GetController(), this);
+
+	ARTSProjectile* SpawnedProjectile = nullptr;
+
+	if (Attack.ProjectileType != nullptr)
+	{
+		// Fire projectile.
+		// Build spawn transform.
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
+
+		// Build spawn info.
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.Instigator = this;
+		SpawnInfo.ObjectFlags |= RF_Transient;
+
+		// Spawn projectile.
+		SpawnedProjectile = GetWorld()->SpawnActor<ARTSProjectile>(Attack.ProjectileType, SpawnTransform, SpawnInfo);
+
+		if (SpawnedProjectile)
+		{
+			UE_LOG(RTSLog, Log, TEXT("%s fired projectile %s at target %s."), *GetName(), *SpawnedProjectile->GetName(), *Target->GetName());
+
+			// Aim at target.
+			SpawnedProjectile->FireAt(Target, Attack.Damage, Attack.DamageType, GetController(), this);
+		}
+	}
+	else
+	{
+		// Deal damage immediately.
+		Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), GetController(), this);
+	}
 
 	// Start cooldown timer.
 	AttackComponent->RemainingCooldown = Attack.Cooldown;
 
 	// Notify listeners.
-	NotifyOnUsedAttack(Attack, Target);
+	NotifyOnUsedAttack(Attack, Target, SpawnedProjectile);
 }
 
 void ARTSCharacter::NotifyOnCooldownReady()
@@ -130,7 +162,7 @@ void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
 	ReceiveOnOwnerChanged(NewOwner);
 }
 
-void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target)
+void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile)
 {
-	ReceiveOnUsedAttack(Attack, Target);
+	ReceiveOnUsedAttack(Attack, Target, Projectile);
 }

@@ -9,6 +9,7 @@
 #include "RTSCharacter.generated.h"
 
 
+class ARTSProjectile;
 class URTSAttackComponent;
 
 
@@ -34,7 +35,7 @@ public:
 	virtual void NotifyOnOwnerChanged(AController* NewOwner);
 
 	/** Event when a character has used an attack. */
-	virtual void NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target);
+	virtual void NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile);
 
 	/** Event when the attack cooldown has expired. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnCooldownReady"))
@@ -54,7 +55,7 @@ public:
 
 	/** Event when a character has used an attack. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnUsedAttack"))
-	void ReceiveOnUsedAttack(const FRTSAttackData& Attack, AActor* Target);
+	void ReceiveOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile);
 
 
 	virtual void Tick(float DeltaSeconds) override;
