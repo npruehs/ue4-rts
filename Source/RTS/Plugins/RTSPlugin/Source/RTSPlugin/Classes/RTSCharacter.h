@@ -22,6 +22,11 @@ class ARTSCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+	/** Uses the passed attack on the specified target and starts the cooldown timer. */
+	UFUNCTION(BlueprintCallable)
+	void UseAttack(int AttackIndex, AActor* Target);
+
+
 	/** Event when the attack cooldown has expired. */
 	virtual void NotifyOnCooldownReady();
 
@@ -67,9 +72,4 @@ protected:
 private:
 	/** Attack data of this character. */
 	URTSAttackComponent* AttackComponent;
-
-
-	/** Uses the passed attack on the specified target and starts the cooldown timer. */
-	UFUNCTION(BlueprintCallable)
-	void UseAttack(int AttackIndex, AActor* Target);
 };

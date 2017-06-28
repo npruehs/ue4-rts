@@ -29,7 +29,20 @@ public:
 
 	virtual void PlayerTick(float DeltaTime) override;
 
-	
+
+	/** Orders all selected units to attack the specified unit. */
+	UFUNCTION(BlueprintCallable)
+	void IssueAttackOrder(AActor* Target);
+
+	/** Orders all selected units to move to the specified location. */
+	UFUNCTION(BlueprintCallable)
+	void IssueMoveOrder(const FVector& TargetLocation);
+
+	/** Orders all selected units to stop all current actions. */
+	UFUNCTION(BlueprintCallable)
+	void IssueStopOrder();
+
+
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
 
@@ -94,18 +107,6 @@ private:
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
     void IssueOrder();
-
-	/** Orders all selected units to attack the specified unit. */
-	UFUNCTION(BlueprintCallable)
-	void IssueAttackOrder(AActor* Target);
-
-    /** Orders all selected units to move to the specified location. */
-    UFUNCTION(BlueprintCallable)
-    void IssueMoveOrder(const FVector& TargetLocation);
-
-	/** Orders all selected units to stop all current actions. */
-	UFUNCTION(BlueprintCallable)
-	void IssueStopOrder();
 
 	/** Orders the passed unit to attack the specified unit. */
 	UFUNCTION(Reliable, Server, WithValidation)
