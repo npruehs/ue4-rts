@@ -8,6 +8,7 @@
 
 
 class ARTSCharacter;
+class ARTSPlayerStart;
 
 
 /**
@@ -27,7 +28,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	TSubclassOf<AActor> DefeatConditionActor;
 
+	ARTSPlayerStart* FindRTSPlayerStart(AController* Player);
 
+	virtual void RestartPlayer(AController* NewPlayer) override;
 	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 
 

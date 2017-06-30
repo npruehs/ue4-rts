@@ -36,7 +36,7 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 
 ### Creating Maps
 
-1. Add PlayerStarts to the map.
+1. Add RTSPlayerStarts to the map.
 1. Add RTSCameraBoundsVolume to the map.
 1. Add a NavMeshBoundsVolume to the map, and build Navigation. You may press P to review your results in the viewport.
 
@@ -52,7 +52,7 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 
 1. Create a RTSPlayerPawn blueprint.
 1. Add a Camera component.
-1. Set the Location of the Camera component as desired (e.g. X = 0, Y = 0, Z = 600).
+1. Set the Location of the Camera component as desired (e.g. X = 0, Y = 0, Z = 1500).
 1. Set the Rotation of the Camera component as desired (e.g. X = 0, Y = 270, Z = 0).
 1. Use the RTSPlayerPawn as default pawn in your game mode.
 
@@ -60,13 +60,14 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 
 1. Bind the axis MoveCameraLeftRight (e.g. to Left and Right keys).
 1. Bind the axis MoveCameraUpDown (e.g. to Up and Down keys).
-1. At your RTSPlayerController, set the CameraSpeed (e.g. to 500).
-1. At your RTSPlayerController, set the CameraScrollThreshold (e.g. to 10).
+1. At your RTSPlayerController, set the CameraSpeed (e.g. to 1000).
+1. At your RTSPlayerController, set the CameraScrollThreshold (e.g. to 20).
 
 ### Adding Units
 
 1. Create a new RTSCharacter blueprint.
 1. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual.
+1. At the CharacterMovement component, you may set the Max Acceleration property to a high value to avoid stuttering when changing move orders.
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
@@ -81,9 +82,16 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Add the RTSAttackableComponent and RTSHealthComponent to any actors that can be attacked.
 1. Set the Current Health and Maximum Health properties of the RTSHealthComponent for these actors.
 1. Add the RTSAttackComponent to any actors than can attack.
-1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage and Range.
+1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage, Range, Acquisition Radius and Chase Radius.
 
 _Setting the Damage Type is optional. Remaining Cooldown is handled by the framework and just exposed for scripting purposes._
+
+### Adding Projectiles
+
+1. Create a new RTSProjectile blueprint.
+1. Set the Impact Threshold property.
+1. Set the Replicates property to true (this might change in the future, as we don't really care about exact projectile positions on client-side).
+1. For all RTSAttackComponents that should use this projectile, reference the new projectile.
 
 ### Setup Victory Conditions
 

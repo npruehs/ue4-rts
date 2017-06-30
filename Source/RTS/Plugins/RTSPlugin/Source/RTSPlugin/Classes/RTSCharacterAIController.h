@@ -7,6 +7,9 @@
 #include "RTSCharacterAIController.generated.h"
 
 
+class URTSAttackComponent;
+
+
 /**
 * AI controller that drives RTS unit movement and orders.
 */
@@ -25,6 +28,10 @@ public:
     UBlackboardData* CharacterBlackboardAsset;
 
 
+	/** Makes the pawn look for a feasible target in its acquisition radius. */
+	UFUNCTION(BlueprintCallable)
+	void FindTargetInAcquisitionRadius();
+
 	/** Makes the pawn attack the specified target. */
 	UFUNCTION(BlueprintCallable)
 	void IssueAttackOrder(AActor* Target);
@@ -38,6 +45,10 @@ public:
 	void IssueStopOrder();
 
 protected:
-    virtual void BeginPlay() override;
+	virtual void Possess(APawn* InPawn) override;
 
+private:
+	URTSAttackComponent* AttackComponent;
+
+	bool TraceSphere(const FVector& Location, const float Radius, AActor* ActorToIgnore, ECollisionChannel TraceChannel, TArray<struct FHitResult>& OutHitResults);
 };

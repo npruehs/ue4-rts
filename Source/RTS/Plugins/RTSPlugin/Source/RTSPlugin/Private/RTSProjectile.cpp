@@ -44,7 +44,7 @@ void ARTSProjectile::FireAt(AActor* Target, float Damage, TSubclassOf<class UDam
 
 void ARTSProjectile::Tick(float DeltaSeconds)
 {
-	if (!Target)
+	if (!IsValid(Target))
 	{
 		return;
 	}
