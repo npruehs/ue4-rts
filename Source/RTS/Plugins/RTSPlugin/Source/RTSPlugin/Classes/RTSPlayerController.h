@@ -100,9 +100,18 @@ private:
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
 
+	/** Mouse position on screen when creating the selection frame started. */
+	FVector2D SelectionFrameMouseStartPosition;
 
-    /** Casts a ray from the current pointer position and collects the results. */
+	/** Mouse position on screen when creating the selection frame ended. */
+	FVector2D SelectionFrameMouseEndPosition;
+
+
+    /** Casts a ray from the current mouse position and collects the results. */
     bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
+	
+	/** Casts a box from the current selection frame and collects the results. */
+	bool GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults);
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
@@ -126,7 +135,11 @@ private:
     /** Applies vertical axis input to camera movement. */
     void MoveCameraUpDown(float Value);
 
-    /** Selects the first selectable actor at the current pointer position. */
+    /** Remembers the current mouse position for multi-selection, finished by FinishSelectActors. */
     UFUNCTION()
-    void SelectActor();
+    void StartSelectActors();
+
+	/** Selects all selectable actors within the created selection frame, started by StartSelectActors. */
+	UFUNCTION()
+	void FinishSelectActors();
 };
