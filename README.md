@@ -46,6 +46,12 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Add SelectableComponents to everything selectable.
 1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController.
 
+### Showing Selection Frames
+
+1. Create a new HUD deriving from RTSHUD.
+1. Create a new selection frame material and set the RTSHUD reference.
+1. Use the new RTSHUD in your game mode.
+
 ### Setting Up The Camera
 
 #### Creating The Camera

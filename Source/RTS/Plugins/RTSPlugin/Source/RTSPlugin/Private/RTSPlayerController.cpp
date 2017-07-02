@@ -30,7 +30,8 @@ void ARTSPlayerController::SetupInputComponent()
 	APlayerController::bEnableMouseOverEvents = true;
 
 	// Bind actions.
-	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::SelectActor);
+	InputComponent->BindAction("Select", IE_Pressed, this, &ARTSPlayerController::StartSelectActors);
+	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::FinishSelectActors);
 	InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
 	InputComponent->BindAction("IssueStopOrder", IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
@@ -65,6 +66,29 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 	{
 		Character->NotifyOnOwnerChanged(this);
 	}
+}
+
+bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
+{
+	if (!bCreatingSelectionFrame)
+	{
+		return false;
+	}
+
+	// Get mouse input.
+	float MouseX;
+	float MouseY;
+
+	if (!GetMousePosition(MouseX, MouseY))
+	{
+		return false;
+	}
+
+	OutSelectionFrame = FIntRect(
+		FIntPoint(SelectionFrameMouseStartPosition.X, SelectionFrameMouseStartPosition.Y),
+		FIntPoint(MouseX, MouseY));
+
+	return true;
 }
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)
@@ -107,6 +131,51 @@ bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitRe
         WorldOrigin,
         WorldOrigin + WorldDirection * HitResultTraceDistance,
         Params);
+}
+
+bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults)
+{
+	UWorld* World = GetWorld();
+
+	if (!World)
+	{
+		return false;
+	}
+
+	// Get selection frame.
+	FIntRect SelectionFrame;
+	
+	if (!GetSelectionFrame(SelectionFrame))
+	{
+		return false;
+	}
+
+	if (SelectionFrame.Area() < 10)
+	{
+		// Selection frame too small - just consider left-click.
+		return GetObjectsAtPointerPosition(HitResults);
+	}
+
+	// Iterate all characters.
+	HitResults.Reset();
+
+	for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
+	{
+		ARTSCharacter* Character = *CharacterIt;
+
+		FVector2D CharacterScreenPosition;
+
+		if (UGameplayStatics::ProjectWorldToScreen(this, Character->GetActorLocation(), CharacterScreenPosition))
+		{
+			if (SelectionFrame.Contains(FIntPoint(CharacterScreenPosition.X, CharacterScreenPosition.Y)))
+			{
+				FHitResult HitResult(Character, nullptr, Character->GetActorLocation(), FVector());
+				HitResults.Add(HitResult);
+			}
+		}
+	}
+
+	return HitResults.Num() > 0;
 }
 
 void ARTSPlayerController::IssueOrder()
@@ -306,13 +375,27 @@ bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
 	return OrderedPawn->GetOwner() == this;
 }
 
-void ARTSPlayerController::SelectActor()
+void ARTSPlayerController::StartSelectActors()
+{
+	// Get mouse input.
+	float MouseX;
+	float MouseY;
+
+	if (GetMousePosition(MouseX, MouseY))
+	{
+		SelectionFrameMouseStartPosition = FVector2D(MouseX, MouseY);
+		bCreatingSelectionFrame = true;
+	}
+}
+
+void ARTSPlayerController::FinishSelectActors()
 {
     // Get objects at pointer position.
     TArray<FHitResult> HitResults;
     
-    if (!GetObjectsAtPointerPosition(HitResults))
+    if (!GetObjectsInSelectionFrame(HitResults))
     {
+		bCreatingSelectionFrame = false;
         return;
     }
 
@@ -327,6 +410,11 @@ void ARTSPlayerController::SelectActor()
             continue;
         }
 
+		if (SelectedActors.Contains(HitResult.Actor))
+		{
+			continue;
+		}
+
         // Check if hit selectable actor.
         auto SelectableComponent = HitResult.Actor->FindComponentByClass<URTSSelectableComponent>();
 
@@ -335,15 +423,16 @@ void ARTSPlayerController::SelectActor()
             continue;
         }
 
-        // Select single actor.
+        // Select actor.
         SelectedActors.Add(HitResult.Actor.Get());
 
         UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
-        break;
     }
 
     // Notify listeners.
     NotifyOnSelectionChanged(SelectedActors);
+
+	bCreatingSelectionFrame = false;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
