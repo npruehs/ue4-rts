@@ -68,6 +68,29 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 	}
 }
 
+bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
+{
+	if (!bCreatingSelectionFrame)
+	{
+		return false;
+	}
+
+	// Get mouse input.
+	float MouseX;
+	float MouseY;
+
+	if (!GetMousePosition(MouseX, MouseY))
+	{
+		return false;
+	}
+
+	OutSelectionFrame = FIntRect(
+		FIntPoint(SelectionFrameMouseStartPosition.X, SelectionFrameMouseStartPosition.Y),
+		FIntPoint(MouseX, MouseY));
+
+	return true;
+}
+
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)
 {
     UWorld* World = GetWorld();
@@ -120,9 +143,12 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 	}
 
 	// Get selection frame.
-	FIntRect SelectionFrame(
-		FIntPoint(SelectionFrameMouseStartPosition.X, SelectionFrameMouseStartPosition.Y),
-		FIntPoint(SelectionFrameMouseEndPosition.X, SelectionFrameMouseEndPosition.Y));
+	FIntRect SelectionFrame;
+	
+	if (!GetSelectionFrame(SelectionFrame))
+	{
+		return false;
+	}
 
 	if (SelectionFrame.Area() < 10)
 	{
@@ -358,27 +384,18 @@ void ARTSPlayerController::StartSelectActors()
 	if (GetMousePosition(MouseX, MouseY))
 	{
 		SelectionFrameMouseStartPosition = FVector2D(MouseX, MouseY);
+		bCreatingSelectionFrame = true;
 	}
 }
 
 void ARTSPlayerController::FinishSelectActors()
 {
-	// Get mouse input.
-	float MouseX;
-	float MouseY;
-
-	if (!GetMousePosition(MouseX, MouseY))
-	{
-		return;
-	}
-
-	SelectionFrameMouseEndPosition = FVector2D(MouseX, MouseY);
-
     // Get objects at pointer position.
     TArray<FHitResult> HitResults;
     
     if (!GetObjectsInSelectionFrame(HitResults))
     {
+		bCreatingSelectionFrame = false;
         return;
     }
 
@@ -414,6 +431,8 @@ void ARTSPlayerController::FinishSelectActors()
 
     // Notify listeners.
     NotifyOnSelectionChanged(SelectedActors);
+
+	bCreatingSelectionFrame = false;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)

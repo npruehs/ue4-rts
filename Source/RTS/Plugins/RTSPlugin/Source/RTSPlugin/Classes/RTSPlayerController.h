@@ -30,6 +30,10 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 
+	/** Gets the current selection frame, in screen space. */
+	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
+
+
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
 	void IssueAttackOrder(AActor* Target);
@@ -100,11 +104,12 @@ private:
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
 
+
+	/** Whether we're currently creating a selection frame by dragging the mouse. */
+	bool bCreatingSelectionFrame;
+
 	/** Mouse position on screen when creating the selection frame started. */
 	FVector2D SelectionFrameMouseStartPosition;
-
-	/** Mouse position on screen when creating the selection frame ended. */
-	FVector2D SelectionFrameMouseEndPosition;
 
 
     /** Casts a ray from the current mouse position and collects the results. */
