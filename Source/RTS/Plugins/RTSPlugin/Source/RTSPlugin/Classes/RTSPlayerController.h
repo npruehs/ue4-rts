@@ -47,6 +47,35 @@ public:
 	void IssueStopOrder();
 
 
+	UFUNCTION(BlueprintCallable)
+	void SaveControlGroup(int Index);
+
+	UFUNCTION(BlueprintCallable) void SaveControlGroup0();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup1();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup2();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup3();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup4();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup5();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup6();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup7();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup8();
+	UFUNCTION(BlueprintCallable) void SaveControlGroup9();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadControlGroup(int Index);
+
+	UFUNCTION(BlueprintCallable) void LoadControlGroup0();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup1();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup2();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup3();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup4();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup5();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup6();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup7();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup8();
+	UFUNCTION(BlueprintCallable) void LoadControlGroup9();
+
+
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
 
@@ -100,6 +129,10 @@ private:
 
     /** Last vertical axis input applied to camera movement. */
     float CameraUpDownAxisValue;
+
+
+	/** Saved selections of this player. */
+	TArray<TArray<AActor*>> ControlGroups;
 
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
