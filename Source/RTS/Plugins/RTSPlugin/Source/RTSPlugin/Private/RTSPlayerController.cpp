@@ -32,8 +32,32 @@ void ARTSPlayerController::SetupInputComponent()
 	// Bind actions.
 	InputComponent->BindAction("Select", IE_Pressed, this, &ARTSPlayerController::StartSelectActors);
 	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::FinishSelectActors);
+
 	InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
 	InputComponent->BindAction("IssueStopOrder", IE_Released, this, &ARTSPlayerController::IssueStopOrder);
+
+	InputComponent->BindAction("SaveControlGroup0", IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
+	InputComponent->BindAction("SaveControlGroup1", IE_Released, this, &ARTSPlayerController::SaveControlGroup1);
+	InputComponent->BindAction("SaveControlGroup2", IE_Released, this, &ARTSPlayerController::SaveControlGroup2);
+	InputComponent->BindAction("SaveControlGroup3", IE_Released, this, &ARTSPlayerController::SaveControlGroup3);
+	InputComponent->BindAction("SaveControlGroup4", IE_Released, this, &ARTSPlayerController::SaveControlGroup4);
+	InputComponent->BindAction("SaveControlGroup5", IE_Released, this, &ARTSPlayerController::SaveControlGroup5);
+	InputComponent->BindAction("SaveControlGroup6", IE_Released, this, &ARTSPlayerController::SaveControlGroup6);
+	InputComponent->BindAction("SaveControlGroup7", IE_Released, this, &ARTSPlayerController::SaveControlGroup7);
+	InputComponent->BindAction("SaveControlGroup8", IE_Released, this, &ARTSPlayerController::SaveControlGroup8);
+	InputComponent->BindAction("SaveControlGroup9", IE_Released, this, &ARTSPlayerController::SaveControlGroup9);
+
+	InputComponent->BindAction("LoadControlGroup0", IE_Released, this, &ARTSPlayerController::LoadControlGroup0);
+	InputComponent->BindAction("LoadControlGroup1", IE_Released, this, &ARTSPlayerController::LoadControlGroup1);
+	InputComponent->BindAction("LoadControlGroup2", IE_Released, this, &ARTSPlayerController::LoadControlGroup2);
+	InputComponent->BindAction("LoadControlGroup3", IE_Released, this, &ARTSPlayerController::LoadControlGroup3);
+	InputComponent->BindAction("LoadControlGroup4", IE_Released, this, &ARTSPlayerController::LoadControlGroup4);
+	InputComponent->BindAction("LoadControlGroup5", IE_Released, this, &ARTSPlayerController::LoadControlGroup5);
+	InputComponent->BindAction("LoadControlGroup6", IE_Released, this, &ARTSPlayerController::LoadControlGroup6);
+	InputComponent->BindAction("LoadControlGroup7", IE_Released, this, &ARTSPlayerController::LoadControlGroup7);
+	InputComponent->BindAction("LoadControlGroup8", IE_Released, this, &ARTSPlayerController::LoadControlGroup8);
+	InputComponent->BindAction("LoadControlGroup9", IE_Released, this, &ARTSPlayerController::LoadControlGroup9);
+
 	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
 	InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
 
@@ -48,6 +72,9 @@ void ARTSPlayerController::SetupInputComponent()
 	{
 		UE_LOG(RTSLog, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
 	}
+
+	// Setup control groups.
+	ControlGroups.SetNum(10);
 }
 
 void ARTSPlayerController::TransferOwnership(AActor* Actor)
@@ -328,6 +355,56 @@ void ARTSPlayerController::IssueStopOrder()
 		NotifyOnIssuedStopOrder(SelectedActor);
 	}
 }
+
+void ARTSPlayerController::SaveControlGroup(int Index)
+{
+	if (Index < 0 || Index > 9)
+	{
+		return;
+	}
+
+	// Save control group.
+	ControlGroups[Index] = SelectedActors;
+
+	UE_LOG(RTSLog, Log, TEXT("Saved selection to control group %d."), Index);
+}
+
+void ARTSPlayerController::SaveControlGroup0() { SaveControlGroup(0); }
+void ARTSPlayerController::SaveControlGroup1() { SaveControlGroup(1); }
+void ARTSPlayerController::SaveControlGroup2() { SaveControlGroup(2); }
+void ARTSPlayerController::SaveControlGroup3() { SaveControlGroup(3); }
+void ARTSPlayerController::SaveControlGroup4() { SaveControlGroup(4); }
+void ARTSPlayerController::SaveControlGroup5() { SaveControlGroup(5); }
+void ARTSPlayerController::SaveControlGroup6() { SaveControlGroup(6); }
+void ARTSPlayerController::SaveControlGroup7() { SaveControlGroup(7); }
+void ARTSPlayerController::SaveControlGroup8() { SaveControlGroup(8); }
+void ARTSPlayerController::SaveControlGroup9() { SaveControlGroup(9); }
+
+void ARTSPlayerController::LoadControlGroup(int Index)
+{
+	if (Index < 0 || Index > 9)
+	{
+		return;
+	}
+
+	SelectedActors = ControlGroups[Index];
+
+	UE_LOG(RTSLog, Log, TEXT("Loaded selection from control group %d."), Index);
+
+	// Notify listeners.
+	NotifyOnSelectionChanged(SelectedActors);
+}
+
+void ARTSPlayerController::LoadControlGroup0() { LoadControlGroup(0); }
+void ARTSPlayerController::LoadControlGroup1() { LoadControlGroup(1); }
+void ARTSPlayerController::LoadControlGroup2() { LoadControlGroup(2); }
+void ARTSPlayerController::LoadControlGroup3() { LoadControlGroup(3); }
+void ARTSPlayerController::LoadControlGroup4() { LoadControlGroup(4); }
+void ARTSPlayerController::LoadControlGroup5() { LoadControlGroup(5); }
+void ARTSPlayerController::LoadControlGroup6() { LoadControlGroup(6); }
+void ARTSPlayerController::LoadControlGroup7() { LoadControlGroup(7); }
+void ARTSPlayerController::LoadControlGroup8() { LoadControlGroup(8); }
+void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
 
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
