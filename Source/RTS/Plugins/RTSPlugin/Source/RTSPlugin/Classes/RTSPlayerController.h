@@ -46,6 +46,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();
 
+	UFUNCTION(BlueprintCallable)
+	void SelectActors(TArray<AActor*> Actors);
 
 	UFUNCTION(BlueprintCallable)
 	void SaveControlGroup(int Index);

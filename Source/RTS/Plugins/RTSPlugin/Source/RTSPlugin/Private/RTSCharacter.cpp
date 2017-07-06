@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSCharacter.h"
 
+#include "Components/CapsuleComponent.h"
+#include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSAttackComponent.h"
@@ -9,12 +11,26 @@
 #include "RTSProjectile.h"
 
 
+ARTSCharacter::ARTSCharacter()
+{
+	// Create selection circle.
+	SelectionCircleDecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionCircleDecal"));
+	SelectionCircleDecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
+}
+
 void ARTSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// Cache component references.
 	AttackComponent = FindComponentByClass<URTSAttackComponent>();
+
+	// Setup selection circle.
+	FCollisionShape CollisionShape = GetCapsuleComponent()->GetCollisionShape();
+	float DecalHeight = CollisionShape.Capsule.HalfHeight * 2;
+	float DecalRadius = CollisionShape.Capsule.Radius * 2;
+
+	SelectionCircleDecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
 }
 
 void ARTSCharacter::Tick(float DeltaSeconds)
@@ -31,6 +47,17 @@ void ARTSCharacter::Tick(float DeltaSeconds)
 			// Notify listeners.
 			NotifyOnCooldownReady();
 		}
+	}
+
+	if (bSelected)
+	{
+		// Show selection circle.
+		SelectionCircleDecalComponent->SetWorldLocation(GetActorLocation());
+	}
+	else
+	{
+		// HACK(np): Hide selection circle.
+		SelectionCircleDecalComponent->SetWorldLocation(FVector(0.0f, 0.0f, -10000.0f));
 	}
 }
 
@@ -147,6 +174,14 @@ void ARTSCharacter::NotifyOnCooldownReady()
 	ReceiveOnCooldownReady();
 }
 
+void ARTSCharacter::NotifyOnDeselected()
+{
+	bSelected = false;
+
+	// Notify listeners.
+	ReceiveOnSelected();
+}
+
 void ARTSCharacter::NotifyOnHealthChanged(float OldHealth, float NewHealth)
 {
 	ReceiveOnHealthChanged(OldHealth, NewHealth);
@@ -160,6 +195,14 @@ void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
 void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
 {
 	ReceiveOnOwnerChanged(NewOwner);
+}
+
+void ARTSCharacter::NotifyOnSelected()
+{
+	bSelected = true;
+
+	// Notify listeners.
+	ReceiveOnSelected();
 }
 
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile)

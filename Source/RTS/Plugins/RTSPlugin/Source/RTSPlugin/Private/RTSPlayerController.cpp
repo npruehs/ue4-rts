@@ -356,6 +356,36 @@ void ARTSPlayerController::IssueStopOrder()
 	}
 }
 
+void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
+{
+	// Clear selection.
+	for (AActor* SelectedActor : SelectedActors)
+	{
+		ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
+
+		if (Character != nullptr)
+		{
+			Character->NotifyOnDeselected();
+		}
+	}
+
+	// Apply new selection.
+	SelectedActors = Actors;
+
+	for (AActor* SelectedActor : SelectedActors)
+	{
+		ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
+
+		if (Character != nullptr)
+		{
+			Character->NotifyOnSelected();
+		}
+	}
+
+	// Notify listeners.
+	NotifyOnSelectionChanged(SelectedActors);
+}
+
 void ARTSPlayerController::SaveControlGroup(int Index)
 {
 	if (Index < 0 || Index > 9)
@@ -387,12 +417,9 @@ void ARTSPlayerController::LoadControlGroup(int Index)
 		return;
 	}
 
-	SelectedActors = ControlGroups[Index];
+	SelectActors(ControlGroups[Index]);
 
 	UE_LOG(RTSLog, Log, TEXT("Loaded selection from control group %d."), Index);
-
-	// Notify listeners.
-	NotifyOnSelectionChanged(SelectedActors);
 }
 
 void ARTSPlayerController::LoadControlGroup0() { LoadControlGroup(0); }
@@ -477,7 +504,7 @@ void ARTSPlayerController::FinishSelectActors()
     }
 
     // Check results.
-    SelectedActors.Empty();
+	TArray<AActor*> ActorsToSelect;
 
     for (auto& HitResult : HitResults)
     {
@@ -487,7 +514,7 @@ void ARTSPlayerController::FinishSelectActors()
             continue;
         }
 
-		if (SelectedActors.Contains(HitResult.Actor))
+		if (ActorsToSelect.Contains(HitResult.Actor))
 		{
 			continue;
 		}
@@ -501,13 +528,12 @@ void ARTSPlayerController::FinishSelectActors()
         }
 
         // Select actor.
-        SelectedActors.Add(HitResult.Actor.Get());
+		ActorsToSelect.Add(HitResult.Actor.Get());
 
-        UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+		UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
     }
 
-    // Notify listeners.
-    NotifyOnSelectionChanged(SelectedActors);
+	SelectActors(ActorsToSelect);
 
 	bCreatingSelectionFrame = false;
 }
