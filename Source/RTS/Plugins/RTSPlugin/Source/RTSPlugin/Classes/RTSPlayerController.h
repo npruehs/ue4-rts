@@ -30,6 +30,9 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 
+	/** Gets the list of units currently selected by this player. */
+	TArray<AActor*> GetSelectedActors();
+
 	/** Gets the current selection frame, in screen space. */
 	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
 

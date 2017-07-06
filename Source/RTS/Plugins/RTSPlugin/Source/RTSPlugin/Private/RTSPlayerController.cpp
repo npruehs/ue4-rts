@@ -95,6 +95,11 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 	}
 }
 
+TArray<AActor*> ARTSPlayerController::GetSelectedActors()
+{
+	return SelectedActors;
+}
+
 bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 {
 	if (!bCreatingSelectionFrame)

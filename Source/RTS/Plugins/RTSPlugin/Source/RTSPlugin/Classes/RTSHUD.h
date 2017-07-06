@@ -7,6 +7,9 @@
 #include "RTSHUD.generated.h"
 
 
+class ARTSCharacter;
+
+
 /**
 * HUD with RTS features, such as showing a selection frame.
 */
@@ -23,7 +26,12 @@ public:
 
 	virtual void DrawHUD() override;
 
+	virtual void DrawHealthBar(ARTSCharacter* Character, float CurrentHealth, float MaximumHealth);
+
 private:
 	/** Draws the current selection frame if mouse is being dragged. */
 	void DrawSelectionFrame();
+
+	/** Draws unit health bars. */
+	void DrawHealthBars();
 };
