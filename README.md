@@ -40,18 +40,6 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Add RTSCameraBoundsVolume to the map.
 1. Add a NavMeshBoundsVolume to the map, and build Navigation. You may press P to review your results in the viewport.
 
-### Enabling Selection
-
-1. Bind the action Select (e.g. to left mouse button).
-1. Add SelectableComponents to everything selectable.
-1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController.
-
-### Showing Selection Frames
-
-1. Create a new HUD deriving from RTSHUD.
-1. Create a new selection frame material and set the RTSHUD reference.
-1. Use the new RTSHUD in your game mode.
-
 ### Setting Up The Camera
 
 #### Creating The Camera
@@ -77,6 +65,29 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
+
+### Selecting Units
+
+#### Enabling Selection
+
+1. Bind the action Select (e.g. to left mouse button).
+1. Add SelectableComponents to everything selectable.
+1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController.
+
+#### Showing Selection Frames
+
+1. Create a new HUD deriving from RTSHUD.
+1. Create a new selection frame material and set the RTSHUD reference.
+1. Use the new RTSHUD in your game mode.
+
+#### Enabling Control Groups
+
+1. Bind the actions SaveControlGroup0 to SaveControlGroup9 (e.g. to CTRL+0 to CTRL+9).
+1. Bind the actions LoadControlGroup0 to LoadControlGroup9 (e.g. to 0 to 9).
+
+#### Showing Selection
+
+1. For each character, set the Decal Material of its SelectionCircleDecalComponent.
 
 ### Enabling Unit Orders
 
