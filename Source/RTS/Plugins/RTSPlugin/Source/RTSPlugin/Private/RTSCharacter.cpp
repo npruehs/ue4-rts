@@ -125,6 +125,11 @@ void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 		return;
 	}
 
+	if (!IsValid(Target))
+	{
+		return;
+	}
+
 	// Check cooldown.
 	if (AttackComponent->RemainingCooldown > 0)
 	{
