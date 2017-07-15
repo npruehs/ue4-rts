@@ -61,6 +61,9 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
 	InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
 
+	InputComponent->BindAction("ShowHealthBars", IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
+	InputComponent->BindAction("ShowHealthBars", IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
+
 	// Get camera bounds.
 	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -462,6 +465,11 @@ void ARTSPlayerController::LoadControlGroup7() { LoadControlGroup(7); }
 void ARTSPlayerController::LoadControlGroup8() { LoadControlGroup(8); }
 void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
 
+bool ARTSPlayerController::IsHealthBarHotkeyPressed()
+{
+	return bHealthBarHotkeyPressed;
+}
+
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
 	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
@@ -556,6 +564,16 @@ void ARTSPlayerController::FinishSelectActors()
 	SelectActors(ActorsToSelect);
 
 	bCreatingSelectionFrame = false;
+}
+
+void ARTSPlayerController::StartShowingHealthBars()
+{
+	bHealthBarHotkeyPressed = true;
+}
+
+void ARTSPlayerController::StopShowingHealthBars()
+{
+	bHealthBarHotkeyPressed = false;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)

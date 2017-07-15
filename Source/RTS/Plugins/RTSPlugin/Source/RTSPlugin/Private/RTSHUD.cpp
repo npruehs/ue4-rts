@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSHUD.h"
 
+#include "EngineUtils.h"
+
 #include "RTSCharacter.h"
 #include "RTSHealthComponent.h"
 #include "RTSPlayerController.h"
@@ -27,39 +29,30 @@ void ARTSHUD::DrawHUD()
 	}
 }
 
-void ARTSHUD::DrawHealthBar(ARTSCharacter* Character, float CurrentHealth, float MaximumHealth)
-{
-	FVector2D Center = GetCharacterCenterOnScreen(Character);
-	FVector2D Size = GetCharacterSizeOnScreen(Character);
-
-	// Get health bar size.
-	const float HealthBarHeight = 15.0f;
-	const float HealthBarWidth = Size.X * 2;
-
-	const float HealthBarBorderSize = 3.0f;
-
-	const float HealthPercentage = CurrentHealth / MaximumHealth;
-
-	// Draw health bar border.
-	DrawRect(
-		FColor::White,
-		Center.X + (Size.X / 2) - (HealthBarWidth / 2),
-		Center.Y - (Size.Y / 2) - (HealthBarHeight * 2),
-		HealthBarWidth,
-		HealthBarHeight);
-
-	// Draw health bar.
-	DrawRect(
-		FColor::Green,
-		Center.X + (Size.X / 2) - (HealthBarWidth / 2) + HealthBarBorderSize,
-		Center.Y - (Size.Y / 2) - (HealthBarHeight * 2) + HealthBarBorderSize,
-		(HealthBarWidth - (HealthBarBorderSize * 2)) * HealthPercentage,
-		HealthBarHeight - (HealthBarBorderSize * 2));
-}
-
 void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
 {
 	ReceiveDrawHoveredActorEffect(HoveredActor);
+}
+
+void ARTSHUD::NotifyDrawHealthBar(
+	ARTSCharacter* Character,
+	float CurrentHealth,
+	float MaximumHealth,
+	float HealthPercentage,
+	float SuggestedHealthBarLeft,
+	float SuggestedHealthBarTop,
+	float SuggestedHealthBarWidth,
+	float SuggestedHealthBarHeight)
+{
+	ReceiveDrawHealthBar(
+		Character,
+		CurrentHealth,
+		MaximumHealth,
+		HealthPercentage,
+		SuggestedHealthBarLeft,
+		SuggestedHealthBarTop,
+		SuggestedHealthBarWidth,
+		SuggestedHealthBarHeight);
 }
 
 void ARTSHUD::NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height)
@@ -123,25 +116,74 @@ void ARTSHUD::DrawHealthBars()
 		return;
 	}
 
-	for (int i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
+	// Check override conditions.
+	if (bAlwaysShowHealthBars || (bShowHotkeyHealthBars && PlayerController->IsHealthBarHotkeyPressed()))
 	{
-		AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
-		ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
-
-		if (!IsValid(Character))
+		// Draw all health bars.
+		for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
 		{
-			continue;
+			ARTSCharacter* Character = *CharacterIt;
+			DrawHealthBar(Character);
 		}
 
-		// Check if got health.
-		URTSHealthComponent* HealthComponent = Character->FindComponentByClass<URTSHealthComponent>();
-
-		if (!HealthComponent)
-		{
-			continue;
-		}
-
-		// Draw health bar.
-		DrawHealthBar(Character, HealthComponent->CurrentHealth, HealthComponent->MaximumHealth);
+		return;
 	}
+
+	// Draw health bar for hovered character.
+	if (bShowHoverHealthBars)
+	{
+		AActor* HoveredActor = PlayerController->GetHoveredActor();
+		ARTSCharacter* Character = Cast<ARTSCharacter>(HoveredActor);
+		DrawHealthBar(Character);
+	}
+
+	// Draw health bars for selected characters.
+	if (bShowSelectionHealthBars)
+	{
+		for (int i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
+		{
+			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
+			ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
+			DrawHealthBar(Character);
+		}
+	}
+}
+
+void ARTSHUD::DrawHealthBar(ARTSCharacter* Character)
+{
+	if (!IsValid(Character))
+	{
+		return;
+	}
+
+	// Check health.
+	URTSHealthComponent* HealthComponent = Character->FindComponentByClass<URTSHealthComponent>();
+
+	if (!HealthComponent)
+	{
+		return;
+	}
+
+	const float HealthPercentage = HealthComponent->CurrentHealth / HealthComponent->MaximumHealth;
+
+	// Suggest health bar size.
+	FVector2D Center = GetCharacterCenterOnScreen(Character);
+	FVector2D Size = GetCharacterSizeOnScreen(Character);
+
+	const float SuggestedHealthBarWidth = Size.X * 2;
+	const float SuggestedHealthBarHeight = 15.0f;
+
+	const float SuggestedHealthBarLeft = Center.X - (SuggestedHealthBarWidth / 2);
+	const float SuggestedHealthBarTop = Center.Y - (Size.Y / 2) - (SuggestedHealthBarHeight * 2);
+
+	// Draw health bar.
+	NotifyDrawHealthBar(
+		Character,
+		HealthComponent->CurrentHealth,
+		HealthComponent->MaximumHealth,
+		HealthPercentage,
+		SuggestedHealthBarLeft,
+		SuggestedHealthBarTop,
+		SuggestedHealthBarWidth,
+		SuggestedHealthBarHeight);
 }
