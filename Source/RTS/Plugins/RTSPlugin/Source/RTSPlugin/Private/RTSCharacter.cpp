@@ -190,7 +190,7 @@ void ARTSCharacter::NotifyOnDeselected()
 	bSelected = false;
 
 	// Notify listeners.
-	ReceiveOnSelected();
+	ReceiveOnDeselected();
 }
 
 void ARTSCharacter::NotifyOnHealthChanged(float OldHealth, float NewHealth)
