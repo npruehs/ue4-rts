@@ -28,6 +28,21 @@ public:
 
 	virtual void DrawHealthBar(ARTSCharacter* Character, float CurrentHealth, float MaximumHealth);
 
+
+	/** Event for drawing an effect for the currently hovered actor. */
+	virtual void NotifyDrawHoveredActorEffect(AActor* HoveredActor);
+
+	/** Event for drawing an effect for the currently hovered actor. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHoveredActorEffect"))
+	void ReceiveDrawHoveredActorEffect(AActor* HoveredActor);
+
+
+	UFUNCTION(BlueprintCallable)
+	FVector2D GetCharacterCenterOnScreen(ACharacter* Character);
+
+	UFUNCTION(BlueprintCallable)
+	FVector2D GetCharacterSizeOnScreen(ACharacter* Character);
+
 private:
 	/** Draws the current selection frame if mouse is being dragged. */
 	void DrawSelectionFrame();

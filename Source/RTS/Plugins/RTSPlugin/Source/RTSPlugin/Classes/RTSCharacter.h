@@ -9,9 +9,11 @@
 #include "RTSCharacter.generated.h"
 
 
+class APlayerState;
+class UDecalComponent;
+
 class ARTSProjectile;
 class URTSAttackComponent;
-class UDecalComponent;
 
 
 /**
@@ -25,6 +27,9 @@ class ARTSCharacter : public ACharacter
 public:
 	ARTSCharacter();
 
+	/** Gets the player owning this character. */
+	UFUNCTION(BlueprintCallable)
+	APlayerState* GetPlayerOwner();
 
 	/** Uses the passed attack on the specified target and starts the cooldown timer. */
 	UFUNCTION(BlueprintCallable)
@@ -90,6 +95,9 @@ protected:
 private:
 	/** Attack data of this character. */
 	URTSAttackComponent* AttackComponent;
+
+	/** Player owning this character. */
+	APlayerState* PlayerOwner;
 
 	/** Decal used for rendering the selection circle of this character. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

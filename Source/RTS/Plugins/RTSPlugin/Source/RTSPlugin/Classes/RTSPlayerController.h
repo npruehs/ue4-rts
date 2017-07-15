@@ -30,6 +30,10 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 
+	/** Gets the actor currently hovered by this player. */
+	UFUNCTION(BlueprintCallable)
+	AActor* GetHoveredActor();
+
 	/** Gets the list of units currently selected by this player. */
 	TArray<AActor*> GetSelectedActors();
 
@@ -139,6 +143,9 @@ private:
 	/** Saved selections of this player. */
 	TArray<TArray<AActor*>> ControlGroups;
 
+	/** Actor currently hovered by this player. */
+	AActor* HoveredActor;
+
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
 
@@ -155,6 +162,9 @@ private:
 	
 	/** Casts a box from the current selection frame and collects the results. */
 	bool GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults);
+
+	/** Checks whether the specified actor is valid and selectable. */
+	bool IsSelectableActor(AActor* Actor);
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()

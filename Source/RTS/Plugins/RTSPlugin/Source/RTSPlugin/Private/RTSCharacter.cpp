@@ -10,12 +10,18 @@
 #include "RTSHealthComponent.h"
 #include "RTSProjectile.h"
 
+#include "GameFramework/PlayerState.h"
 
 ARTSCharacter::ARTSCharacter()
 {
 	// Create selection circle.
 	SelectionCircleDecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionCircleDecal"));
 	SelectionCircleDecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
+}
+
+APlayerState* ARTSCharacter::GetPlayerOwner()
+{
+	return PlayerOwner;
 }
 
 void ARTSCharacter::BeginPlay()
@@ -194,6 +200,8 @@ void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
 
 void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
 {
+	PlayerOwner = NewOwner->PlayerState;
+
 	ReceiveOnOwnerChanged(NewOwner);
 }
 

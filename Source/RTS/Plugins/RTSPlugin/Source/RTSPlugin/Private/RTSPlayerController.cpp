@@ -95,6 +95,11 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 	}
 }
 
+AActor* ARTSPlayerController::GetHoveredActor()
+{
+	return HoveredActor;
+}
+
 TArray<AActor*> ARTSPlayerController::GetSelectedActors()
 {
 	return SelectedActors;
@@ -208,6 +213,25 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 	}
 
 	return HitResults.Num() > 0;
+}
+
+bool ARTSPlayerController::IsSelectableActor(AActor* Actor)
+{
+	// Check if valid.
+	if (!IsValid(Actor))
+	{
+		return false;
+	}
+
+	// Check if selectable.
+	auto SelectableComponent = Actor->FindComponentByClass<URTSSelectableComponent>();
+
+	if (!SelectableComponent)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void ARTSPlayerController::IssueOrder()
@@ -513,24 +537,15 @@ void ARTSPlayerController::FinishSelectActors()
 
     for (auto& HitResult : HitResults)
     {
-        // Check if hit any actor.
-        if (HitResult.Actor == nullptr)
-        {
-            continue;
-        }
+		if (!IsSelectableActor(HitResult.Actor.Get()))
+		{
+			continue;
+		}
 
 		if (ActorsToSelect.Contains(HitResult.Actor))
 		{
 			continue;
 		}
-
-        // Check if hit selectable actor.
-        auto SelectableComponent = HitResult.Actor->FindComponentByClass<URTSSelectableComponent>();
-
-        if (!SelectableComponent)
-        {
-            continue;
-        }
 
         // Select actor.
 		ActorsToSelect.Add(HitResult.Actor.Get());
@@ -632,4 +647,32 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
     {
         PlayerPawn->SetActorLocation(Location);
     }
+
+	// Get hovered actors.
+	HoveredActor = nullptr;
+
+	TArray<FHitResult> HitResults;
+
+	if (GetObjectsAtPointerPosition(HitResults))
+	{
+		for (auto& HitResult : HitResults)
+		{
+			// Check if hit any actor.
+			if (HitResult.Actor == nullptr)
+			{
+				continue;
+			}
+
+			// Check if hit selectable actor.
+			auto SelectableComponent = HitResult.Actor->FindComponentByClass<URTSSelectableComponent>();
+
+			if (!SelectableComponent)
+			{
+				continue;
+			}
+
+			// Set hovered actor.
+			HoveredActor = HitResult.Actor.Get();
+		}
+	}
 }
