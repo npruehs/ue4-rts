@@ -14,19 +14,7 @@ void ARTSHUD::DrawHUD()
 
 	DrawSelectionFrame();
 	DrawHealthBars();
-
-	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
-
-	if (!PlayerController)
-	{
-		return;
-	}
-
-	AActor* HoveredActor = PlayerController->GetHoveredActor();
-	if (HoveredActor != nullptr)
-	{
-		NotifyDrawHoveredActorEffect(HoveredActor);
-	}
+	DrawHoveredActorEffect();
 }
 
 void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
@@ -99,7 +87,7 @@ void ARTSHUD::DrawSelectionFrame()
 		return;
 	}
 
-	// Draw texture.
+	// Draw selection frame.
 	NotifyDrawSelectionFrame(
 		SelectionFrame.Min.X,
 		SelectionFrame.Min.Y,
@@ -186,4 +174,24 @@ void ARTSHUD::DrawHealthBar(ARTSCharacter* Character)
 		SuggestedHealthBarTop,
 		SuggestedHealthBarWidth,
 		SuggestedHealthBarHeight);
+}
+
+void ARTSHUD::DrawHoveredActorEffect()
+{
+	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
+
+	if (!PlayerController)
+	{
+		return;
+	}
+
+	AActor* HoveredActor = PlayerController->GetHoveredActor();
+
+	if (HoveredActor == nullptr)
+	{
+		return;
+	}
+
+	// Draw hovered actor effect.
+	NotifyDrawHoveredActorEffect(HoveredActor);
 }

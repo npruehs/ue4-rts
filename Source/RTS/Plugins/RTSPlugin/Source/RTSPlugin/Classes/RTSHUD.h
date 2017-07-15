@@ -92,4 +92,7 @@ private:
 
 	/** Draws the health bar of the specified character. */
 	void DrawHealthBar(ARTSCharacter* Character);
+
+	/** Draws a custom HUD effect for the currently hovered actor (e.g. player name). */
+	void DrawHoveredActorEffect();
 };
