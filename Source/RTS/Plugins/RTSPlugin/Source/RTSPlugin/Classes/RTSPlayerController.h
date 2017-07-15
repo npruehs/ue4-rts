@@ -84,6 +84,10 @@ public:
 	UFUNCTION(BlueprintCallable) void LoadControlGroup8();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup9();
 
+	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
+	UFUNCTION(BlueprintCallable)
+	bool IsHealthBarHotkeyPressed();
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -156,6 +160,8 @@ private:
 	/** Mouse position on screen when creating the selection frame started. */
 	FVector2D SelectionFrameMouseStartPosition;
 
+	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
+	bool bHealthBarHotkeyPressed;
 
     /** Casts a ray from the current mouse position and collects the results. */
     bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
@@ -195,4 +201,12 @@ private:
 	/** Selects all selectable actors within the created selection frame, started by StartSelectActors. */
 	UFUNCTION()
 	void FinishSelectActors();
+
+	/** Force showing all health bars. */
+	UFUNCTION()
+	void StartShowingHealthBars();
+
+	/** Stop showing all health bars. */
+	UFUNCTION()
+	void StopShowingHealthBars();
 };

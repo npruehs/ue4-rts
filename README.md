@@ -10,16 +10,20 @@ Note that we're still in heavy development. Some things are already in place, su
 
 * Camera Movement & Bounds
 * Initial Unit Placement
-* Single Unit Selection
+* Single- and Multi-Unit Selection
 * Movement Orders
 * Stop Orders
 * Attack Orders
 * Health, Damage (and Healing), Cooldown, Range
 * Victory Conditions
+* Projectiles
+* Unit Target Acquisition
+* Control Groups
+* Health Bars
 
 All of this is already completely working in multiplayer as well, and has been fully exposed to scripting, enabling you to update UI and play animations and sounds.
 
-We're now moving on to more advanced stuff, such as [units automatically returning fire using an acquisition radius, minimap or fog of war](https://github.com/npruehs/ue4-rts/issues).
+We're now moving on to more advanced stuff, such as [minimap or fog of war](https://github.com/npruehs/ue4-rts/issues).
 
 Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 
@@ -77,8 +81,12 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 #### Showing Selection Frames
 
 1. Create a new HUD deriving from RTSHUD.
-1. Create a new selection frame material and set the RTSHUD reference.
 1. Use the new RTSHUD in your game mode.
+1. In your RTSHUD, implement the DrawSelectionFrame event as desired.
+
+Example: Drawing selection frame as transparent rectangle with borders
+
+![Draw Selection Frame](Documents/Manual/Images/SelectionFrameBlueprint.png)
 
 #### Enabling Control Groups
 
@@ -114,6 +122,26 @@ _Setting the Damage Type is optional. Remaining Cooldown is handled by the frame
 
 1. Set the Initial Actors for your RTSGameMode. This will spawn initial units for each player at their player start.
 1. Optionally, set the Defeat Condition Actor type for your RTSGameMode. This will check whether any actors of the specified type exist for a player whenever he or she loses a unit. If no actor of the specified type remains, the player is defeated. Note that it is up to you to define how defeated players should be handled, e.g. whether you've making a 1v1, FFA or team game.
+
+### Add HUD
+
+#### Showing Health Bars
+
+1. In your RTSHUD, set AlwaysShowHealthBars, ShowHoverHealthBars, ShowSelectionHealthBars and ShowHotkeyHealthBars as desired.
+1. If you checked ShowHotkeyHealthBars, bind the action ShowHealthBars (e.g. to the LeftAlt key).
+1. In your RTSHUD, implement the DrawHealthBar event as desired.
+
+Example: Drawing health bars as rectangles with borders
+
+![Draw Health Bars](Documents/Manual/Images/HealthBarBlueprint.png)
+
+#### Showing Hovered Unit Effects
+
+1. In your RTSHUD, implement the DrawHoveredActorEffect event as desired.
+
+Example: Drawing names of unit owners
+
+![Draw Player Name](Documents/Manual/Images/HoveredActorEffectBlueprint.png)
 
 ## Bugs & Feature Requests
 
