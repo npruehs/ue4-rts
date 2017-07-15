@@ -19,11 +19,6 @@ class ARTSHUD : public AHUD
 	GENERATED_BODY()
 
 public:
-	/** Material to draw when creating a selection frame by dragging the mouse. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	UMaterialInterface* SelectionFrameMaterial;
-
-
 	virtual void DrawHUD() override;
 
 	virtual void DrawHealthBar(ARTSCharacter* Character, float CurrentHealth, float MaximumHealth);
@@ -32,9 +27,16 @@ public:
 	/** Event for drawing an effect for the currently hovered actor. */
 	virtual void NotifyDrawHoveredActorEffect(AActor* HoveredActor);
 
+	/** Event for drawing the selection frame because the mouse is being dragged. */
+	virtual void NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
+
 	/** Event for drawing an effect for the currently hovered actor. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHoveredActorEffect"))
 	void ReceiveDrawHoveredActorEffect(AActor* HoveredActor);
+
+	/** Event for drawing the selection frame because the mouse is being dragged. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawSelectionFrame"))
+	void ReceiveDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
 
 
 	UFUNCTION(BlueprintCallable)

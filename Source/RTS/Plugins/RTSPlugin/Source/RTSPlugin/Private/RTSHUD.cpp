@@ -62,6 +62,11 @@ void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
 	ReceiveDrawHoveredActorEffect(HoveredActor);
 }
 
+void ARTSHUD::NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height)
+{
+	ReceiveDrawSelectionFrame(ScreenX, ScreenY, Width, Height);
+}
+
 FVector2D ARTSHUD::GetCharacterCenterOnScreen(ACharacter* Character)
 {
 	FVector ProjectedLocation = Project(Character->GetActorLocation());
@@ -86,11 +91,6 @@ FVector2D ARTSHUD::GetCharacterSizeOnScreen(ACharacter* Character)
 
 void ARTSHUD::DrawSelectionFrame()
 {
-	if (!SelectionFrameMaterial)
-	{
-		return;
-	}
-
 	// Get selection frame.
 	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
 
@@ -107,8 +107,7 @@ void ARTSHUD::DrawSelectionFrame()
 	}
 
 	// Draw texture.
-	DrawMaterialSimple(
-		SelectionFrameMaterial,
+	NotifyDrawSelectionFrame(
 		SelectionFrame.Min.X,
 		SelectionFrame.Min.Y,
 		SelectionFrame.Width(),
