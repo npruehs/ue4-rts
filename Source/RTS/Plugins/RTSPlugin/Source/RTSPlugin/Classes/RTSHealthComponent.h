@@ -17,10 +17,13 @@ class URTSHealthComponent : public UActorComponent
 
 public:
 	/** Current health of the actor. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", meta = (ClampMin = 0))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", meta = (ClampMin = 0), replicated)
 	float CurrentHealth;
 
 	/** Maximum health of the actor. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", meta = (ClampMin = 0))
 	float MaximumHealth;
+
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

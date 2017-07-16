@@ -15,6 +15,7 @@ class UDecalComponent;
 
 class ARTSProjectile;
 class URTSAttackComponent;
+class URTSHealthComponent;
 
 
 /**
@@ -31,6 +32,9 @@ public:
 
 
 	ARTSCharacter();
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 	/** Gets the player owning this character. */
 	UFUNCTION(BlueprintCallable)
@@ -101,7 +105,11 @@ private:
 	/** Attack data of this character. */
 	URTSAttackComponent* AttackComponent;
 
+	/** Health data of this character. */
+	URTSHealthComponent* HealthComponent;
+
 	/** Player owning this character. */
+	UPROPERTY(replicated)
 	APlayerState* PlayerOwner;
 
 	/** Decal used for rendering the selection circle of this character. */

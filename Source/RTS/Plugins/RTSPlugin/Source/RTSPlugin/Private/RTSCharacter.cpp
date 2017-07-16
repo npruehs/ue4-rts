@@ -4,6 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 #include "RTSAttackComponent.h"
 #include "RTSGameMode.h"
@@ -17,6 +18,16 @@ ARTSCharacter::ARTSCharacter()
 	// Create selection circle.
 	SelectionCircleDecalComponent = CreateDefaultSubobject<UDecalComponent>(TEXT("SelectionCircleDecal"));
 	SelectionCircleDecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
+
+	// Enable replication.
+	bReplicates = true;
+}
+
+void ARTSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARTSCharacter, PlayerOwner);
 }
 
 APlayerState* ARTSCharacter::GetPlayerOwner()
@@ -30,6 +41,7 @@ void ARTSCharacter::BeginPlay()
 
 	// Cache component references.
 	AttackComponent = FindComponentByClass<URTSAttackComponent>();
+	HealthComponent = FindComponentByClass<URTSHealthComponent>();
 
 	// Setup selection circle.
 	FCollisionShape CollisionShape = GetCapsuleComponent()->GetCollisionShape();
@@ -37,6 +49,12 @@ void ARTSCharacter::BeginPlay()
 	float DecalRadius = CollisionShape.Capsule.Radius * 2;
 
 	SelectionCircleDecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
+
+
+	if (HealthComponent)
+	{
+		HealthComponent->SetIsReplicated(true);
+	}
 }
 
 void ARTSCharacter::Tick(float DeltaSeconds)
@@ -72,8 +90,6 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
 	// Adjust health.
-	URTSHealthComponent* HealthComponent = FindComponentByClass<URTSHealthComponent>();
-
 	if (!HealthComponent)
 	{
 		return 0.0f;
