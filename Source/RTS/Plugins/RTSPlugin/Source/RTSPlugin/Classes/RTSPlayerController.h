@@ -35,6 +35,7 @@ public:
 	AActor* GetHoveredActor();
 
 	/** Gets the list of units currently selected by this player. */
+	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedActors();
 
 	/** Gets the current selection frame, in screen space. */
