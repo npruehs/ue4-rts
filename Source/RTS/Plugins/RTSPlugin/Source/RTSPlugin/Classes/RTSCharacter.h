@@ -2,6 +2,7 @@
 
 #include "RTSPluginPrivatePCH.h"
 
+#include "Engine/Texture2D.h"
 #include "GameFramework/Character.h"
 
 #include "RTSAttackData.h"
@@ -25,6 +26,10 @@ class ARTSCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
+	UTexture2D* Portrait;
+
+
 	ARTSCharacter();
 
 	/** Gets the player owning this character. */
