@@ -59,8 +59,8 @@ FVector2D ARTSHUD::GetCharacterSizeOnScreen(ACharacter* Character)
 	// Get character position projected on HUD.
 	FCollisionShape CollisionShape = Character->GetCapsuleComponent()->GetCollisionShape();
 
-	FVector CharacterTopPosition = Project(Character->GetActorLocation() + (Character->GetActorUpVector() * CollisionShape.Capsule.HalfHeight));
-	FVector CharacterBottomPosition = Project(Character->GetActorLocation() - (Character->GetActorUpVector() * CollisionShape.Capsule.HalfHeight));
+	FVector CharacterTopPosition = Project(Character->GetActorLocation() + (Character->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
+	FVector CharacterBottomPosition = Project(Character->GetActorLocation() - (Character->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
 	FVector CharacterLeftPosition = Project(Character->GetActorLocation() - (Character->GetActorRightVector() * CollisionShape.Capsule.Radius));
 	FVector CharacterRightPosition = Project(Character->GetActorLocation() + (Character->GetActorRightVector() * CollisionShape.Capsule.Radius));
 
