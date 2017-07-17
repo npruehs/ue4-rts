@@ -143,6 +143,22 @@ Example: Drawing names of unit owners
 
 ![Draw Player Name](Documents/Manual/Images/HoveredActorEffectBlueprint.png)
 
+### Setup Minimap
+
+#### Minimap Background Layer
+
+1. Create a new Asset > Materials & Textures > Render Target (e.g. called MinimapBackgroundRenderTarget).
+1. Set its Compression Settings to User Interface and Texture Group to UI.
+1. Create a Material from your Render Target.
+1. Set its Material Domain to User Interface and make sure the texture is connected to Final Color.
+1. Add a SceneCapture2D at the very center of your map (X = 0, Y = 0).
+1. Set its height to a reasonable distance (e.g. Z = 2000).
+1. Rotate it, making it face your map (e.g. Rotation Y = -90).
+1. In the Scene Capture section, assign your render target to the Texture Target of the SceneCapture2D.
+1. Disable Capture Every Frame.
+1. Still in the Scene Capture section, in the hidden settings, at General Show Flags, disable everything that doesn't make sense for a minimap background (e.g. check BSP, Landscape, Static Meshes only).
+1. Add an Image to your UMG UI, referencing your material.
+
 ## Bugs & Feature Requests
 
 We are sorry that you've experienced issues or are missing a feature! After verifying that you are using the latest version and having checked whether a [similar issue](https://github.com/npruehs/ue4-rts/issues) has already been reported, feel free to [open a new issue](https://github.com/npruehs/ue4-rts/issues/new). In order to help us resolving your problem as fast as possible, please include the following details in your report:
