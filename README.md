@@ -157,7 +157,16 @@ Example: Drawing names of unit owners
 1. In the Scene Capture section, assign your render target to the Texture Target of the SceneCapture2D.
 1. Disable Capture Every Frame.
 1. Still in the Scene Capture section, in the hidden settings, at General Show Flags, disable everything that doesn't make sense for a minimap background (e.g. check BSP, Landscape, Static Meshes only).
-1. Add an Image to your UMG UI, referencing your material.
+
+#### Minimap Units Layer
+
+1. Add a MinimapVolume at the very center of your map.
+1. Set its brush size to match the extents of your playable map.
+1. Create a new RTSMinimapWidget blueprint.
+1. Set the minimap background image to your minimap background render target material.
+1. Set the minimap background image size to a reasonable value (e.g. 256 x 256).
+1. Setup brushes for own units, enemy units and neutral units (e.g. image = WhiteSquareTexture, size = 4 x 4, tint = green, red, yellow, respectively).
+1. Add your RTSMinimapWidget to your UI, with a matching size (e.g. 256 x 256).
 
 ## Bugs & Feature Requests
 
