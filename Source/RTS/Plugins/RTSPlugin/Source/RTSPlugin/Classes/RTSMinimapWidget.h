@@ -8,6 +8,7 @@
 
 
 class ARTSMinimapVolume;
+class ARTSPlayerController;
 
 
 /**
@@ -47,6 +48,10 @@ private:
 
 	void DrawBackground(FPaintContext& InContext) const;
 	void DrawUnits(FPaintContext& InContext) const;
+	void DrawViewFrustum(FPaintContext& InContext) const;
 
 	void DrawBoxWithBrush(FPaintContext& InContext, const FVector2D& Position, const FSlateBrush& Brush) const;
+
+	bool ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& WorldPosition) const;
+	FVector2D WorldToMinimap(const FVector& WorldPosition) const;
 };

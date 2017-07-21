@@ -2,9 +2,10 @@
 #include "RTSMinimapWidget.h"
 
 #include "Components/BrushComponent.h"
-#include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "RTSMinimapVolume.h"
+#include "RTSPlayerController.h"
 
 
 URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer)
@@ -43,6 +44,7 @@ void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 
 	DrawBackground(InContext);
 	DrawUnits(InContext);
+	DrawViewFrustum(InContext);
 }
 
 void URTSMinimapWidget::DrawBackground(FPaintContext& InContext) const
@@ -63,35 +65,77 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 	{
 		ARTSCharacter* Character = *CharacterIt;
 
-		// Get relative world position.
-		FVector CharacterLocation = Character->GetActorLocation();
-
-		float RelativeWorldX = CharacterLocation.X / MinimapWorldSize.X + 0.5f;
-		float RelativeWorldY = CharacterLocation.Y / MinimapWorldSize.Y + 0.5f;
-
-		// Rotate to match UI coordinate system.
-		float temp = RelativeWorldX;
-		RelativeWorldX = RelativeWorldY;
-		RelativeWorldY = 1 - temp;
-
-		// Convert to minimap coordinates.
-		float MinimapX = RelativeWorldX * MinimapBackground.ImageSize.X;
-		float MinimapY = RelativeWorldY * MinimapBackground.ImageSize.Y;
-
+		FVector CharacterLocationWorld = Character->GetActorLocation();
+		FVector2D CharacterLocationMinimap = WorldToMinimap(CharacterLocationWorld);
+		
 		// Draw on minimap.
 		if (Character->GetPlayerOwner() == Player->PlayerState)
 		{
-			DrawBoxWithBrush(InContext, FVector2D(MinimapX, MinimapY), OwnUnitsBrush);
+			DrawBoxWithBrush(InContext, FVector2D(CharacterLocationMinimap.X, CharacterLocationMinimap.Y), OwnUnitsBrush);
 		}
 		else if (Character->GetPlayerOwner() != nullptr)
 		{
-			DrawBoxWithBrush(InContext, FVector2D(MinimapX, MinimapY), EnemyUnitsBrush);
+			DrawBoxWithBrush(InContext, FVector2D(CharacterLocationMinimap.X, CharacterLocationMinimap.Y), EnemyUnitsBrush);
 		}
 		else
 		{
-			DrawBoxWithBrush(InContext, FVector2D(MinimapX, MinimapY), NeutralUnitsBrush);
+			DrawBoxWithBrush(InContext, FVector2D(CharacterLocationMinimap.X, CharacterLocationMinimap.Y), NeutralUnitsBrush);
 		}
 	}
+}
+
+void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
+{
+	// Get viewport size.
+	ARTSPlayerController* Player = Cast<ARTSPlayerController>(GetOwningPlayer());
+
+	if (!Player)
+	{
+		return;
+	}
+
+	int ViewportWidth;
+	int ViewportHeight;
+
+	Player->GetViewportSize(ViewportWidth, ViewportHeight);
+
+	// Cast four rays.
+	FVector2D ViewportTopLeft(0, 0);
+	FVector2D ViewportTopRight(ViewportWidth, 0);
+	FVector2D ViewportBottomLeft(0, ViewportHeight);
+	FVector2D ViewportBottomRight(ViewportWidth, ViewportHeight);
+
+	FVector WorldTopLeft;
+	FVector WorldTopRight;
+	FVector WorldBottomLeft;
+	FVector WorldBottomRight;
+
+	ViewportToWorld(Player, ViewportTopLeft, WorldTopLeft);
+	ViewportToWorld(Player, ViewportTopRight, WorldTopRight);
+	ViewportToWorld(Player, ViewportBottomLeft, WorldBottomLeft);
+	ViewportToWorld(Player, ViewportBottomRight, WorldBottomRight);
+
+	// Convert to minimap space.
+	FVector2D MinimapTopLeft = WorldToMinimap(WorldTopLeft);
+	FVector2D MinimapTopRight = WorldToMinimap(WorldTopRight);
+	FVector2D MinimapBottomLeft = WorldToMinimap(WorldBottomLeft);
+	FVector2D MinimapBottomRight = WorldToMinimap(WorldBottomRight);
+
+	// Draw view frustum.
+	TArray<FVector2D> Points;
+
+	Points.Add(MinimapTopLeft);
+	Points.Add(MinimapTopRight);
+	Points.Add(MinimapBottomRight);
+	Points.Add(MinimapBottomLeft);
+	Points.Add(MinimapTopLeft);
+
+	FSlateDrawElement::MakeLines(
+		InContext.OutDrawElements,
+		InContext.MaxLayer,
+		InContext.AllottedGeometry.ToPaintGeometry(),
+		Points,
+		InContext.MyClippingRect);
 }
 
 void URTSMinimapWidget::DrawBoxWithBrush(FPaintContext& InContext, const FVector2D& Position, const FSlateBrush& Brush) const
@@ -104,4 +148,40 @@ void URTSMinimapWidget::DrawBoxWithBrush(FPaintContext& InContext, const FVector
 		InContext.MyClippingRect,
 		ESlateDrawEffect::None,
 		Brush.TintColor.GetSpecifiedColor());
+}
+
+bool URTSMinimapWidget::ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& WorldPosition) const
+{
+	// Get ray.
+	FVector WorldOrigin;
+	FVector WorldDirection;
+	if (!UGameplayStatics::DeprojectScreenToWorld(Player, ViewportPosition, WorldOrigin, WorldDirection))
+	{
+		return false;
+	}
+
+	// Make plane.
+	FPlane ZPlane = FPlane(FVector::ZeroVector, FVector::UpVector);
+
+	// Calculate intersection point.
+	WorldPosition = FMath::LinePlaneIntersection(WorldOrigin, WorldOrigin + WorldDirection * 1000.0f, ZPlane);
+	return true;
+}
+
+FVector2D URTSMinimapWidget::WorldToMinimap(const FVector& WorldPosition) const
+{
+	// Get relative world position.
+	float RelativeWorldX = WorldPosition.X / MinimapWorldSize.X + 0.5f;
+	float RelativeWorldY = WorldPosition.Y / MinimapWorldSize.Y + 0.5f;
+
+	// Rotate to match UI coordinate system.
+	float temp = RelativeWorldX;
+	RelativeWorldX = RelativeWorldY;
+	RelativeWorldY = 1 - temp;
+
+	// Convert to minimap coordinates.
+	float MinimapX = RelativeWorldX * MinimapBackground.ImageSize.X;
+	float MinimapY = RelativeWorldY * MinimapBackground.ImageSize.Y;
+
+	return FVector2D(MinimapX, MinimapY);
 }
