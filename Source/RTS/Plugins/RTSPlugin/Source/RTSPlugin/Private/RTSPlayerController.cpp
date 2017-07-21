@@ -108,6 +108,33 @@ TArray<AActor*> ARTSPlayerController::GetSelectedActors()
 	return SelectedActors;
 }
 
+bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults)
+{
+	UWorld* World = GetWorld();
+
+	if (!World)
+	{
+		return false;
+	}
+
+	// Get ray.
+	FVector WorldOrigin;
+	FVector WorldDirection;
+	if (!UGameplayStatics::DeprojectScreenToWorld(this, ScreenPosition, WorldOrigin, WorldDirection))
+	{
+		return false;
+	}
+
+	// Cast ray.
+	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
+
+	return World->LineTraceMultiByObjectType(
+		HitResults,
+		WorldOrigin,
+		WorldOrigin + WorldDirection * HitResultTraceDistance,
+		Params);
+}
+
 bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 {
 	if (!bCreatingSelectionFrame)
@@ -133,13 +160,6 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)
 {
-    UWorld* World = GetWorld();
-
-    if (!World)
-    {
-        return false;
-    }
-
     // Get local player viewport.
     ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
 
@@ -155,22 +175,7 @@ bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitRe
         return false;
     }
 
-    // Get ray.
-    FVector WorldOrigin;
-    FVector WorldDirection;
-    if (!UGameplayStatics::DeprojectScreenToWorld(this, MousePosition, WorldOrigin, WorldDirection))
-    {
-        return false;
-    }
-
-    // Cast ray.
-    FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
-
-    return World->LineTraceMultiByObjectType(
-        HitResults,
-        WorldOrigin,
-        WorldOrigin + WorldDirection * HitResultTraceDistance,
-        Params);
+	return GetObjectsAtScreenPosition(MousePosition, HitResults);
 }
 
 bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults)
