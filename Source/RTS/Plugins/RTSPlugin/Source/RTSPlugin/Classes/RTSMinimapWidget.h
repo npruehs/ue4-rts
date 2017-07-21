@@ -49,6 +49,13 @@ public:
 	bool bDrawViewFrustum = true;
 
 
+	/** Event for custom drawing of units on the minimap. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDrawUnit"))
+	void ReceiveOnDrawUnit(UPARAM(ref) FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
+
+	/** Event for custom drawing of units on the minimap. */
+	virtual void NotifyOnDrawUnit(FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
+
 protected:
 	void NativeConstruct() override;
 	void NativePaint(FPaintContext& InContext) const override;

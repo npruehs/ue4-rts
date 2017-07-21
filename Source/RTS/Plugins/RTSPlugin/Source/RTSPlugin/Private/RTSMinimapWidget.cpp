@@ -13,6 +13,11 @@ URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer
 {
 }
 
+void URTSMinimapWidget::NotifyOnDrawUnit(FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const
+{
+	ReceiveOnDrawUnit(Context, Character, CharacterOwner, MinimapPosition, LocalPlayer);
+}
+
 void URTSMinimapWidget::NativeConstruct()
 {
 	UUserWidget::NativeConstruct();
@@ -59,11 +64,6 @@ void URTSMinimapWidget::DrawBackground(FPaintContext& InContext) const
 
 void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 {
-	if (!bDrawUnitsWithTeamColors)
-	{
-		return;
-	}
-
 	if (!MinimapVolume)
 	{
 		return;
@@ -79,18 +79,24 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 		FVector2D CharacterLocationMinimap = WorldToMinimap(CharacterLocationWorld);
 		
 		// Draw on minimap.
-		if (Character->GetPlayerOwner() == Player->PlayerState)
+		if (bDrawUnitsWithTeamColors)
 		{
-			DrawBoxWithBrush(InContext, FVector2D(CharacterLocationMinimap.X, CharacterLocationMinimap.Y), OwnUnitsBrush);
+			if (Character->GetPlayerOwner() == Player->PlayerState)
+			{
+				DrawBoxWithBrush(InContext, CharacterLocationMinimap, OwnUnitsBrush);
+			}
+			else if (Character->GetPlayerOwner() != nullptr)
+			{
+				DrawBoxWithBrush(InContext, CharacterLocationMinimap, EnemyUnitsBrush);
+			}
+			else
+			{
+				DrawBoxWithBrush(InContext, CharacterLocationMinimap, NeutralUnitsBrush);
+			}
 		}
-		else if (Character->GetPlayerOwner() != nullptr)
-		{
-			DrawBoxWithBrush(InContext, FVector2D(CharacterLocationMinimap.X, CharacterLocationMinimap.Y), EnemyUnitsBrush);
-		}
-		else
-		{
-			DrawBoxWithBrush(InContext, FVector2D(CharacterLocationMinimap.X, CharacterLocationMinimap.Y), NeutralUnitsBrush);
-		}
+		
+		// Allow custom drawing.
+		NotifyOnDrawUnit(InContext, Character, Character->GetPlayerOwner(), CharacterLocationMinimap, Player->PlayerState);
 	}
 }
 
