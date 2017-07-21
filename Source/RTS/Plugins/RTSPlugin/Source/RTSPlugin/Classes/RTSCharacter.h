@@ -27,6 +27,7 @@ class ARTSCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
+	/** Portrait of this character. Can be shown in the HUD. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
 	UTexture2D* Portrait;
 

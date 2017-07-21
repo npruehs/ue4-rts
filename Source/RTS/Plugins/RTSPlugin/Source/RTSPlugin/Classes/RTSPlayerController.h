@@ -38,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> GetSelectedActors();
 
+	/** Casts a ray from the specified screen position and collects the results. */
+	bool GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults);
+
 	/** Gets the current selection frame, in screen space. */
 	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
 
