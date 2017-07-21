@@ -49,11 +49,21 @@ void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 
 void URTSMinimapWidget::DrawBackground(FPaintContext& InContext) const
 {
+	if (!bDrawBackground)
+	{
+		return;
+	}
+
 	DrawBoxWithBrush(InContext, FVector2D(0, 0), MinimapBackground);
 }
 
 void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 {
+	if (!bDrawUnitsWithTeamColors)
+	{
+		return;
+	}
+
 	if (!MinimapVolume)
 	{
 		return;
@@ -86,6 +96,11 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 
 void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 {
+	if (!bDrawViewFrustum)
+	{
+		return;
+	}
+
 	// Get viewport size.
 	ARTSPlayerController* Player = Cast<ARTSPlayerController>(GetOwningPlayer());
 

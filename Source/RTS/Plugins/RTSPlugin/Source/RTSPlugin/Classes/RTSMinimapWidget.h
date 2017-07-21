@@ -21,20 +21,32 @@ class URTSMinimapWidget : public UUserWidget
 
 public:
 	/** Brush for drawing the background of the current map. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Background")
 	FSlateBrush MinimapBackground;
 
 	/** Brush for drawing own units on the minimap. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Units")
 	FSlateBrush OwnUnitsBrush;
 
 	/** Brush for drawing enemy units on the minimap. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Units")
 	FSlateBrush EnemyUnitsBrush;
 
 	/** Brush for drawing neutral units on the minimap. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Units")
 	FSlateBrush NeutralUnitsBrush;
+
+	/** Whether to draw the minimap background layer. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Background")
+	bool bDrawBackground = true;
+
+	/** Whether to draw unit dots on the minimap, with OwnUnitsBrush, EnemyUnitsBrush and NeutralUnitsBrush. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Units")
+	bool bDrawUnitsWithTeamColors = true;
+
+	/** Whether to show the current camera frustum on the minimap. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	bool bDrawViewFrustum = true;
 
 
 protected:
