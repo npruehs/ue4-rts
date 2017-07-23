@@ -41,6 +41,9 @@ public:
 	/** Casts a ray from the specified screen position and collects the results. */
 	bool GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults);
 
+	/** Casts a ray to find any objects at the specified world position. */
+	bool GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& HitResults);
+
 	/** Gets the current selection frame, in screen space. */
 	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
 
@@ -180,12 +183,18 @@ private:
 	/** Casts a box from the current selection frame and collects the results. */
 	bool GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults);
 
+	/** Traces all relevant objects using the specified ray. */
+	bool TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& HitResults);
+
 	/** Checks whether the specified actor is valid and selectable. */
 	bool IsSelectableActor(AActor* Actor);
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
     void IssueOrder();
+
+	/** Automatically issues the most reasonable order for the specified targets. */
+	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
 
 	/** Orders the passed unit to attack the specified unit. */
 	UFUNCTION(Reliable, Server, WithValidation)

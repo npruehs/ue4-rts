@@ -110,13 +110,6 @@ TArray<AActor*> ARTSPlayerController::GetSelectedActors()
 
 bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults)
 {
-	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return false;
-	}
-
 	// Get ray.
 	FVector WorldOrigin;
 	FVector WorldDirection;
@@ -126,13 +119,17 @@ bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, 
 	}
 
 	// Cast ray.
-	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
+	return TraceObjects(WorldOrigin, WorldDirection, HitResults);
+}
 
-	return World->LineTraceMultiByObjectType(
-		HitResults,
-		WorldOrigin,
-		WorldOrigin + WorldDirection * HitResultTraceDistance,
-		Params);
+bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& HitResults)
+{
+	// Get ray.
+	FVector WorldOrigin = FVector(WorldPositionXY.X, WorldPositionXY.Y, HitResultTraceDistance / 2);
+	FVector WorldDirection = -FVector::UpVector;
+
+	// Cast ray.
+	return TraceObjects(WorldOrigin, WorldDirection, HitResults);
 }
 
 bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
@@ -223,6 +220,24 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 	return HitResults.Num() > 0;
 }
 
+bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& HitResults)
+{
+	UWorld* World = GetWorld();
+
+	if (!World)
+	{
+		return false;
+	}
+
+	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
+
+	return World->LineTraceMultiByObjectType(
+		HitResults,
+		WorldOrigin,
+		WorldOrigin + WorldDirection * HitResultTraceDistance,
+		Params);
+}
+
 bool ARTSPlayerController::IsSelectableActor(AActor* Actor)
 {
 	// Check if valid.
@@ -244,12 +259,6 @@ bool ARTSPlayerController::IsSelectableActor(AActor* Actor)
 
 void ARTSPlayerController::IssueOrder()
 {
-    // Check if there's anybody to receive the order.
-    if (SelectedActors.Num() == 0)
-    {
-        return;
-    }
-
     // Get objects at pointer position.
     TArray<FHitResult> HitResults;
 
@@ -258,11 +267,22 @@ void ARTSPlayerController::IssueOrder()
         return;
     }
 
-    // Get target location.
-    for (auto& HitResult : HitResults)
-    {
-        if (HitResult.Actor != nullptr)
-        {
+	IssueOrderTargetingObjects(HitResults);
+}
+
+void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitResults)
+{
+	// Check if there's anybody to receive the order.
+	if (SelectedActors.Num() == 0)
+	{
+		return;
+	}
+
+	// Get target location.
+	for (auto& HitResult : HitResults)
+	{
+		if (HitResult.Actor != nullptr)
+		{
 			// Check if hit attackable actor.
 			auto AttackableComponent = HitResult.Actor->FindComponentByClass<URTSAttackableComponent>();
 
@@ -276,12 +296,12 @@ void ARTSPlayerController::IssueOrder()
 				IssueAttackOrder(HitResult.Actor.Get());
 				return;
 			}
-        }
+		}
 
-        // Issue move order.
-        IssueMoveOrder(HitResult.Location);
-        return;
-    }
+		// Issue move order.
+		IssueMoveOrder(HitResult.Location);
+		return;
+	}
 }
 
 void ARTSPlayerController::IssueAttackOrder(AActor* Target)
@@ -625,10 +645,25 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 		return;
 	}
 
-	// Move camera.
-	FVector NewCameraLocation = FVector(WorldPosition.X, WorldPosition.Y, PlayerPawn->GetActorLocation().Z);
-	PlayerPawn->SetActorLocation(NewCameraLocation);
+	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
+	{
+		// Move camera.
+		FVector NewCameraLocation = FVector(WorldPosition.X, WorldPosition.Y, PlayerPawn->GetActorLocation().Z);
+		PlayerPawn->SetActorLocation(NewCameraLocation);
+	}
+	else if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
+	{
+		// Get objects at pointer position.
+		TArray<FHitResult> HitResults;
 
+		if (!GetObjectsAtWorldPosition(WorldPosition, HitResults))
+		{
+			return;
+		}
+
+		IssueOrderTargetingObjects(HitResults);
+	}
+	
 	// Notify listeners.
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
 }
