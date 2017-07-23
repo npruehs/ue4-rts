@@ -29,17 +29,17 @@ public:
 
 	/** Locks on to the specified target, dealing damage on impact. */
 	UFUNCTION(BlueprintCallable)
-	void FireAt(AActor* Target, float Damage, TSubclassOf<class UDamageType> DamageType, AController* EventInstigator, AActor* DamageCauser);
+	void FireAt(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileInstigator, AActor* ProjectileDamageCauser);
 
 	virtual void Tick(float DeltaSeconds) override;
 
 
 	/** Event when this projectile hits its target. */
-	virtual void NotifyOnProjectileDetonated(AActor* Target, float Damage, TSubclassOf<class UDamageType> DamageType, AController* EventInstigator, AActor* DamageCauser);
+	virtual void NotifyOnProjectileDetonated(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileInstigator, AActor* ProjectileDamageCauser);
 
 	/** Event when this projectile hits its target. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnProjectileDetonated"))
-	void ReceiveOnProjectileDetonated(AActor* Target, float Damage, TSubclassOf<class UDamageType> DamageType, AController* EventInstigator, AActor* DamageCauser);
+	void ReceiveOnProjectileDetonated(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileInstigator, AActor* ProjectileDamageCauser);
 
 private:
 	AActor* Target;

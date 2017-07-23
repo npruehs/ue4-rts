@@ -15,19 +15,19 @@ ARTSProjectile::ARTSProjectile()
 	ImpactThresholdSquared = 100.0f;
 }
 
-void ARTSProjectile::FireAt(AActor* Target, float Damage, TSubclassOf<class UDamageType> DamageType, AController* EventInstigator, AActor* DamageCauser)
+void ARTSProjectile::FireAt(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator, AActor* ProjectileDamageCauser)
 {
-	if (!Target)
+	if (!ProjectileTarget)
 	{
 		UE_LOG(RTSLog, Error, TEXT("No target set for projectile %s!"), *GetName());
 		return;
 	}
 
-	this->Target = Target;
-	this->Damage = Damage;
-	this->DamageType = DamageType;
-	this->EventInstigator = EventInstigator;
-	this->DamageCauser = DamageCauser;
+	Target = ProjectileTarget;
+	Damage = ProjectileDamage;
+	DamageType = ProjectileDamageType;
+	EventInstigator = ProjectileEventInstigator;
+	DamageCauser = ProjectileDamageCauser;
 
 	// Set direction.
 	FVector Direction = Target->GetActorLocation() - GetActorLocation();
@@ -64,7 +64,7 @@ void ARTSProjectile::Tick(float DeltaSeconds)
 	}
 }
 
-void ARTSProjectile::NotifyOnProjectileDetonated(AActor* Target, float Damage, TSubclassOf<class UDamageType> DamageType, AController* EventInstigator, AActor* DamageCauser)
+void ARTSProjectile::NotifyOnProjectileDetonated(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator, AActor* ProjectileDamageCauser)
 {
-	ReceiveOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+	ReceiveOnProjectileDetonated(ProjectileTarget, ProjectileDamage, ProjectileDamageType, ProjectileEventInstigator, ProjectileDamageCauser);
 }

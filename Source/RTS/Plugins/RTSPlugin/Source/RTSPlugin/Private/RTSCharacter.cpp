@@ -114,7 +114,7 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		UE_LOG(RTSLog, Log, TEXT("Character %s has been killed."), *GetName());
 
 		// Get owner before destruction.
-		AController* Owner = Cast<AController>(GetOwner());
+		AController* OwningPlayer = Cast<AController>(GetOwner());
 
 		// Destroy this actor.
 		Destroy();
@@ -124,11 +124,11 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 
 		if (GameMode != nullptr)
 		{
-			GameMode->NotifyOnCharacterKilled(this, Owner);
+			GameMode->NotifyOnCharacterKilled(this, OwningPlayer);
 		}
 
 		// Notify listeners.
-		NotifyOnKilled(Owner);
+		NotifyOnKilled(OwningPlayer);
 	}
 
 	return ActualDamage;

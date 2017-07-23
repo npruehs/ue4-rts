@@ -90,11 +90,11 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 	// Notify listeners.
 	NotifyOnActorOwnerChanged(Actor);
 
-	ARTSCharacter* Character = Cast<ARTSCharacter>(Actor);
+	ARTSCharacter* Unit = Cast<ARTSCharacter>(Actor);
 
-	if (Character)
+	if (Unit)
 	{
-		Character->NotifyOnOwnerChanged(this);
+		Unit->NotifyOnOwnerChanged(this);
 	}
 }
 
@@ -203,15 +203,15 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 
 	for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
 	{
-		ARTSCharacter* Character = *CharacterIt;
+		ARTSCharacter* Unit = *CharacterIt;
 
 		FVector2D CharacterScreenPosition;
 
-		if (UGameplayStatics::ProjectWorldToScreen(this, Character->GetActorLocation(), CharacterScreenPosition))
+		if (UGameplayStatics::ProjectWorldToScreen(this, Unit->GetActorLocation(), CharacterScreenPosition))
 		{
 			if (SelectionFrame.Contains(FIntPoint(CharacterScreenPosition.X, CharacterScreenPosition.Y)))
 			{
-				FHitResult HitResult(Character, nullptr, Character->GetActorLocation(), FVector());
+				FHitResult HitResult(Unit, nullptr, Unit->GetActorLocation(), FVector());
 				HitResults.Add(HitResult);
 			}
 		}
@@ -418,11 +418,11 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 	// Clear selection.
 	for (AActor* SelectedActor : SelectedActors)
 	{
-		ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
+		ARTSCharacter* Unit = Cast<ARTSCharacter>(SelectedActor);
 
-		if (Character != nullptr)
+		if (Unit != nullptr)
 		{
-			Character->NotifyOnDeselected();
+			Unit->NotifyOnDeselected();
 		}
 	}
 
@@ -431,11 +431,11 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 
 	for (AActor* SelectedActor : SelectedActors)
 	{
-		ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
+		ARTSCharacter* Unit = Cast<ARTSCharacter>(SelectedActor);
 
-		if (Character != nullptr)
+		if (Unit != nullptr)
 		{
-			Character->NotifyOnSelected();
+			Unit->NotifyOnSelected();
 		}
 	}
 

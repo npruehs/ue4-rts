@@ -109,14 +109,14 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	}
 }
 
-void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController* Owner)
+void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController* CharacterOwner)
 {
 	if (DefeatConditionActor == nullptr)
 	{
 		return;
 	}
 
-	APlayerController* OwningPlayer = Cast<APlayerController>(Owner);
+	APlayerController* OwningPlayer = Cast<APlayerController>(CharacterOwner);
 
 	if (OwningPlayer == nullptr)
 	{

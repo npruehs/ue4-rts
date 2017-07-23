@@ -35,7 +35,7 @@ public:
 
 
 	/** Event when a character has been killed. */
-	virtual void NotifyOnCharacterKilled(ARTSCharacter* Character, AController* Owner);
+	virtual void NotifyOnCharacterKilled(ARTSCharacter* Character, AController* CharacterOwner);
 
 	/** Event when a player has been defeated. */
 	virtual void NotifyOnPlayerDefeated(APlayerController* Player);
