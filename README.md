@@ -27,6 +27,13 @@ We're now moving on to more advanced stuff, such as [minimap or fog of war](http
 
 Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 
+## Adding The Plugin
+
+1. Close the Unreal Editor.
+1. Copy the RTSPlugin folder to Plugins folder next to your .uproject file.
+1. Start the Unreal Editor.
+1. Enable the plugin in Edit > Plugins > RTS.
+
 ## Usage
 
 ### Setting Up The Framewok
