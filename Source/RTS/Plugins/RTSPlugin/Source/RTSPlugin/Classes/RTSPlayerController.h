@@ -105,6 +105,9 @@ public:
 	/** Event when an actor has received a stop order. */
 	virtual void NotifyOnIssuedStopOrder(AActor* Actor);
 
+	/** Event when the player has clicked a spot on the minimap. */
+	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
 
@@ -123,6 +126,10 @@ public:
 	/** Event when an actor has received a stop order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedStopOrder"))
 	void ReceiveOnIssuedStopOrder(AActor* Actor);
+
+	/** Event when the player has clicked a spot on the minimap. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "NotifyOnMinimapClicked"))
+	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))

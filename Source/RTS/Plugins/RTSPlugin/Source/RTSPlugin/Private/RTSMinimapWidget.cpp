@@ -52,6 +52,57 @@ void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 	DrawViewFrustum(InContext);
 }
 
+FReply URTSMinimapWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	// Apply default handling.
+	auto Reply = UUserWidget::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	if (Reply.IsEventHandled())
+	{
+		return Reply;
+	}
+
+	// Handle MouseMove events from now on.
+	bMouseDown = true;
+
+	// Handle initial click.
+	return HandleMinimapClick(InGeometry, InMouseEvent);
+}
+
+FReply URTSMinimapWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	// Apply default handling.
+	auto Reply = UUserWidget::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
+
+	if (Reply.IsEventHandled())
+	{
+		return Reply;
+	}
+
+	// Stop handling MouseMove events.
+	bMouseDown = false;
+	return FReply::Handled();
+}
+
+FReply URTSMinimapWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	// Apply default handling.
+	auto Reply = UUserWidget::NativeOnMouseMove(InGeometry, InMouseEvent);
+
+	if (Reply.IsEventHandled())
+	{
+		return Reply;
+	}
+
+	if (bMouseDown)
+	{
+		// Handle movement.
+		return HandleMinimapClick(InGeometry, InMouseEvent);
+	}
+
+	return FReply::Unhandled();
+}
+
 void URTSMinimapWidget::DrawBackground(FPaintContext& InContext) const
 {
 	if (!bDrawBackground)
@@ -169,6 +220,42 @@ void URTSMinimapWidget::DrawBoxWithBrush(FPaintContext& InContext, const FVector
 		InContext.MyClippingRect,
 		ESlateDrawEffect::None,
 		Brush.TintColor.GetSpecifiedColor());
+}
+
+FReply URTSMinimapWidget::HandleMinimapClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	ARTSPlayerController* Player = Cast<ARTSPlayerController>(GetOwningPlayer());
+
+	if (!Player)
+	{
+		FReply::Unhandled();
+	}
+
+	// Convert clicked minimap position to world space.
+	FVector2D MinimapPosition = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	FVector WorldPosition = MinimapToWorld(MinimapPosition);
+
+	// Notify player.
+	Player->NotifyOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
+	return FReply::Handled();
+}
+
+FVector URTSMinimapWidget::MinimapToWorld(const FVector2D& MinimapPosition) const
+{
+	// Convert to relative minimap position.
+	float RelativeMinimapX = MinimapPosition.X / MinimapBackground.ImageSize.X;
+	float RelativeMinimapY = MinimapPosition.Y / MinimapBackground.ImageSize.Y;
+
+	// Rotate to match UI coordinate system.
+	float temp = RelativeMinimapX;
+	RelativeMinimapX = 1 - RelativeMinimapY;
+	RelativeMinimapY = temp;
+
+	// Convert to world coordinates.
+	float WorldX = (RelativeMinimapX - 0.5) * MinimapWorldSize.X;
+	float WorldY = (RelativeMinimapY - 0.5) * MinimapWorldSize.Y;
+
+	return FVector(WorldX, WorldY, 0.0f);
 }
 
 bool URTSMinimapWidget::ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& WorldPosition) const
