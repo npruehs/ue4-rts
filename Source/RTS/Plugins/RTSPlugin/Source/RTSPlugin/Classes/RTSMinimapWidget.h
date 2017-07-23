@@ -59,9 +59,12 @@ public:
 protected:
 	void NativeConstruct() override;
 	void NativePaint(FPaintContext& InContext) const override;
-
+	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 private:
+	bool bMouseDown;
 	ARTSMinimapVolume* MinimapVolume;
 	FVector MinimapWorldSize;
 
@@ -71,6 +74,9 @@ private:
 
 	void DrawBoxWithBrush(FPaintContext& InContext, const FVector2D& Position, const FSlateBrush& Brush) const;
 
+	FReply HandleMinimapClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
+
+	FVector MinimapToWorld(const FVector2D& MinimapPosition) const;
 	bool ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& WorldPosition) const;
 	FVector2D WorldToMinimap(const FVector& WorldPosition) const;
 };

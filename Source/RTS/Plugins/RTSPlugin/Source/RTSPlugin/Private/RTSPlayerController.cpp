@@ -616,6 +616,23 @@ void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selec
     ReceiveOnSelectionChanged(Selection);
 }
 
+void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition)
+{
+	APawn* PlayerPawn = GetPawn();
+
+	if (!PlayerPawn)
+	{
+		return;
+	}
+
+	// Move camera.
+	FVector NewCameraLocation = FVector(WorldPosition.X, WorldPosition.Y, PlayerPawn->GetActorLocation().Z);
+	PlayerPawn->SetActorLocation(NewCameraLocation);
+
+	// Notify listeners.
+	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
+}
+
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
