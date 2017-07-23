@@ -3,6 +3,7 @@
 
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Rendering/DrawElements.h"
 
 #include "RTSMinimapVolume.h"
 #include "RTSPlayerController.h"
