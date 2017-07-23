@@ -167,6 +167,7 @@ Example: Drawing names of unit owners
 1. Set the minimap background image size to a reasonable value (e.g. 256 x 256).
 1. Setup brushes for own units, enemy units and neutral units (e.g. image = WhiteSquareTexture, size = 4 x 4, tint = green, red, yellow, respectively).
 1. Add your RTSMinimapWidget to your UI, with a matching size (e.g. 256 x 256).
+1. Set its Behaviour > Visibility to Visible if the player should be able to move the camera and give orders using the minimap.
 
 ## Bugs & Feature Requests
 
