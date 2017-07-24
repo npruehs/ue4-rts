@@ -60,9 +60,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();
 
+	/** Selects the specified actors. */
 	UFUNCTION(BlueprintCallable)
 	void SelectActors(TArray<AActor*> Actors);
 
+	/** Saves the current selection to the specified control group. */
 	UFUNCTION(BlueprintCallable)
 	void SaveControlGroup(int Index);
 
@@ -77,6 +79,7 @@ public:
 	UFUNCTION(BlueprintCallable) void SaveControlGroup8();
 	UFUNCTION(BlueprintCallable) void SaveControlGroup9();
 
+	/** Restores the selection saved in the specified control group. */
 	UFUNCTION(BlueprintCallable)
 	void LoadControlGroup(int Index);
 

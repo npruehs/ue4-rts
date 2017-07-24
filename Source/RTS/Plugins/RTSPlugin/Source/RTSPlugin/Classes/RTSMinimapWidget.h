@@ -49,7 +49,7 @@ public:
 	bool bDrawViewFrustum = true;
 
 
-	/** Event for custom drawing of units on the minimap. */
+	/** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDrawUnit"))
 	void ReceiveOnDrawUnit(UPARAM(ref) FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
 
