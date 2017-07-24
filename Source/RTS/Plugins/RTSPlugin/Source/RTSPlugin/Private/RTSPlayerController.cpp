@@ -32,6 +32,10 @@ void ARTSPlayerController::SetupInputComponent()
 	// Bind actions.
 	InputComponent->BindAction("Select", IE_Pressed, this, &ARTSPlayerController::StartSelectActors);
 	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::FinishSelectActors);
+	InputComponent->BindAction("AddSelection", IE_Pressed, this, &ARTSPlayerController::StartAddSelection);
+	InputComponent->BindAction("AddSelection", IE_Released, this, &ARTSPlayerController::StopAddSelection);
+	InputComponent->BindAction("ToggleSelection", IE_Pressed, this, &ARTSPlayerController::StartToggleSelection);
+	InputComponent->BindAction("ToggleSelection", IE_Released, this, &ARTSPlayerController::StopToggleSelection);
 
 	InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
 	InputComponent->BindAction("IssueStopOrder", IE_Released, this, &ARTSPlayerController::IssueStopOrder);
@@ -568,6 +572,11 @@ void ARTSPlayerController::FinishSelectActors()
     // Check results.
 	TArray<AActor*> ActorsToSelect;
 
+	if (bAddSelectionHotkeyPressed || bToggleSelectionHotkeyPressed)
+	{
+		ActorsToSelect = SelectedActors;
+	}
+
     for (auto& HitResult : HitResults)
     {
 		if (!IsSelectableActor(HitResult.Actor.Get()))
@@ -575,15 +584,36 @@ void ARTSPlayerController::FinishSelectActors()
 			continue;
 		}
 
-		if (ActorsToSelect.Contains(HitResult.Actor))
+		// Check how to apply selection.
+		if (bToggleSelectionHotkeyPressed)
 		{
-			continue;
+			if (SelectedActors.Contains(HitResult.Actor))
+			{
+				// Deselect actor.
+				ActorsToSelect.Remove(HitResult.Actor.Get());
+
+				UE_LOG(RTSLog, Log, TEXT("Deselected actor %s."), *HitResult.Actor->GetName());
+			}
+			else if (!ActorsToSelect.Contains(HitResult.Actor))
+			{
+				// Select actor.
+				ActorsToSelect.Add(HitResult.Actor.Get());
+
+				UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+			}
 		}
+		else
+		{
+			if (ActorsToSelect.Contains(HitResult.Actor))
+			{
+				continue;
+			}
 
-        // Select actor.
-		ActorsToSelect.Add(HitResult.Actor.Get());
+			// Select actor.
+			ActorsToSelect.Add(HitResult.Actor.Get());
 
-		UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+			UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+		}
     }
 
 	SelectActors(ActorsToSelect);
@@ -599,6 +629,26 @@ void ARTSPlayerController::StartShowingHealthBars()
 void ARTSPlayerController::StopShowingHealthBars()
 {
 	bHealthBarHotkeyPressed = false;
+}
+
+void ARTSPlayerController::StartAddSelection()
+{
+	bAddSelectionHotkeyPressed = true;
+}
+
+void ARTSPlayerController::StopAddSelection()
+{
+	bAddSelectionHotkeyPressed = false;
+}
+
+void ARTSPlayerController::StartToggleSelection()
+{
+	bToggleSelectionHotkeyPressed = true;
+}
+
+void ARTSPlayerController::StopToggleSelection()
+{
+	bToggleSelectionHotkeyPressed = false;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)

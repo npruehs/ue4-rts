@@ -180,6 +180,12 @@ private:
 	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
 	bool bHealthBarHotkeyPressed;
 
+	/** Whether to add clicked units to the current selection. */
+	bool bAddSelectionHotkeyPressed;
+
+	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
+	bool bToggleSelectionHotkeyPressed;
+
     /** Casts a ray from the current mouse position and collects the results. */
     bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
 	
@@ -232,4 +238,20 @@ private:
 	/** Stop showing all health bars. */
 	UFUNCTION()
 	void StopShowingHealthBars();
+
+	/** Start adding clicked units to the current selection. */
+	UFUNCTION()
+	void StartAddSelection();
+
+	/** Stop adding clicked units to the current selection. */
+	UFUNCTION()
+	void StopAddSelection();
+
+	/** Start adding clicked units to the current selection, if they're not already selected, and deselecting them otherwise. */
+	UFUNCTION()
+	void StartToggleSelection();
+
+	/** Stop adding clicked units to the current selection, if they're not already selected, and deselecting them otherwise. */
+	UFUNCTION()
+	void StopToggleSelection();
 };
