@@ -82,6 +82,8 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 #### Enabling Selection
 
 1. Bind the action Select (e.g. to left mouse button).
+1. Bind the action AddSelection (e.g. to Left Shift).
+1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 1. Add SelectableComponents to everything selectable.
 1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController.
 
