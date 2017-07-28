@@ -10,8 +10,11 @@
 class ARTSTeamInfo;
 
 
+/**
+* Game state with RTS features, such as teams.
+*/
 UCLASS()
-class ARTSGameState : public AGameState
+class ARTSGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 

@@ -4,6 +4,8 @@
 
 void ARTSPlayerState::NotifyOnTeamChanged()
 {
+	UE_LOG(RTSLog, Log, TEXT("Player %s added to team %d."), *GetName(), Team->TeamIndex);
+
 	ReceiveOnTeamChanged();
 }
 

@@ -9,6 +9,7 @@
 
 class ARTSCharacter;
 class ARTSPlayerStart;
+class ARTSTeamInfo;
 
 
 /**
@@ -27,6 +28,21 @@ public:
 	/** Optional type of actor that is required for a player to be alive. As soon as no actor of the specified type is alive, the player is defeated. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	TSubclassOf<AActor> DefeatConditionActor;
+
+	/** Number of teams to create. */
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	uint8 NumTeams;
+
+	/** Teams of the current match. */
+	UPROPERTY(BlueprintReadOnly, Category = "Team")
+	TArray<ARTSTeamInfo*> Teams;
+
+	/** Class of TeamInfo to spawn. */
+	UPROPERTY(EditDefaultsOnly, Category = "Team")
+	TSubclassOf<ARTSTeamInfo> TeamClass;
+
+
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 	ARTSPlayerStart* FindRTSPlayerStart(AController* Player);
 
