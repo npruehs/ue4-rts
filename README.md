@@ -39,15 +39,19 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 ### Setting Up The Framewok
 
 1. Create a player controller deriving from RTSPlayerController.
-1. Create a game mode deriving from RTSGameMode using that player controller. Compile and save.
+1. Create a game mode deriving from RTSGameMode using that player controller.
+1. Set the number of teams for your game (e.g. 2). Compile and save.
 1. Use the new game mode in the world settings.
 1. Create a controller deriving from RTSCharacterAIController.
 1. Set the Character Behavior Tree Asset of the new controller to RTSCharacterBehaviorTree.
 1. Set the Character Blackboard Asset of the new controller to RTSCharacterBlackboard.
+1. Set the Game State Class of your game mode to any RTSGameState.
+1. Set the Player State Class of your game mode to any RTSPlayerState.
 
 ### Creating Maps
 
 1. Add RTSPlayerStarts to the map.
+1. Set the Team Index for each player start.
 1. Add RTSCameraBoundsVolume to the map.
 1. Add a NavMeshBoundsVolume to the map, and build Navigation. You may press P to review your results in the viewport.
 

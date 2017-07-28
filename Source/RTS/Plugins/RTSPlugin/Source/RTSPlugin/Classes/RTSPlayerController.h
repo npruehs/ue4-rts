@@ -6,7 +6,9 @@
 
 #include "RTSPlayerController.generated.h"
 
+
 class ARTSCameraBoundsVolume;
+class ARTSPlayerState;
 
 
 /**
@@ -33,6 +35,10 @@ public:
 	/** Gets the actor currently hovered by this player. */
 	UFUNCTION(BlueprintCallable)
 	AActor* GetHoveredActor();
+
+	/** Gets the replicated state of this player. */
+	UFUNCTION(BlueprintCallable)
+	ARTSPlayerState* GetPlayerState();
 
 	/** Gets the list of units currently selected by this player. */
 	UFUNCTION(BlueprintCallable)

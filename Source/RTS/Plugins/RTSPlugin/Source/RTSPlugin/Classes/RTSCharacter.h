@@ -4,15 +4,16 @@
 
 #include "Engine/Texture2D.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/Controller.h"
 
 #include "RTSAttackData.h"
 
 #include "RTSCharacter.generated.h"
 
 
-class APlayerState;
 class UDecalComponent;
 
+class ARTSPlayerState;
 class ARTSProjectile;
 class URTSAttackComponent;
 class URTSHealthComponent;
@@ -39,7 +40,15 @@ public:
 
 	/** Gets the player owning this character. */
 	UFUNCTION(BlueprintCallable)
-	APlayerState* GetPlayerOwner();
+	ARTSPlayerState* GetPlayerOwner();
+
+	/** Checks whether this character belongs to the same team as the specified one. */
+	UFUNCTION(BlueprintCallable)
+	bool IsSameTeamAsCharacter(ARTSCharacter* Other);
+
+	/** Checks whether the player owning this character belongs to the same team as the specified player. */
+	UFUNCTION(BlueprintCallable)
+	bool IsSameTeamAsController(AController* C);
 
 	/** Uses the passed attack on the specified target and starts the cooldown timer. */
 	UFUNCTION(BlueprintCallable)
@@ -111,7 +120,7 @@ private:
 
 	/** Player owning this character. */
 	UPROPERTY(replicated)
-	APlayerState* PlayerOwner;
+	ARTSPlayerState* PlayerOwner;
 
 	/** Decal used for rendering the selection circle of this character. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -119,4 +128,8 @@ private:
 
 	/** Whether this unit is currently selected by the local player, or not. */
 	bool bSelected;
+
+
+	/** Checks whether the two specified players belong to the same team. */
+	bool AreSameTeam(ARTSPlayerState* First, ARTSPlayerState* Second);
 };

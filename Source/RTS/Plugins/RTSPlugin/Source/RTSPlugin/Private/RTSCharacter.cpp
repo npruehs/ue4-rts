@@ -9,9 +9,10 @@
 #include "RTSAttackComponent.h"
 #include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
+#include "RTSPlayerState.h"
 #include "RTSProjectile.h"
+#include "RTSTeamInfo.h"
 
-#include "GameFramework/PlayerState.h"
 
 ARTSCharacter::ARTSCharacter()
 {
@@ -30,7 +31,7 @@ void ARTSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ARTSCharacter, PlayerOwner);
 }
 
-APlayerState* ARTSCharacter::GetPlayerOwner()
+ARTSPlayerState* ARTSCharacter::GetPlayerOwner()
 {
 	return PlayerOwner;
 }
@@ -134,6 +135,22 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	return ActualDamage;
 }
 
+bool ARTSCharacter::IsSameTeamAsCharacter(ARTSCharacter* Other)
+{
+	ARTSPlayerState* MyOwner = GetPlayerOwner();
+	ARTSPlayerState* OtherOwner = Other->GetPlayerOwner();
+
+	return AreSameTeam(MyOwner, OtherOwner);
+}
+
+bool ARTSCharacter::IsSameTeamAsController(AController* C)
+{
+	ARTSPlayerState* MyOwner = GetPlayerOwner();
+	ARTSPlayerState* OtherPlayer = Cast<ARTSPlayerState>(C->PlayerState);
+
+	return AreSameTeam(MyOwner, OtherPlayer);
+}
+
 void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 {
 	if (AttackComponent == nullptr)
@@ -221,9 +238,12 @@ void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
 
 void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
 {
-	PlayerOwner = NewOwner->PlayerState;
+	PlayerOwner = Cast<ARTSPlayerState>(NewOwner->PlayerState);
 
-	ReceiveOnOwnerChanged(NewOwner);
+	if (PlayerOwner)
+	{
+		ReceiveOnOwnerChanged(NewOwner);
+	}
 }
 
 void ARTSCharacter::NotifyOnSelected()
@@ -237,4 +257,22 @@ void ARTSCharacter::NotifyOnSelected()
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile)
 {
 	ReceiveOnUsedAttack(Attack, Target, Projectile);
+}
+
+bool ARTSCharacter::AreSameTeam(ARTSPlayerState* First, ARTSPlayerState* Second)
+{
+	if (!First || !Second)
+	{
+		return false;
+	}
+
+	ARTSTeamInfo* FirstTeam = First->Team;
+	ARTSTeamInfo* SecondTeam = Second->Team;
+
+	if (!FirstTeam || !SecondTeam)
+	{
+		return false;
+	}
+
+	return FirstTeam->TeamIndex == SecondTeam->TeamIndex;
 }

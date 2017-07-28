@@ -8,7 +8,26 @@
 #include "RTSCharacter.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerStart.h"
+#include "RTSTeamInfo.h"
 
+
+void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	AGameModeBase::InitGame(MapName, Options, ErrorMessage);
+
+	// Set up teams.
+	if (TeamClass == nullptr)
+	{
+		TeamClass = ARTSTeamInfo::StaticClass();
+	}
+
+	for (uint8 i = 0; i < NumTeams; ++i)
+	{
+		ARTSTeamInfo* NewTeam = GetWorld()->SpawnActor<ARTSTeamInfo>(TeamClass);
+		NewTeam->TeamIndex = i;
+		Teams.Add(NewTeam);
+	}
+}
 
 ARTSPlayerStart* ARTSGameMode::FindRTSPlayerStart(AController* Player)
 {
@@ -78,6 +97,16 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	{
 		UE_LOG(RTSLog, Log, TEXT("Start spot %s is now occupied by player %s."), *PlayerStart->GetName(), *NewPlayer->GetName());
 		PlayerStart->Player = NewPlayer;
+	}
+
+	// Set team.
+	if (PlayerStart->TeamIndex >= Teams.Num())
+	{
+		UE_LOG(RTSLog, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->TeamIndex, Teams.Num());
+	}
+	else
+	{
+		Teams[PlayerStart->TeamIndex]->AddToTeam(NewPlayer);
 	}
 
 	// Build spawn transform.
