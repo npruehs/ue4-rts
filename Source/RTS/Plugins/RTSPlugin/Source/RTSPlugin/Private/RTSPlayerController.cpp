@@ -12,6 +12,7 @@
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
+#include "RTSPlayerState.h"
 #include "RTSSelectableComponent.h"
 
 
@@ -105,6 +106,11 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 AActor* ARTSPlayerController::GetHoveredActor()
 {
 	return HoveredActor;
+}
+
+ARTSPlayerState* ARTSPlayerController::GetPlayerState()
+{
+	return Cast<ARTSPlayerState>(PlayerState);
 }
 
 TArray<AActor*> ARTSPlayerController::GetSelectedActors()
@@ -310,29 +316,33 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 
 void ARTSPlayerController::IssueAttackOrder(AActor* Target)
 {
+	ARTSTeamInfo* MyTeam = GetPlayerState()->Team;
+
 	// Issue attack orders.
 	for (auto SelectedActor : SelectedActors)
 	{
-		// Verify pawn and owner.
-		auto SelectedPawn = Cast<APawn>(SelectedActor);
+		// Verify target.
+		auto SelectedCharacter = Cast<ARTSCharacter>(SelectedActor);
 
-		if (!SelectedPawn)
+		if (!SelectedCharacter)
 		{
 			continue;
 		}
 
-		if (SelectedPawn->GetOwner() != this)
+		auto TargetCharacter = Cast<ARTSCharacter>(Target);
+
+		if (TargetCharacter && TargetCharacter->IsSameTeamAsCharacter(SelectedCharacter))
 		{
 			continue;
 		}
-
-		if (SelectedPawn->FindComponentByClass<URTSAttackComponent>() == nullptr)
+		
+		if (SelectedCharacter->FindComponentByClass<URTSAttackComponent>() == nullptr)
 		{
 			continue;
 		}
 
 		// Send attack order to server.
-		ServerIssueAttackOrder(SelectedPawn, Target);
+		ServerIssueAttackOrder(SelectedCharacter, Target);
 		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
 
 		// Notify listeners.

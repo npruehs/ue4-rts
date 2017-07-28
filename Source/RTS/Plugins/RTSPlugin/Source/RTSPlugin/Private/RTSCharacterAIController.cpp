@@ -6,6 +6,7 @@
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
+#include "RTSCharacter.h"
 #include "RTSOrderType.h"
 
 
@@ -53,7 +54,10 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		}
 		
 		// Check owner.
-		if (HitResult.Actor->GetOwner() == GetPawn()->GetOwner())
+		auto MyCharacter = Cast<ARTSCharacter>(GetPawn());
+		auto TargetCharacter = Cast<ARTSCharacter>(HitResult.Actor.Get());
+
+		if (MyCharacter && TargetCharacter && MyCharacter->IsSameTeamAsCharacter(TargetCharacter))
 		{
 			continue;
 		}

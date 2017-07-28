@@ -137,7 +137,7 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 			{
 				DrawBoxWithBrush(InContext, CharacterLocationMinimap, OwnUnitsBrush);
 			}
-			else if (Character->GetPlayerOwner() != nullptr)
+			else if (Character->GetPlayerOwner() != nullptr && !Character->IsSameTeamAsController(Player))
 			{
 				DrawBoxWithBrush(InContext, CharacterLocationMinimap, EnemyUnitsBrush);
 			}
