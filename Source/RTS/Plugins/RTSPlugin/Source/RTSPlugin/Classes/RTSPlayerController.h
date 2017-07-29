@@ -7,6 +7,9 @@
 #include "RTSPlayerController.generated.h"
 
 
+class USkeletalMesh;
+
+class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
 class ARTSPlayerState;
 
@@ -27,6 +30,9 @@ public:
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     int CameraScrollThreshold;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
 
 
 	virtual void PlayerTick(float DeltaTime) override;
@@ -106,7 +112,7 @@ public:
 
 	/** Begin finding a suitable location for constructing a building of the specified type. */
 	UFUNCTION(BlueprintCallable)
-	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType);
+	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh);
 
 
 	/** Event when this player is now owning the specified actor. */
@@ -186,8 +192,8 @@ private:
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingTypeBeingPlaced;
 
-	/** Dummy building currently being placed, if any. */
-	AActor* BuildingBeingPlaced;
+	/** Current cursor for placing a new building. */
+	ARTSBuildingCursor* BuildingCursor;
 
 
 	/** Whether we're currently creating a selection frame by dragging the mouse. */

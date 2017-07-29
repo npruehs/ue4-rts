@@ -3,12 +3,14 @@
 
 #include "EngineUtils.h"
 #include "Components/InputComponent.h"
-#include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/SkeletalMesh.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
+#include "RTSBuildingCursor.h"
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
@@ -512,13 +514,16 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 	return bHealthBarHotkeyPressed;
 }
 
-void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType)
+void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh)
 {
 	// Spawn dummy building.
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	BuildingBeingPlaced = GetWorld()->SpawnActor<AActor>(BuildingType, SpawnParams);
+	BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
+	BuildingCursor->SetMesh(PreviewMesh);
+	BuildingCursor->SetInvalidLocation();
+
 	BuildingTypeBeingPlaced = BuildingType;
 }
 
@@ -676,14 +681,14 @@ void ARTSPlayerController::StopToggleSelection()
 
 void ARTSPlayerController::ConfirmBuildingPlacement()
 {
-	if (!BuildingBeingPlaced)
+	if (!BuildingCursor)
 	{
 		return;
 	}
 
 	// Remove dummy building.
-	BuildingBeingPlaced->Destroy();
-	BuildingBeingPlaced = nullptr;
+	BuildingCursor->Destroy();
+	BuildingCursor = nullptr;
 
 	// Start construction.
 	ServerConstructBuildingAtLocation(BuildingTypeBeingPlaced, HoveredWorldPosition);
@@ -691,14 +696,14 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 
 void ARTSPlayerController::CancelBuildingPlacement()
 {
-	if (!BuildingBeingPlaced)
+	if (!BuildingCursor)
 	{
 		return;
 	}
 
 	// Remove dummy building.
-	BuildingBeingPlaced->Destroy();
-	BuildingBeingPlaced = nullptr;
+	BuildingCursor->Destroy();
+	BuildingCursor = nullptr;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
@@ -839,9 +844,9 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 				HoveredWorldPosition = HitResult.Location;
 
 				// Update position of building being placed.
-				if (BuildingBeingPlaced)
+				if (BuildingCursor)
 				{
-					BuildingBeingPlaced->SetActorLocation(HoveredWorldPosition);
+					BuildingCursor->SetActorLocation(HoveredWorldPosition);
 				}
 				continue;
 			}
