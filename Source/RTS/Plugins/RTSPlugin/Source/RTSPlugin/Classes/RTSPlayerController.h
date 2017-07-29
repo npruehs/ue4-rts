@@ -114,6 +114,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh);
 
+	/**
+	 * Checks whether the specified building can be placed at the passed location.
+	 * You may add custom building placement logic here, e.g. requires other nearby building, cursed terrain, energy field, fixed slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category = "RTS", meta = (DisplayName = "CanPlaceBuilding"))
+	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingType, const FVector& Location) const;
+	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const;
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);

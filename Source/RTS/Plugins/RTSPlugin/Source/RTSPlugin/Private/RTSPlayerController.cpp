@@ -527,6 +527,11 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingTy
 	BuildingTypeBeingPlaced = BuildingType;
 }
 
+bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const
+{
+	return true;
+}
+
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
 	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
@@ -682,6 +687,11 @@ void ARTSPlayerController::StopToggleSelection()
 void ARTSPlayerController::ConfirmBuildingPlacement()
 {
 	if (!BuildingCursor)
+	{
+		return;
+	}
+
+	if (!CanPlaceBuilding(BuildingTypeBeingPlaced, HoveredWorldPosition))
 	{
 		return;
 	}
@@ -847,6 +857,15 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 				if (BuildingCursor)
 				{
 					BuildingCursor->SetActorLocation(HoveredWorldPosition);
+
+					if (CanPlaceBuilding(BuildingTypeBeingPlaced, HoveredWorldPosition))
+					{
+						BuildingCursor->SetValidLocation();
+					}
+					else
+					{
+						BuildingCursor->SetInvalidLocation();
+					}
 				}
 				continue;
 			}
@@ -881,5 +900,5 @@ void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSub
 
 bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)
 {
-	return true;
+	return CanPlaceBuilding(BuildingType, Location);
 }
