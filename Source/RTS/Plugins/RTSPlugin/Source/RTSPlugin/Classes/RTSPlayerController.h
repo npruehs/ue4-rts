@@ -112,15 +112,16 @@ public:
 
 	/** Begin finding a suitable location for constructing a building of the specified type. */
 	UFUNCTION(BlueprintCallable)
-	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh);
+	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh, const FVector& CollisionBoxSize);
 
 	/**
 	 * Checks whether the specified building can be placed at the passed location.
+	 * Default implementation checks for any dynamic objects within a box of the specified collision size.
 	 * You may add custom building placement logic here, e.g. requires other nearby building, cursed terrain, energy field, fixed slot.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "RTS", meta = (DisplayName = "CanPlaceBuilding"))
-	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingType, const FVector& Location) const;
-	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const;
+	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const;
+	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const;
 
 
 	/** Event when this player is now owning the specified actor. */
@@ -198,7 +199,10 @@ private:
     TArray<AActor*> SelectedActors;
 
 	/** Type of the building currently being placed, if any. */
-	TSubclassOf<AActor> BuildingTypeBeingPlaced;
+	TSubclassOf<AActor> BuildingBeingPlacedType;
+
+	/** Collision size of the building currently being placed, if any. */
+	FVector BuildingBeingPlacedCollisionBoxSize;
 
 	/** Current cursor for placing a new building. */
 	ARTSBuildingCursor* BuildingCursor;

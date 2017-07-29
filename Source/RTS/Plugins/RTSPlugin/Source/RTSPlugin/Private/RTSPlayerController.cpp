@@ -514,7 +514,7 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 	return bHealthBarHotkeyPressed;
 }
 
-void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh)
+void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh, const FVector& CollisionBoxSize)
 {
 	// Spawn dummy building.
 	FActorSpawnParameters SpawnParams;
@@ -524,12 +524,26 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingTy
 	BuildingCursor->SetMesh(PreviewMesh);
 	BuildingCursor->SetInvalidLocation();
 
-	BuildingTypeBeingPlaced = BuildingType;
+	BuildingBeingPlacedType = BuildingType;
+	BuildingBeingPlacedCollisionBoxSize = CollisionBoxSize;
 }
 
-bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const
+bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const
 {
-	return true;
+	UWorld* World = GetWorld();
+
+	if (!World)
+	{
+		return false;
+	}
+
+	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllDynamicObjects);
+
+	return !World->OverlapAnyTestByObjectType(
+		Location,
+		FQuat::Identity,
+		Params,
+		FCollisionShape::MakeBox(CollisionBoxSize / 2));
 }
 
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
@@ -691,7 +705,7 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 		return;
 	}
 
-	if (!CanPlaceBuilding(BuildingTypeBeingPlaced, HoveredWorldPosition))
+	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
 	{
 		return;
 	}
@@ -701,7 +715,7 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 	BuildingCursor = nullptr;
 
 	// Start construction.
-	ServerConstructBuildingAtLocation(BuildingTypeBeingPlaced, HoveredWorldPosition);
+	ServerConstructBuildingAtLocation(BuildingBeingPlacedType, HoveredWorldPosition);
 }
 
 void ARTSPlayerController::CancelBuildingPlacement()
@@ -858,7 +872,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 				{
 					BuildingCursor->SetActorLocation(HoveredWorldPosition);
 
-					if (CanPlaceBuilding(BuildingTypeBeingPlaced, HoveredWorldPosition))
+					if (CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
 					{
 						BuildingCursor->SetValidLocation();
 					}
@@ -900,5 +914,5 @@ void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSub
 
 bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)
 {
-	return CanPlaceBuilding(BuildingType, Location);
+	return true;
 }
