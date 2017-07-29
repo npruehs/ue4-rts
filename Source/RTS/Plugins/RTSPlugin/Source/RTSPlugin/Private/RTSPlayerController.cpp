@@ -69,6 +69,9 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ShowHealthBars", IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
 	InputComponent->BindAction("ShowHealthBars", IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
 
+	InputComponent->BindAction("ConfirmBuildingPlacement", IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
+	InputComponent->BindAction("CancelBuildingPlacement", IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
+
 	// Get camera bounds.
 	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -509,6 +512,16 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 	return bHealthBarHotkeyPressed;
 }
 
+void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType)
+{
+	// Spawn dummy building.
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	BuildingBeingPlaced = GetWorld()->SpawnActor<AActor>(BuildingType, SpawnParams);
+	BuildingTypeBeingPlaced = BuildingType;
+}
+
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
 	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
@@ -661,6 +674,33 @@ void ARTSPlayerController::StopToggleSelection()
 	bToggleSelectionHotkeyPressed = false;
 }
 
+void ARTSPlayerController::ConfirmBuildingPlacement()
+{
+	if (!BuildingBeingPlaced)
+	{
+		return;
+	}
+
+	// Remove dummy building.
+	BuildingBeingPlaced->Destroy();
+	BuildingBeingPlaced = nullptr;
+
+	// Start construction.
+	ServerConstructBuildingAtLocation(BuildingTypeBeingPlaced, HoveredWorldPosition);
+}
+
+void ARTSPlayerController::CancelBuildingPlacement()
+{
+	if (!BuildingBeingPlaced)
+	{
+		return;
+	}
+
+	// Remove dummy building.
+	BuildingBeingPlaced->Destroy();
+	BuildingBeingPlaced = nullptr;
+}
+
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
 {
     CameraLeftRightAxisValue = Value;
@@ -795,6 +835,14 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			// Check if hit any actor.
 			if (HitResult.Actor == nullptr)
 			{
+				// Store hovered world position.
+				HoveredWorldPosition = HitResult.Location;
+
+				// Update position of building being placed.
+				if (BuildingBeingPlaced)
+				{
+					BuildingBeingPlaced->SetActorLocation(HoveredWorldPosition);
+				}
 				continue;
 			}
 
@@ -810,4 +858,23 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			HoveredActor = HitResult.Actor.Get();
 		}
 	}
+}
+
+void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSubclassOf<AActor> BuildingType, FVector Location)
+{
+	// Spawn building to construct.
+	// TODO: Add different styles of building construction (e.g. C&C, Warcraft).
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(BuildingType, Location, FRotator::ZeroRotator, SpawnParams);
+
+	UE_LOG(RTSLog, Log, TEXT("Constructed building %s at %s."), *BuildingType.Get()->GetName(), *Location.ToString());
+
+	// TODO: Raise event.
+}
+
+bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)
+{
+	return true;
 }

@@ -104,6 +104,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsHealthBarHotkeyPressed();
 
+	/** Begin finding a suitable location for constructing a building of the specified type. */
+	UFUNCTION(BlueprintCallable)
+	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType);
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -173,8 +177,17 @@ private:
 	/** Actor currently hovered by this player. */
 	AActor* HoveredActor;
 
+	/** World position currently hovered by this player. */
+	FVector HoveredWorldPosition;
+
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
+
+	/** Type of the building currently being placed, if any. */
+	TSubclassOf<AActor> BuildingTypeBeingPlaced;
+
+	/** Dummy building currently being placed, if any. */
+	AActor* BuildingBeingPlaced;
 
 
 	/** Whether we're currently creating a selection frame by dragging the mouse. */
@@ -191,6 +204,7 @@ private:
 
 	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
 	bool bToggleSelectionHotkeyPressed;
+
 
     /** Casts a ray from the current mouse position and collects the results. */
     bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
@@ -260,4 +274,16 @@ private:
 	/** Stop adding clicked units to the current selection, if they're not already selected, and deselecting them otherwise. */
 	UFUNCTION()
 	void StopToggleSelection();
+	
+	/** Confirms placing the current building at the hovered location. */
+	UFUNCTION()
+	void ConfirmBuildingPlacement();
+
+	/** Cancels placing the current building without effect. */
+	UFUNCTION()
+	void CancelBuildingPlacement();
+
+	/** Starts constructing a building of the specified type at the passed location. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerConstructBuildingAtLocation(TSubclassOf<AActor> BuildingType, FVector Location);
 };
