@@ -148,6 +148,12 @@ Example: Drawing health bars as rectangles with borders
 
 ![Draw Health Bars](Documents/Manual/Images/HealthBarBlueprint.png)
 
+#### Showing Construction Progress Bars
+
+1. In your RTSHUD, set AlwaysShowConstructionProgressBars, ShowHoverConstructionProgressBars, ShowSelectionConstructionProgressBars and ShowHotkeyConstructionProgressBars as desired.
+1. If you checked ShowHotkeyConstructionProgressBars, bind the action ShowConstructionProgressBars (e.g. to the LeftAlt key).
+1. In your RTSHUD, implement the DrawConstructionProgressBar event as desired.
+
 #### Showing Hovered Unit Effects
 
 1. In your RTSHUD, implement the DrawHoveredActorEffect event as desired.
