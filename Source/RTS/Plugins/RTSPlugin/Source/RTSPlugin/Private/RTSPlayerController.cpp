@@ -68,6 +68,9 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
 	InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
 
+	InputComponent->BindAction("ShowConstructionProgressBars", IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
+	InputComponent->BindAction("ShowConstructionProgressBars", IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
+
 	InputComponent->BindAction("ShowHealthBars", IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
 	InputComponent->BindAction("ShowHealthBars", IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
 
@@ -509,6 +512,11 @@ void ARTSPlayerController::LoadControlGroup7() { LoadControlGroup(7); }
 void ARTSPlayerController::LoadControlGroup8() { LoadControlGroup(8); }
 void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
 
+bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed()
+{
+	return bConstructionProgressBarHotkeyPressed;
+}
+
 bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 {
 	return bHealthBarHotkeyPressed;
@@ -666,6 +674,16 @@ void ARTSPlayerController::FinishSelectActors()
 	SelectActors(ActorsToSelect);
 
 	bCreatingSelectionFrame = false;
+}
+
+void ARTSPlayerController::StartShowingConstructionProgressBars()
+{
+	bConstructionProgressBarHotkeyPressed = true;
+}
+
+void ARTSPlayerController::StopShowingConstructionProgressBars()
+{
+	bConstructionProgressBarHotkeyPressed = false;
 }
 
 void ARTSPlayerController::StartShowingHealthBars()

@@ -106,6 +106,10 @@ public:
 	UFUNCTION(BlueprintCallable) void LoadControlGroup8();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup9();
 
+	/** Whether the hotkey for showing all construction progress bars is currently pressed, or not. */
+	UFUNCTION(BlueprintCallable)
+	bool IsConstructionProgressBarHotkeyPressed();
+
 	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
 	UFUNCTION(BlueprintCallable)
 	bool IsHealthBarHotkeyPressed();
@@ -214,6 +218,9 @@ private:
 	/** Mouse position on screen when creating the selection frame started. */
 	FVector2D SelectionFrameMouseStartPosition;
 
+	/** Whether the hotkey for showing all construction progress bars is currently pressed, or not. */
+	bool bConstructionProgressBarHotkeyPressed;
+
 	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
 	bool bHealthBarHotkeyPressed;
 
@@ -268,6 +275,14 @@ private:
 	/** Selects all selectable actors within the created selection frame, started by StartSelectActors. */
 	UFUNCTION()
 	void FinishSelectActors();
+
+	/** Force showing all construction progress bars. */
+	UFUNCTION()
+	void StartShowingConstructionProgressBars();
+
+	/** Stop showing all construction progress bars. */
+	UFUNCTION()
+	void StopShowingConstructionProgressBars();
 
 	/** Force showing all health bars. */
 	UFUNCTION()
