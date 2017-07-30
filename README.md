@@ -182,6 +182,13 @@ Example: Drawing names of unit owners
 1. Add your RTSMinimapWidget to your UI, with a matching size (e.g. 256 x 256).
 1. Set its Behaviour > Visibility to Visible if the player should be able to move the camera and give orders using the minimap.
 
+### Setup Building Placement
+
+1. Create an RTSBuildingCursor, setting its valid and invalid materials.
+1. In your player controller, set the building cursor reference.
+1. Bind the action ConfirmBuildingPlacement (e.g. to Left Mouse Button).
+1. Bind the action CancelBuildingPlacement (e.g. to Right Mouse Button).
+
 ## Bugs & Feature Requests
 
 We are sorry that you've experienced issues or are missing a feature! After verifying that you are using the latest version and having checked whether a [similar issue](https://github.com/npruehs/ue4-rts/issues) has already been reported, feel free to [open a new issue](https://github.com/npruehs/ue4-rts/issues/new). In order to help us resolving your problem as fast as possible, please include the following details in your report:

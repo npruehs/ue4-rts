@@ -3,12 +3,14 @@
 
 #include "EngineUtils.h"
 #include "Components/InputComponent.h"
-#include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/SkeletalMesh.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
+#include "RTSBuildingCursor.h"
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
@@ -68,6 +70,9 @@ void ARTSPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("ShowHealthBars", IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
 	InputComponent->BindAction("ShowHealthBars", IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
+
+	InputComponent->BindAction("ConfirmBuildingPlacement", IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
+	InputComponent->BindAction("CancelBuildingPlacement", IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
 
 	// Get camera bounds.
 	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -509,6 +514,38 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 	return bHealthBarHotkeyPressed;
 }
 
+void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh, const FVector& CollisionBoxSize)
+{
+	// Spawn dummy building.
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
+	BuildingCursor->SetMesh(PreviewMesh);
+	BuildingCursor->SetInvalidLocation();
+
+	BuildingBeingPlacedType = BuildingType;
+	BuildingBeingPlacedCollisionBoxSize = CollisionBoxSize;
+}
+
+bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const
+{
+	UWorld* World = GetWorld();
+
+	if (!World)
+	{
+		return false;
+	}
+
+	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllDynamicObjects);
+
+	return !World->OverlapAnyTestByObjectType(
+		Location,
+		FQuat::Identity,
+		Params,
+		FCollisionShape::MakeBox(CollisionBoxSize / 2));
+}
+
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
 	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
@@ -661,6 +698,38 @@ void ARTSPlayerController::StopToggleSelection()
 	bToggleSelectionHotkeyPressed = false;
 }
 
+void ARTSPlayerController::ConfirmBuildingPlacement()
+{
+	if (!BuildingCursor)
+	{
+		return;
+	}
+
+	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
+	{
+		return;
+	}
+
+	// Remove dummy building.
+	BuildingCursor->Destroy();
+	BuildingCursor = nullptr;
+
+	// Start construction.
+	ServerConstructBuildingAtLocation(BuildingBeingPlacedType, HoveredWorldPosition);
+}
+
+void ARTSPlayerController::CancelBuildingPlacement()
+{
+	if (!BuildingCursor)
+	{
+		return;
+	}
+
+	// Remove dummy building.
+	BuildingCursor->Destroy();
+	BuildingCursor = nullptr;
+}
+
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
 {
     CameraLeftRightAxisValue = Value;
@@ -795,6 +864,23 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			// Check if hit any actor.
 			if (HitResult.Actor == nullptr)
 			{
+				// Store hovered world position.
+				HoveredWorldPosition = HitResult.Location;
+
+				// Update position of building being placed.
+				if (BuildingCursor)
+				{
+					BuildingCursor->SetActorLocation(HoveredWorldPosition);
+
+					if (CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
+					{
+						BuildingCursor->SetValidLocation();
+					}
+					else
+					{
+						BuildingCursor->SetInvalidLocation();
+					}
+				}
 				continue;
 			}
 
@@ -810,4 +896,23 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			HoveredActor = HitResult.Actor.Get();
 		}
 	}
+}
+
+void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSubclassOf<AActor> BuildingType, FVector Location)
+{
+	// Spawn building to construct.
+	// TODO: Add different styles of building construction (e.g. C&C, Warcraft).
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(BuildingType, Location, FRotator::ZeroRotator, SpawnParams);
+
+	UE_LOG(RTSLog, Log, TEXT("Constructed building %s at %s."), *BuildingType.Get()->GetName(), *Location.ToString());
+
+	// TODO: Raise event.
+}
+
+bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)
+{
+	return true;
 }

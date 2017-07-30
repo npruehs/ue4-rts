@@ -7,6 +7,9 @@
 #include "RTSPlayerController.generated.h"
 
 
+class USkeletalMesh;
+
+class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
 class ARTSPlayerState;
 
@@ -27,6 +30,9 @@ public:
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     int CameraScrollThreshold;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
 
 
 	virtual void PlayerTick(float DeltaTime) override;
@@ -104,6 +110,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsHealthBarHotkeyPressed();
 
+	/** Begin finding a suitable location for constructing a building of the specified type. */
+	UFUNCTION(BlueprintCallable)
+	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh, const FVector& CollisionBoxSize);
+
+	/**
+	 * Checks whether the specified building can be placed at the passed location.
+	 * Default implementation checks for any dynamic objects within a box of the specified collision size.
+	 * You may add custom building placement logic here, e.g. requires other nearby building, cursed terrain, energy field, fixed slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category = "RTS", meta = (DisplayName = "CanPlaceBuilding"))
+	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const;
+	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const;
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -173,8 +192,20 @@ private:
 	/** Actor currently hovered by this player. */
 	AActor* HoveredActor;
 
+	/** World position currently hovered by this player. */
+	FVector HoveredWorldPosition;
+
     /** Actors selected by this player. */
     TArray<AActor*> SelectedActors;
+
+	/** Type of the building currently being placed, if any. */
+	TSubclassOf<AActor> BuildingBeingPlacedType;
+
+	/** Collision size of the building currently being placed, if any. */
+	FVector BuildingBeingPlacedCollisionBoxSize;
+
+	/** Current cursor for placing a new building. */
+	ARTSBuildingCursor* BuildingCursor;
 
 
 	/** Whether we're currently creating a selection frame by dragging the mouse. */
@@ -191,6 +222,7 @@ private:
 
 	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
 	bool bToggleSelectionHotkeyPressed;
+
 
     /** Casts a ray from the current mouse position and collects the results. */
     bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
@@ -260,4 +292,16 @@ private:
 	/** Stop adding clicked units to the current selection, if they're not already selected, and deselecting them otherwise. */
 	UFUNCTION()
 	void StopToggleSelection();
+	
+	/** Confirms placing the current building at the hovered location. */
+	UFUNCTION()
+	void ConfirmBuildingPlacement();
+
+	/** Cancels placing the current building without effect. */
+	UFUNCTION()
+	void CancelBuildingPlacement();
+
+	/** Starts constructing a building of the specified type at the passed location. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerConstructBuildingAtLocation(TSubclassOf<AActor> BuildingType, FVector Location);
 };
