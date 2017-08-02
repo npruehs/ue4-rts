@@ -535,6 +535,8 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingTy
 	BuildingBeingPlacedType = BuildingType;
 	BuildingBeingPlacedCollisionBoxSize = CollisionBoxSize;
 
+	UE_LOG(RTSLog, Log, TEXT("Beginning placement of building %s."), *BuildingType->GetName());
+
 	// Notify listeners.
 	NotifyOnBuildingPlacementStarted(BuildingType);
 }
@@ -728,10 +730,14 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 
 	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
 	{
+		UE_LOG(RTSLog, Log, TEXT("Can't place building %s at %s."), *BuildingBeingPlacedType->GetName(), *HoveredWorldPosition.ToString());
+
 		// Notify listeners.
 		NotifyOnBuildingPlacementError(BuildingBeingPlacedType, HoveredWorldPosition);
 		return;
 	}
+
+	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingBeingPlacedType->GetName(), *HoveredWorldPosition.ToString());
 
 	// Remove dummy building.
 	BuildingCursor->Destroy();
@@ -754,6 +760,8 @@ void ARTSPlayerController::CancelBuildingPlacement()
 	// Remove dummy building.
 	BuildingCursor->Destroy();
 	BuildingCursor = nullptr;
+
+	UE_LOG(RTSLog, Log, TEXT("Cancelled placement of building %s."), *BuildingBeingPlacedType->GetName());
 
 	// Notify listeners.
 	NotifyOnBuildingPlacementCancelled(BuildingBeingPlacedType);
@@ -956,9 +964,7 @@ void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSub
 
 	GetWorld()->SpawnActor<AActor>(BuildingType, Location, FRotator::ZeroRotator, SpawnParams);
 
-	UE_LOG(RTSLog, Log, TEXT("Constructed building %s at %s."), *BuildingType.Get()->GetName(), *Location.ToString());
-
-	// TODO: Raise event.
+	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingType->GetName(), *Location.ToString());
 }
 
 bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)

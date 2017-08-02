@@ -46,6 +46,8 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		RemainingConstructionTime = 0;
 		bConstructing = false;
 
+		UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
+
 		// Notify listeners.
 		OnConstructionFinished.Broadcast();
 	}
@@ -70,6 +72,8 @@ void URTSConstructionSiteComponent::StartConstruction()
 
 	RemainingConstructionTime = ConstructionTime;
 	bConstructing = true;
+
+	UE_LOG(RTSLog, Log, TEXT("Construction %s started."), *GetName());
 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(ConstructionTime);
