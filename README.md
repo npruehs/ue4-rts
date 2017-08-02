@@ -81,6 +81,11 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Add a SelectableComponent.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
 
+### Adding Buildings
+
+1. See Adding Units.
+1. Add an RTSConstructionSiteComponent and set the ConstructionTime.
+
 ### Selecting Units
 
 #### Enabling Selection
