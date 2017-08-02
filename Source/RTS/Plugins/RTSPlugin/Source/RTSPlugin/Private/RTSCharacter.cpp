@@ -140,7 +140,7 @@ bool ARTSCharacter::IsSameTeamAsCharacter(ARTSCharacter* Other)
 	ARTSPlayerState* MyOwner = GetPlayerOwner();
 	ARTSPlayerState* OtherOwner = Other->GetPlayerOwner();
 
-	return AreSameTeam(MyOwner, OtherOwner);
+	return MyOwner && MyOwner->IsSameTeamAs(OtherOwner);
 }
 
 bool ARTSCharacter::IsSameTeamAsController(AController* C)
@@ -148,7 +148,7 @@ bool ARTSCharacter::IsSameTeamAsController(AController* C)
 	ARTSPlayerState* MyOwner = GetPlayerOwner();
 	ARTSPlayerState* OtherPlayer = Cast<ARTSPlayerState>(C->PlayerState);
 
-	return AreSameTeam(MyOwner, OtherPlayer);
+	return MyOwner && MyOwner->IsSameTeamAs(OtherPlayer);
 }
 
 void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
@@ -257,22 +257,4 @@ void ARTSCharacter::NotifyOnSelected()
 void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile)
 {
 	ReceiveOnUsedAttack(Attack, Target, Projectile);
-}
-
-bool ARTSCharacter::AreSameTeam(ARTSPlayerState* First, ARTSPlayerState* Second)
-{
-	if (!First || !Second)
-	{
-		return false;
-	}
-
-	ARTSTeamInfo* FirstTeam = First->Team;
-	ARTSTeamInfo* SecondTeam = Second->Team;
-
-	if (!FirstTeam || !SecondTeam)
-	{
-		return false;
-	}
-
-	return FirstTeam->TeamIndex == SecondTeam->TeamIndex;
 }

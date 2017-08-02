@@ -128,8 +128,4 @@ private:
 
 	/** Whether this unit is currently selected by the local player, or not. */
 	bool bSelected;
-
-
-	/** Checks whether the two specified players belong to the same team. */
-	bool AreSameTeam(ARTSPlayerState* First, ARTSPlayerState* Second);
 };

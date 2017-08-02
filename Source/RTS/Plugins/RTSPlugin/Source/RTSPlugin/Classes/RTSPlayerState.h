@@ -24,6 +24,10 @@ public:
 	ARTSTeamInfo* Team;
 
 
+	/** Checks whether this player belong to the same team as the specified one. */
+	bool IsSameTeamAs(ARTSPlayerState* Other);
+
+
 	/** Event when this player changed team. */
 	UFUNCTION()
 	virtual void NotifyOnTeamChanged();
