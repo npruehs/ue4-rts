@@ -25,6 +25,7 @@ public:
 
 
 	/** Checks whether this player belong to the same team as the specified one. */
+	UFUNCTION(BlueprintCallable)
 	bool IsSameTeamAs(ARTSPlayerState* Other);
 
 

@@ -38,9 +38,11 @@ public:
 
 
 	/** Gets the current construction progress [0..1]. */
+	UFUNCTION(BlueprintCallable)
 	float GetProgressPercentage() const;
 
 	/** Whether the construction timer is currently being ticked, or not. */
+	UFUNCTION(BlueprintCallable)
 	bool IsConstructing() const;
 
 private:
