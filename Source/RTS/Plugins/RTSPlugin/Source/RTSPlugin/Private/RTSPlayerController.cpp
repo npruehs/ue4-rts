@@ -962,9 +962,12 @@ void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSub
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	GetWorld()->SpawnActor<AActor>(BuildingType, Location, FRotator::ZeroRotator, SpawnParams);
+	AActor* NewBuilding = GetWorld()->SpawnActor<AActor>(BuildingType, Location, FRotator::ZeroRotator, SpawnParams);
 
 	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingType->GetName(), *Location.ToString());
+
+	// Set owning player.
+	TransferOwnership(NewBuilding);
 }
 
 bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)
