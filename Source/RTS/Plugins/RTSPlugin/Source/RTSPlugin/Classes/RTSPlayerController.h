@@ -131,6 +131,18 @@ public:
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
 
+	/** Event when the player begins placing a building. */
+	virtual void NotifyOnBuildingPlacementStarted(TSubclassOf<AActor> BuildingType);
+
+	/** Event when the player confirms a location for placing a building. */
+	virtual void NotifyOnBuildingPlacementConfirmed(TSubclassOf<AActor> BuildingType, const FVector& Location);
+
+	/** Event when the player receives an error placing a building at a specific location. */
+	virtual void NotifyOnBuildingPlacementError(TSubclassOf<AActor> BuildingType, const FVector& Location);
+
+	/** Event when the player cancels placing a building. */
+	virtual void NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingType);
+
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target);
 
@@ -149,6 +161,22 @@ public:
 	/** Event when this player is now owning the specified actor. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Ownership", meta = (DisplayName = "OnActorOwnerChanged"))
 	void ReceiveOnActorOwnerChanged(AActor* Actor);
+
+	/** Event when the player begins placing a building. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Construction", meta = (DisplayName = "OnBuildingPlacementStarted"))
+	void ReceiveOnBuildingPlacementStarted(TSubclassOf<AActor> BuildingType);
+
+	/** Event when the player confirms a location for placing a building. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Construction", meta = (DisplayName = "OnBuildingPlacementConfirmed"))
+	void ReceiveOnBuildingPlacementConfirmed(TSubclassOf<AActor> BuildingType, const FVector& Location);
+
+	/** Event when the player receives an error placing a building at a specific location. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Construction", meta = (DisplayName = "OnBuildingPlacementError"))
+	void ReceiveOnBuildingPlacementError(TSubclassOf<AActor> BuildingType, const FVector& Location);
+
+	/** Event when the player cancels placing a building. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Construction", meta = (DisplayName = "OnBuildingPlacementCancelled"))
+	void ReceiveOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingType);
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))

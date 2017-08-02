@@ -7,6 +7,10 @@
 #include "RTSConstructionSiteComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionStartedSignature, float, TotalConstructionTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionFinishedSignature);
+
+
 /** Allows constructing the actor over time. */
 UCLASS(meta = (BlueprintSpawnableComponent))
 class URTSConstructionSiteComponent : public UActorComponent
@@ -44,6 +48,19 @@ public:
 	/** Whether the construction timer is currently being ticked, or not. */
 	UFUNCTION(BlueprintCallable)
 	bool IsConstructing() const;
+
+	/** Starts constructing the actor, setting the timer. */
+	UFUNCTION(BlueprintCallable)
+	void StartConstruction();
+
+
+	/** Event when the construction timer has been started. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSConstructionSiteComponentConstructionStartedSignature OnConstructionStarted;
+
+	/** Event when the construction timer has been expired. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSConstructionSiteComponentConstructionFinishedSignature OnConstructionFinished;
 
 private:
 	/** Whether the construction timer is currently being ticked, or not. */

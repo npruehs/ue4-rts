@@ -534,6 +534,9 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingTy
 
 	BuildingBeingPlacedType = BuildingType;
 	BuildingBeingPlacedCollisionBoxSize = CollisionBoxSize;
+
+	// Notify listeners.
+	NotifyOnBuildingPlacementStarted(BuildingType);
 }
 
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const
@@ -725,12 +728,17 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 
 	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
 	{
+		// Notify listeners.
+		NotifyOnBuildingPlacementError(BuildingBeingPlacedType, HoveredWorldPosition);
 		return;
 	}
 
 	// Remove dummy building.
 	BuildingCursor->Destroy();
 	BuildingCursor = nullptr;
+
+	// Notify listeners.
+	NotifyOnBuildingPlacementConfirmed(BuildingBeingPlacedType, HoveredWorldPosition);
 
 	// Start construction.
 	ServerConstructBuildingAtLocation(BuildingBeingPlacedType, HoveredWorldPosition);
@@ -746,6 +754,9 @@ void ARTSPlayerController::CancelBuildingPlacement()
 	// Remove dummy building.
 	BuildingCursor->Destroy();
 	BuildingCursor = nullptr;
+
+	// Notify listeners.
+	NotifyOnBuildingPlacementCancelled(BuildingBeingPlacedType);
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
@@ -761,6 +772,26 @@ void ARTSPlayerController::MoveCameraUpDown(float Value)
 void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
 {
 	ReceiveOnActorOwnerChanged(Actor);
+}
+
+void ARTSPlayerController::NotifyOnBuildingPlacementStarted(TSubclassOf<AActor> BuildingType)
+{
+	ReceiveOnBuildingPlacementStarted(BuildingType);
+}
+
+void ARTSPlayerController::NotifyOnBuildingPlacementConfirmed(TSubclassOf<AActor> BuildingType, const FVector& Location)
+{
+	ReceiveOnBuildingPlacementConfirmed(BuildingType, Location);
+}
+
+void ARTSPlayerController::NotifyOnBuildingPlacementError(TSubclassOf<AActor> BuildingType, const FVector& Location)
+{
+	ReceiveOnBuildingPlacementError(BuildingType, Location);
+}
+
+void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingType)
+{
+	ReceiveOnBuildingPlacementCancelled(BuildingType);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target)

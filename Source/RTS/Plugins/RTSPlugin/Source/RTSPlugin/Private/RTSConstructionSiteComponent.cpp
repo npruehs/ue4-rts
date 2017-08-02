@@ -21,8 +21,7 @@ void URTSConstructionSiteComponent::BeginPlay()
 
 	if (bStartImmediately)
 	{
-		RemainingConstructionTime = ConstructionTime;
-		bConstructing = true;
+		StartConstruction();
 	}
 }
 
@@ -46,6 +45,9 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	{
 		RemainingConstructionTime = 0;
 		bConstructing = false;
+
+		// Notify listeners.
+		OnConstructionFinished.Broadcast();
 	}
 }
 
@@ -57,4 +59,18 @@ float URTSConstructionSiteComponent::GetProgressPercentage() const
 bool URTSConstructionSiteComponent::IsConstructing() const
 {
 	return bConstructing;
+}
+
+void URTSConstructionSiteComponent::StartConstruction()
+{
+	if (bConstructing)
+	{
+		return;
+	}
+
+	RemainingConstructionTime = ConstructionTime;
+	bConstructing = true;
+
+	// Notify listeners.
+	OnConstructionStarted.Broadcast(ConstructionTime);
 }
