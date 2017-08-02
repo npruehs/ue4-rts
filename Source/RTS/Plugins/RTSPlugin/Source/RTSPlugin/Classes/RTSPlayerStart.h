@@ -17,7 +17,7 @@ class ARTSPlayerStart : public APlayerStart
 
 public:
 	/** Team to add the spawned player to. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Object)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
 	int32 TeamIndex;
 
 	/** Player who's been spawned at this start. */

@@ -20,7 +20,7 @@ class ARTSPlayerState : public APlayerState
 
 public:
 	/** Team this player belongs to. */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = NotifyOnTeamChanged, Category = Team)
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = NotifyOnTeamChanged, Category = "Team")
 	ARTSTeamInfo* Team;
 
 

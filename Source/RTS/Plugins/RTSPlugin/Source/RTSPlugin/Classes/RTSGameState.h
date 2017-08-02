@@ -20,6 +20,6 @@ class ARTSGameState : public AGameStateBase
 
 public:
 	/** Teams of the current match. */
-	UPROPERTY(BlueprintReadOnly, Category = Team)
+	UPROPERTY(BlueprintReadOnly, Category = "Team")
 	TArray<ARTSTeamInfo*> Teams;
 };
