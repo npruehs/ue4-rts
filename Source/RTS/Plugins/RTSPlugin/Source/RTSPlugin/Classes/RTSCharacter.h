@@ -2,7 +2,6 @@
 
 #include "RTSPluginPrivatePCH.h"
 
-#include "Engine/Texture2D.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 
@@ -28,11 +27,6 @@ class ARTSCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	/** Portrait of this character. Can be shown in the HUD. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
-	UTexture2D* Portrait;
-
-
 	ARTSCharacter();
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
