@@ -8,6 +8,7 @@
 
 #include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
+#include "RTSSelectableComponent.h"
 
 
 ARTSCharacter::ARTSCharacter()
@@ -24,6 +25,9 @@ void ARTSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Cache component references.
+	SelectableComponent = FindComponentByClass<URTSSelectableComponent>();
+
 	// Setup selection circle.
 	FCollisionShape CollisionShape = GetCapsuleComponent()->GetCollisionShape();
 	float DecalHeight = CollisionShape.Capsule.HalfHeight * 2;
@@ -34,7 +38,7 @@ void ARTSCharacter::BeginPlay()
 
 void ARTSCharacter::Tick(float DeltaSeconds)
 {
-	if (bSelected)
+	if (SelectableComponent && SelectableComponent->IsSelected())
 	{
 		// Show selection circle.
 		SelectionCircleDecalComponent->SetWorldLocation(GetActorLocation());
@@ -58,20 +62,4 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	}
 
 	return HealthComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-}
-
-void ARTSCharacter::NotifyOnDeselected()
-{
-	bSelected = false;
-
-	// Notify listeners.
-	ReceiveOnDeselected();
-}
-
-void ARTSCharacter::NotifyOnSelected()
-{
-	bSelected = true;
-
-	// Notify listeners.
-	ReceiveOnSelected();
 }

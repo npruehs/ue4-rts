@@ -12,9 +12,11 @@
 
 class UDecalComponent;
 
+class URTSSelectableComponent;
+
 
 /**
-* Character with RTS features, such as using an attack.
+* Character with RTS features, such as taking damage.
 */
 UCLASS()
 class ARTSCharacter : public ACharacter
@@ -23,21 +25,6 @@ class ARTSCharacter : public ACharacter
 
 public:
 	ARTSCharacter();
-
-
-	/** Event when the character has been deselected. */
-	virtual void NotifyOnDeselected();
-
-	/** Event when the character has been selected. */
-	virtual void NotifyOnSelected();
-
-	/** Event when the character has been deselected. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDeselected"))
-	void ReceiveOnDeselected();
-
-	/** Event when the character has been selected. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnSelected"))
-	void ReceiveOnSelected();
 
 
 	virtual void Tick(float DeltaSeconds) override;
@@ -51,6 +38,5 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UDecalComponent* SelectionCircleDecalComponent;
 
-	/** Whether this unit is currently selected by the local player, or not. */
-	bool bSelected;
+	URTSSelectableComponent* SelectableComponent;
 };

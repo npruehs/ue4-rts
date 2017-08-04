@@ -453,9 +453,14 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 	{
 		ARTSCharacter* Unit = Cast<ARTSCharacter>(SelectedActor);
 
-		if (Unit != nullptr)
+		if (Unit)
 		{
-			Unit->NotifyOnDeselected();
+			URTSSelectableComponent* SelectableComponent = Unit->FindComponentByClass<URTSSelectableComponent>();
+
+			if (SelectableComponent)
+			{
+				SelectableComponent->DeselectActor();
+			}
 		}
 	}
 
@@ -466,9 +471,14 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 	{
 		ARTSCharacter* Unit = Cast<ARTSCharacter>(SelectedActor);
 
-		if (Unit != nullptr)
+		if (Unit)
 		{
-			Unit->NotifyOnSelected();
+			URTSSelectableComponent* SelectableComponent = Unit->FindComponentByClass<URTSSelectableComponent>();
+
+			if (SelectableComponent)
+			{
+				SelectableComponent->SelectActor();
+			}
 		}
 	}
 
