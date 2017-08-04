@@ -7,6 +7,10 @@
 #include "RTSHealthComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSHealthComponentHealthChangedSignature, float, OldHealth, float, NewHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSHealthComponentKilledSignature, AController*, PreviousOwner);
+
+
 /**
 * Adds health to the actor, e.g. for taking damage and dying.
 */
@@ -25,5 +29,20 @@ public:
 	float MaximumHealth;
 
 
+	URTSHealthComponent(const FObjectInitializer& ObjectInitializer);
+
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+
+	/** Apply damage to this actor. */
+	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+
+	/** Event when the current health of the character has changed. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSHealthComponentHealthChangedSignature OnHealthChanged;
+
+	/** Event when the character has been killed. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSHealthComponentKilledSignature OnKilled;
 };

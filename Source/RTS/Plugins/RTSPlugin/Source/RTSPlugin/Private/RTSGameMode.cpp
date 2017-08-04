@@ -138,7 +138,7 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	}
 }
 
-void ARTSGameMode::NotifyOnCharacterKilled(ARTSCharacter* Character, AController* CharacterOwner)
+void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* CharacterOwner)
 {
 	if (DefeatConditionActor == nullptr)
 	{
