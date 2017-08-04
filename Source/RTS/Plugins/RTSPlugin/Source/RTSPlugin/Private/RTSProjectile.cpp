@@ -13,6 +13,10 @@ ARTSProjectile::ARTSProjectile()
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
 	ImpactThresholdSquared = 100.0f;
+
+	// Enable replication.
+	// This might change in the future, as we don't really care about exact projectile positions on client-side.
+	bReplicates = true;
 }
 
 void ARTSProjectile::FireAt(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator, AActor* ProjectileDamageCauser)
