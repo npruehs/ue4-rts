@@ -30,14 +30,6 @@ public:
 	ARTSCharacter();
 
 
-	/** Uses the passed attack on the specified target and starts the cooldown timer. */
-	UFUNCTION(BlueprintCallable)
-	void UseAttack(int AttackIndex, AActor* Target);
-
-
-	/** Event when the attack cooldown has expired. */
-	virtual void NotifyOnCooldownReady();
-
 	/** Event when the character has been deselected. */
 	virtual void NotifyOnDeselected();
 
@@ -49,13 +41,6 @@ public:
 
 	/** Event when the character has been selected. */
 	virtual void NotifyOnSelected();
-
-	/** Event when a character has used an attack. */
-	virtual void NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile);
-
-	/** Event when the attack cooldown has expired. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnCooldownReady"))
-	void ReceiveOnCooldownReady();
 
 	/** Event when the character has been deselected. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDeselected"))
@@ -73,10 +58,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnSelected"))
 	void ReceiveOnSelected();
 
-	/** Event when a character has used an attack. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnUsedAttack"))
-	void ReceiveOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile);
-
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
@@ -85,9 +66,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	/** Attack data of this character. */
-	URTSAttackComponent* AttackComponent;
-
 	/** Health data of this character. */
 	URTSHealthComponent* HealthComponent;
 

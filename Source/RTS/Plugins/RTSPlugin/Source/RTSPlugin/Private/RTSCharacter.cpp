@@ -6,7 +6,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
-#include "RTSAttackComponent.h"
 #include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
 #include "RTSProjectile.h"
@@ -28,7 +27,6 @@ void ARTSCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Cache component references.
-	AttackComponent = FindComponentByClass<URTSAttackComponent>();
 	HealthComponent = FindComponentByClass<URTSHealthComponent>();
 
 	// Setup selection circle.
@@ -47,20 +45,6 @@ void ARTSCharacter::BeginPlay()
 
 void ARTSCharacter::Tick(float DeltaSeconds)
 {
-	// Update cooldown timer.
-	if (AttackComponent && AttackComponent->RemainingCooldown > 0)
-	{
-		AttackComponent->RemainingCooldown -= DeltaSeconds;
-
-		if (AttackComponent->RemainingCooldown <= 0)
-		{
-			UE_LOG(RTSLog, Log, TEXT("Character %s attack is ready again."), *GetName());
-
-			// Notify listeners.
-			NotifyOnCooldownReady();
-		}
-	}
-
 	if (bSelected)
 	{
 		// Show selection circle.
@@ -122,73 +106,6 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	return ActualDamage;
 }
 
-void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
-{
-	if (AttackComponent == nullptr)
-	{
-		return;
-	}
-
-	if (!IsValid(Target))
-	{
-		return;
-	}
-
-	// Check cooldown.
-	if (AttackComponent->RemainingCooldown > 0)
-	{
-		return;
-	}
-
-	// Use attack.
-	UE_LOG(RTSLog, Log, TEXT("Character %s attacks %s."), *GetName(), *Target->GetName());
-
-	const FRTSAttackData& Attack = AttackComponent->Attacks[0];
-
-	ARTSProjectile* SpawnedProjectile = nullptr;
-
-	if (Attack.ProjectileType != nullptr)
-	{
-		// Fire projectile.
-		// Build spawn transform.
-		FVector SpawnLocation = GetActorLocation();
-		FRotator SpawnRotation = GetActorRotation();
-		FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
-
-		// Build spawn info.
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.Instigator = this;
-		SpawnInfo.ObjectFlags |= RF_Transient;
-
-		// Spawn projectile.
-		SpawnedProjectile = GetWorld()->SpawnActor<ARTSProjectile>(Attack.ProjectileType, SpawnTransform, SpawnInfo);
-
-		if (SpawnedProjectile)
-		{
-			UE_LOG(RTSLog, Log, TEXT("%s fired projectile %s at target %s."), *GetName(), *SpawnedProjectile->GetName(), *Target->GetName());
-
-			// Aim at target.
-			SpawnedProjectile->FireAt(Target, Attack.Damage, Attack.DamageType, GetController(), this);
-		}
-	}
-	else
-	{
-		// Deal damage immediately.
-		Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), GetController(), this);
-	}
-
-	// Start cooldown timer.
-	AttackComponent->RemainingCooldown = Attack.Cooldown;
-
-	// Notify listeners.
-	NotifyOnUsedAttack(Attack, Target, SpawnedProjectile);
-}
-
-void ARTSCharacter::NotifyOnCooldownReady()
-{
-	ReceiveOnCooldownReady();
-}
-
 void ARTSCharacter::NotifyOnDeselected()
 {
 	bSelected = false;
@@ -213,9 +130,4 @@ void ARTSCharacter::NotifyOnSelected()
 
 	// Notify listeners.
 	ReceiveOnSelected();
-}
-
-void ARTSCharacter::NotifyOnUsedAttack(const FRTSAttackData& Attack, AActor* Target, ARTSProjectile* Projectile)
-{
-	ReceiveOnUsedAttack(Attack, Target, Projectile);
 }
