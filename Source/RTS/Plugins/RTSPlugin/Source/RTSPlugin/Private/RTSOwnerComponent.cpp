@@ -43,7 +43,7 @@ void URTSOwnerComponent::SetPlayerOwner(AController* Controller)
 	}
 }
 
-bool URTSOwnerComponent::IsSameTeamAsCharacter(ARTSCharacter* Other)
+bool URTSOwnerComponent::IsSameTeamAsActor(AActor* Other)
 {
 	if (!Other)
 	{

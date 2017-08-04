@@ -55,7 +55,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSAttackComponentCooldownReadySignature OnCooldownReady;
 
-	/** Event when a character has used an attack. */
+	/** Event when an actor has used an attack. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSAttackComponentAttackedUsedSignature OnAttackUsed;
 };

@@ -38,11 +38,11 @@ public:
 	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 
-	/** Event when the current health of the character has changed. */
+	/** Event when the current health of the actor has changed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSHealthComponentHealthChangedSignature OnHealthChanged;
 
-	/** Event when the character has been killed. */
+	/** Event when the actor has been killed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSHealthComponentKilledSignature OnKilled;
 };

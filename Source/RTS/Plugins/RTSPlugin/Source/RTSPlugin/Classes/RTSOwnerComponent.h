@@ -30,31 +30,31 @@ public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
-	/** Gets the player owning this character. */
+	/** Gets the player owning the actor. */
 	UFUNCTION(BlueprintCallable)
 	ARTSPlayerState* GetPlayerOwner();
 
-	/** Sets the player owning this character. */
+	/** Sets the player owning the actor. */
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerOwner(AController* Controller);
 
 
-	/** Checks whether this character belongs to the same team as the specified one. */
+	/** Checks whether the actor belongs to the same team as the specified one. */
 	UFUNCTION(BlueprintCallable)
-	bool IsSameTeamAsCharacter(ARTSCharacter* Other);
+	bool IsSameTeamAsActor(AActor* Other);
 
-	/** Checks whether the player owning this character belongs to the same team as the specified player. */
+	/** Checks whether the player owning the actor belongs to the same team as the specified player. */
 	UFUNCTION(BlueprintCallable)
 	bool IsSameTeamAsController(AController* C);
 
 
-	/** Event when the character is owned by a different player. */
+	/** Event when the actor is owned by a different player. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSOwnerComponentOwnerChangedSignature OnOwnerChanged;
 
 
 private:
-	/** Player owning this character. */
+	/** Player owning this actor. */
 	UPROPERTY(replicated)
 	ARTSPlayerState* PlayerOwner;
 };

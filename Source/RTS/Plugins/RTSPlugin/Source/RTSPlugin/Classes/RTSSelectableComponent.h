@@ -33,11 +33,11 @@ public:
 	bool IsSelected();
 
 
-	/** Event when the character has been deselected. */
+	/** Event when the actor has been deselected. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSSelectableComponentDeselectedSignature OnDeselected;
 
-	/** Event when the character has been selected. */
+	/** Event when the actor has been selected. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSSelectableComponentSelectedSignature OnSelected;
 

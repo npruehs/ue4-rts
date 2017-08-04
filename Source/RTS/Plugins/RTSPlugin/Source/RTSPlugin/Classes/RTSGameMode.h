@@ -7,7 +7,6 @@
 #include "RTSGameMode.generated.h"
 
 
-class ARTSCharacter;
 class ARTSPlayerStart;
 class ARTSTeamInfo;
 
@@ -51,7 +50,7 @@ public:
 
 
 	/** Event when an actor has been killed. */
-	virtual void NotifyOnActorKilled(AActor* Actor, AController* CharacterOwner);
+	virtual void NotifyOnActorKilled(AActor* Actor, AController* ActorOwner);
 
 	/** Event when a player has been defeated. */
 	virtual void NotifyOnPlayerDefeated(APlayerController* Player);

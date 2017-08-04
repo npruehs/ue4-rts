@@ -19,7 +19,7 @@ class URTSPortraitComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	/** Portrait of this character. Can be shown in the UI. */
+	/** Portrait of the actor. Can be shown in the UI. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
 	UTexture2D* Portrait;
 };

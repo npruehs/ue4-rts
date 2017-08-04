@@ -16,9 +16,9 @@ URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer
 {
 }
 
-void URTSMinimapWidget::NotifyOnDrawUnit(FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const
+void URTSMinimapWidget::NotifyOnDrawUnit(FPaintContext& Context, AActor* Actor, APlayerState* ActorOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const
 {
-	ReceiveOnDrawUnit(Context, Character, CharacterOwner, MinimapPosition, LocalPlayer);
+	ReceiveOnDrawUnit(Context, Actor, ActorOwner, MinimapPosition, LocalPlayer);
 }
 
 void URTSMinimapWidget::NativeConstruct()
@@ -125,37 +125,37 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 
 	APlayerController* Player = GetOwningPlayer();
 
-	for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
+	for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 	{
-		ARTSCharacter* Character = *CharacterIt;
-		URTSOwnerComponent* OwnerComponent = Character->FindComponentByClass<URTSOwnerComponent>();
+		AActor* Actor = *ActorIt;
+		URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
 
-		FVector CharacterLocationWorld = Character->GetActorLocation();
-		FVector2D CharacterLocationMinimap = WorldToMinimap(CharacterLocationWorld);
+		FVector ActorLocationWorld = Actor->GetActorLocation();
+		FVector2D ActorLocationMinimap = WorldToMinimap(ActorLocationWorld);
 		
 		// Draw on minimap.
-		if (bDrawUnitsWithTeamColors)
+		if (bDrawUnitsWithTeamColors && OwnerComponent)
 		{
-			if (OwnerComponent && OwnerComponent->GetPlayerOwner() == Player->PlayerState)
+			if (OwnerComponent->GetPlayerOwner() == Player->PlayerState)
 			{
-				DrawBoxWithBrush(InContext, CharacterLocationMinimap, OwnUnitsBrush);
+				DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
 			}
-			else if (OwnerComponent && OwnerComponent->GetPlayerOwner() != nullptr && !OwnerComponent->IsSameTeamAsController(Player))
+			else if (OwnerComponent->GetPlayerOwner() != nullptr && !OwnerComponent->IsSameTeamAsController(Player))
 			{
-				DrawBoxWithBrush(InContext, CharacterLocationMinimap, EnemyUnitsBrush);
+				DrawBoxWithBrush(InContext, ActorLocationMinimap, EnemyUnitsBrush);
 			}
 			else
 			{
-				DrawBoxWithBrush(InContext, CharacterLocationMinimap, NeutralUnitsBrush);
+				DrawBoxWithBrush(InContext, ActorLocationMinimap, NeutralUnitsBrush);
 			}
 		}
 		
 		// Allow custom drawing.
 		NotifyOnDrawUnit(
 			InContext,
-			Character,
+			Actor,
 			OwnerComponent ? OwnerComponent->GetPlayerOwner() : nullptr,
-			CharacterLocationMinimap,
+			ActorLocationMinimap,
 			Player->PlayerState);
 	}
 }

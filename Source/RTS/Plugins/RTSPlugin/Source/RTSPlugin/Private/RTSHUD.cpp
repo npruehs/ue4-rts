@@ -19,10 +19,10 @@ void ARTSHUD::DrawHUD()
 	DrawHoveredActorEffect();
 }
 
-void ARTSHUD::NotifyDrawConstructionProgressBar(ARTSCharacter* Character, float ConstructionTime, float RemainingConstructionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
+void ARTSHUD::NotifyDrawConstructionProgressBar(AActor* Actor, float ConstructionTime, float RemainingConstructionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
 {
 	ReceiveDrawConstructionProgressBar(
-		Character,
+		Actor,
 		ConstructionTime,
 		RemainingConstructionTime,
 		ProgressPercentage,
@@ -38,7 +38,7 @@ void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
 }
 
 void ARTSHUD::NotifyDrawHealthBar(
-	ARTSCharacter* Character,
+	AActor* Actor,
 	float CurrentHealth,
 	float MaximumHealth,
 	float HealthPercentage,
@@ -48,7 +48,7 @@ void ARTSHUD::NotifyDrawHealthBar(
 	float SuggestedHealthBarHeight)
 {
 	ReceiveDrawHealthBar(
-		Character,
+		Actor,
 		CurrentHealth,
 		MaximumHealth,
 		HealthPercentage,
@@ -63,24 +63,31 @@ void ARTSHUD::NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width
 	ReceiveDrawSelectionFrame(ScreenX, ScreenY, Width, Height);
 }
 
-FVector2D ARTSHUD::GetCharacterCenterOnScreen(ACharacter* Character) const
+FVector2D ARTSHUD::GetActorCenterOnScreen(AActor* Actor) const
 {
-	FVector ProjectedLocation = Project(Character->GetActorLocation());
+	FVector ProjectedLocation = Project(Actor->GetActorLocation());
 	return FVector2D(ProjectedLocation.X, ProjectedLocation.Y);
 }
 
-FVector2D ARTSHUD::GetCharacterSizeOnScreen(ACharacter* Character) const
+FVector2D ARTSHUD::GetActorSizeOnScreen(AActor* Actor) const
 {
-	// Get character position projected on HUD.
-	FCollisionShape CollisionShape = Character->GetCapsuleComponent()->GetCollisionShape();
+	// Get actor position projected on HUD.
+	UCapsuleComponent* CapsuleComponent = Actor->FindComponentByClass<UCapsuleComponent>();
 
-	FVector CharacterTopPosition = Project(Character->GetActorLocation() + (Character->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
-	FVector CharacterBottomPosition = Project(Character->GetActorLocation() - (Character->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
-	FVector CharacterLeftPosition = Project(Character->GetActorLocation() - (Character->GetActorRightVector() * CollisionShape.Capsule.Radius));
-	FVector CharacterRightPosition = Project(Character->GetActorLocation() + (Character->GetActorRightVector() * CollisionShape.Capsule.Radius));
+	if (!CapsuleComponent)
+	{
+		return FVector2D::ZeroVector;
+	}
 
-	float Width = FVector(CharacterRightPosition - CharacterLeftPosition).Size();
-	float Height = FVector(CharacterTopPosition - CharacterBottomPosition).Size();
+	FCollisionShape CollisionShape = CapsuleComponent->GetCollisionShape();
+
+	FVector ActorTopPosition = Project(Actor->GetActorLocation() + (Actor->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
+	FVector ActorBottomPosition = Project(Actor->GetActorLocation() - (Actor->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
+	FVector ActorLeftPosition = Project(Actor->GetActorLocation() - (Actor->GetActorRightVector() * CollisionShape.Capsule.Radius));
+	FVector ActorRightPosition = Project(Actor->GetActorLocation() + (Actor->GetActorRightVector() * CollisionShape.Capsule.Radius));
+
+	float Width = FVector(ActorRightPosition - ActorLeftPosition).Size();
+	float Height = FVector(ActorTopPosition - ActorBottomPosition).Size();
 
 	return FVector2D(Width, Height);
 }
@@ -123,44 +130,42 @@ void ARTSHUD::DrawHealthBars()
 	if (bAlwaysShowHealthBars || (bShowHotkeyHealthBars && PlayerController->IsHealthBarHotkeyPressed()))
 	{
 		// Draw all health bars.
-		for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
+		for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 		{
-			ARTSCharacter* Character = *CharacterIt;
-			DrawHealthBar(Character);
+			AActor* Actor = *ActorIt;
+			DrawHealthBar(Actor);
 		}
 
 		return;
 	}
 
-	// Draw health bar for hovered character.
+	// Draw health bar for hovered actor.
 	if (bShowHoverHealthBars)
 	{
 		AActor* HoveredActor = PlayerController->GetHoveredActor();
-		ARTSCharacter* Character = Cast<ARTSCharacter>(HoveredActor);
-		DrawHealthBar(Character);
+		DrawHealthBar(HoveredActor);
 	}
 
-	// Draw health bars for selected characters.
+	// Draw health bars for selected actors.
 	if (bShowSelectionHealthBars)
 	{
 		for (int i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
 		{
 			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
-			ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
-			DrawHealthBar(Character);
+			DrawHealthBar(SelectedActor);
 		}
 	}
 }
 
-void ARTSHUD::DrawHealthBar(ARTSCharacter* Character)
+void ARTSHUD::DrawHealthBar(AActor* Actor)
 {
-	if (!IsValid(Character))
+	if (!IsValid(Actor))
 	{
 		return;
 	}
 
 	// Check health.
-	URTSHealthComponent* HealthComponent = Character->FindComponentByClass<URTSHealthComponent>();
+	URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
 
 	if (!HealthComponent)
 	{
@@ -175,11 +180,11 @@ void ARTSHUD::DrawHealthBar(ARTSCharacter* Character)
 	float SuggestedHealthBarWidth;
 	float SuggestedHealthBarHeight;
 
-	SuggestUnitBarSize(Character, SuggestedHealthBarLeft, SuggestedHealthBarTop, SuggestedHealthBarWidth, SuggestedHealthBarHeight);
+	SuggestUnitBarSize(Actor, SuggestedHealthBarLeft, SuggestedHealthBarTop, SuggestedHealthBarWidth, SuggestedHealthBarHeight);
 
 	// Draw health bar.
 	NotifyDrawHealthBar(
-		Character,
+		Actor,
 		HealthComponent->CurrentHealth,
 		HealthComponent->MaximumHealth,
 		HealthPercentage,
@@ -202,44 +207,42 @@ void ARTSHUD::DrawConstructionProgressBars()
 	if (bAlwaysShowConstructionProgressBars || (bShowHotkeyConstructionProgressBars && PlayerController->IsConstructionProgressBarHotkeyPressed()))
 	{
 		// Draw all progress bars.
-		for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
+		for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 		{
-			ARTSCharacter* Character = *CharacterIt;
-			DrawConstructionProgressBar(Character);
+			AActor* Actor = *ActorIt;
+			DrawConstructionProgressBar(Actor);
 		}
 
 		return;
 	}
 
-	// Draw progress bar for hovered character.
+	// Draw progress bar for hovered actor.
 	if (bShowHoverConstructionProgressBars)
 	{
 		AActor* HoveredActor = PlayerController->GetHoveredActor();
-		ARTSCharacter* Character = Cast<ARTSCharacter>(HoveredActor);
-		DrawConstructionProgressBar(Character);
+		DrawConstructionProgressBar(HoveredActor);
 	}
 
-	// Draw progress bars for selected characters.
+	// Draw progress bars for selected actors.
 	if (bShowSelectionConstructionProgressBars)
 	{
 		for (int i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
 		{
 			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
-			ARTSCharacter* Character = Cast<ARTSCharacter>(SelectedActor);
-			DrawConstructionProgressBar(Character);
+			DrawConstructionProgressBar(SelectedActor);
 		}
 	}
 }
 
-void ARTSHUD::DrawConstructionProgressBar(ARTSCharacter* Character)
+void ARTSHUD::DrawConstructionProgressBar(AActor* Actor)
 {
-	if (!IsValid(Character))
+	if (!IsValid(Actor))
 	{
 		return;
 	}
 
 	// Check progress.
-	URTSConstructionSiteComponent* ConstructionSiteComponent = Character->FindComponentByClass<URTSConstructionSiteComponent>();
+	URTSConstructionSiteComponent* ConstructionSiteComponent = Actor->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	if (!ConstructionSiteComponent)
 	{
@@ -259,11 +262,11 @@ void ARTSHUD::DrawConstructionProgressBar(ARTSCharacter* Character)
 	float SuggestedProgressBarWidth;
 	float SuggestedProgressBarHeight;
 	
-	SuggestUnitBarSize(Character, SuggestedProgressBarLeft, SuggestedProgressBarTop, SuggestedProgressBarWidth, SuggestedProgressBarHeight);
+	SuggestUnitBarSize(Actor, SuggestedProgressBarLeft, SuggestedProgressBarTop, SuggestedProgressBarWidth, SuggestedProgressBarHeight);
 
 	// Draw progress bar.
 	NotifyDrawConstructionProgressBar(
-		Character,
+		Actor,
 		ConstructionSiteComponent->ConstructionTime,
 		ConstructionSiteComponent->RemainingConstructionTime,
 		ProgressPercentage,
@@ -293,10 +296,10 @@ void ARTSHUD::DrawHoveredActorEffect()
 	NotifyDrawHoveredActorEffect(HoveredActor);
 }
 
-void ARTSHUD::SuggestUnitBarSize(ARTSCharacter* Character, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const
+void ARTSHUD::SuggestUnitBarSize(AActor* Actor, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const
 {
-	FVector2D Center = GetCharacterCenterOnScreen(Character);
-	FVector2D Size = GetCharacterSizeOnScreen(Character);
+	FVector2D Center = GetActorCenterOnScreen(Actor);
+	FVector2D Size = GetActorSizeOnScreen(Actor);
 
 	OutWidth = Size.X * 2;
 	OutHeight = 15.0f;

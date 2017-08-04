@@ -7,9 +7,6 @@
 #include "RTSHUD.generated.h"
 
 
-class ARTSCharacter;
-
-
 /**
 * HUD with RTS features, such as showing a selection frame.
 */
@@ -58,7 +55,7 @@ public:
 
 	/** Event for drawing the construction progress bar for the specified unit. */
 	virtual void NotifyDrawConstructionProgressBar(
-		ARTSCharacter* Character,
+		AActor* Actor,
 		float ConstructionTime,
 		float RemainingConstructionTime,
 		float ProgressPercentage,
@@ -70,9 +67,9 @@ public:
 	/** Event for drawing an effect for the currently hovered actor. */
 	virtual void NotifyDrawHoveredActorEffect(AActor* HoveredActor);
 
-	/** Event for drawing the health bar for the specified character. */
+	/** Event for drawing the health bar for the specified actor. */
 	virtual void NotifyDrawHealthBar(
-		ARTSCharacter* Character,
+		AActor* Actor,
 		float CurrentHealth,
 		float MaximumHealth,
 		float HealthPercentage,
@@ -87,7 +84,7 @@ public:
 	/** Event for drawing the construction progress bar for the specified unit. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawConstructionProgressBar"))
 	void ReceiveDrawConstructionProgressBar(
-		ARTSCharacter* Character,
+		AActor* Actor,
 		float ConstructionTime,
 		float RemainingConstructionTime,
 		float ProgressPercentage,
@@ -100,10 +97,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHoveredActorEffect"))
 	void ReceiveDrawHoveredActorEffect(AActor* HoveredActor);
 
-	/** Event for drawing the health bar for the specified character. */
+	/** Event for drawing the health bar for the specified actor. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHealthBar"))
 	void ReceiveDrawHealthBar(
-		ARTSCharacter* Character,
+		AActor* Actor,
 		float CurrentHealth,
 		float MaximumHealth,
 		float HealthPercentage,
@@ -118,10 +115,10 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
-	FVector2D GetCharacterCenterOnScreen(ACharacter* Character) const;
+	FVector2D GetActorCenterOnScreen(AActor* Actor) const;
 
 	UFUNCTION(BlueprintCallable)
-	FVector2D GetCharacterSizeOnScreen(ACharacter* Character) const;
+	FVector2D GetActorSizeOnScreen(AActor* Actor) const;
 
 private:
 	/** Draws the current selection frame if mouse is being dragged. */
@@ -130,18 +127,18 @@ private:
 	/** Draws unit health bars. */
 	void DrawHealthBars();
 
-	/** Draws the health bar of the specified character. */
-	void DrawHealthBar(ARTSCharacter* Character);
+	/** Draws the health bar of the specified actor. */
+	void DrawHealthBar(AActor* Actor);
 
 	/** Draws all construction progress bars. */
 	void DrawConstructionProgressBars();
 
-	/** Draws the construction progress bar of the specified character. */
-	void DrawConstructionProgressBar(ARTSCharacter* Character);
+	/** Draws the construction progress bar of the specified actor. */
+	void DrawConstructionProgressBar(AActor* Actor);
 
 	/** Draws a custom HUD effect for the currently hovered actor (e.g. player name). */
 	void DrawHoveredActorEffect();
 
 	/** Suggests a position and size for drawing a progress bar widget for the specified unit. */
-	void SuggestUnitBarSize(ARTSCharacter* Character, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const;
+	void SuggestUnitBarSize(AActor* Actor, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const;
 };
