@@ -6,7 +6,9 @@
 #include "Rendering/DrawElements.h"
 
 #include "RTSMinimapVolume.h"
+#include "RTSOwnerComponent.h"
 #include "RTSPlayerController.h"
+#include "RTSPlayerState.h"
 
 
 URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer)
@@ -126,6 +128,7 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 	for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
 	{
 		ARTSCharacter* Character = *CharacterIt;
+		URTSOwnerComponent* OwnerComponent = Character->FindComponentByClass<URTSOwnerComponent>();
 
 		FVector CharacterLocationWorld = Character->GetActorLocation();
 		FVector2D CharacterLocationMinimap = WorldToMinimap(CharacterLocationWorld);
@@ -133,11 +136,11 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 		// Draw on minimap.
 		if (bDrawUnitsWithTeamColors)
 		{
-			if (Character->GetPlayerOwner() == Player->PlayerState)
+			if (OwnerComponent && OwnerComponent->GetPlayerOwner() == Player->PlayerState)
 			{
 				DrawBoxWithBrush(InContext, CharacterLocationMinimap, OwnUnitsBrush);
 			}
-			else if (Character->GetPlayerOwner() != nullptr && !Character->IsSameTeamAsController(Player))
+			else if (OwnerComponent && OwnerComponent->GetPlayerOwner() != nullptr && !OwnerComponent->IsSameTeamAsController(Player))
 			{
 				DrawBoxWithBrush(InContext, CharacterLocationMinimap, EnemyUnitsBrush);
 			}
@@ -148,7 +151,12 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 		}
 		
 		// Allow custom drawing.
-		NotifyOnDrawUnit(InContext, Character, Character->GetPlayerOwner(), CharacterLocationMinimap, Player->PlayerState);
+		NotifyOnDrawUnit(
+			InContext,
+			Character,
+			OwnerComponent ? OwnerComponent->GetPlayerOwner() : nullptr,
+			CharacterLocationMinimap,
+			Player->PlayerState);
 	}
 }
 

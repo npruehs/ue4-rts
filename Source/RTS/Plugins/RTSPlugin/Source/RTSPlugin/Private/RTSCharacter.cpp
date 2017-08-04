@@ -9,9 +9,8 @@
 #include "RTSAttackComponent.h"
 #include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
-#include "RTSPlayerState.h"
 #include "RTSProjectile.h"
-#include "RTSTeamInfo.h"
+
 
 
 ARTSCharacter::ARTSCharacter()
@@ -22,18 +21,6 @@ ARTSCharacter::ARTSCharacter()
 
 	// Enable replication.
 	bReplicates = true;
-}
-
-void ARTSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ARTSCharacter, PlayerOwner);
-}
-
-ARTSPlayerState* ARTSCharacter::GetPlayerOwner()
-{
-	return PlayerOwner;
 }
 
 void ARTSCharacter::BeginPlay()
@@ -135,22 +122,6 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	return ActualDamage;
 }
 
-bool ARTSCharacter::IsSameTeamAsCharacter(ARTSCharacter* Other)
-{
-	ARTSPlayerState* MyOwner = GetPlayerOwner();
-	ARTSPlayerState* OtherOwner = Other->GetPlayerOwner();
-
-	return MyOwner && MyOwner->IsSameTeamAs(OtherOwner);
-}
-
-bool ARTSCharacter::IsSameTeamAsController(AController* C)
-{
-	ARTSPlayerState* MyOwner = GetPlayerOwner();
-	ARTSPlayerState* OtherPlayer = Cast<ARTSPlayerState>(C->PlayerState);
-
-	return MyOwner && MyOwner->IsSameTeamAs(OtherPlayer);
-}
-
 void ARTSCharacter::UseAttack(int AttackIndex, AActor* Target)
 {
 	if (AttackComponent == nullptr)
@@ -234,16 +205,6 @@ void ARTSCharacter::NotifyOnHealthChanged(float OldHealth, float NewHealth)
 void ARTSCharacter::NotifyOnKilled(AController* PreviousOwner)
 {
 	ReceiveOnKilled(PreviousOwner);
-}
-
-void ARTSCharacter::NotifyOnOwnerChanged(AController* NewOwner)
-{
-	PlayerOwner = Cast<ARTSPlayerState>(NewOwner->PlayerState);
-
-	if (PlayerOwner)
-	{
-		ReceiveOnOwnerChanged(NewOwner);
-	}
 }
 
 void ARTSCharacter::NotifyOnSelected()

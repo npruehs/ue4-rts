@@ -14,6 +14,7 @@
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
+#include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSSelectableComponent.h"
 
@@ -107,7 +108,12 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 
 	if (Unit)
 	{
-		Unit->NotifyOnOwnerChanged(this);
+		URTSOwnerComponent* OwnerComponent = Unit->FindComponentByClass<URTSOwnerComponent>();
+
+		if (OwnerComponent)
+		{
+			OwnerComponent->SetPlayerOwner(this);
+		}
 	}
 }
 
@@ -339,9 +345,14 @@ void ARTSPlayerController::IssueAttackOrder(AActor* Target)
 
 		auto TargetCharacter = Cast<ARTSCharacter>(Target);
 
-		if (TargetCharacter && TargetCharacter->IsSameTeamAsCharacter(SelectedCharacter))
+		if (TargetCharacter)
 		{
-			continue;
+			auto TargetOwnerComponent = TargetCharacter->FindComponentByClass<URTSOwnerComponent>();
+
+			if (TargetOwnerComponent && TargetOwnerComponent->IsSameTeamAsCharacter(SelectedCharacter))
+			{
+				continue;
+			}
 		}
 		
 		if (SelectedCharacter->FindComponentByClass<URTSAttackComponent>() == nullptr)

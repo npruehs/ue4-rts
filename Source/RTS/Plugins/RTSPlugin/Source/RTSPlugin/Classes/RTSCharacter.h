@@ -12,7 +12,7 @@
 
 class UDecalComponent;
 
-class ARTSPlayerState;
+
 class ARTSProjectile;
 class URTSAttackComponent;
 class URTSHealthComponent;
@@ -29,20 +29,6 @@ class ARTSCharacter : public ACharacter
 public:
 	ARTSCharacter();
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-
-	/** Gets the player owning this character. */
-	UFUNCTION(BlueprintCallable)
-	ARTSPlayerState* GetPlayerOwner();
-
-	/** Checks whether this character belongs to the same team as the specified one. */
-	UFUNCTION(BlueprintCallable)
-	bool IsSameTeamAsCharacter(ARTSCharacter* Other);
-
-	/** Checks whether the player owning this character belongs to the same team as the specified player. */
-	UFUNCTION(BlueprintCallable)
-	bool IsSameTeamAsController(AController* C);
 
 	/** Uses the passed attack on the specified target and starts the cooldown timer. */
 	UFUNCTION(BlueprintCallable)
@@ -60,9 +46,6 @@ public:
 	
 	/** Event when the character has been killed. */
 	virtual void NotifyOnKilled(AController* PreviousOwner);
-
-	/** Event when the character is owned by a different player. */
-	virtual void NotifyOnOwnerChanged(AController* NewOwner);
 
 	/** Event when the character has been selected. */
 	virtual void NotifyOnSelected();
@@ -86,10 +69,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnKilled"))
 	void ReceiveOnKilled(AController* PreviousOwner);
 
-	/** Event when the character is owned by a different player. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnOwnerChanged"))
-	void ReceiveOnOwnerChanged(AController* NewOwner);
-
 	/** Event when the character has been selected. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnSelected"))
 	void ReceiveOnSelected();
@@ -111,10 +90,6 @@ private:
 
 	/** Health data of this character. */
 	URTSHealthComponent* HealthComponent;
-
-	/** Player owning this character. */
-	UPROPERTY(replicated)
-	ARTSPlayerState* PlayerOwner;
 
 	/** Decal used for rendering the selection circle of this character. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

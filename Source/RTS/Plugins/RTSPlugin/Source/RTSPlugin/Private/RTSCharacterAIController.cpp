@@ -8,6 +8,7 @@
 #include "RTSAttackableComponent.h"
 #include "RTSCharacter.h"
 #include "RTSOrderType.h"
+#include "RTSOwnerComponent.h"
 
 
 void ARTSCharacterAIController::Possess(APawn* InPawn)
@@ -57,9 +58,14 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		auto MyCharacter = Cast<ARTSCharacter>(GetPawn());
 		auto TargetCharacter = Cast<ARTSCharacter>(HitResult.Actor.Get());
 
-		if (MyCharacter && TargetCharacter && MyCharacter->IsSameTeamAsCharacter(TargetCharacter))
+		if (MyCharacter && TargetCharacter)
 		{
-			continue;
+			auto MyOwnerComponent = MyCharacter->FindComponentByClass<URTSOwnerComponent>();
+
+			if (MyOwnerComponent && MyOwnerComponent->IsSameTeamAsCharacter(TargetCharacter))
+			{
+				continue;
+			}
 		}
 
 		// Check if found attackable actor.
