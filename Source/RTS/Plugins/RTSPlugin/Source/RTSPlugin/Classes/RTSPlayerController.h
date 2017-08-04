@@ -144,13 +144,13 @@ public:
 	virtual void NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingType);
 
 	/** Event when an actor has received an attack order. */
-	virtual void NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target);
+	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
     /** Event when an actor has received a move order. */
-    virtual void NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation);
+    virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
 	/** Event when an actor has received a stop order. */
-	virtual void NotifyOnIssuedStopOrder(AActor* Actor);
+	virtual void NotifyOnIssuedStopOrder(APawn* OrderedPawn);
 
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
@@ -180,15 +180,15 @@ public:
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
-	void ReceiveOnIssuedAttackOrder(AActor* Actor, AActor* Target);
+	void ReceiveOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
-    void ReceiveOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation);
+    void ReceiveOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
 	/** Event when an actor has received a stop order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedStopOrder"))
-	void ReceiveOnIssuedStopOrder(AActor* Actor);
+	void ReceiveOnIssuedStopOrder(APawn* OrderedPawn);
 
 	/** Event when the player has clicked a spot on the minimap. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "NotifyOnMinimapClicked"))

@@ -20,10 +20,13 @@ Note that we're still in heavy development. Some things are already in place, su
 * Unit Target Acquisition
 * Control Groups
 * Health Bars
+* Minimap
+* Teams
+* Constructions
 
 All of this is already completely working in multiplayer as well, and has been fully exposed to scripting, enabling you to update UI and play animations and sounds.
 
-We're now moving on to more advanced stuff, such as [minimap or fog of war](https://github.com/npruehs/ue4-rts/issues).
+We're now moving on to more advanced stuff, such as [fog of war](https://github.com/npruehs/ue4-rts/issues).
 
 Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 
@@ -62,7 +65,7 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Create a RTSPlayerPawn blueprint.
 1. Add a Camera component.
 1. Set the Location of the Camera component as desired (e.g. X = 0, Y = 0, Z = 1500).
-1. Set the Rotation of the Camera component as desired (e.g. X = 0, Y = 270, Z = 0).
+1. Set the Rotation of the Camera component as desired (e.g. X = 0, Y = 285, Z = 0).
 1. Use the RTSPlayerPawn as default pawn in your game mode.
 
 #### Setting Up Camera Movement
@@ -75,10 +78,15 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 ### Adding Units
 
 1. Create a new RTSCharacter blueprint.
-1. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual.
+
+_Note that you may use any class derived from Actor, if you want to. The plugin does not expect any kind of character whatsoever. Right now, RTSCharacter doesn't do much more than showing a nice selection circle, and relaying damage events. You can copy this functionality to any actor you like. Note that, for receiving orders such as Move or Attack, you need to derive from Pawn at least, because orders require AI._
+
+2. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual.
 1. At the CharacterMovement component, you may set the Max Acceleration property to a high value to avoid stuttering when changing move orders.
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
+1. Add a PortraitComponent.
+1. Add an OwnerComponent.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
 
 ### Adding Buildings
@@ -133,7 +141,6 @@ _Setting the Damage Type is optional. Remaining Cooldown is handled by the frame
 
 1. Create a new RTSProjectile blueprint.
 1. Set the Impact Threshold property.
-1. Set the Replicates property to true (this might change in the future, as we don't really care about exact projectile positions on client-side).
 1. For all RTSAttackComponents that should use this projectile, reference the new projectile.
 
 ### Setup Victory Conditions

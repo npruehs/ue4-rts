@@ -14,6 +14,7 @@
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
+#include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSSelectableComponent.h"
 
@@ -95,20 +96,25 @@ void ARTSPlayerController::SetupInputComponent()
 
 void ARTSPlayerController::TransferOwnership(AActor* Actor)
 {
+	if (!Actor)
+	{
+		return;
+	}
+
 	// Set owning player.
 	Actor->SetOwner(this);
+
+	URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+	if (OwnerComponent)
+	{
+		OwnerComponent->SetPlayerOwner(this);
+	}
 
 	UE_LOG(RTSLog, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
 
 	// Notify listeners.
 	NotifyOnActorOwnerChanged(Actor);
-
-	ARTSCharacter* Unit = Cast<ARTSCharacter>(Actor);
-
-	if (Unit)
-	{
-		Unit->NotifyOnOwnerChanged(this);
-	}
 }
 
 AActor* ARTSPlayerController::GetHoveredActor()
@@ -216,20 +222,20 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 		return GetObjectsAtPointerPosition(HitResults);
 	}
 
-	// Iterate all characters.
+	// Iterate all actors.
 	HitResults.Reset();
 
-	for (TActorIterator<ARTSCharacter> CharacterIt(GetWorld()); CharacterIt; ++CharacterIt)
+	for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 	{
-		ARTSCharacter* Unit = *CharacterIt;
+		AActor* Actor = *ActorIt;
 
-		FVector2D CharacterScreenPosition;
+		FVector2D ActorScreenPosition;
 
-		if (UGameplayStatics::ProjectWorldToScreen(this, Unit->GetActorLocation(), CharacterScreenPosition))
+		if (UGameplayStatics::ProjectWorldToScreen(this, Actor->GetActorLocation(), ActorScreenPosition))
 		{
-			if (SelectionFrame.Contains(FIntPoint(CharacterScreenPosition.X, CharacterScreenPosition.Y)))
+			if (SelectionFrame.Contains(FIntPoint(ActorScreenPosition.X, ActorScreenPosition.Y)))
 			{
-				FHitResult HitResult(Unit, nullptr, Unit->GetActorLocation(), FVector());
+				FHitResult HitResult(Actor, nullptr, Actor->GetActorLocation(), FVector());
 				HitResults.Add(HitResult);
 			}
 		}
@@ -324,37 +330,42 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 
 void ARTSPlayerController::IssueAttackOrder(AActor* Target)
 {
+	if (!Target)
+	{
+		return;
+	}
+
 	ARTSTeamInfo* MyTeam = GetPlayerState()->Team;
 
 	// Issue attack orders.
 	for (auto SelectedActor : SelectedActors)
 	{
+		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+		if (!SelectedPawn)
+		{
+			continue;
+		}
+
 		// Verify target.
-		auto SelectedCharacter = Cast<ARTSCharacter>(SelectedActor);
+		auto TargetOwnerComponent = Target->FindComponentByClass<URTSOwnerComponent>();
 
-		if (!SelectedCharacter)
+		if (TargetOwnerComponent && TargetOwnerComponent->IsSameTeamAsActor(SelectedActor))
 		{
 			continue;
 		}
 
-		auto TargetCharacter = Cast<ARTSCharacter>(Target);
-
-		if (TargetCharacter && TargetCharacter->IsSameTeamAsCharacter(SelectedCharacter))
-		{
-			continue;
-		}
-		
-		if (SelectedCharacter->FindComponentByClass<URTSAttackComponent>() == nullptr)
+		if (SelectedActor->FindComponentByClass<URTSAttackComponent>() == nullptr)
 		{
 			continue;
 		}
 
 		// Send attack order to server.
-		ServerIssueAttackOrder(SelectedCharacter, Target);
+		ServerIssueAttackOrder(SelectedPawn, Target);
 		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
 
 		// Notify listeners.
-		NotifyOnIssuedAttackOrder(SelectedActor, Target);
+		NotifyOnIssuedAttackOrder(SelectedPawn, Target);
 	}
 }
 
@@ -404,7 +415,7 @@ void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
         UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
 
         // Notify listeners.
-        NotifyOnIssuedMoveOrder(SelectedActor, TargetLocation);
+        NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
     }
 }
 
@@ -431,7 +442,7 @@ void ARTSPlayerController::IssueStopOrder()
 		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
 
 		// Notify listeners.
-		NotifyOnIssuedStopOrder(SelectedActor);
+		NotifyOnIssuedStopOrder(SelectedPawn);
 	}
 }
 
@@ -440,11 +451,11 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 	// Clear selection.
 	for (AActor* SelectedActor : SelectedActors)
 	{
-		ARTSCharacter* Unit = Cast<ARTSCharacter>(SelectedActor);
+		URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
 
-		if (Unit != nullptr)
+		if (SelectableComponent)
 		{
-			Unit->NotifyOnDeselected();
+			SelectableComponent->DeselectActor();
 		}
 	}
 
@@ -453,11 +464,11 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 
 	for (AActor* SelectedActor : SelectedActors)
 	{
-		ARTSCharacter* Unit = Cast<ARTSCharacter>(SelectedActor);
+		URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
 
-		if (Unit != nullptr)
+		if (SelectableComponent)
 		{
-			Unit->NotifyOnSelected();
+			SelectableComponent->SelectActor();
 		}
 	}
 
@@ -802,19 +813,19 @@ void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor
 	ReceiveOnBuildingPlacementCancelled(BuildingType);
 }
 
-void ARTSPlayerController::NotifyOnIssuedAttackOrder(AActor* Actor, AActor* Target)
+void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
 {
-	ReceiveOnIssuedAttackOrder(Actor, Target);
+	ReceiveOnIssuedAttackOrder(OrderedPawn, Target);
 }
 
-void ARTSPlayerController::NotifyOnIssuedMoveOrder(AActor* Actor, const FVector& TargetLocation)
+void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation)
 {
-    ReceiveOnIssuedMoveOrder(Actor, TargetLocation);
+    ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
 }
 
-void ARTSPlayerController::NotifyOnIssuedStopOrder(AActor* Actor)
+void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)
 {
-	ReceiveOnIssuedStopOrder(Actor);
+	ReceiveOnIssuedStopOrder(OrderedPawn);
 }
 
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)

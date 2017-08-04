@@ -51,10 +51,10 @@ public:
 
 	/** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDrawUnit"))
-	void ReceiveOnDrawUnit(UPARAM(ref) FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
+	void ReceiveOnDrawUnit(UPARAM(ref) FPaintContext& Context, AActor* Actor, APlayerState* ActorOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
 
 	/** Event for custom drawing of units on the minimap. */
-	virtual void NotifyOnDrawUnit(FPaintContext& Context, ARTSCharacter* Character, APlayerState* CharacterOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
+	virtual void NotifyOnDrawUnit(FPaintContext& Context, AActor* Actor, APlayerState* ActorOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
 
 protected:
 	void NativeConstruct() override;

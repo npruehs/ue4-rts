@@ -7,7 +7,6 @@
 #include "RTSGameMode.generated.h"
 
 
-class ARTSCharacter;
 class ARTSPlayerStart;
 class ARTSTeamInfo;
 
@@ -50,8 +49,8 @@ public:
 	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 
 
-	/** Event when a character has been killed. */
-	virtual void NotifyOnCharacterKilled(ARTSCharacter* Character, AController* CharacterOwner);
+	/** Event when an actor has been killed. */
+	virtual void NotifyOnActorKilled(AActor* Actor, AController* ActorOwner);
 
 	/** Event when a player has been defeated. */
 	virtual void NotifyOnPlayerDefeated(APlayerController* Player);
