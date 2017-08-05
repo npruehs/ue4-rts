@@ -131,7 +131,12 @@ void ARTSCharacterAIController::IssueStopOrder()
 	}
 }
 
-bool ARTSCharacterAIController::TraceSphere(const FVector& Location, const float Radius, AActor* ActorToIgnore, ECollisionChannel TraceChannel, TArray<struct FHitResult>& OutHitResults)
+bool ARTSCharacterAIController::TraceSphere(
+	const FVector& Location,
+	const float Radius,
+	AActor* ActorToIgnore,
+	ECollisionChannel TraceChannel,
+	TArray<struct FHitResult>& OutHitResults)
 {
 	UWorld* World = GetWorld();
 

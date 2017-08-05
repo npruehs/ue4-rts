@@ -19,7 +19,12 @@ ARTSProjectile::ARTSProjectile()
 	bReplicates = true;
 }
 
-void ARTSProjectile::FireAt(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator, AActor* ProjectileDamageCauser)
+void ARTSProjectile::FireAt(
+	AActor* ProjectileTarget,
+	float ProjectileDamage,
+	TSubclassOf<class UDamageType> ProjectileDamageType,
+	AController* ProjectileEventInstigator,
+	AActor* ProjectileDamageCauser)
 {
 	if (!ProjectileTarget)
 	{
@@ -68,7 +73,12 @@ void ARTSProjectile::Tick(float DeltaSeconds)
 	}
 }
 
-void ARTSProjectile::NotifyOnProjectileDetonated(AActor* ProjectileTarget, float ProjectileDamage, TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator, AActor* ProjectileDamageCauser)
+void ARTSProjectile::NotifyOnProjectileDetonated(
+	AActor* ProjectileTarget,
+	float ProjectileDamage,
+	TSubclassOf<class UDamageType> ProjectileDamageType,
+	AController* ProjectileEventInstigator,
+	AActor* ProjectileDamageCauser)
 {
 	ReceiveOnProjectileDetonated(ProjectileTarget, ProjectileDamage, ProjectileDamageType, ProjectileEventInstigator, ProjectileDamageCauser);
 }

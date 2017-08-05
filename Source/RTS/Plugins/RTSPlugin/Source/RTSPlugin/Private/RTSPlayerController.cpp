@@ -132,7 +132,7 @@ TArray<AActor*> ARTSPlayerController::GetSelectedActors()
 	return SelectedActors;
 }
 
-bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults)
 {
 	// Get ray.
 	FVector WorldOrigin;
@@ -143,17 +143,17 @@ bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, 
 	}
 
 	// Cast ray.
-	return TraceObjects(WorldOrigin, WorldDirection, HitResults);
+	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
 }
 
-bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults)
 {
 	// Get ray.
 	FVector WorldOrigin = FVector(WorldPositionXY.X, WorldPositionXY.Y, HitResultTraceDistance / 2);
 	FVector WorldDirection = -FVector::UpVector;
 
 	// Cast ray.
-	return TraceObjects(WorldOrigin, WorldDirection, HitResults);
+	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
 }
 
 bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
@@ -179,7 +179,7 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 	return true;
 }
 
-bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults)
 {
     // Get local player viewport.
     ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
@@ -196,7 +196,7 @@ bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitRe
         return false;
     }
 
-	return GetObjectsAtScreenPosition(MousePosition, HitResults);
+	return GetObjectsAtScreenPosition(MousePosition, OutHitResults);
 }
 
 bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults)
@@ -244,7 +244,7 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 	return HitResults.Num() > 0;
 }
 
-bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults)
 {
 	UWorld* World = GetWorld();
 
@@ -256,7 +256,7 @@ bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVecto
 	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
 
 	return World->LineTraceMultiByObjectType(
-		HitResults,
+		OutHitResults,
 		WorldOrigin,
 		WorldOrigin + WorldDirection * HitResultTraceDistance,
 		Params);
