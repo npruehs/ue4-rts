@@ -51,10 +51,20 @@ public:
 
 	/** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDrawUnit"))
-	void ReceiveOnDrawUnit(UPARAM(ref) FPaintContext& Context, AActor* Actor, APlayerState* ActorOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
+	void ReceiveOnDrawUnit(
+		UPARAM(ref) FPaintContext& Context,
+		AActor* Actor,
+		APlayerState* ActorOwner,
+		const FVector2D& MinimapPosition,
+		APlayerState* LocalPlayer) const;
 
 	/** Event for custom drawing of units on the minimap. */
-	virtual void NotifyOnDrawUnit(FPaintContext& Context, AActor* Actor, APlayerState* ActorOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const;
+	virtual void NotifyOnDrawUnit(
+		FPaintContext& Context,
+		AActor* Actor,
+		APlayerState* ActorOwner,
+		const FVector2D& MinimapPosition,
+		APlayerState* LocalPlayer) const;
 
 protected:
 	void NativeConstruct() override;
@@ -77,6 +87,6 @@ private:
 	FReply HandleMinimapClick(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
 
 	FVector MinimapToWorld(const FVector2D& MinimapPosition) const;
-	bool ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& WorldPosition) const;
+	bool ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& OutWorldPosition) const;
 	FVector2D WorldToMinimap(const FVector& WorldPosition) const;
 };

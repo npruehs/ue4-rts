@@ -50,5 +50,10 @@ protected:
 private:
 	URTSAttackComponent* AttackComponent;
 
-	bool TraceSphere(const FVector& Location, const float Radius, AActor* ActorToIgnore, ECollisionChannel TraceChannel, TArray<struct FHitResult>& OutHitResults);
+	bool TraceSphere(
+		const FVector& Location,
+		const float Radius,
+		AActor* ActorToIgnore,
+		ECollisionChannel TraceChannel,
+		TArray<struct FHitResult>& OutHitResults);
 };

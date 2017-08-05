@@ -29,7 +29,7 @@ public:
 
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
-    int CameraScrollThreshold;
+	int32 CameraScrollThreshold;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
@@ -51,10 +51,10 @@ public:
 	TArray<AActor*> GetSelectedActors();
 
 	/** Casts a ray from the specified screen position and collects the results. */
-	bool GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults);
+	bool GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults);
 
 	/** Casts a ray to find any objects at the specified world position. */
-	bool GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& HitResults);
+	bool GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults);
 
 	/** Gets the current selection frame, in screen space. */
 	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
@@ -78,7 +78,7 @@ public:
 
 	/** Saves the current selection to the specified control group. */
 	UFUNCTION(BlueprintCallable)
-	void SaveControlGroup(int Index);
+	void SaveControlGroup(int32 Index);
 
 	UFUNCTION(BlueprintCallable) void SaveControlGroup0();
 	UFUNCTION(BlueprintCallable) void SaveControlGroup1();
@@ -93,7 +93,7 @@ public:
 
 	/** Restores the selection saved in the specified control group. */
 	UFUNCTION(BlueprintCallable)
-	void LoadControlGroup(int Index);
+	void LoadControlGroup(int32 Index);
 
 	UFUNCTION(BlueprintCallable) void LoadControlGroup0();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup1();
@@ -260,13 +260,13 @@ private:
 
 
     /** Casts a ray from the current mouse position and collects the results. */
-    bool GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults);
+    bool GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults);
 	
 	/** Casts a box from the current selection frame and collects the results. */
-	bool GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults);
+	bool GetObjectsInSelectionFrame(TArray<FHitResult>& OutHitResults);
 
 	/** Traces all relevant objects using the specified ray. */
-	bool TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& HitResults);
+	bool TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults);
 
 	/** Checks whether the specified actor is valid and selectable. */
 	bool IsSelectableActor(AActor* Actor);

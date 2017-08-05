@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSAttackComponent.h"
 
+#include "RTSProjectile.h"
+
 
 URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitializer)
 {
@@ -24,7 +26,7 @@ void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	}
 }
 
-void URTSAttackComponent::UseAttack(int AttackIndex, AActor* Target)
+void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 {
 	AActor* Owner = GetOwner();
 	APawn* OwnerPawn = Cast<APawn>(Owner);

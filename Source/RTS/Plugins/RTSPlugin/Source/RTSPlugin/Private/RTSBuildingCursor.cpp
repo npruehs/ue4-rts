@@ -8,7 +8,7 @@
 
 ARTSBuildingCursor::ARTSBuildingCursor()
 {
-	Mesh = CreateOptionalDefaultSubobject<USkeletalMeshComponent>("Skeletal Mesh");
+	Mesh = CreateOptionalDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh"));
 	SetRootComponent(Mesh);
 }
 

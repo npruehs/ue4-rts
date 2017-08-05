@@ -77,7 +77,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		}
 
 		// Acquire target.
-		Blackboard->SetValueAsObject("TargetActor", HitResult.Actor.Get());
+		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.Actor.Get());
 
 		UE_LOG(RTSLog, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
 	}
@@ -86,10 +86,10 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 {
 	// Update blackboard.
-	Blackboard->SetValueAsEnum("OrderType", ERTSOrderType::ORDER_Attack);
-	Blackboard->ClearValue("HomeLocation");
-	Blackboard->SetValueAsObject("TargetActor", Target);
-	Blackboard->ClearValue("TargetLocation");
+	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)ERTSOrderType::ORDER_Attack);
+	Blackboard->ClearValue(TEXT("HomeLocation"));
+	Blackboard->SetValueAsObject(TEXT("TargetActor"), Target);
+	Blackboard->ClearValue(TEXT("TargetLocation"));
 
 	// Stop any current orders and start over.
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
@@ -102,10 +102,10 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
     // Update blackboard.
-	Blackboard->SetValueAsEnum("OrderType", ERTSOrderType::ORDER_Move);
-	Blackboard->ClearValue("HomeLocation");
-	Blackboard->ClearValue("TargetActor");
-    Blackboard->SetValueAsVector("TargetLocation", Location);
+	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)ERTSOrderType::ORDER_Move);
+	Blackboard->ClearValue(TEXT("HomeLocation"));
+	Blackboard->ClearValue(TEXT("TargetActor"));
+    Blackboard->SetValueAsVector(TEXT("TargetLocation"), Location);
 
     // Stop any current orders and start over.
     UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
@@ -118,10 +118,10 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 void ARTSCharacterAIController::IssueStopOrder()
 {
 	// Update blackboard.
-	Blackboard->SetValueAsEnum("OrderType", ERTSOrderType::ORDER_None);
-	Blackboard->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
-	Blackboard->ClearValue("TargetActor");
-	Blackboard->ClearValue("TargetLocation");
+	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)ERTSOrderType::ORDER_None);
+	Blackboard->SetValueAsVector(TEXT("HomeLocation"), GetPawn()->GetActorLocation());
+	Blackboard->ClearValue(TEXT("TargetActor"));
+	Blackboard->ClearValue(TEXT("TargetLocation"));
 
 	// Stop any current orders and start over.
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
@@ -131,7 +131,12 @@ void ARTSCharacterAIController::IssueStopOrder()
 	}
 }
 
-bool ARTSCharacterAIController::TraceSphere(const FVector& Location, const float Radius, AActor* ActorToIgnore, ECollisionChannel TraceChannel, TArray<struct FHitResult>& OutHitResults)
+bool ARTSCharacterAIController::TraceSphere(
+	const FVector& Location,
+	const float Radius,
+	AActor* ActorToIgnore,
+	ECollisionChannel TraceChannel,
+	TArray<struct FHitResult>& OutHitResults)
 {
 	UWorld* World = GetWorld();
 

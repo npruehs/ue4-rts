@@ -6,7 +6,7 @@
 
 
 UENUM(BlueprintType)
-enum ERTSOrderType
+enum class ERTSOrderType : uint8
 {
 	/** Idle. */
 	ORDER_None,

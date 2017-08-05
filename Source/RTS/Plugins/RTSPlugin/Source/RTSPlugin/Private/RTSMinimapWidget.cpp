@@ -16,7 +16,12 @@ URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer
 {
 }
 
-void URTSMinimapWidget::NotifyOnDrawUnit(FPaintContext& Context, AActor* Actor, APlayerState* ActorOwner, const FVector2D& MinimapPosition, APlayerState* LocalPlayer) const
+void URTSMinimapWidget::NotifyOnDrawUnit(
+	FPaintContext& Context,
+	AActor* Actor,
+	APlayerState* ActorOwner,
+	const FVector2D& MinimapPosition,
+	APlayerState* LocalPlayer) const
 {
 	ReceiveOnDrawUnit(Context, Actor, ActorOwner, MinimapPosition, LocalPlayer);
 }
@@ -175,8 +180,8 @@ void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 		return;
 	}
 
-	int ViewportWidth;
-	int ViewportHeight;
+	int32 ViewportWidth;
+	int32 ViewportHeight;
 
 	Player->GetViewportSize(ViewportWidth, ViewportHeight);
 
@@ -267,7 +272,7 @@ FVector URTSMinimapWidget::MinimapToWorld(const FVector2D& MinimapPosition) cons
 	return FVector(WorldX, WorldY, 0.0f);
 }
 
-bool URTSMinimapWidget::ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& WorldPosition) const
+bool URTSMinimapWidget::ViewportToWorld(ARTSPlayerController* Player, const FVector2D& ViewportPosition, FVector& OutWorldPosition) const
 {
 	// Get ray.
 	FVector WorldOrigin;
@@ -281,7 +286,7 @@ bool URTSMinimapWidget::ViewportToWorld(ARTSPlayerController* Player, const FVec
 	FPlane ZPlane = FPlane(FVector::ZeroVector, FVector::UpVector);
 
 	// Calculate intersection point.
-	WorldPosition = FMath::LinePlaneIntersection(WorldOrigin, WorldOrigin + WorldDirection * 1000.0f, ZPlane);
+	OutWorldPosition = FMath::LinePlaneIntersection(WorldOrigin, WorldOrigin + WorldDirection * 1000.0f, ZPlane);
 	return true;
 }
 

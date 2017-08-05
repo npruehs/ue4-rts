@@ -34,49 +34,49 @@ void ARTSPlayerController::SetupInputComponent()
 	APlayerController::bEnableMouseOverEvents = true;
 
 	// Bind actions.
-	InputComponent->BindAction("Select", IE_Pressed, this, &ARTSPlayerController::StartSelectActors);
-	InputComponent->BindAction("Select", IE_Released, this, &ARTSPlayerController::FinishSelectActors);
-	InputComponent->BindAction("AddSelection", IE_Pressed, this, &ARTSPlayerController::StartAddSelection);
-	InputComponent->BindAction("AddSelection", IE_Released, this, &ARTSPlayerController::StopAddSelection);
-	InputComponent->BindAction("ToggleSelection", IE_Pressed, this, &ARTSPlayerController::StartToggleSelection);
-	InputComponent->BindAction("ToggleSelection", IE_Released, this, &ARTSPlayerController::StopToggleSelection);
+	InputComponent->BindAction(TEXT("Select"), IE_Pressed, this, &ARTSPlayerController::StartSelectActors);
+	InputComponent->BindAction(TEXT("Select"), IE_Released, this, &ARTSPlayerController::FinishSelectActors);
+	InputComponent->BindAction(TEXT("AddSelection"), IE_Pressed, this, &ARTSPlayerController::StartAddSelection);
+	InputComponent->BindAction(TEXT("AddSelection"), IE_Released, this, &ARTSPlayerController::StopAddSelection);
+	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Pressed, this, &ARTSPlayerController::StartToggleSelection);
+	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Released, this, &ARTSPlayerController::StopToggleSelection);
 
-	InputComponent->BindAction("IssueOrder", IE_Released, this, &ARTSPlayerController::IssueOrder);
-	InputComponent->BindAction("IssueStopOrder", IE_Released, this, &ARTSPlayerController::IssueStopOrder);
+	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueOrder);
+	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 
-	InputComponent->BindAction("SaveControlGroup0", IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
-	InputComponent->BindAction("SaveControlGroup1", IE_Released, this, &ARTSPlayerController::SaveControlGroup1);
-	InputComponent->BindAction("SaveControlGroup2", IE_Released, this, &ARTSPlayerController::SaveControlGroup2);
-	InputComponent->BindAction("SaveControlGroup3", IE_Released, this, &ARTSPlayerController::SaveControlGroup3);
-	InputComponent->BindAction("SaveControlGroup4", IE_Released, this, &ARTSPlayerController::SaveControlGroup4);
-	InputComponent->BindAction("SaveControlGroup5", IE_Released, this, &ARTSPlayerController::SaveControlGroup5);
-	InputComponent->BindAction("SaveControlGroup6", IE_Released, this, &ARTSPlayerController::SaveControlGroup6);
-	InputComponent->BindAction("SaveControlGroup7", IE_Released, this, &ARTSPlayerController::SaveControlGroup7);
-	InputComponent->BindAction("SaveControlGroup8", IE_Released, this, &ARTSPlayerController::SaveControlGroup8);
-	InputComponent->BindAction("SaveControlGroup9", IE_Released, this, &ARTSPlayerController::SaveControlGroup9);
+	InputComponent->BindAction(TEXT("SaveControlGroup0"), IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
+	InputComponent->BindAction(TEXT("SaveControlGroup1"), IE_Released, this, &ARTSPlayerController::SaveControlGroup1);
+	InputComponent->BindAction(TEXT("SaveControlGroup2"), IE_Released, this, &ARTSPlayerController::SaveControlGroup2);
+	InputComponent->BindAction(TEXT("SaveControlGroup3"), IE_Released, this, &ARTSPlayerController::SaveControlGroup3);
+	InputComponent->BindAction(TEXT("SaveControlGroup4"), IE_Released, this, &ARTSPlayerController::SaveControlGroup4);
+	InputComponent->BindAction(TEXT("SaveControlGroup5"), IE_Released, this, &ARTSPlayerController::SaveControlGroup5);
+	InputComponent->BindAction(TEXT("SaveControlGroup6"), IE_Released, this, &ARTSPlayerController::SaveControlGroup6);
+	InputComponent->BindAction(TEXT("SaveControlGroup7"), IE_Released, this, &ARTSPlayerController::SaveControlGroup7);
+	InputComponent->BindAction(TEXT("SaveControlGroup8"), IE_Released, this, &ARTSPlayerController::SaveControlGroup8);
+	InputComponent->BindAction(TEXT("SaveControlGroup9"), IE_Released, this, &ARTSPlayerController::SaveControlGroup9);
 
-	InputComponent->BindAction("LoadControlGroup0", IE_Released, this, &ARTSPlayerController::LoadControlGroup0);
-	InputComponent->BindAction("LoadControlGroup1", IE_Released, this, &ARTSPlayerController::LoadControlGroup1);
-	InputComponent->BindAction("LoadControlGroup2", IE_Released, this, &ARTSPlayerController::LoadControlGroup2);
-	InputComponent->BindAction("LoadControlGroup3", IE_Released, this, &ARTSPlayerController::LoadControlGroup3);
-	InputComponent->BindAction("LoadControlGroup4", IE_Released, this, &ARTSPlayerController::LoadControlGroup4);
-	InputComponent->BindAction("LoadControlGroup5", IE_Released, this, &ARTSPlayerController::LoadControlGroup5);
-	InputComponent->BindAction("LoadControlGroup6", IE_Released, this, &ARTSPlayerController::LoadControlGroup6);
-	InputComponent->BindAction("LoadControlGroup7", IE_Released, this, &ARTSPlayerController::LoadControlGroup7);
-	InputComponent->BindAction("LoadControlGroup8", IE_Released, this, &ARTSPlayerController::LoadControlGroup8);
-	InputComponent->BindAction("LoadControlGroup9", IE_Released, this, &ARTSPlayerController::LoadControlGroup9);
+	InputComponent->BindAction(TEXT("LoadControlGroup0"), IE_Released, this, &ARTSPlayerController::LoadControlGroup0);
+	InputComponent->BindAction(TEXT("LoadControlGroup1"), IE_Released, this, &ARTSPlayerController::LoadControlGroup1);
+	InputComponent->BindAction(TEXT("LoadControlGroup2"), IE_Released, this, &ARTSPlayerController::LoadControlGroup2);
+	InputComponent->BindAction(TEXT("LoadControlGroup3"), IE_Released, this, &ARTSPlayerController::LoadControlGroup3);
+	InputComponent->BindAction(TEXT("LoadControlGroup4"), IE_Released, this, &ARTSPlayerController::LoadControlGroup4);
+	InputComponent->BindAction(TEXT("LoadControlGroup5"), IE_Released, this, &ARTSPlayerController::LoadControlGroup5);
+	InputComponent->BindAction(TEXT("LoadControlGroup6"), IE_Released, this, &ARTSPlayerController::LoadControlGroup6);
+	InputComponent->BindAction(TEXT("LoadControlGroup7"), IE_Released, this, &ARTSPlayerController::LoadControlGroup7);
+	InputComponent->BindAction(TEXT("LoadControlGroup8"), IE_Released, this, &ARTSPlayerController::LoadControlGroup8);
+	InputComponent->BindAction(TEXT("LoadControlGroup9"), IE_Released, this, &ARTSPlayerController::LoadControlGroup9);
 
-	InputComponent->BindAxis("MoveCameraLeftRight", this, &ARTSPlayerController::MoveCameraLeftRight);
-	InputComponent->BindAxis("MoveCameraUpDown", this, &ARTSPlayerController::MoveCameraUpDown);
+	InputComponent->BindAxis(TEXT("MoveCameraLeftRight"), this, &ARTSPlayerController::MoveCameraLeftRight);
+	InputComponent->BindAxis(TEXT("MoveCameraUpDown"), this, &ARTSPlayerController::MoveCameraUpDown);
 
-	InputComponent->BindAction("ShowConstructionProgressBars", IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
-	InputComponent->BindAction("ShowConstructionProgressBars", IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
+	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
+	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
 
-	InputComponent->BindAction("ShowHealthBars", IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
-	InputComponent->BindAction("ShowHealthBars", IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
+	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
+	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
 
-	InputComponent->BindAction("ConfirmBuildingPlacement", IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
-	InputComponent->BindAction("CancelBuildingPlacement", IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
+	InputComponent->BindAction(TEXT("ConfirmBuildingPlacement"), IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
+	InputComponent->BindAction(TEXT("CancelBuildingPlacement"), IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
 
 	// Get camera bounds.
 	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -132,7 +132,7 @@ TArray<AActor*> ARTSPlayerController::GetSelectedActors()
 	return SelectedActors;
 }
 
-bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults)
 {
 	// Get ray.
 	FVector WorldOrigin;
@@ -143,17 +143,17 @@ bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, 
 	}
 
 	// Cast ray.
-	return TraceObjects(WorldOrigin, WorldDirection, HitResults);
+	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
 }
 
-bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults)
 {
 	// Get ray.
 	FVector WorldOrigin = FVector(WorldPositionXY.X, WorldPositionXY.Y, HitResultTraceDistance / 2);
 	FVector WorldDirection = -FVector::UpVector;
 
 	// Cast ray.
-	return TraceObjects(WorldOrigin, WorldDirection, HitResults);
+	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
 }
 
 bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
@@ -179,7 +179,7 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 	return true;
 }
 
-bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults)
 {
     // Get local player viewport.
     ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
@@ -196,7 +196,7 @@ bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& HitRe
         return false;
     }
 
-	return GetObjectsAtScreenPosition(MousePosition, HitResults);
+	return GetObjectsAtScreenPosition(MousePosition, OutHitResults);
 }
 
 bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults)
@@ -244,7 +244,7 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 	return HitResults.Num() > 0;
 }
 
-bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults)
 {
 	UWorld* World = GetWorld();
 
@@ -256,7 +256,7 @@ bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVecto
 	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
 
 	return World->LineTraceMultiByObjectType(
-		HitResults,
+		OutHitResults,
 		WorldOrigin,
 		WorldOrigin + WorldDirection * HitResultTraceDistance,
 		Params);
@@ -476,7 +476,7 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 	NotifyOnSelectionChanged(SelectedActors);
 }
 
-void ARTSPlayerController::SaveControlGroup(int Index)
+void ARTSPlayerController::SaveControlGroup(int32 Index)
 {
 	if (Index < 0 || Index > 9)
 	{
@@ -500,7 +500,7 @@ void ARTSPlayerController::SaveControlGroup7() { SaveControlGroup(7); }
 void ARTSPlayerController::SaveControlGroup8() { SaveControlGroup(8); }
 void ARTSPlayerController::SaveControlGroup9() { SaveControlGroup(9); }
 
-void ARTSPlayerController::LoadControlGroup(int Index)
+void ARTSPlayerController::LoadControlGroup(int32 Index)
 {
 	if (Index < 0 || Index > 9)
 	{

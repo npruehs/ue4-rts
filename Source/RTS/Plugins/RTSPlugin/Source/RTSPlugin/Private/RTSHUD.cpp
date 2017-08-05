@@ -149,7 +149,7 @@ void ARTSHUD::DrawHealthBars()
 	// Draw health bars for selected actors.
 	if (bShowSelectionHealthBars)
 	{
-		for (int i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
+		for (int32 i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
 		{
 			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
 			DrawHealthBar(SelectedActor);
@@ -226,7 +226,7 @@ void ARTSHUD::DrawConstructionProgressBars()
 	// Draw progress bars for selected actors.
 	if (bShowSelectionConstructionProgressBars)
 	{
-		for (int i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
+		for (int32 i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
 		{
 			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
 			DrawConstructionProgressBar(SelectedActor);

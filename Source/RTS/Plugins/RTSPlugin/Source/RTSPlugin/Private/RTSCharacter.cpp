@@ -3,9 +3,11 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
+#include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
+#include "RTSAttackData.h"
 #include "RTSGameMode.h"
 #include "RTSHealthComponent.h"
 #include "RTSSelectableComponent.h"

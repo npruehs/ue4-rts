@@ -48,7 +48,7 @@ public:
 
 	/** Uses the passed attack on the specified target and starts the cooldown timer. */
 	UFUNCTION(BlueprintCallable)
-	void UseAttack(int AttackIndex, AActor* Target);
+	void UseAttack(int32 AttackIndex, AActor* Target);
 
 
 	/** Event when the attack cooldown has expired. */

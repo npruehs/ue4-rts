@@ -2,9 +2,10 @@
 
 #include "RTSPluginPrivatePCH.h"
 
-#include "RTSProjectile.h"
-
 #include "RTSAttackData.generated.h"
+
+
+class ARTSProjectile;
 
 
 USTRUCT(BlueprintType)
