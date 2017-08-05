@@ -29,7 +29,7 @@ public:
 
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
-    int CameraScrollThreshold;
+	int32 CameraScrollThreshold;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
@@ -78,7 +78,7 @@ public:
 
 	/** Saves the current selection to the specified control group. */
 	UFUNCTION(BlueprintCallable)
-	void SaveControlGroup(int Index);
+	void SaveControlGroup(int32 Index);
 
 	UFUNCTION(BlueprintCallable) void SaveControlGroup0();
 	UFUNCTION(BlueprintCallable) void SaveControlGroup1();
@@ -93,7 +93,7 @@ public:
 
 	/** Restores the selection saved in the specified control group. */
 	UFUNCTION(BlueprintCallable)
-	void LoadControlGroup(int Index);
+	void LoadControlGroup(int32 Index);
 
 	UFUNCTION(BlueprintCallable) void LoadControlGroup0();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup1();

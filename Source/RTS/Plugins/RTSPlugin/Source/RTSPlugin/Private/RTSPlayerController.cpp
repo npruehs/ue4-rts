@@ -476,7 +476,7 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 	NotifyOnSelectionChanged(SelectedActors);
 }
 
-void ARTSPlayerController::SaveControlGroup(int Index)
+void ARTSPlayerController::SaveControlGroup(int32 Index)
 {
 	if (Index < 0 || Index > 9)
 	{
@@ -500,7 +500,7 @@ void ARTSPlayerController::SaveControlGroup7() { SaveControlGroup(7); }
 void ARTSPlayerController::SaveControlGroup8() { SaveControlGroup(8); }
 void ARTSPlayerController::SaveControlGroup9() { SaveControlGroup(9); }
 
-void ARTSPlayerController::LoadControlGroup(int Index)
+void ARTSPlayerController::LoadControlGroup(int32 Index)
 {
 	if (Index < 0 || Index > 9)
 	{

@@ -180,8 +180,8 @@ void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 		return;
 	}
 
-	int ViewportWidth;
-	int ViewportHeight;
+	int32 ViewportWidth;
+	int32 ViewportHeight;
 
 	Player->GetViewportSize(ViewportWidth, ViewportHeight);
 
