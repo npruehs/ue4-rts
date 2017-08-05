@@ -86,7 +86,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 {
 	// Update blackboard.
-	Blackboard->SetValueAsEnum("OrderType", ERTSOrderType::ORDER_Attack);
+	Blackboard->SetValueAsEnum("OrderType", (uint8)ERTSOrderType::ORDER_Attack);
 	Blackboard->ClearValue("HomeLocation");
 	Blackboard->SetValueAsObject("TargetActor", Target);
 	Blackboard->ClearValue("TargetLocation");
@@ -102,7 +102,7 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
     // Update blackboard.
-	Blackboard->SetValueAsEnum("OrderType", ERTSOrderType::ORDER_Move);
+	Blackboard->SetValueAsEnum("OrderType", (uint8)ERTSOrderType::ORDER_Move);
 	Blackboard->ClearValue("HomeLocation");
 	Blackboard->ClearValue("TargetActor");
     Blackboard->SetValueAsVector("TargetLocation", Location);
@@ -118,7 +118,7 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 void ARTSCharacterAIController::IssueStopOrder()
 {
 	// Update blackboard.
-	Blackboard->SetValueAsEnum("OrderType", ERTSOrderType::ORDER_None);
+	Blackboard->SetValueAsEnum("OrderType", (uint8)ERTSOrderType::ORDER_None);
 	Blackboard->SetValueAsVector("HomeLocation", GetPawn()->GetActorLocation());
 	Blackboard->ClearValue("TargetActor");
 	Blackboard->ClearValue("TargetLocation");
