@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSAttackComponent.h"
 
+#include "RTSProjectile.h"
+
 
 URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitializer)
 {

@@ -3,15 +3,14 @@
 #include "RTSPluginPrivatePCH.h"
 
 #include "GameFramework/Character.h"
-#include "GameFramework/Controller.h"
-
-#include "RTSAttackData.h"
 
 #include "RTSCharacter.generated.h"
 
 
+class AController;
 class UDecalComponent;
 
+struct FRTSAttackData;
 class URTSSelectableComponent;
 
 

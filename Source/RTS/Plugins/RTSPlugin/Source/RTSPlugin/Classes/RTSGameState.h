@@ -2,7 +2,7 @@
 
 #include "RTSPluginPrivatePCH.h"
 
-#include "GameFramework/GameState.h"
+#include "GameFramework/GameStateBase.h"
 
 #include "RTSGameState.generated.h"
 
