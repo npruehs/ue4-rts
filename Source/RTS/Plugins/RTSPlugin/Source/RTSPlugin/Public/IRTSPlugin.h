@@ -29,4 +29,3 @@ public:
 		return FModuleManager::Get().IsModuleLoaded( "RTSPlugin" );
 	}
 };
-

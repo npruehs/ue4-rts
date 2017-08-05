@@ -17,4 +17,3 @@ class ARTSCameraBoundsVolume : public AVolume
 {
     GENERATED_UCLASS_BODY()
 };
-
