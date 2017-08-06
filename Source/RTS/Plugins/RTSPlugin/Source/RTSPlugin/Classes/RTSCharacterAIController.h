@@ -44,7 +44,7 @@ public:
 
 	/** Makes the pawn continue constructing the specified building. */
 	UFUNCTION(BlueprintCallable)
-	void IssueContinueConstructionOrder(AActor* BuildingSite);
+	void IssueContinueConstructionOrder(AActor* ConstructionSite);
 
     /** Makes the pawn move towards the specified location. */
     UFUNCTION(BlueprintCallable)

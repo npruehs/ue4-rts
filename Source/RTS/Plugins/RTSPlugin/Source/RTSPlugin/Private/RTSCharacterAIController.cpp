@@ -124,13 +124,13 @@ void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> 
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* BuildingSite)
+void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_ContinueConstruction);
 	ClearBuildingType();
 	ClearHomeLocation();
-	SetTargetActor(BuildingSite);
+	SetTargetActor(ConstructionSite);
 	ClearTargetLocation();
 
 	// Stop any current orders and start over.

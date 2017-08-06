@@ -62,15 +62,19 @@ public:
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
-	void IssueAttackOrder(AActor* Target);
+	bool IssueAttackOrder(AActor* Target);
 
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(BlueprintCallable)
-	void IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	bool IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Orders selected builders to finish constructing the specified building. */
+	UFUNCTION(BlueprintCallable)
+	bool IssueContinueConstructionOrder(AActor* ConstructionSite);
 
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
-	void IssueMoveOrder(const FVector& TargetLocation);
+	bool IssueMoveOrder(const FVector& TargetLocation);
 
 	/** Orders all selected units to stop all current actions. */
 	UFUNCTION(BlueprintCallable)
@@ -150,8 +154,11 @@ public:
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
-	/** Event when an actor has received a construction order. */
+	/** Event when an actor has received a begin construction order. */
 	virtual void NotifyOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Event when an actor has received a continue construction order. */
+	virtual void NotifyOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
@@ -189,9 +196,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
 	void ReceiveOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
-	/** Event when an actor has received a construction order. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedConstructionOrder"))
+	/** Event when an actor has received a begin construction order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedBeginConstructionOrder"))
 	void ReceiveOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Event when an actor has received a continue construction order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedContinueConstructionOrder"))
+	void ReceiveOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
@@ -294,6 +305,10 @@ private:
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Orders selected builders to finish constructing the specified building. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)
