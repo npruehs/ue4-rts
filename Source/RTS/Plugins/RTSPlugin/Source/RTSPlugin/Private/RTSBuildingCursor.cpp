@@ -12,9 +12,10 @@ ARTSBuildingCursor::ARTSBuildingCursor()
 	SetRootComponent(Mesh);
 }
 
-void ARTSBuildingCursor::SetMesh(USkeletalMesh* BuildingMesh)
+void ARTSBuildingCursor::SetMesh(USkeletalMesh* BuildingMesh, const FVector& MeshRelativeScale3D)
 {
 	Mesh->SetSkeletalMesh(BuildingMesh);
+	SetActorRelativeScale3D(MeshRelativeScale3D);
 }
 
 void ARTSBuildingCursor::SetValidLocation()

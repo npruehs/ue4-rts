@@ -3,6 +3,8 @@
 
 #include "EngineUtils.h"
 #include "Components/InputComponent.h"
+#include "Components/PrimitiveComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
@@ -533,18 +535,20 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 	return bHealthBarHotkeyPressed;
 }
 
-void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh, const FVector& CollisionBoxSize)
+void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType)
 {
 	// Spawn dummy building.
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	AActor* DefaultBuilding = BuildingType->GetDefaultObject<AActor>();
+	USkeletalMeshComponent* SkeletalMeshComponent = DefaultBuilding->FindComponentByClass<USkeletalMeshComponent>();
+
 	BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
-	BuildingCursor->SetMesh(PreviewMesh);
+	BuildingCursor->SetMesh(SkeletalMeshComponent->SkeletalMesh, DefaultBuilding->GetActorRelativeScale3D());
 	BuildingCursor->SetInvalidLocation();
 
 	BuildingBeingPlacedType = BuildingType;
-	BuildingBeingPlacedCollisionBoxSize = CollisionBoxSize;
 
 	UE_LOG(RTSLog, Log, TEXT("Beginning placement of building %s."), *BuildingType->GetName());
 
@@ -552,7 +556,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingTy
 	NotifyOnBuildingPlacementStarted(BuildingType);
 }
 
-bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const
+bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const
 {
 	UWorld* World = GetWorld();
 
@@ -561,13 +565,21 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		return false;
 	}
 
+	AActor* DefaultBuilding = BuildingType->GetDefaultObject<AActor>();
+	UPrimitiveComponent* PrimitiveComponent = DefaultBuilding->FindComponentByClass<UPrimitiveComponent>();
+
+	if (!PrimitiveComponent)
+	{
+		return true;
+	}
+
 	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllDynamicObjects);
 
 	return !World->OverlapAnyTestByObjectType(
 		Location,
 		FQuat::Identity,
 		Params,
-		FCollisionShape::MakeBox(CollisionBoxSize / 2));
+		PrimitiveComponent->GetCollisionShape());
 }
 
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
@@ -739,7 +751,7 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 		return;
 	}
 
-	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
+	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition))
 	{
 		UE_LOG(RTSLog, Log, TEXT("Can't place building %s at %s."), *BuildingBeingPlacedType->GetName(), *HoveredWorldPosition.ToString());
 
@@ -940,7 +952,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 				{
 					BuildingCursor->SetActorLocation(HoveredWorldPosition);
 
-					if (CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition, BuildingBeingPlacedCollisionBoxSize))
+					if (CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition))
 					{
 						BuildingCursor->SetValidLocation();
 					}
