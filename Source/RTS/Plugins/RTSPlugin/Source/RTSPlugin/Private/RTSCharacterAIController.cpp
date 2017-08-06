@@ -6,8 +6,8 @@
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
+#include "RTSBuilderComponent.h"
 #include "RTSCharacter.h"
-#include "RTSOrderType.h"
 #include "RTSOwnerComponent.h"
 
 
@@ -86,49 +86,122 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 {
 	// Update blackboard.
-	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)ERTSOrderType::ORDER_Attack);
-	Blackboard->ClearValue(TEXT("HomeLocation"));
-	Blackboard->SetValueAsObject(TEXT("TargetActor"), Target);
-	Blackboard->ClearValue(TEXT("TargetLocation"));
+	SetOrderType(ERTSOrderType::ORDER_Attack);
+	ClearBuildingType();
+	ClearHomeLocation();
+	SetTargetActor(Target);
+	ClearTargetLocation();
 
 	// Stop any current orders and start over.
-	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
-	if (BehaviorTreeComponent)
+	ApplyOrders();
+}
+
+void ARTSCharacterAIController::IssueConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+{
+	// Somehow, classes are not properly serialized to blackboard values and back, so we're going to use the building index here instead.
+	URTSBuilderComponent* BuilderComponent = GetPawn()->FindComponentByClass<URTSBuilderComponent>();
+
+	if (!BuilderComponent)
 	{
-		BehaviorTreeComponent->RestartTree();
+		return;
 	}
+
+	int32 BuildingIndex = BuilderComponent->ConstructibleBuildingTypes.IndexOfByKey(BuildingType);
+
+	if (BuildingIndex == INDEX_NONE)
+	{
+		return;
+	}
+
+	// Update blackboard.
+	SetOrderType(ERTSOrderType::ORDER_Construct);
+	SetBuildingType(BuildingIndex);
+	ClearHomeLocation();
+	ClearTargetActor();
+	SetTargetLocation(TargetLocation);
+
+	// Stop any current orders and start over.
+	ApplyOrders();
 }
 
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
     // Update blackboard.
-	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)ERTSOrderType::ORDER_Move);
-	Blackboard->ClearValue(TEXT("HomeLocation"));
-	Blackboard->ClearValue(TEXT("TargetActor"));
-    Blackboard->SetValueAsVector(TEXT("TargetLocation"), Location);
+	SetOrderType(ERTSOrderType::ORDER_Move);
+	ClearBuildingType();
+	ClearHomeLocation();
+	ClearTargetActor();
+	SetTargetLocation(Location);
 
     // Stop any current orders and start over.
-    UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
-    if (BehaviorTreeComponent)
-    {
-        BehaviorTreeComponent->RestartTree();
-    }
+	ApplyOrders();
 }
 
 void ARTSCharacterAIController::IssueStopOrder()
 {
 	// Update blackboard.
-	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)ERTSOrderType::ORDER_None);
-	Blackboard->SetValueAsVector(TEXT("HomeLocation"), GetPawn()->GetActorLocation());
-	Blackboard->ClearValue(TEXT("TargetActor"));
-	Blackboard->ClearValue(TEXT("TargetLocation"));
+	SetOrderType(ERTSOrderType::ORDER_None);
+	ClearBuildingType();
+	SetHomeLocation(GetPawn()->GetActorLocation());
+	ClearTargetActor();
+	ClearTargetLocation();
 
 	// Stop any current orders and start over.
+	ApplyOrders();
+}
+
+void ARTSCharacterAIController::ApplyOrders()
+{
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTreeComponent)
 	{
 		BehaviorTreeComponent->RestartTree();
 	}
+}
+
+void ARTSCharacterAIController::ClearBuildingType()
+{
+	Blackboard->ClearValue(TEXT("BuildingType"));
+}
+
+void ARTSCharacterAIController::ClearHomeLocation()
+{
+	Blackboard->ClearValue(TEXT("HomeLocation"));
+}
+
+void ARTSCharacterAIController::ClearTargetActor()
+{
+	Blackboard->ClearValue(TEXT("TargetActor"));
+}
+
+void ARTSCharacterAIController::ClearTargetLocation()
+{
+	Blackboard->ClearValue(TEXT("TargetLocation"));
+}
+
+void ARTSCharacterAIController::SetBuildingType(int32 BuildingIndex)
+{
+	Blackboard->SetValueAsInt(TEXT("BuildingType"), BuildingIndex);
+}
+
+void ARTSCharacterAIController::SetHomeLocation(const FVector& HomeLocation)
+{
+	Blackboard->SetValueAsVector(TEXT("HomeLocation"), HomeLocation);
+}
+
+void ARTSCharacterAIController::SetOrderType(const ERTSOrderType OrderType)
+{
+	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderType);
+}
+
+void ARTSCharacterAIController::SetTargetActor(AActor* TargetActor)
+{
+	Blackboard->SetValueAsObject(TEXT("TargetActor"), TargetActor);
+}
+
+void ARTSCharacterAIController::SetTargetLocation(const FVector& TargetLocation)
+{
+	Blackboard->SetValueAsVector(TEXT("TargetLocation"), TargetLocation);
 }
 
 bool ARTSCharacterAIController::TraceSphere(

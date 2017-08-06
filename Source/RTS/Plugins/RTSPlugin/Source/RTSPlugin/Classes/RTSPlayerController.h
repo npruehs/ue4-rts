@@ -64,6 +64,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IssueAttackOrder(AActor* Target);
 
+	/** Orders a selected builder to construct the specified building at the passed location. */
+	UFUNCTION(BlueprintCallable)
+	void IssueConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
 	void IssueMoveOrder(const FVector& TargetLocation);
@@ -146,6 +150,9 @@ public:
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
+	/** Event when an actor has received a construction order. */
+	virtual void NotifyOnIssuedConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
@@ -182,6 +189,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
 	void ReceiveOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
+	/** Event when an actor has received a construction order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedConstructionOrder"))
+	void ReceiveOnIssuedConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
     void ReceiveOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
@@ -202,6 +213,7 @@ public:
 	/** Sets this player as the owner of the specified actor. */
 	UFUNCTION(BlueprintCallable)
 	void TransferOwnership(AActor* Actor);
+
 
 protected:
     virtual void BeginPlay() override;
@@ -278,6 +290,10 @@ private:
 	/** Orders the passed unit to attack the specified unit. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
+	
+	/** Orders a selected builder to construct the specified building at the passed location. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
 
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -340,8 +356,4 @@ private:
 	/** Cancels placing the current building without effect. */
 	UFUNCTION()
 	void CancelBuildingPlacement();
-
-	/** Starts constructing a building of the specified type at the passed location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerConstructBuildingAtLocation(TSubclassOf<AActor> BuildingType, FVector Location);
 };

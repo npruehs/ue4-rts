@@ -12,6 +12,7 @@
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
+#include "RTSBuilderComponent.h"
 #include "RTSBuildingCursor.h"
 #include "RTSCameraBoundsVolume.h"
 #include "RTSCharacter.h"
@@ -394,6 +395,67 @@ bool ARTSPlayerController::ServerIssueAttackOrder_Validate(APawn* OrderedPawn, A
 	return OrderedPawn->GetOwner() == this;
 }
 
+void ARTSPlayerController::IssueConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+{
+	// Find suitable selected builder.
+	for (auto SelectedActor : SelectedActors)
+	{
+		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+		if (!SelectedPawn)
+		{
+			continue;
+		}
+
+		// Check if builder.
+		auto BuilderComponent = SelectedPawn->FindComponentByClass<URTSBuilderComponent>();
+
+		if (!BuilderComponent)
+		{
+			continue;
+		}
+
+		// Check if builder knows about building.
+		if (!BuilderComponent->ConstructibleBuildingTypes.Contains(BuildingType))
+		{
+			continue;
+		}
+
+		// Send construction order to server.
+		ServerIssueConstructionOrder(SelectedPawn, BuildingType, TargetLocation);
+		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to construct %s at %s."), *SelectedPawn->GetName(), *BuildingType->GetName(), *TargetLocation.ToString());
+
+		// Notify listeners.
+		NotifyOnIssuedConstructionOrder(SelectedPawn, BuildingType, TargetLocation);
+
+		// Just send one builder.
+		return;
+	}
+}
+
+void ARTSPlayerController::ServerIssueConstructionOrder_Implementation(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue construction order.
+	PawnController->IssueConstructionOrder(BuildingType, TargetLocation);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to construct %s at %s."), *OrderedPawn->GetName(), *BuildingType->GetName(), *TargetLocation.ToString());
+
+	// Notify listeners.
+	NotifyOnIssuedConstructionOrder(OrderedPawn, BuildingType, TargetLocation);
+}
+
+bool ARTSPlayerController::ServerIssueConstructionOrder_Validate(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
+}
+
 void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 {
     // Issue move orders.
@@ -421,6 +483,29 @@ void ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
     }
 }
 
+void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue move order.
+	PawnController->IssueMoveOrder(TargetLocation);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
+
+	// Notify listeners.
+	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
+}
+
+bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
+}
+
 void ARTSPlayerController::IssueStopOrder()
 {
 	// Issue stop orders.
@@ -446,6 +531,28 @@ void ARTSPlayerController::IssueStopOrder()
 		// Notify listeners.
 		NotifyOnIssuedStopOrder(SelectedPawn);
 	}
+
+void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue stop order.
+	PawnController->IssueStopOrder();
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
+
+	// Notify listeners.
+	NotifyOnIssuedStopOrder(OrderedPawn);
+}
+
+bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
 }
 
 void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
@@ -582,54 +689,14 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		PrimitiveComponent->GetCollisionShape());
 }
 
-void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
-{
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue move order.
-	PawnController->IssueMoveOrder(TargetLocation);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
-
-	// Notify listeners.
-	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
-}
-
-bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
-{
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue stop order.
-	PawnController->IssueStopOrder();
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedStopOrder(OrderedPawn);
-}
-
-bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
 void ARTSPlayerController::StartSelectActors()
 {
+	if (BuildingCursor)
+	{
+		// We're selecting a building location instead.
+		return;
+	}
+
 	// Get mouse input.
 	float MouseX;
 	float MouseY;
@@ -770,7 +837,7 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 	NotifyOnBuildingPlacementConfirmed(BuildingBeingPlacedType, HoveredWorldPosition);
 
 	// Start construction.
-	ServerConstructBuildingAtLocation(BuildingBeingPlacedType, HoveredWorldPosition);
+	IssueConstructionOrder(BuildingBeingPlacedType, HoveredWorldPosition);
 }
 
 void ARTSPlayerController::CancelBuildingPlacement()
@@ -828,6 +895,11 @@ void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
 {
 	ReceiveOnIssuedAttackOrder(OrderedPawn, Target);
+}
+
+void ARTSPlayerController::NotifyOnIssuedConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+{
+	ReceiveOnIssuedConstructionOrder(OrderedPawn, BuildingType, TargetLocation);
 }
 
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation)
@@ -976,24 +1048,4 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			HoveredActor = HitResult.Actor.Get();
 		}
 	}
-}
-
-void ARTSPlayerController::ServerConstructBuildingAtLocation_Implementation(TSubclassOf<AActor> BuildingType, FVector Location)
-{
-	// Spawn building to construct.
-	// TODO: Add different styles of building construction (e.g. C&C, Warcraft).
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	AActor* NewBuilding = GetWorld()->SpawnActor<AActor>(BuildingType, Location, FRotator::ZeroRotator, SpawnParams);
-
-	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingType->GetName(), *Location.ToString());
-
-	// Set owning player.
-	TransferOwnership(NewBuilding);
-}
-
-bool ARTSPlayerController::ServerConstructBuildingAtLocation_Validate(TSubclassOf<AActor> BuildingType, FVector Location)
-{
-	return true;
 }
