@@ -1058,4 +1058,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			HoveredActor = HitResult.Actor.Get();
 		}
 	}
+
+	// Verify selection.
+	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->bHidden; });
 }
