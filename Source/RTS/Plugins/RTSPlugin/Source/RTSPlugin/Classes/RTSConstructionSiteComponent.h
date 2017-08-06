@@ -25,6 +25,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	float ConstructionTime;
 
+	/** Whether any builders working at this construction site are destroyed when finished. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	bool bConsumesBuilders;
+
 	/** Time before the actor is constructed, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", replicated)
 	float RemainingConstructionTime;

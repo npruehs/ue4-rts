@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSConstructionSiteComponent.h"
 
+#include "GameFramework/Actor.h"
+
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -52,6 +54,14 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		bConstructing = false;
 
 		UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
+
+		if (bConsumesBuilders)
+		{
+			for (AActor* Builder : AssignedBuilders)
+			{
+				Builder->Destroy();
+			}
+		}
 
 		// Notify listeners.
 		OnConstructionFinished.Broadcast();
