@@ -3,6 +3,8 @@
 
 #include "GameFramework/Actor.h"
 
+#include "RTSBuilderComponent.h"
+
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -55,12 +57,30 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 
 		UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
 
+		// Notify builders.
 		if (bConsumesBuilders)
 		{
 			for (AActor* Builder : AssignedBuilders)
 			{
 				Builder->Destroy();
 			}
+		}
+
+		for (AActor* Builder : AssignedBuilders)
+		{
+			if (!IsValid(Builder))
+			{
+				continue;
+			}
+
+			auto BuilderComponent = Builder->FindComponentByClass<URTSBuilderComponent>();
+
+			if (!BuilderComponent)
+			{
+				continue;
+			}
+
+			BuilderComponent->LeaveConstructionSite();
 		}
 
 		// Notify listeners.

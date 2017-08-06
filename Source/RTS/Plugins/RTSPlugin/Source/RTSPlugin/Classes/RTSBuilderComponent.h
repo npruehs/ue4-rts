@@ -20,6 +20,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	TArray<TSubclassOf<AActor>> ConstructibleBuildingTypes;
 
+	/** Whether the builder enters the construction site while working on it, or not. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	bool bEnterConstructionSite;
+
 
 	/** Assigns the builder to the specified construction site. */
 	UFUNCTION(BlueprintCallable)

@@ -32,6 +32,12 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		// Assign builder.
 		AssignedConstructionSite = ConstructionSite;
 		ConstructionSiteComponent->AssignedBuilders.Add(GetOwner());
+
+		if (bEnterConstructionSite)
+		{
+			GetOwner()->SetActorHiddenInGame(true);
+			GetOwner()->SetActorEnableCollision(false);
+		}
 	}
 }
 
@@ -98,4 +104,10 @@ void URTSBuilderComponent::LeaveConstructionSite()
 	// Remove builder.
 	AssignedConstructionSite = nullptr;
 	ConstructionSiteComponent->AssignedBuilders.Remove(GetOwner());
+
+	if (bEnterConstructionSite)
+	{
+		GetOwner()->SetActorHiddenInGame(false);
+		GetOwner()->SetActorEnableCollision(true);
+	}
 }
