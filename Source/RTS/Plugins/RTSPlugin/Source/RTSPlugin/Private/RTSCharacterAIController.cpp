@@ -96,7 +96,7 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
 {
 	// Somehow, classes are not properly serialized to blackboard values and back, so we're going to use the building index here instead.
 	URTSBuilderComponent* BuilderComponent = GetPawn()->FindComponentByClass<URTSBuilderComponent>();
@@ -114,11 +114,24 @@ void ARTSCharacterAIController::IssueConstructionOrder(TSubclassOf<AActor> Build
 	}
 
 	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_Construct);
+	SetOrderType(ERTSOrderType::ORDER_BeginConstruction);
 	SetBuildingType(BuildingIndex);
 	ClearHomeLocation();
 	ClearTargetActor();
 	SetTargetLocation(TargetLocation);
+
+	// Stop any current orders and start over.
+	ApplyOrders();
+}
+
+void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* BuildingSite)
+{
+	// Update blackboard.
+	SetOrderType(ERTSOrderType::ORDER_ContinueConstruction);
+	ClearBuildingType();
+	ClearHomeLocation();
+	SetTargetActor(BuildingSite);
+	ClearTargetLocation();
 
 	// Stop any current orders and start over.
 	ApplyOrders();

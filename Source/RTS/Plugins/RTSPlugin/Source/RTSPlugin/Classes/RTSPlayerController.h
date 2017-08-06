@@ -66,7 +66,7 @@ public:
 
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(BlueprintCallable)
-	void IssueConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	void IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
 
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
@@ -151,7 +151,7 @@ public:
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
 	/** Event when an actor has received a construction order. */
-	virtual void NotifyOnIssuedConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	virtual void NotifyOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
 
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
@@ -191,7 +191,7 @@ public:
 
 	/** Event when an actor has received a construction order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedConstructionOrder"))
-	void ReceiveOnIssuedConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	void ReceiveOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
 
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
@@ -293,7 +293,7 @@ private:
 	
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
 
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)

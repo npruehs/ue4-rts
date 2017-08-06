@@ -10,6 +10,8 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	State = ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted;
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -33,12 +35,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!bConstructing)
-	{
-		return;
-	}
-
-	if (RemainingConstructionTime <= 0)
+	if (State == ERTSConstructionState::CONSTRUCTIONSTATE_Finished)
 	{
 		return;
 	}
@@ -53,7 +50,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	if (RemainingConstructionTime <= 0)
 	{
 		RemainingConstructionTime = 0;
-		bConstructing = false;
+		State = ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
 
 		UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
 
@@ -64,23 +61,6 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 			{
 				Builder->Destroy();
 			}
-		}
-
-		for (AActor* Builder : AssignedBuilders)
-		{
-			if (!IsValid(Builder))
-			{
-				continue;
-			}
-
-			auto BuilderComponent = Builder->FindComponentByClass<URTSBuilderComponent>();
-
-			if (!BuilderComponent)
-			{
-				continue;
-			}
-
-			BuilderComponent->LeaveConstructionSite();
 		}
 
 		// Notify listeners.
@@ -95,18 +75,23 @@ float URTSConstructionSiteComponent::GetProgressPercentage() const
 
 bool URTSConstructionSiteComponent::IsConstructing() const
 {
-	return bConstructing;
+	return State == ERTSConstructionState::CONSTRUCTIONSTATE_Constructing;
+}
+
+bool URTSConstructionSiteComponent::IsFinished() const
+{
+	return State == ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
 }
 
 void URTSConstructionSiteComponent::StartConstruction()
 {
-	if (bConstructing)
+	if (State != ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted)
 	{
 		return;
 	}
 
 	RemainingConstructionTime = ConstructionTime;
-	bConstructing = true;
+	State = ERTSConstructionState::CONSTRUCTIONSTATE_Constructing;
 
 	UE_LOG(RTSLog, Log, TEXT("Construction %s started."), *GetName());
 

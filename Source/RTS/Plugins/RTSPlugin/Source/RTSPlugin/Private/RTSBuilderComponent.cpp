@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSConstructionSiteComponent.h"
+#include "RTSCharacterAIController.h"
 #include "RTSGameMode.h"
 #include "RTSPlayerController.h"
 
@@ -69,7 +70,22 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingType, c
 		return;
 	}
 
-	AssignToConstructionSite(Building);
+	// Issue construction order.
+	auto Pawn = Cast<APawn>(GetOwner());
+
+	if (!Pawn)
+	{
+		return;
+	}
+
+	auto PawnController = Cast<ARTSCharacterAIController>(Pawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	PawnController->IssueContinueConstructionOrder(Building);
 }
 
 void URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)

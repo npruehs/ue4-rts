@@ -4,6 +4,8 @@
 
 #include "Components/ActorComponent.h"
 
+#include "RTSConstructionState.h"
+
 #include "RTSConstructionSiteComponent.generated.h"
 
 
@@ -59,6 +61,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsConstructing() const;
 
+	/** Whether the construction is finished and the actor ready to use. */
+	UFUNCTION(BlueprintCallable)
+	bool IsFinished() const;
+
 	/** Starts constructing the actor, setting the timer. */
 	UFUNCTION(BlueprintCallable)
 	void StartConstruction();
@@ -74,5 +80,5 @@ public:
 
 private:
 	/** Whether the construction timer is currently being ticked, or not. */
-	bool bConstructing;
+	ERTSConstructionState State;
 };
