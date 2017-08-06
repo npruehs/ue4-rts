@@ -39,8 +39,13 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		return;
 	}
 
-	RemainingConstructionTime -= DeltaTime;
+	// Compute construction progress based on number of assigned builders.
+	float ConstructionProgress = bRequiresBuilderAttention ? DeltaTime * AssignedBuilders.Num() : DeltaTime;
 
+	// Update construction progress.
+	RemainingConstructionTime -= ConstructionProgress;
+
+	// Check if finished.
 	if (RemainingConstructionTime <= 0)
 	{
 		RemainingConstructionTime = 0;

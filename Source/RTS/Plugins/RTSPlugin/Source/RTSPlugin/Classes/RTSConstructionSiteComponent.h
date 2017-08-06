@@ -18,18 +18,24 @@ class URTSConstructionSiteComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	/** Builders currently working at this construction site. */
+	TArray<AActor*> AssignedBuilders;
 
 	/** Time for constructing the actor, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-		float ConstructionTime;
-
-	/** Whether to start construction immediately after spawn, or not. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-		bool bStartImmediately;
+	float ConstructionTime;
 
 	/** Time before the actor is constructed, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", replicated)
-		float RemainingConstructionTime;
+	float RemainingConstructionTime;
+
+	/** Whether builders are required for making construction progress, or the building is constructed automatically. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	bool bRequiresBuilderAttention;
+
+	/** Whether to start construction immediately after spawn, or not. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	bool bStartImmediately;
 
 
 	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer);

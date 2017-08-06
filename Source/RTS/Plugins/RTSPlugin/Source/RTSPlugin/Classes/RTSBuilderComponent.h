@@ -21,6 +21,10 @@ public:
 	TArray<TSubclassOf<AActor>> ConstructibleBuildingTypes;
 
 
+	/** Assigns the builder to the specified construction site. */
+	UFUNCTION(BlueprintCallable)
+	void AssignToConstructionSite(AActor* ConstructionSite);
+
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
 	void BeginConstruction(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
@@ -28,4 +32,16 @@ public:
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
 	void BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation);
+
+	/** Gets the construction site the builder is currently working on. */
+	UFUNCTION(BlueprintCallable)
+	AActor* GetAssignedConstructionSite();
+
+	/** Removes the builder from its assigned construction site. */
+	UFUNCTION(BlueprintCallable)
+	void LeaveConstructionSite();
+
+private:
+	/** Construction site the builder is currently working on. */
+	AActor* AssignedConstructionSite;
 };
