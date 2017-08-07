@@ -28,7 +28,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		return;
 	}
 
-	if (ConstructionSiteComponent->bRequiresBuilderAttention)
+	if (ConstructionSiteComponent->CanAssignBuilder(GetOwner()))
 	{
 		// Assign builder.
 		AssignedConstructionSite = ConstructionSite;

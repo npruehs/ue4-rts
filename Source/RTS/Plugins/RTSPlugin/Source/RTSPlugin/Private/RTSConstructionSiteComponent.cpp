@@ -41,7 +41,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	}
 
 	// Compute construction progress based on number of assigned builders.
-	float ConstructionProgress = bRequiresBuilderAttention ? DeltaTime * AssignedBuilders.Num() : DeltaTime;
+	float ConstructionProgress = (DeltaTime * ProgressMadeAutomatically) + (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num());
 
 	// Update construction progress.
 	RemainingConstructionTime -= ConstructionProgress;
@@ -66,6 +66,11 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		// Notify listeners.
 		OnConstructionFinished.Broadcast();
 	}
+}
+
+bool URTSConstructionSiteComponent::CanAssignBuilder(AActor* Builder) const
+{
+	return AssignedBuilders.Num() < MaxAssignedBuilders;
 }
 
 float URTSConstructionSiteComponent::GetProgressPercentage() const

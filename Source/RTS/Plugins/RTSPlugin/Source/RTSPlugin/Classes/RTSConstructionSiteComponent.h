@@ -31,13 +31,21 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	bool bConsumesBuilders;
 
+	/** How many builders may be assigned to this construction site at the same time. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	int32 MaxAssignedBuilders;
+
+	/** Factor to multiply all passed construction time with, independent of any currently assigned builders. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	float ProgressMadeAutomatically;
+
+	/** Factor to multiply all passed construction time with, multiplied with the number of currently assigned builders. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	float ProgressMadePerBuilder;
+
 	/** Time before the actor is constructed, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", replicated)
 	float RemainingConstructionTime;
-
-	/** Whether builders are required for making construction progress, or the building is constructed automatically. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	bool bRequiresBuilderAttention;
 
 	/** Whether to start construction immediately after spawn, or not. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
@@ -52,6 +60,10 @@ public:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
+
+	/** Whether the specified builder can be assigned to this construction site. */
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanAssignBuilder(AActor* Builder) const;
 
 	/** Gets the current construction progress [0..1]. */
 	UFUNCTION(BlueprintCallable)
