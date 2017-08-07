@@ -49,22 +49,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	// Check if finished.
 	if (RemainingConstructionTime <= 0)
 	{
-		RemainingConstructionTime = 0;
-		State = ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
-
-		UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
-
-		// Notify builders.
-		if (bConsumesBuilders)
-		{
-			for (AActor* Builder : AssignedBuilders)
-			{
-				Builder->Destroy();
-			}
-		}
-
-		// Notify listeners.
-		OnConstructionFinished.Broadcast();
+		FinishConstruction();
 	}
 }
 
@@ -102,4 +87,35 @@ void URTSConstructionSiteComponent::StartConstruction()
 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(ConstructionTime);
+}
+
+void URTSConstructionSiteComponent::FinishConstruction()
+{
+	RemainingConstructionTime = 0;
+	State = ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
+
+	UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
+
+	// Notify builders.
+	if (bConsumesBuilders)
+	{
+		for (AActor* Builder : AssignedBuilders)
+		{
+			Builder->Destroy();
+		}
+	}
+
+	// Notify listeners.
+	OnConstructionFinished.Broadcast();
+}
+
+void URTSConstructionSiteComponent::CancelConstruction()
+{
+	UE_LOG(RTSLog, Log, TEXT("Construction %s cancelled."), *GetName());
+
+	// Destroy construction site.
+	GetOwner()->Destroy();
+
+	// Notify listeners.
+	OnConstructionCanceled.Broadcast();
 }

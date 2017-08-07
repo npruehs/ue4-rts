@@ -298,6 +298,10 @@ private:
 	/** Automatically issues the most reasonable order for the specified targets. */
 	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
 
+	/** Cancels constructing the specified actor, destroying the construction site. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerCancelConstruction(AActor* ConstructionSite);
+
 	/** Orders the passed unit to attack the specified unit. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
@@ -371,4 +375,8 @@ private:
 	/** Cancels placing the current building without effect. */
 	UFUNCTION()
 	void CancelBuildingPlacement();
+
+	/** Cancels the construction of the first selected building. */
+	UFUNCTION()
+	void CancelConstruction();
 };

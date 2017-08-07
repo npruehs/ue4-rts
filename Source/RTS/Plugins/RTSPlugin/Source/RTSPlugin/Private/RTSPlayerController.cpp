@@ -82,6 +82,8 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("ConfirmBuildingPlacement"), IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
 	InputComponent->BindAction(TEXT("CancelBuildingPlacement"), IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
 
+	InputComponent->BindAction(TEXT("CancelConstruction"), IE_Released, this, &ARTSPlayerController::CancelConstruction);
+
 	// Get camera bounds.
 	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -967,6 +969,50 @@ void ARTSPlayerController::CancelBuildingPlacement()
 
 	// Notify listeners.
 	NotifyOnBuildingPlacementCancelled(BuildingBeingPlacedType);
+}
+
+void ARTSPlayerController::CancelConstruction()
+{
+	for (auto SelectedActor : SelectedActors)
+	{
+		// Verify construction site and owner.
+		auto ConstructionSiteComponent = SelectedActor->FindComponentByClass<URTSConstructionSiteComponent>();;
+
+		if (!ConstructionSiteComponent)
+		{
+			continue;
+		}
+
+		if (SelectedActor->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Send message to server.
+		ServerCancelConstruction(SelectedActor);
+
+		// Only cancel one construction at a time.
+		return;
+	}
+}
+
+void ARTSPlayerController::ServerCancelConstruction_Implementation(AActor* ConstructionSite)
+{
+	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();;
+
+	if (!ConstructionSiteComponent)
+	{
+		return;
+	}
+
+	// Cancel construction.
+	ConstructionSiteComponent->CancelConstruction();
+}
+
+bool ARTSPlayerController::ServerCancelConstruction_Validate(AActor* ConstructionSite)
+{
+	// Verify owner to prevent cheating.
+	return ConstructionSite->GetOwner() == this;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
