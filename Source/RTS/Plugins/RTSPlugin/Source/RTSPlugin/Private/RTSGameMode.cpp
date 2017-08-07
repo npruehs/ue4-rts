@@ -119,23 +119,31 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
 
 	// Build spawn info.
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Instigator = Instigator;
-	SpawnInfo.ObjectFlags |= RF_Transient;
-
 	for (TSubclassOf<AActor> ActorClass : InitialActors)
 	{
 		// Spawn actor.
-		AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ActorClass, SpawnTransform, SpawnInfo);
-		
-		if (SpawnedActor && PlayerController)
-		{
-			UE_LOG(RTSLog, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *NewPlayer->GetName(), *SpawnLocation.ToString());
-
-			// Set owning player.
-			PlayerController->TransferOwnership(SpawnedActor);
-		}
+		SpawnActorForPlayer(ActorClass, PlayerController, SpawnTransform);
 	}
+}
+
+AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorType, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform)
+{
+	// Spawn actor.
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ActorType->GetDefaultObject()->GetClass(), SpawnTransform, SpawnParams);
+
+	// Set owning player.
+	if (SpawnedActor && ActorOwner)
+	{
+		UE_LOG(RTSLog, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *ActorOwner->GetName(), *SpawnTransform.GetLocation().ToString());
+
+		// Set owning player.
+		ActorOwner->TransferOwnership(SpawnedActor);
+	}
+
+	return SpawnedActor;
 }
 
 void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)

@@ -62,11 +62,19 @@ public:
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
-	void IssueAttackOrder(AActor* Target);
+	bool IssueAttackOrder(AActor* Target);
+
+	/** Orders a selected builder to construct the specified building at the passed location. */
+	UFUNCTION(BlueprintCallable)
+	bool IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Orders selected builders to finish constructing the specified building. */
+	UFUNCTION(BlueprintCallable)
+	bool IssueContinueConstructionOrder(AActor* ConstructionSite);
 
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
-	void IssueMoveOrder(const FVector& TargetLocation);
+	bool IssueMoveOrder(const FVector& TargetLocation);
 
 	/** Orders all selected units to stop all current actions. */
 	UFUNCTION(BlueprintCallable)
@@ -116,7 +124,7 @@ public:
 
 	/** Begin finding a suitable location for constructing a building of the specified type. */
 	UFUNCTION(BlueprintCallable)
-	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType, USkeletalMesh* PreviewMesh, const FVector& CollisionBoxSize);
+	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType);
 
 	/**
 	 * Checks whether the specified building can be placed at the passed location.
@@ -124,8 +132,8 @@ public:
 	 * You may add custom building placement logic here, e.g. requires other nearby building, cursed terrain, energy field, fixed slot.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category = "RTS", meta = (DisplayName = "CanPlaceBuilding"))
-	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const;
-	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location, const FVector& CollisionBoxSize) const;
+	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingType, const FVector& Location) const;
+	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const;
 
 
 	/** Event when this player is now owning the specified actor. */
@@ -145,6 +153,12 @@ public:
 
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
+
+	/** Event when an actor has received a begin construction order. */
+	virtual void NotifyOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Event when an actor has received a continue construction order. */
+	virtual void NotifyOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
@@ -182,6 +196,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
 	void ReceiveOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
+	/** Event when an actor has received a begin construction order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedBeginConstructionOrder"))
+	void ReceiveOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Event when an actor has received a continue construction order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedContinueConstructionOrder"))
+	void ReceiveOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
+
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
     void ReceiveOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
@@ -202,6 +224,7 @@ public:
 	/** Sets this player as the owner of the specified actor. */
 	UFUNCTION(BlueprintCallable)
 	void TransferOwnership(AActor* Actor);
+
 
 protected:
     virtual void BeginPlay() override;
@@ -232,9 +255,6 @@ private:
 
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingBeingPlacedType;
-
-	/** Collision size of the building currently being placed, if any. */
-	FVector BuildingBeingPlacedCollisionBoxSize;
 
 	/** Current cursor for placing a new building. */
 	ARTSBuildingCursor* BuildingCursor;
@@ -278,9 +298,21 @@ private:
 	/** Automatically issues the most reasonable order for the specified targets. */
 	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
 
+	/** Cancels constructing the specified actor, destroying the construction site. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerCancelConstruction(AActor* ConstructionSite);
+
 	/** Orders the passed unit to attack the specified unit. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
+	
+	/** Orders a selected builder to construct the specified building at the passed location. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Orders selected builders to finish constructing the specified building. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -336,6 +368,10 @@ private:
 	UFUNCTION()
 	void StopToggleSelection();
 	
+	/** Begin placing any building available to the currently selected builder. */
+	UFUNCTION()
+	void BeginAnyBuildingPlacement();
+
 	/** Confirms placing the current building at the hovered location. */
 	UFUNCTION()
 	void ConfirmBuildingPlacement();
@@ -344,7 +380,7 @@ private:
 	UFUNCTION()
 	void CancelBuildingPlacement();
 
-	/** Starts constructing a building of the specified type at the passed location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerConstructBuildingAtLocation(TSubclassOf<AActor> BuildingType, FVector Location);
+	/** Cancels the construction of the first selected building. */
+	UFUNCTION()
+	void CancelConstruction();
 };

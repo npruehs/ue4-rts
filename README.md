@@ -93,6 +93,10 @@ _Note that you may use any class derived from Actor, if you want to. The plugin 
 
 1. See Adding Units.
 1. Add an RTSConstructionSiteComponent and set the ConstructionTime.
+1. Set the Consumes Builders flag if builders working at the construction site should be destroyed when finished (similar to Zerg in StarCraft).
+1. Set Max Assigned Builders if you want to require a builder to work at the construction site to make progress, and/or to allow multi-building (similar to Age of Empires).
+1. Set the Progress Made Automatically and Progress Made Per Builder factors.
+1. Set the Start Immediately flag unless you want to trigger construction start from script.
 
 ### Selecting Units
 
@@ -204,8 +208,16 @@ Example: Drawing names of unit owners
 
 1. Create an RTSBuildingCursor, setting its valid and invalid materials.
 1. In your player controller, set the building cursor reference.
+1. Bind any input or UI button to the BeginBuildingPlacement function of your RTSPlayerController.
 1. Bind the action ConfirmBuildingPlacement (e.g. to Left Mouse Button).
 1. Bind the action CancelBuildingPlacement (e.g. to Right Mouse Button).
+1. Bind the action CancelConstruction (e.g. to Escape).
+
+### Setup Construction
+
+1. Add the RTSBuilderComponent to any actors you want to be able to construct buildings.
+1. Set the Constructible Building Types for these builders.
+1. Set the Enter Construction Site if you want the builder to be unavailable while building (similar to Humans in WarCraft).
 
 ## Bugs & Feature Requests
 

@@ -4,6 +4,8 @@
 
 #include "AIController.h"
 
+#include "RTSOrderType.h"
+
 #include "RTSCharacterAIController.generated.h"
 
 
@@ -36,6 +38,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IssueAttackOrder(AActor* Target);
 
+	/** Makes the pawn construct the specified building at the passed location. */
+	UFUNCTION(BlueprintCallable)
+	void IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+
+	/** Makes the pawn continue constructing the specified building. */
+	UFUNCTION(BlueprintCallable)
+	void IssueContinueConstructionOrder(AActor* ConstructionSite);
+
     /** Makes the pawn move towards the specified location. */
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& Location);
@@ -49,6 +59,19 @@ protected:
 
 private:
 	URTSAttackComponent* AttackComponent;
+
+	void ApplyOrders();
+
+	void ClearBuildingType();
+	void ClearHomeLocation();
+	void ClearTargetActor();
+	void ClearTargetLocation();
+
+	void SetBuildingType(int32 BuildingIndex);
+	void SetHomeLocation(const FVector& HomeLocation);
+	void SetOrderType(const ERTSOrderType OrderType);
+	void SetTargetActor(AActor* TargetActor);
+	void SetTargetLocation(const FVector& TargetLocation);
 
 	bool TraceSphere(
 		const FVector& Location,

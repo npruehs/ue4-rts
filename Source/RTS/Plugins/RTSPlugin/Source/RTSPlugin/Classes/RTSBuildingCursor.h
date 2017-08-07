@@ -30,7 +30,7 @@ public:
 
 
 	/** Sets the preview mesh of this cursor. */
-	void SetMesh(USkeletalMesh* BuildingMesh);
+	void SetMesh(USkeletalMesh* BuildingMesh, const FVector& MeshRelativeScale3D);
 
 	/** Applies the material for valid locations. */
 	void SetValidLocation();

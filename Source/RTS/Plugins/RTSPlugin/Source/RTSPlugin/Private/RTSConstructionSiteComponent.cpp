@@ -1,11 +1,19 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSConstructionSiteComponent.h"
 
+#include "GameFramework/Actor.h"
+
+#include "RTSBuilderComponent.h"
+
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	SetIsReplicated(true);
+
+	State = ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted;
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -29,28 +37,27 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!bConstructing)
+	if (State == ERTSConstructionState::CONSTRUCTIONSTATE_Finished)
 	{
 		return;
 	}
 
+	// Compute construction progress based on number of assigned builders.
+	float ConstructionProgress = (DeltaTime * ProgressMadeAutomatically) + (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num());
+
+	// Update construction progress.
+	RemainingConstructionTime -= ConstructionProgress;
+
+	// Check if finished.
 	if (RemainingConstructionTime <= 0)
 	{
-		return;
+		FinishConstruction();
 	}
+}
 
-	RemainingConstructionTime -= DeltaTime;
-
-	if (RemainingConstructionTime <= 0)
-	{
-		RemainingConstructionTime = 0;
-		bConstructing = false;
-
-		UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
-
-		// Notify listeners.
-		OnConstructionFinished.Broadcast();
-	}
+bool URTSConstructionSiteComponent::CanAssignBuilder(AActor* Builder) const
+{
+	return AssignedBuilders.Num() < MaxAssignedBuilders;
 }
 
 float URTSConstructionSiteComponent::GetProgressPercentage() const
@@ -60,21 +67,58 @@ float URTSConstructionSiteComponent::GetProgressPercentage() const
 
 bool URTSConstructionSiteComponent::IsConstructing() const
 {
-	return bConstructing;
+	return State == ERTSConstructionState::CONSTRUCTIONSTATE_Constructing;
+}
+
+bool URTSConstructionSiteComponent::IsFinished() const
+{
+	return State == ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
 }
 
 void URTSConstructionSiteComponent::StartConstruction()
 {
-	if (bConstructing)
+	if (State != ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted)
 	{
 		return;
 	}
 
 	RemainingConstructionTime = ConstructionTime;
-	bConstructing = true;
+	State = ERTSConstructionState::CONSTRUCTIONSTATE_Constructing;
 
 	UE_LOG(RTSLog, Log, TEXT("Construction %s started."), *GetName());
 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(ConstructionTime);
+}
+
+void URTSConstructionSiteComponent::FinishConstruction()
+{
+	RemainingConstructionTime = 0;
+	State = ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
+
+	UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
+
+	// Notify builders.
+	if (bConsumesBuilders)
+	{
+		for (AActor* Builder : AssignedBuilders)
+		{
+			Builder->Destroy();
+			OnBuilderConsumed.Broadcast(Builder);
+		}
+	}
+
+	// Notify listeners.
+	OnConstructionFinished.Broadcast();
+}
+
+void URTSConstructionSiteComponent::CancelConstruction()
+{
+	UE_LOG(RTSLog, Log, TEXT("Construction %s canceled."), *GetName());
+
+	// Destroy construction site.
+	GetOwner()->Destroy();
+
+	// Notify listeners.
+	OnConstructionCanceled.Broadcast();
 }

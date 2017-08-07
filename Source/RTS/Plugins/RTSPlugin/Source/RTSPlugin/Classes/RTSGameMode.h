@@ -7,6 +7,7 @@
 #include "RTSGameMode.generated.h"
 
 
+class ARTSPlayerController;
 class ARTSPlayerStart;
 class ARTSTeamInfo;
 
@@ -47,6 +48,9 @@ public:
 
 	virtual void RestartPlayer(AController* NewPlayer) override;
 	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
+
+	/** Spawns an actor of the specified type and transfers ownership to the specified player. */
+	virtual AActor* SpawnActorForPlayer(TSubclassOf<AActor> ActorType, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform);
 
 
 	/** Event when an actor has been killed. */
