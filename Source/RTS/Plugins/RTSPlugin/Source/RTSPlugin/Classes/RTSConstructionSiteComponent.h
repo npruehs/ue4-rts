@@ -80,15 +80,15 @@ public:
 
 	/** Starts constructing the actor, setting the timer. */
 	UFUNCTION(BlueprintCallable)
-	void StartConstruction();
+	virtual void StartConstruction();
 
 	/** Finishes constructing the actor. */
 	UFUNCTION(BlueprintCallable)
-	void FinishConstruction();
+	virtual void FinishConstruction();
 
 	/** Cancels constructing the actor, destroying it. */
 	UFUNCTION(BlueprintCallable)
-	void CancelConstruction();
+	virtual void CancelConstruction();
 
 	/** Event when the construction timer has been started. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")

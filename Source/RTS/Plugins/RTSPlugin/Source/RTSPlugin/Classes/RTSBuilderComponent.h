@@ -27,11 +27,11 @@ public:
 
 	/** Assigns the builder to the specified construction site. */
 	UFUNCTION(BlueprintCallable)
-	void AssignToConstructionSite(AActor* ConstructionSite);
+	virtual void AssignToConstructionSite(AActor* ConstructionSite);
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
-	void BeginConstruction(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	virtual void BeginConstruction(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
@@ -43,7 +43,7 @@ public:
 
 	/** Removes the builder from its assigned construction site. */
 	UFUNCTION(BlueprintCallable)
-	void LeaveConstructionSite();
+	virtual void LeaveConstructionSite();
 
 private:
 	/** Construction site the builder is currently working on. */
