@@ -112,7 +112,7 @@ void URTSConstructionSiteComponent::FinishConstruction()
 
 void URTSConstructionSiteComponent::CancelConstruction()
 {
-	UE_LOG(RTSLog, Log, TEXT("Construction %s cancelled."), *GetName());
+	UE_LOG(RTSLog, Log, TEXT("Construction %s canceled."), *GetName());
 
 	// Destroy construction site.
 	GetOwner()->Destroy();
