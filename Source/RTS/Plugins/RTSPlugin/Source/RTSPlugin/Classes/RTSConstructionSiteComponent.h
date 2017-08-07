@@ -12,6 +12,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionStartedSignature, float, TotalConstructionTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionFinishedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionCanceledSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentBuilderConsumedSignature, AActor*, Builder);
 
 
 /** Allows constructing the actor over time. */
@@ -90,6 +91,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelConstruction();
 
+
 	/** Event when the construction timer has been started. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionStartedSignature OnConstructionStarted;
@@ -98,9 +100,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionFinishedSignature OnConstructionFinished;
 
-	/** Event when the construction has been canceled and the building site destroyed. */
+	/** Event when the construction has been canceled and the construction site destroyed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionCanceledSignature OnConstructionCanceled;
+
+	/** Event when a builder working at this construction site has been destroyed. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSConstructionSiteComponentBuilderConsumedSignature OnBuilderConsumed;
+
 
 private:
 	/** Whether the construction timer is currently being ticked, or not. */

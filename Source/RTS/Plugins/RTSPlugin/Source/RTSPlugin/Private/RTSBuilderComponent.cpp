@@ -34,10 +34,16 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		AssignedConstructionSite = ConstructionSite;
 		ConstructionSiteComponent->AssignedBuilders.Add(GetOwner());
 
+		// Notify listeners.
+		OnAssignedToConstructionSite.Broadcast(ConstructionSite);
+
 		if (bEnterConstructionSite)
 		{
+			// Enter construction site.
 			GetOwner()->SetActorHiddenInGame(true);
 			GetOwner()->SetActorEnableCollision(false);
+
+			OnConstructionSiteEntered.Broadcast(ConstructionSite);
 		}
 	}
 }
@@ -69,6 +75,9 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingType, c
 	{
 		return;
 	}
+
+	// Notify listeners.
+	OnConstructionStarted.Broadcast(Building);
 
 	// Issue construction order.
 	auto Pawn = Cast<APawn>(GetOwner());
@@ -110,7 +119,8 @@ void URTSBuilderComponent::LeaveConstructionSite()
 		return;
 	}
 
-	auto ConstructionSiteComponent = AssignedConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
+	auto ConstructionSite = AssignedConstructionSite;
+	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	if (!ConstructionSiteComponent)
 	{
@@ -121,9 +131,14 @@ void URTSBuilderComponent::LeaveConstructionSite()
 	AssignedConstructionSite = nullptr;
 	ConstructionSiteComponent->AssignedBuilders.Remove(GetOwner());
 
+	// Notify listeners.
+	OnRemovedFromConstructionSite.Broadcast(ConstructionSite);
+
 	if (bEnterConstructionSite)
 	{
 		GetOwner()->SetActorHiddenInGame(false);
 		GetOwner()->SetActorEnableCollision(true);
+
+		OnConstructionSiteLeft.Broadcast(ConstructionSite);
 	}
 }

@@ -7,6 +7,13 @@
 #include "RTSBuilderComponent.generated.h"
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentAssignedToConstructionSiteSignature, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentRemovedFromConstructionSiteSignature, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionSiteEnteredSignature, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionSiteLeftSignature, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionStartedSignature, AActor*, ConstructionSite);
+
+
 /**
  * Allows the actor to construct buildings.
  */
@@ -44,6 +51,28 @@ public:
 	/** Removes the builder from its assigned construction site. */
 	UFUNCTION(BlueprintCallable)
 	virtual void LeaveConstructionSite();
+
+
+	/** Event when the builder has been assigned to a construction site. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSBuilderComponentAssignedToConstructionSiteSignature OnAssignedToConstructionSite;
+
+	/** Event when the builder is no longer assigned to a construction site. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSBuilderComponentRemovedFromConstructionSiteSignature OnRemovedFromConstructionSite;
+
+	/** Event when the builder has entered a construction site. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSBuilderComponentConstructionSiteEnteredSignature OnConstructionSiteEntered;
+
+	/** Event when the builder has left a construction site. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSBuilderComponentConstructionSiteLeftSignature OnConstructionSiteLeft;
+
+	/** Event when the builder has created a new construction site. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSBuilderComponentConstructionSiteEnteredSignature OnConstructionStarted;
+
 
 private:
 	/** Construction site the builder is currently working on. */

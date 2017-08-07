@@ -102,6 +102,7 @@ void URTSConstructionSiteComponent::FinishConstruction()
 		for (AActor* Builder : AssignedBuilders)
 		{
 			Builder->Destroy();
+			OnBuilderConsumed.Broadcast(Builder);
 		}
 	}
 
