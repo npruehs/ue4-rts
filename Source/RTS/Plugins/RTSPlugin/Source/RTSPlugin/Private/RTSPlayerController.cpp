@@ -79,6 +79,7 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
 	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
 
+	InputComponent->BindAction(TEXT("BeginAnyBuildingPlacement"), IE_Released, this, &ARTSPlayerController::BeginAnyBuildingPlacement);
 	InputComponent->BindAction(TEXT("ConfirmBuildingPlacement"), IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
 	InputComponent->BindAction(TEXT("CancelBuildingPlacement"), IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
 
@@ -645,6 +646,7 @@ void ARTSPlayerController::IssueStopOrder()
 		// Notify listeners.
 		NotifyOnIssuedStopOrder(SelectedPawn);
 	}
+}
 
 void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
 {
@@ -923,6 +925,37 @@ void ARTSPlayerController::StartToggleSelection()
 void ARTSPlayerController::StopToggleSelection()
 {
 	bToggleSelectionHotkeyPressed = false;
+}
+
+void ARTSPlayerController::BeginAnyBuildingPlacement()
+{
+	// Find suitable selected builder.
+	for (auto SelectedActor : SelectedActors)
+	{
+		// Verify owner.
+		if (SelectedActor->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Check if builder.
+		auto BuilderComponent = SelectedActor->FindComponentByClass<URTSBuilderComponent>();
+
+		if (!BuilderComponent)
+		{
+			continue;
+		}
+
+		// Check if builder knows about building.
+		if (BuilderComponent->ConstructibleBuildingTypes.Num() <= 0)
+		{
+			continue;
+		}
+
+		// Begin placement.
+		BeginBuildingPlacement(BuilderComponent->ConstructibleBuildingTypes[0]);
+		return;
+	}
 }
 
 void ARTSPlayerController::ConfirmBuildingPlacement()

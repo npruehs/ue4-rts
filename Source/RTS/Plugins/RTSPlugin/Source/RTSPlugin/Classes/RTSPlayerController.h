@@ -368,6 +368,10 @@ private:
 	UFUNCTION()
 	void StopToggleSelection();
 	
+	/** Begin placing any building available to the currently selected builder. */
+	UFUNCTION()
+	void BeginAnyBuildingPlacement();
+
 	/** Confirms placing the current building at the hovered location. */
 	UFUNCTION()
 	void ConfirmBuildingPlacement();
