@@ -23,12 +23,14 @@ Note that we're still in heavy development. Some things are already in place, su
 * Minimap
 * Teams
 * Constructions
+* Unit Production/Tech Research
 
 All of this is already completely working in multiplayer as well, and has been fully exposed to scripting, enabling you to update UI and play animations and sounds.
 
-We're now moving on to more advanced stuff, such as [fog of war](https://github.com/npruehs/ue4-rts/issues).
+We're now moving on to [more advanced stuff](https://github.com/npruehs/ue4-rts/issues), such as fog of war.
 
 Also, we're going to add it to the Unreal Marketplace for free soon (tm).
+
 
 ## Adding The Plugin
 
@@ -36,6 +38,7 @@ Also, we're going to add it to the Unreal Marketplace for free soon (tm).
 1. Copy the RTSPlugin folder to Plugins folder next to your .uproject file.
 1. Start the Unreal Editor.
 1. Enable the plugin in Edit > Plugins > RTS.
+
 
 ## Usage
 
@@ -170,6 +173,12 @@ Example: Drawing health bars as rectangles with borders
 1. If you checked ShowHotkeyConstructionProgressBars, bind the action ShowConstructionProgressBars (e.g. to the LeftAlt key).
 1. In your RTSHUD, implement the DrawConstructionProgressBar event as desired.
 
+#### Showing Production Progress Bars
+
+1. In your RTSHUD, set AlwaysShowProductionProgressBars, ShowHoverProductionProgressBars, ShowSelectionProductionProgressBars and ShowHotkeyProductionProgressBars as desired.
+1. If you checked ShowHotkeyProductionProgressBars, bind the action ShowProductionProgressBars (e.g. to the LeftAlt key).
+1. In your RTSHUD, implement the DrawProductionProgressBar event as desired.
+
 #### Showing Hovered Unit Effects
 
 1. In your RTSHUD, implement the DrawHoveredActorEffect event as desired.
@@ -217,7 +226,20 @@ Example: Drawing names of unit owners
 
 1. Add the RTSBuilderComponent to any actors you want to be able to construct buildings.
 1. Set the Constructible Building Types for these builders.
-1. Set the Enter Construction Site if you want the builder to be unavailable while building (similar to Humans in WarCraft).
+1. Set the Enter Construction Site if you want the builder to be unavailable while building (similar to Orcs in WarCraft).
+
+### Setup Unit Production
+
+1. Add the RTSProductionComponent to any actors you want to be able to produce units or research technology.
+1. Add everything you want to produce or research to the Available Products for these factories.
+1. Set the Queue Count, specifying how many products can be produced in parallel.
+1. Set the Capacity Per Queue, specifying how many products can be produced one after another.
+1. Add the RTSProductionCostComponent to everything you want to be produced.
+1. Set the Production Time for these products.
+1. Bind the action CancelProduction (e.g. to Escape).
+
+_Note that, technically, producing units does not differ from researching technology. You can create actor blueprints without physical representation for each technology to research, and add them as products. Then, you can check whether any player owns an actor of that technology for checking a tech tree._
+
 
 ## Bugs & Feature Requests
 
@@ -228,6 +250,7 @@ We are sorry that you've experienced issues or are missing a feature! After veri
 * What did you expect to happen?
 
 After being able to reproduce the issue, we'll look into fixing it immediately.
+
 
 ## Contributing
 
@@ -252,6 +275,7 @@ Real-Time Strategy Plugin for Unreal Engine 4 is based on [Unreal Engine 4.16.1]
 ### Step 4: Open a pull request
 
 Finally, [open a pull request](https://help.github.com/articles/creating-a-pull-request/) so we can review your changes together, and finally integrate it into the next release.
+
 
 ## License
 
