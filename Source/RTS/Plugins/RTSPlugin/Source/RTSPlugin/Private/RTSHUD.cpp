@@ -7,6 +7,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSHealthComponent.h"
 #include "RTSPlayerController.h"
+#include "RTSProductionComponent.h"
 
 
 void ARTSHUD::DrawHUD()
@@ -16,6 +17,7 @@ void ARTSHUD::DrawHUD()
 	DrawSelectionFrame();
 	DrawHealthBars();
 	DrawConstructionProgressBars();
+	DrawProductionProgressBars();
 	DrawHoveredActorEffect();
 }
 
@@ -56,6 +58,19 @@ void ARTSHUD::NotifyDrawHealthBar(
 		SuggestedHealthBarTop,
 		SuggestedHealthBarWidth,
 		SuggestedHealthBarHeight);
+}
+
+void ARTSHUD::NotifyDrawProductionProgressBar(AActor* Actor, float ProductionTime, float RemainingProductionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
+{
+	ReceiveDrawProductionProgressBar(
+		Actor,
+		ProductionTime,
+		RemainingProductionTime,
+		ProgressPercentage,
+		SuggestedProgressBarLeft,
+		SuggestedProgressBarTop,
+		SuggestedProgressBarWidth,
+		SuggestedProgressBarHeight);
 }
 
 void ARTSHUD::NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height)
@@ -294,6 +309,88 @@ void ARTSHUD::DrawHoveredActorEffect()
 
 	// Draw hovered actor effect.
 	NotifyDrawHoveredActorEffect(HoveredActor);
+}
+
+void ARTSHUD::DrawProductionProgressBars()
+{
+	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
+
+	if (!PlayerController)
+	{
+		return;
+	}
+
+	// Check override conditions.
+	if (bAlwaysShowProductionProgressBars || (bShowHotkeyProductionProgressBars && PlayerController->IsProductionProgressBarHotkeyPressed()))
+	{
+		// Draw all progress bars.
+		for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+		{
+			AActor* Actor = *ActorIt;
+			DrawProductionProgressBar(Actor);
+		}
+
+		return;
+	}
+
+	// Draw progress bar for hovered actor.
+	if (bShowHoverProductionProgressBars)
+	{
+		AActor* HoveredActor = PlayerController->GetHoveredActor();
+		DrawProductionProgressBar(HoveredActor);
+	}
+
+	// Draw progress bars for selected actors.
+	if (bShowSelectionProductionProgressBars)
+	{
+		for (int32 i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
+		{
+			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
+			DrawProductionProgressBar(SelectedActor);
+		}
+	}
+}
+
+void ARTSHUD::DrawProductionProgressBar(AActor* Actor)
+{
+	if (!IsValid(Actor))
+	{
+		return;
+	}
+
+	// Check progress.
+	URTSProductionComponent* ProductionComponent = Actor->FindComponentByClass<URTSProductionComponent>();
+
+	if (!ProductionComponent)
+	{
+		return;
+	}
+
+	if (!ProductionComponent->IsProducing())
+	{
+		return;
+	}
+
+	const float ProgressPercentage = ProductionComponent->GetProgressPercentage();
+
+	// Suggest progress bar size.
+	float SuggestedProgressBarLeft;
+	float SuggestedProgressBarTop;
+	float SuggestedProgressBarWidth;
+	float SuggestedProgressBarHeight;
+
+	SuggestUnitBarSize(Actor, SuggestedProgressBarLeft, SuggestedProgressBarTop, SuggestedProgressBarWidth, SuggestedProgressBarHeight);
+
+	// Draw progress bar.
+	NotifyDrawProductionProgressBar(
+		Actor,
+		ProductionComponent->GetProductionTime(),
+		ProductionComponent->GetRemainingProductionTime(),
+		ProgressPercentage,
+		SuggestedProgressBarLeft,
+		SuggestedProgressBarTop,
+		SuggestedProgressBarWidth,
+		SuggestedProgressBarHeight);
 }
 
 void ARTSHUD::SuggestUnitBarSize(AActor* Actor, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const
