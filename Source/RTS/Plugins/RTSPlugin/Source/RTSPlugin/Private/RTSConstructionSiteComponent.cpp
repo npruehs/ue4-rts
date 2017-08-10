@@ -114,6 +114,11 @@ void URTSConstructionSiteComponent::FinishConstruction()
 
 void URTSConstructionSiteComponent::CancelConstruction()
 {
+	if (IsFinished())
+	{
+		return;
+	}
+
 	UE_LOG(RTSLog, Log, TEXT("Construction %s canceled."), *GetName());
 
 	// Destroy construction site.
