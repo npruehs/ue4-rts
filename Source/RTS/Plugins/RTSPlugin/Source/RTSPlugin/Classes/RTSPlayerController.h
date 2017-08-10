@@ -122,6 +122,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsHealthBarHotkeyPressed();
 
+	/** Whether the hotkey for showing all production progress bars is currently pressed, or not. */
+	UFUNCTION(BlueprintCallable)
+	bool IsProductionProgressBarHotkeyPressed();
+
 	/** Begin finding a suitable location for constructing a building of the specified type. */
 	UFUNCTION(BlueprintCallable)
 	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingType);
@@ -272,6 +276,9 @@ private:
 	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
 	bool bHealthBarHotkeyPressed;
 
+	/** Whether the hotkey for showing all production progress bars is currently pressed, or not. */
+	bool bProductionProgressBarHotkeyPressed;
+
 	/** Whether to add clicked units to the current selection. */
 	bool bAddSelectionHotkeyPressed;
 
@@ -322,6 +329,14 @@ private:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueStopOrder(APawn* OrderedPawn);
 
+	/** Start producing the specified product at the specified actor. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerStartProduction(AActor* ProductionActor, int32 ProductIndex);
+
+	/** Cancels the current production at the specified actor. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerCancelProduction(AActor* ProductionActor);
+
     /** Applies horizontal axis input to camera movement. */
     void MoveCameraLeftRight(float Value);
 
@@ -352,6 +367,14 @@ private:
 	UFUNCTION()
 	void StopShowingHealthBars();
 
+	/** Force showing all production progress bars. */
+	UFUNCTION()
+	void StartShowingProductionProgressBars();
+
+	/** Stop showing all production progress bars. */
+	UFUNCTION()
+	void StopShowingProductionProgressBars();
+
 	/** Start adding clicked units to the current selection. */
 	UFUNCTION()
 	void StartAddSelection();
@@ -368,9 +391,9 @@ private:
 	UFUNCTION()
 	void StopToggleSelection();
 	
-	/** Begin placing any building available to the currently selected builder. */
+	/** Begin placing the first building available to the currently selected builder. */
 	UFUNCTION()
-	void BeginAnyBuildingPlacement();
+	void BeginDefaultBuildingPlacement();
 
 	/** Confirms placing the current building at the hovered location. */
 	UFUNCTION()
@@ -383,4 +406,12 @@ private:
 	/** Cancels the construction of the first selected building. */
 	UFUNCTION()
 	void CancelConstruction();
+
+	/** Start producing the first product available to the currently selected production actor. */
+	UFUNCTION()
+	void StartDefaultProduction();
+
+	/** Cancels the current production of the first selected building. */
+	UFUNCTION()
+	void CancelProduction();
 };

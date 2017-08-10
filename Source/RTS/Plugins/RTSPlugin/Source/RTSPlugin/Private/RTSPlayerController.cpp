@@ -20,6 +20,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
+#include "RTSProductionComponent.h"
 #include "RTSSelectableComponent.h"
 
 
@@ -75,15 +76,19 @@ void ARTSPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
-
 	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
 	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Released, this, &ARTSPlayerController::StopShowingHealthBars);
+	InputComponent->BindAction(TEXT("ShowProductionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingProductionProgressBars);
+	InputComponent->BindAction(TEXT("ShowProductionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingProductionProgressBars);
 
-	InputComponent->BindAction(TEXT("BeginAnyBuildingPlacement"), IE_Released, this, &ARTSPlayerController::BeginAnyBuildingPlacement);
+	InputComponent->BindAction(TEXT("BeginDefaultBuildingPlacement"), IE_Released, this, &ARTSPlayerController::BeginDefaultBuildingPlacement);
 	InputComponent->BindAction(TEXT("ConfirmBuildingPlacement"), IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
 	InputComponent->BindAction(TEXT("CancelBuildingPlacement"), IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
 
 	InputComponent->BindAction(TEXT("CancelConstruction"), IE_Released, this, &ARTSPlayerController::CancelConstruction);
+
+	InputComponent->BindAction(TEXT("StartDefaultProduction"), IE_Released, this, &ARTSPlayerController::StartDefaultProduction);
+	InputComponent->BindAction(TEXT("CancelProduction"), IE_Released, this, &ARTSPlayerController::CancelProduction);
 
 	// Get camera bounds.
 	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
@@ -758,6 +763,11 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 	return bHealthBarHotkeyPressed;
 }
 
+bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed()
+{
+	return bProductionProgressBarHotkeyPressed;
+}
+
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType)
 {
 	// Spawn dummy building.
@@ -907,6 +917,16 @@ void ARTSPlayerController::StopShowingHealthBars()
 	bHealthBarHotkeyPressed = false;
 }
 
+void ARTSPlayerController::StartShowingProductionProgressBars()
+{
+	bProductionProgressBarHotkeyPressed = true;
+}
+
+void ARTSPlayerController::StopShowingProductionProgressBars()
+{
+	bProductionProgressBarHotkeyPressed = false;
+}
+
 void ARTSPlayerController::StartAddSelection()
 {
 	bAddSelectionHotkeyPressed = true;
@@ -927,7 +947,7 @@ void ARTSPlayerController::StopToggleSelection()
 	bToggleSelectionHotkeyPressed = false;
 }
 
-void ARTSPlayerController::BeginAnyBuildingPlacement()
+void ARTSPlayerController::BeginDefaultBuildingPlacement()
 {
 	// Find suitable selected builder.
 	for (auto SelectedActor : SelectedActors)
@@ -1009,7 +1029,7 @@ void ARTSPlayerController::CancelConstruction()
 	for (auto SelectedActor : SelectedActors)
 	{
 		// Verify construction site and owner.
-		auto ConstructionSiteComponent = SelectedActor->FindComponentByClass<URTSConstructionSiteComponent>();;
+		auto ConstructionSiteComponent = SelectedActor->FindComponentByClass<URTSConstructionSiteComponent>();
 
 		if (!ConstructionSiteComponent)
 		{
@@ -1031,7 +1051,7 @@ void ARTSPlayerController::CancelConstruction()
 
 void ARTSPlayerController::ServerCancelConstruction_Implementation(AActor* ConstructionSite)
 {
-	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();;
+	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	if (!ConstructionSiteComponent)
 	{
@@ -1046,6 +1066,105 @@ bool ARTSPlayerController::ServerCancelConstruction_Validate(AActor* Constructio
 {
 	// Verify owner to prevent cheating.
 	return ConstructionSite->GetOwner() == this;
+}
+
+void ARTSPlayerController::StartDefaultProduction()
+{
+	// Find suitable selected actor.
+	for (auto SelectedActor : SelectedActors)
+	{
+		// Verify owner.
+		if (SelectedActor->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Check if production actor.
+		auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+
+		if (!ProductionComponent)
+		{
+			continue;
+		}
+
+		if (ProductionComponent->AvailableProducts.Num() <= 0)
+		{
+			continue;
+		}
+
+		// Begin production.
+		ServerStartProduction(SelectedActor, 0);
+		return;
+	}
+}
+
+void ARTSPlayerController::CancelProduction()
+{
+	for (auto SelectedActor : SelectedActors)
+	{
+		// Verify production actor.
+		auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+
+		if (!ProductionComponent)
+		{
+			continue;
+		}
+
+		if (SelectedActor->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Send message to server.
+		ServerCancelProduction(SelectedActor);
+
+		// Only cancel one production at a time.
+		return;
+	}
+}
+
+void ARTSPlayerController::ServerCancelProduction_Implementation(AActor* ProductionActor)
+{
+	auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
+
+	if (!ProductionComponent)
+	{
+		return;
+	}
+
+	// Cancel production.
+	ProductionComponent->CancelProduction();
+}
+
+bool ARTSPlayerController::ServerCancelProduction_Validate(AActor* ProductionActor)
+{
+	// Verify owner to prevent cheating.
+	return ProductionActor->GetOwner() == this;
+}
+
+void ARTSPlayerController::ServerStartProduction_Implementation(AActor* ProductionActor, int32 ProductIndex)
+{
+	auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
+
+	if (!ProductionComponent)
+	{
+		return;
+	}
+
+	if (ProductionComponent->AvailableProducts.Num() <= ProductIndex)
+	{
+		return;
+	}
+
+	// Begin production.
+	TSubclassOf<AActor> ProductClass = ProductionComponent->AvailableProducts[ProductIndex];
+	ProductionComponent->StartProduction(ProductClass);
+}
+
+bool ARTSPlayerController::ServerStartProduction_Validate(AActor* ProductionActor, int32 ProductIndex)
+{
+	// Verify owner to prevent cheating.
+	return ProductionActor->GetOwner() == this;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)

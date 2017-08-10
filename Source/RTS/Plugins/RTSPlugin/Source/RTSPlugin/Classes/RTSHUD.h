@@ -35,19 +35,36 @@ public:
 
 	/** Whether to always show all construction progress bars. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-		bool bAlwaysShowConstructionProgressBars;
+	bool bAlwaysShowConstructionProgressBars;
 
 	/** Whether to show construction progress bars for hovered units. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-		bool bShowHoverConstructionProgressBars = true;
+	bool bShowHoverConstructionProgressBars = true;
 
 	/** Whether to show construction progress bars for selected units. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-		bool bShowSelectionConstructionProgressBars = true;
+	bool bShowSelectionConstructionProgressBars = true;
 
 	/** Whether to show construction progress bars while the respective hotkey is pressed. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-		bool bShowHotkeyConstructionProgressBars = true;
+	bool bShowHotkeyConstructionProgressBars = true;
+
+
+	/** Whether to always show all production progress bars. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
+	bool bAlwaysShowProductionProgressBars;
+
+	/** Whether to show production progress bars for hovered units. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
+	bool bShowHoverProductionProgressBars = true;
+
+	/** Whether to show production progress bars for selected units. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
+	bool bShowSelectionProductionProgressBars = true;
+
+	/** Whether to show production progress bars while the respective hotkey is pressed. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
+	bool bShowHotkeyProductionProgressBars = true;
 
 
 	virtual void DrawHUD() override;
@@ -77,6 +94,17 @@ public:
 		float SuggestedHealthBarTop,
 		float SuggestedHealthBarWidth,
 		float SuggestedHealthBarHeight);
+
+	/** Event for drawing the production progress bar for the specified unit. */
+	virtual void NotifyDrawProductionProgressBar(
+		AActor* Actor,
+		float ProductionTime,
+		float RemainingProductionTime,
+		float ProgressPercentage,
+		float SuggestedProgressBarLeft,
+		float SuggestedProgressBarTop,
+		float SuggestedProgressBarWidth,
+		float SuggestedProgressBarHeight);
 
 	/** Event for drawing the selection frame because the mouse is being dragged. */
 	virtual void NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
@@ -109,6 +137,18 @@ public:
 		float SuggestedHealthBarWidth,
 		float SuggestedHealthBarHeight);
 
+	/** Event for drawing the production progress bar for the specified unit. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawProductionProgressBar"))
+	void ReceiveDrawProductionProgressBar(
+		AActor* Actor,
+		float ProductionTime,
+		float RemainingProductionTime,
+		float ProgressPercentage,
+		float SuggestedProgressBarLeft,
+		float SuggestedProgressBarTop,
+		float SuggestedProgressBarWidth,
+		float SuggestedProgressBarHeight);
+
 	/** Event for drawing the selection frame because the mouse is being dragged. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawSelectionFrame"))
 	void ReceiveDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
@@ -138,6 +178,12 @@ private:
 
 	/** Draws a custom HUD effect for the currently hovered actor (e.g. player name). */
 	void DrawHoveredActorEffect();
+
+	/** Draws all production progress bars. */
+	void DrawProductionProgressBars();
+
+	/** Draws the production progress bar of the specified actor. */
+	void DrawProductionProgressBar(AActor* Actor);
 
 	/** Suggests a position and size for drawing a progress bar widget for the specified unit. */
 	void SuggestUnitBarSize(AActor* Actor, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const;
