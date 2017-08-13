@@ -52,7 +52,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 	}
 }
 
-void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	// Get game.
 	UWorld* World = GetWorld();
@@ -71,7 +71,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingType, c
 
 	// Spawn building.
 	AActor* Building = GameMode->SpawnActorForPlayer(
-		BuildingType,
+		BuildingClass,
 		Cast<ARTSPlayerController>(GetOwner()->GetOwner()),
 		FTransform(FRotator::ZeroRotator, TargetLocation));
 
@@ -105,12 +105,12 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingType, c
 
 void URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)
 {
-	if (BuildingIndex < 0 || BuildingIndex >= ConstructibleBuildingTypes.Num())
+	if (BuildingIndex < 0 || BuildingIndex >= ConstructibleBuildingClasses.Num())
 	{
 		return;
 	}
 
-	BeginConstruction(ConstructibleBuildingTypes[BuildingIndex], TargetLocation);
+	BeginConstruction(ConstructibleBuildingClasses[BuildingIndex], TargetLocation);
 }
 
 AActor* URTSBuilderComponent::GetAssignedConstructionSite()

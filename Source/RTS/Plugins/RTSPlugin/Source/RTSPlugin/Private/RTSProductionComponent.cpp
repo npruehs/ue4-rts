@@ -260,7 +260,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 	float RemainingProductionTime = ProductIndex == 0 ? ProductionQueues[QueueIndex].RemainingProductionTime : TotalProductionTime;
 	float ElapsedProductionTime = TotalProductionTime - RemainingProductionTime;
 
-	UE_LOG(RTSLog, Log, TEXT("%s canceled producing product %i of type %s in queue %i after %f seconds."),
+	UE_LOG(RTSLog, Log, TEXT("%s canceled producing product %i of class %s in queue %i after %f seconds."),
 		*GetOwner()->GetName(),
 		ProductIndex,
 		*ProductClass->GetName(),

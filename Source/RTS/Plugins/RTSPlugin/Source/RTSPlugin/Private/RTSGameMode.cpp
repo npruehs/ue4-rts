@@ -126,13 +126,13 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	}
 }
 
-AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorType, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform)
+AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform)
 {
 	// Spawn actor.
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ActorType->GetDefaultObject()->GetClass(), SpawnTransform, SpawnParams);
+	AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(ActorClass->GetDefaultObject()->GetClass(), SpawnTransform, SpawnParams);
 
 	// Set owning player.
 	if (SpawnedActor && ActorOwner)

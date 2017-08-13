@@ -50,7 +50,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 
 	ARTSProjectile* SpawnedProjectile = nullptr;
 
-	if (Attack.ProjectileType != nullptr)
+	if (Attack.ProjectileClass != nullptr)
 	{
 		// Fire projectile.
 		// Build spawn transform.
@@ -64,7 +64,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 		SpawnInfo.ObjectFlags |= RF_Transient;
 
 		// Spawn projectile.
-		SpawnedProjectile = GetWorld()->SpawnActor<ARTSProjectile>(Attack.ProjectileType, SpawnTransform, SpawnInfo);
+		SpawnedProjectile = GetWorld()->SpawnActor<ARTSProjectile>(Attack.ProjectileClass, SpawnTransform, SpawnInfo);
 
 		if (SpawnedProjectile)
 		{

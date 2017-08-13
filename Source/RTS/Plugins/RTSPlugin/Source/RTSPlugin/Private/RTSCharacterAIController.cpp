@@ -92,7 +92,7 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_Attack);
-	ClearBuildingType();
+	ClearBuildingClass();
 	ClearHomeLocation();
 	SetTargetActor(Target);
 	ClearTargetLocation();
@@ -101,7 +101,7 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	if (!VerifyBlackboard())
 	{
@@ -116,7 +116,7 @@ void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> 
 		return;
 	}
 
-	int32 BuildingIndex = BuilderComponent->ConstructibleBuildingTypes.IndexOfByKey(BuildingType);
+	int32 BuildingIndex = BuilderComponent->ConstructibleBuildingClasses.IndexOfByKey(BuildingClass);
 
 	if (BuildingIndex == INDEX_NONE)
 	{
@@ -125,7 +125,7 @@ void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> 
 
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_BeginConstruction);
-	SetBuildingType(BuildingIndex);
+	SetBuildingClass(BuildingIndex);
 	ClearHomeLocation();
 	ClearTargetActor();
 	SetTargetLocation(TargetLocation);
@@ -143,7 +143,7 @@ void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* Construct
 
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_ContinueConstruction);
-	ClearBuildingType();
+	ClearBuildingClass();
 	ClearHomeLocation();
 	SetTargetActor(ConstructionSite);
 	ClearTargetLocation();
@@ -161,7 +161,7 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 
     // Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_Move);
-	ClearBuildingType();
+	ClearBuildingClass();
 	ClearHomeLocation();
 	ClearTargetActor();
 	SetTargetLocation(Location);
@@ -179,7 +179,7 @@ void ARTSCharacterAIController::IssueStopOrder()
 
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_None);
-	ClearBuildingType();
+	ClearBuildingClass();
 	SetHomeLocation(GetPawn()->GetActorLocation());
 	ClearTargetActor();
 	ClearTargetLocation();
@@ -197,9 +197,9 @@ void ARTSCharacterAIController::ApplyOrders()
 	}
 }
 
-void ARTSCharacterAIController::ClearBuildingType()
+void ARTSCharacterAIController::ClearBuildingClass()
 {
-	Blackboard->ClearValue(TEXT("BuildingType"));
+	Blackboard->ClearValue(TEXT("BuildingClass"));
 }
 
 void ARTSCharacterAIController::ClearHomeLocation()
@@ -217,9 +217,9 @@ void ARTSCharacterAIController::ClearTargetLocation()
 	Blackboard->ClearValue(TEXT("TargetLocation"));
 }
 
-void ARTSCharacterAIController::SetBuildingType(int32 BuildingIndex)
+void ARTSCharacterAIController::SetBuildingClass(int32 BuildingIndex)
 {
-	Blackboard->SetValueAsInt(TEXT("BuildingType"), BuildingIndex);
+	Blackboard->SetValueAsInt(TEXT("BuildingClass"), BuildingIndex);
 }
 
 void ARTSCharacterAIController::SetHomeLocation(const FVector& HomeLocation)

@@ -40,7 +40,7 @@ public:
 
 	/** Makes the pawn construct the specified building at the passed location. */
 	UFUNCTION(BlueprintCallable)
-	void IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	void IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
 
 	/** Makes the pawn continue constructing the specified building. */
 	UFUNCTION(BlueprintCallable)
@@ -62,12 +62,12 @@ private:
 
 	void ApplyOrders();
 
-	void ClearBuildingType();
+	void ClearBuildingClass();
 	void ClearHomeLocation();
 	void ClearTargetActor();
 	void ClearTargetLocation();
 
-	void SetBuildingType(int32 BuildingIndex);
+	void SetBuildingClass(int32 BuildingIndex);
 	void SetHomeLocation(const FVector& HomeLocation);
 	void SetOrderType(const ERTSOrderType OrderType);
 	void SetTargetActor(AActor* TargetActor);

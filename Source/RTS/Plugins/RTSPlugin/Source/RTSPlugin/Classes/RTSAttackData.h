@@ -32,5 +32,5 @@ public:
 
 	/** Type of the projectile to spawn. If not set, damage will be dealt instantly. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
-	TSubclassOf<class ARTSProjectile> ProjectileType;
+	TSubclassOf<class ARTSProjectile> ProjectileClass;
 };

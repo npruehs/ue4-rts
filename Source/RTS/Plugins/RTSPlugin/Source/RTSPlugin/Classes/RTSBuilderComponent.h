@@ -25,7 +25,7 @@ class URTSBuilderComponent : public UActorComponent
 public:
 	/** Types of buildings the builder can construct. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<TSubclassOf<AActor>> ConstructibleBuildingTypes;
+	TArray<TSubclassOf<AActor>> ConstructibleBuildingClasses;
 
 	/** Whether the builder enters the construction site while working on it, or not. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
@@ -38,7 +38,7 @@ public:
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
-	virtual void BeginConstruction(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation);
+	virtual void BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)

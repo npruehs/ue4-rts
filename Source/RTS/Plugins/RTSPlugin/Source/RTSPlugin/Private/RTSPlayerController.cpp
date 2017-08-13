@@ -420,7 +420,7 @@ bool ARTSPlayerController::ServerIssueAttackOrder_Validate(APawn* OrderedPawn, A
 	return OrderedPawn->GetOwner() == this;
 }
 
-bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	// Find suitable selected builder.
 	for (auto SelectedActor : SelectedActors)
@@ -446,17 +446,17 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
 		}
 
 		// Check if builder knows about building.
-		if (!BuilderComponent->ConstructibleBuildingTypes.Contains(BuildingType))
+		if (!BuilderComponent->ConstructibleBuildingClasses.Contains(BuildingClass))
 		{
 			continue;
 		}
 
 		// Send construction order to server.
-		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingType, TargetLocation);
-		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingType->GetName(), *TargetLocation.ToString());
+		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
+		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
 
 		// Notify listeners.
-		NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingType, TargetLocation);
+		NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
 
 		// Just send one builder.
 		return true;
@@ -471,7 +471,7 @@ bool ARTSPlayerController::ServerIssueContinueConstructionOrder_Validate(APawn* 
 	return OrderedPawn->GetOwner() == this;
 }
 
-void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
 
@@ -481,11 +481,11 @@ void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APaw
 	}
 
 	// Issue construction order.
-	PawnController->IssueBeginConstructionOrder(BuildingType, TargetLocation);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *OrderedPawn->GetName(), *BuildingType->GetName(), *TargetLocation.ToString());
+	PawnController->IssueBeginConstructionOrder(BuildingClass, TargetLocation);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *OrderedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
 
 	// Notify listeners.
-	NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingType, TargetLocation);
+	NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, TargetLocation);
 }
 
 bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
@@ -564,7 +564,7 @@ void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(A
 	NotifyOnIssuedContinueConstructionOrder(OrderedPawn, ConstructionSite);
 }
 
-bool ARTSPlayerController::ServerIssueBeginConstructionOrder_Validate(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+bool ARTSPlayerController::ServerIssueBeginConstructionOrder_Validate(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	// Verify owner to prevent cheating.
 	return OrderedPawn->GetOwner() == this;
@@ -768,28 +768,28 @@ bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed()
 	return bProductionProgressBarHotkeyPressed;
 }
 
-void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingType)
+void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
 	// Spawn dummy building.
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AActor* DefaultBuilding = BuildingType->GetDefaultObject<AActor>();
+	AActor* DefaultBuilding = BuildingClass->GetDefaultObject<AActor>();
 	USkeletalMeshComponent* SkeletalMeshComponent = DefaultBuilding->FindComponentByClass<USkeletalMeshComponent>();
 
 	BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
 	BuildingCursor->SetMesh(SkeletalMeshComponent->SkeletalMesh, DefaultBuilding->GetActorRelativeScale3D());
 	BuildingCursor->SetInvalidLocation();
 
-	BuildingBeingPlacedType = BuildingType;
+	BuildingBeingPlacedClass = BuildingClass;
 
-	UE_LOG(RTSLog, Log, TEXT("Beginning placement of building %s."), *BuildingType->GetName());
+	UE_LOG(RTSLog, Log, TEXT("Beginning placement of building %s."), *BuildingClass->GetName());
 
 	// Notify listeners.
-	NotifyOnBuildingPlacementStarted(BuildingType);
+	NotifyOnBuildingPlacementStarted(BuildingClass);
 }
 
-bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingType, const FVector& Location) const
+bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
 	UWorld* World = GetWorld();
 
@@ -798,7 +798,7 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		return false;
 	}
 
-	AActor* DefaultBuilding = BuildingType->GetDefaultObject<AActor>();
+	AActor* DefaultBuilding = BuildingClass->GetDefaultObject<AActor>();
 	UPrimitiveComponent* PrimitiveComponent = DefaultBuilding->FindComponentByClass<UPrimitiveComponent>();
 
 	if (!PrimitiveComponent)
@@ -967,13 +967,13 @@ void ARTSPlayerController::BeginDefaultBuildingPlacement()
 		}
 
 		// Check if builder knows about building.
-		if (BuilderComponent->ConstructibleBuildingTypes.Num() <= 0)
+		if (BuilderComponent->ConstructibleBuildingClasses.Num() <= 0)
 		{
 			continue;
 		}
 
 		// Begin placement.
-		BeginBuildingPlacement(BuilderComponent->ConstructibleBuildingTypes[0]);
+		BeginBuildingPlacement(BuilderComponent->ConstructibleBuildingClasses[0]);
 		return;
 	}
 }
@@ -985,26 +985,26 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 		return;
 	}
 
-	if (!CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition))
+	if (!CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition))
 	{
-		UE_LOG(RTSLog, Log, TEXT("Can't place building %s at %s."), *BuildingBeingPlacedType->GetName(), *HoveredWorldPosition.ToString());
+		UE_LOG(RTSLog, Log, TEXT("Can't place building %s at %s."), *BuildingBeingPlacedClass->GetName(), *HoveredWorldPosition.ToString());
 
 		// Notify listeners.
-		NotifyOnBuildingPlacementError(BuildingBeingPlacedType, HoveredWorldPosition);
+		NotifyOnBuildingPlacementError(BuildingBeingPlacedClass, HoveredWorldPosition);
 		return;
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingBeingPlacedType->GetName(), *HoveredWorldPosition.ToString());
+	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingBeingPlacedClass->GetName(), *HoveredWorldPosition.ToString());
 
 	// Remove dummy building.
 	BuildingCursor->Destroy();
 	BuildingCursor = nullptr;
 
 	// Notify listeners.
-	NotifyOnBuildingPlacementConfirmed(BuildingBeingPlacedType, HoveredWorldPosition);
+	NotifyOnBuildingPlacementConfirmed(BuildingBeingPlacedClass, HoveredWorldPosition);
 
 	// Start construction.
-	IssueBeginConstructionOrder(BuildingBeingPlacedType, HoveredWorldPosition);
+	IssueBeginConstructionOrder(BuildingBeingPlacedClass, HoveredWorldPosition);
 }
 
 void ARTSPlayerController::CancelBuildingPlacement()
@@ -1018,10 +1018,10 @@ void ARTSPlayerController::CancelBuildingPlacement()
 	BuildingCursor->Destroy();
 	BuildingCursor = nullptr;
 
-	UE_LOG(RTSLog, Log, TEXT("Cancelled placement of building %s."), *BuildingBeingPlacedType->GetName());
+	UE_LOG(RTSLog, Log, TEXT("Cancelled placement of building %s."), *BuildingBeingPlacedClass->GetName());
 
 	// Notify listeners.
-	NotifyOnBuildingPlacementCancelled(BuildingBeingPlacedType);
+	NotifyOnBuildingPlacementCancelled(BuildingBeingPlacedClass);
 }
 
 void ARTSPlayerController::CancelConstruction()
@@ -1182,24 +1182,24 @@ void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
 	ReceiveOnActorOwnerChanged(Actor);
 }
 
-void ARTSPlayerController::NotifyOnBuildingPlacementStarted(TSubclassOf<AActor> BuildingType)
+void ARTSPlayerController::NotifyOnBuildingPlacementStarted(TSubclassOf<AActor> BuildingClass)
 {
-	ReceiveOnBuildingPlacementStarted(BuildingType);
+	ReceiveOnBuildingPlacementStarted(BuildingClass);
 }
 
-void ARTSPlayerController::NotifyOnBuildingPlacementConfirmed(TSubclassOf<AActor> BuildingType, const FVector& Location)
+void ARTSPlayerController::NotifyOnBuildingPlacementConfirmed(TSubclassOf<AActor> BuildingClass, const FVector& Location)
 {
-	ReceiveOnBuildingPlacementConfirmed(BuildingType, Location);
+	ReceiveOnBuildingPlacementConfirmed(BuildingClass, Location);
 }
 
-void ARTSPlayerController::NotifyOnBuildingPlacementError(TSubclassOf<AActor> BuildingType, const FVector& Location)
+void ARTSPlayerController::NotifyOnBuildingPlacementError(TSubclassOf<AActor> BuildingClass, const FVector& Location)
 {
-	ReceiveOnBuildingPlacementError(BuildingType, Location);
+	ReceiveOnBuildingPlacementError(BuildingClass, Location);
 }
 
-void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingType)
+void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingClass)
 {
-	ReceiveOnBuildingPlacementCancelled(BuildingType);
+	ReceiveOnBuildingPlacementCancelled(BuildingClass);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
@@ -1207,9 +1207,9 @@ void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor*
 	ReceiveOnIssuedAttackOrder(OrderedPawn, Target);
 }
 
-void ARTSPlayerController::NotifyOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
+void ARTSPlayerController::NotifyOnIssuedBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	ReceiveOnIssuedBeginConstructionOrder(OrderedPawn, BuildingType, TargetLocation);
+	ReceiveOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, TargetLocation);
 }
 
 void ARTSPlayerController::NotifyOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite)
@@ -1339,7 +1339,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 				{
 					BuildingCursor->SetActorLocation(HoveredWorldPosition);
 
-					if (CanPlaceBuilding(BuildingBeingPlacedType, HoveredWorldPosition))
+					if (CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition))
 					{
 						BuildingCursor->SetValidLocation();
 					}
