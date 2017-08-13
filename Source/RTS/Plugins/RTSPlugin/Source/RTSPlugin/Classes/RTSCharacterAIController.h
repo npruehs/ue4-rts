@@ -79,4 +79,6 @@ private:
 		AActor* ActorToIgnore,
 		ECollisionChannel TraceChannel,
 		TArray<struct FHitResult>& OutHitResults);
+
+	bool VerifyBlackboard();
 };

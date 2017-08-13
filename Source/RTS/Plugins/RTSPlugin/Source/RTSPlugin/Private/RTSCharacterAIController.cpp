@@ -85,6 +85,11 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 
 void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 {
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_Attack);
 	ClearBuildingType();
@@ -98,6 +103,11 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 
 void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingType, const FVector& TargetLocation)
 {
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
 	// Somehow, classes are not properly serialized to blackboard values and back, so we're going to use the building index here instead.
 	URTSBuilderComponent* BuilderComponent = GetPawn()->FindComponentByClass<URTSBuilderComponent>();
 
@@ -126,6 +136,11 @@ void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> 
 
 void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_ContinueConstruction);
 	ClearBuildingType();
@@ -139,6 +154,11 @@ void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* Construct
 
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
     // Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_Move);
 	ClearBuildingType();
@@ -152,6 +172,11 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 
 void ARTSCharacterAIController::IssueStopOrder()
 {
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_None);
 	ClearBuildingType();
@@ -242,4 +267,15 @@ bool ARTSCharacterAIController::TraceSphere(
 		FCollisionObjectQueryParams(TraceChannel),
 		FCollisionShape::MakeSphere(Radius)
 	);
+}
+
+bool ARTSCharacterAIController::VerifyBlackboard()
+{
+	if (!Blackboard)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
+		return false;
+	}
+
+	return true;
 }
