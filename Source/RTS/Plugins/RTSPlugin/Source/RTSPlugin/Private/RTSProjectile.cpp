@@ -53,21 +53,24 @@ void ARTSProjectile::FireAt(
 
 void ARTSProjectile::Tick(float DeltaSeconds)
 {
-	if (!IsValid(Target))
+	if (IsValid(Target))
 	{
-		return;
+		LastKnownTargetLocation = Target->GetActorLocation();
 	}
 
-	if (FVector::DistSquared(GetActorLocation(), Target->GetActorLocation()) < ImpactThresholdSquared)
+	if (FVector::DistSquared(GetActorLocation(), LastKnownTargetLocation) < ImpactThresholdSquared)
 	{
-		UE_LOG(RTSLog, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
+		if (IsValid(Target))
+		{
+			UE_LOG(RTSLog, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
 
-		// Deal damage.
-		Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
+			// Deal damage.
+			Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
 
-		// Notify listeners.
-		NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
-
+			// Notify listeners.
+			NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+		}
+		
 		// Destroy projectile.
 		Destroy();
 	}

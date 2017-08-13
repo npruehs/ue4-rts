@@ -62,6 +62,7 @@ private:
 	TSubclassOf<class UDamageType> DamageType;
 	AController* EventInstigator;
 	AActor* DamageCauser;
+	FVector LastKnownTargetLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
