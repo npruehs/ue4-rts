@@ -22,6 +22,7 @@
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
 #include "RTSSelectableComponent.h"
+#include "RTSUtilities.h"
 
 
 void ARTSPlayerController::BeginPlay()
@@ -798,10 +799,9 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		return false;
 	}
 
-	AActor* DefaultBuilding = BuildingClass->GetDefaultObject<AActor>();
-	UPrimitiveComponent* PrimitiveComponent = DefaultBuilding->FindComponentByClass<UPrimitiveComponent>();
+	UShapeComponent* ShapeComponent = URTSUtilities::FindDefaultComponentByClass<UShapeComponent>(BuildingClass);
 
-	if (!PrimitiveComponent)
+	if (!ShapeComponent)
 	{
 		return true;
 	}
@@ -812,7 +812,7 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		Location,
 		FQuat::Identity,
 		Params,
-		PrimitiveComponent->GetCollisionShape());
+		ShapeComponent->GetCollisionShape());
 }
 
 void ARTSPlayerController::StartSelectActors()

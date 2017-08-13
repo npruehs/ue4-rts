@@ -32,6 +32,16 @@ T* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorC
 
 UActorComponent* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)
 {
+	// Check CDO.
+	AActor* ActorCDO = InActorClass->GetDefaultObject<AActor>();;
+	UActorComponent* FoundComponent = ActorCDO->FindComponentByClass(InComponentClass);
+
+	if (FoundComponent)
+	{
+		return FoundComponent;
+	}
+
+	// Check blueprint nodes. Components added in blueprint editor only (and not in code) are not available from CDO.
 	UBlueprintGeneratedClass* ActorBlueprintGeneratedClass = Cast<UBlueprintGeneratedClass>(InActorClass);
 
 	if (!ActorBlueprintGeneratedClass)
@@ -43,7 +53,7 @@ UActorComponent* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AA
 
 	for (USCS_Node* Node : ActorBlueprintNodes)
 	{
-		if (Node->ComponentClass == InComponentClass)
+		if (Node->ComponentClass->IsChildOf(InComponentClass))
 		{
 			return Node->ComponentTemplate;
 		}
