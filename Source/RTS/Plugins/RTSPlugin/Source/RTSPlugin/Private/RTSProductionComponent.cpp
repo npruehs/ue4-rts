@@ -62,7 +62,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 bool URTSProductionComponent::CanAssignProduction(TSubclassOf<AActor> ProductClass) const
 {
-	return FindQueueForProduct(ProductClass) >= 0;
+	return URTSUtilities::IsReadyToUse(GetOwner()) && FindQueueForProduct(ProductClass) >= 0;
 }
 
 int32 URTSProductionComponent::FindQueueForProduct(TSubclassOf<AActor> ProductClass) const
@@ -162,6 +162,11 @@ bool URTSProductionComponent::IsProducing() const
 
 void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 {
+	if (!CanAssignProduction(ProductClass))
+	{
+		return;
+	}
+
 	int32 QueueIndex = FindQueueForProduct(ProductClass);
 
 	if (QueueIndex < 0)

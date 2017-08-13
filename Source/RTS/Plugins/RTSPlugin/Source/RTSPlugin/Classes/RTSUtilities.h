@@ -5,6 +5,9 @@
 #include "RTSUtilities.generated.h"
 
 
+class AActor;
+
+
 /**
 * Various utility functions.
 */
@@ -14,6 +17,9 @@ class URTSUtilities : public UBlueprintFunctionLibrary
 	GENERATED_UCLASS_BODY()
 
 public:
+	/** Checks whether the specified actor is ready to use (e.g. finished construction). */
+	static bool IsReadyToUse(AActor* Actor);
+
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
 	template<class T>
 	static T* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass);

@@ -1,12 +1,28 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSUtilities.h"
 
+#include "GameFramework/Actor.h"
+
+#include "RTSConstructionSiteComponent.h"
+
 
 URTSUtilities::URTSUtilities(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 }
 
+
+bool URTSUtilities::IsReadyToUse(AActor* Actor)
+{
+	if (!Actor)
+	{
+		return false;
+	}
+
+	auto ConstructionSiteComponent = Actor->FindComponentByClass<URTSConstructionSiteComponent>();
+
+	return ConstructionSiteComponent == nullptr || ConstructionSiteComponent->IsFinished();
+}
 
 template<class T>
 T* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass)
