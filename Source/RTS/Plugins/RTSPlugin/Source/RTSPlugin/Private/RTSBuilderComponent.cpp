@@ -3,8 +3,9 @@
 
 #include "Kismet/GameplayStatics.h"
 
-#include "RTSConstructionSiteComponent.h"
 #include "RTSCharacterAIController.h"
+#include "RTSConstructionSiteComponent.h"
+#include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
 #include "RTSPlayerController.h"
 
@@ -42,12 +43,13 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		if (bEnterConstructionSite)
 		{
 			// Enter construction site.
-			GetOwner()->SetActorHiddenInGame(true);
-			GetOwner()->SetActorEnableCollision(false);
+			auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
-			OnConstructionSiteEntered.Broadcast(ConstructionSite);
-
-			UE_LOG(RTSLog, Log, TEXT("Builder %s has entered construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
+			if (ContainerComponent)
+			{
+				ContainerComponent->LoadActor(GetOwner());
+				OnConstructionSiteEntered.Broadcast(ConstructionSite);
+			}
 		}
 	}
 }
@@ -144,11 +146,13 @@ void URTSBuilderComponent::LeaveConstructionSite()
 
 	if (bEnterConstructionSite)
 	{
-		GetOwner()->SetActorHiddenInGame(false);
-		GetOwner()->SetActorEnableCollision(true);
+		// Leave construction site.
+		auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
-		OnConstructionSiteLeft.Broadcast(ConstructionSite);
-
-		UE_LOG(RTSLog, Log, TEXT("Builder %s has left construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
+		if (ContainerComponent)
+		{
+			ContainerComponent->UnloadActor(GetOwner());
+			OnConstructionSiteLeft.Broadcast(ConstructionSite);
+		}
 	}
 }
