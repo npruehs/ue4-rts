@@ -5,6 +5,7 @@
 
 #include "RTSResourceSourceComponent.h"
 #include "RTSResourceDrainComponent.h"
+#include "RTSUtilities.h"
 
 
 URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectInitializer)
@@ -83,6 +84,12 @@ AActor* URTSGathererComponent::FindClosestResourceDrain() const
 			continue;
 		}
 	
+		// Check if ready to use (e.g. construction finished).
+		if (!URTSUtilities::IsReadyToUse(ResourceDrain))
+		{
+			continue;
+		}
+
 		// Check distance.
 		float Distance = Gatherer->GetDistanceTo(ResourceDrain);
 
