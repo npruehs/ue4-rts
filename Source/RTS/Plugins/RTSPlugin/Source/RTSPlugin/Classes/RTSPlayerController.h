@@ -243,7 +243,7 @@ public:
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
 
 	/** Event when the current resource stock amount for the player has changed. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Resources", meta = (DisplayName = "OnOnResourcesChanged"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Resources", meta = (DisplayName = "OnResourcesChanged"))
 	void ReceiveOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
