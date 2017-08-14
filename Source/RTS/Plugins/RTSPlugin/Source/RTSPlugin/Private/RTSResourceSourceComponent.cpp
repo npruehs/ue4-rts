@@ -3,6 +3,7 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "RTSContainerComponent.h"
 
 
 URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer)
@@ -18,6 +19,17 @@ void URTSResourceSourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimePro
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSResourceSourceComponent, CurrentResources);
+}
+
+void URTSResourceSourceComponent::BeginPlay()
+{
+	// Set container size.
+	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
+
+	if (ContainerComponent)
+	{
+		ContainerComponent->Capacity = GathererCapacity;
+	}
 }
 
 float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float ResourceAmount)
@@ -58,4 +70,10 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 	}
 
 	return GatheredAmount;
+}
+
+bool URTSResourceSourceComponent::CanGathererEnter(AActor* Gatherer) const
+{
+	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
+	return !ContainerComponent || ContainerComponent->ContainedActors.Contains(Gatherer) || ContainerComponent->CanLoadActor(Gatherer);
 }

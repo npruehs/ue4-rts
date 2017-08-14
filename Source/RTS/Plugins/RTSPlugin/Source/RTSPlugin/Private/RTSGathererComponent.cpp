@@ -3,6 +3,7 @@
 
 #include "GameFramework/Actor.h"
 
+#include "RTSContainerComponent.h"
 #include "RTSResourceSourceComponent.h"
 #include "RTSResourceDrainComponent.h"
 #include "RTSUtilities.h"
@@ -177,6 +178,11 @@ float URTSGathererComponent::GetGatherRange(AActor* ResourceSource)
 	return GatherData.Range;
 }
 
+bool URTSGathererComponent::IsGathering() const
+{
+	return CurrentResourceSource != nullptr;
+}
+
 void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 {
 	if (!CanGatherFrom(ResourceSource))
@@ -211,6 +217,17 @@ void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 
 	// Start cooldown before first gathering.
 	RemainingCooldown = GatherData.Cooldown;
+
+	if (ResourceSourceComponent->bGathererMustEnter)
+	{
+		// Enter resource source.
+		auto ContainerComponent = ResourceSource->FindComponentByClass<URTSContainerComponent>();
+
+		if (ContainerComponent)
+		{
+			ContainerComponent->LoadActor(GetOwner());
+		}
+	}
 }
 
 float URTSGathererComponent::GatherResources(AActor* ResourceSource)
@@ -266,10 +283,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 		if (CarriedResourceAmount >= GatherData.Capacity)
 		{
 			// Stop gathering.
-			PreviousResourceSource = CurrentResourceSource;
-			CurrentResourceSource = nullptr;
-
-			PreviousResourceType = CarriedResourceType;
+			LeaveCurrentResourceSource();
 		}
 	}
 	else
@@ -302,10 +316,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 		if (!IsValid(ResourceSource))
 		{
 			// Stop gathering.
-			PreviousResourceSource = CurrentResourceSource;
-			CurrentResourceSource = nullptr;
-
-			PreviousResourceType = CarriedResourceType;
+			LeaveCurrentResourceSource();
 		}
 	}
 
@@ -370,4 +381,26 @@ bool URTSGathererComponent::GetGatherDataForResourceType(TSubclassOf<URTSResourc
 	}
 
 	return false;
+}
+
+void URTSGathererComponent::LeaveCurrentResourceSource()
+{
+	if (!CurrentResourceSource)
+	{
+		return;
+	}
+
+	// Leave resource source.
+	auto ContainerComponent = CurrentResourceSource->FindComponentByClass<URTSContainerComponent>();
+
+	if (ContainerComponent)
+	{
+		ContainerComponent->UnloadActor(GetOwner());
+	}
+
+	// Store data about resource source for future reference (e.g. return here, or find similar).
+	PreviousResourceSource = CurrentResourceSource;
+	CurrentResourceSource = nullptr;
+
+	PreviousResourceType = CarriedResourceType;
 }

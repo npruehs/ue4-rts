@@ -52,11 +52,16 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void BeginPlay() override;
+
 
 	/** Extracts resources from this actor, applying gathering factor and checking remaining amount. */
+	UFUNCTION(BlueprintCallable)
 	float ExtractResources(AActor* Gatherer, float ResourceAmount);
 
-
+	/** Checks whether the specified gatherer can enter the resource source right now. */
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanGathererEnter(AActor* Gatherer) const;
 
 
 	/** Event when the amount of available resources has changed. */

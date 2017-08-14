@@ -72,6 +72,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetGatherRange(AActor* ResourceSource);
 
+	/** Whether this gatherer is currently gathering resources. */
+	UFUNCTION(BlueprintCallable)
+	bool IsGathering() const;
+
 	/** Starts the cooldown timer for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
 	virtual void StartGatheringResources(AActor* ResourceSource);
@@ -106,4 +110,5 @@ private:
 
 	bool GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData);
 	bool GetGatherDataForResourceType(TSubclassOf<URTSResourceType> ResourceType, FRTSGatherData* OutGatherData);
+	void LeaveCurrentResourceSource();
 };
