@@ -16,6 +16,21 @@ URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectIni
 
 void URTSGathererComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
+	if (!CurrentResourceSource)
+	{
+		return;
+	}
+
+	// Check range.
+	float GatherRange = GetGatherRange(CurrentResourceSource);
+
+	if (GetOwner()->GetDistanceTo(CurrentResourceSource) > GatherRange)
+	{
+		// Stop gathering.
+		CurrentResourceSource = nullptr;
+		return;
+	}
+
 	// Update cooldown timer.
 	if (RemainingCooldown > 0)
 	{
