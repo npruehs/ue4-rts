@@ -44,7 +44,7 @@ void URTSMinimapWidget::NativeConstruct()
 	}
 
 	UBrushComponent* MinimapBrushComponent = MinimapVolume->GetBrushComponent();
-	FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->ComponentToWorld);
+	FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->GetComponentTransform());
 
 	MinimapWorldSize = MinimapBounds.BoxExtent * 2;
 }
@@ -220,8 +220,7 @@ void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 		InContext.OutDrawElements,
 		InContext.MaxLayer,
 		InContext.AllottedGeometry.ToPaintGeometry(),
-		Points,
-		InContext.MyClippingRect);
+		Points);
 }
 
 void URTSMinimapWidget::DrawBoxWithBrush(FPaintContext& InContext, const FVector2D& Position, const FSlateBrush& Brush) const
@@ -231,7 +230,6 @@ void URTSMinimapWidget::DrawBoxWithBrush(FPaintContext& InContext, const FVector
 		InContext.MaxLayer,
 		InContext.AllottedGeometry.ToPaintGeometry(Position, Brush.ImageSize),
 		&Brush,
-		InContext.MyClippingRect,
 		ESlateDrawEffect::None,
 		Brush.TintColor.GetSpecifiedColor());
 }

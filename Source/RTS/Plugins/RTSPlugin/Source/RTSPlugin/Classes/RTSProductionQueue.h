@@ -5,7 +5,7 @@
 #include "RTSProductionQueue.generated.h"
 
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRTSProductionQueue
 {
 	GENERATED_USTRUCT_BODY()
