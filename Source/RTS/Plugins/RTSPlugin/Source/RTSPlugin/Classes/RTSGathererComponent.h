@@ -64,9 +64,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AActor* FindClosestResourceDrain() const;
 
-	/** Gets the resource source the actor has recently been gathering from. */
+	/** Gets the resource source the actor has recently been gathering from, if available, or a similar one within its sweep radius. */
 	UFUNCTION(BlueprintCallable)
-	AActor* GetPreviousResourceSource() const;
+	AActor* GetPreferredResourceSource() const;
 
 	/** Gets the maximum distance for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
@@ -99,6 +99,10 @@ private:
 
 	/** Resource source the actor has been gathering from before.*/
 	AActor* PreviousResourceSource;
+
+	/** Type of resource gathered before. */
+	TSubclassOf<class URTSResourceType> PreviousResourceType;
+
 
 	bool GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData);
 	bool GetGatherDataForResourceType(TSubclassOf<URTSResourceType> ResourceType, FRTSGatherData* OutGatherData);

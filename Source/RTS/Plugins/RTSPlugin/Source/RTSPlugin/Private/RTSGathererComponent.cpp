@@ -118,9 +118,52 @@ AActor* URTSGathererComponent::FindClosestResourceDrain() const
 	return ClosestResourceDrain;
 }
 
-AActor* URTSGathererComponent::GetPreviousResourceSource() const
+AActor* URTSGathererComponent::GetPreferredResourceSource() const
 {
-	return PreviousResourceSource;
+	if (IsValid(PreviousResourceSource))
+	{
+		return PreviousResourceSource;
+	}
+
+	// Sweep for similar sources.
+	AActor* ClosestResourceSource = nullptr;
+	float ClosestResourceSourceDistance;
+
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		auto Gatherer = GetOwner();
+		auto ResourceSource = *ActorItr;
+
+		// Check if found resource source.
+		auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
+
+		if (!ResourceSourceComponent)
+		{
+			continue;
+		}
+
+		// Check resource type.
+		if (ResourceSourceComponent->ResourceType != PreviousResourceType)
+		{
+			continue;
+		}
+
+		// Check distance.
+		float Distance = Gatherer->GetDistanceTo(ResourceSource);
+
+		if (Distance > ResourceSweepRadius)
+		{
+			continue;
+		}
+
+		if (!ClosestResourceSource || Distance < ClosestResourceSourceDistance)
+		{
+			ClosestResourceSource = ResourceSource;
+			ClosestResourceSourceDistance = Distance;
+		}
+	}
+
+	return ClosestResourceSource;
 }
 
 float URTSGathererComponent::GetGatherRange(AActor* ResourceSource)
@@ -225,6 +268,8 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 			// Stop gathering.
 			PreviousResourceSource = CurrentResourceSource;
 			CurrentResourceSource = nullptr;
+
+			PreviousResourceType = CarriedResourceType;
 		}
 	}
 	else
@@ -259,6 +304,8 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 			// Stop gathering.
 			PreviousResourceSource = CurrentResourceSource;
 			CurrentResourceSource = nullptr;
+
+			PreviousResourceType = CarriedResourceType;
 		}
 	}
 
