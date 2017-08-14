@@ -175,10 +175,6 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 	{
 		// Capacity limit hit. Clamp gathered resources.
 		AmountToGather = GatherData.Capacity - CarriedResourceAmount;
-
-		// Stop gathering.
-		PreviousResourceSource = CurrentResourceSource;
-		CurrentResourceSource = nullptr;
 	}
 
 	// Gather resources.
@@ -198,6 +194,52 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 
 	// Notify listeners.
 	OnResourcesGathered.Broadcast(ResourceSource, GatherData, GatheredResources);
+
+	if (GatherData.bNeedsReturnToDrain)
+	{
+		// Check if we're at capacity.
+		if (CarriedResourceAmount >= GatherData.Capacity)
+		{
+			// Stop gathering.
+			PreviousResourceSource = CurrentResourceSource;
+			CurrentResourceSource = nullptr;
+		}
+	}
+	else
+	{
+		// Check if we're at capacity or resource source depleted.
+		if (CarriedResourceAmount >= GatherData.Capacity || !IsValid(ResourceSource))
+		{
+			// Return immediately.
+			auto OwningPlayer = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+
+			if (OwningPlayer)
+			{
+				float ReturnedResources = OwningPlayer->AddResources(CarriedResourceType, CarriedResourceAmount);
+
+				if (ReturnedResources > 0.0f)
+				{
+					CarriedResourceAmount -= ReturnedResources;
+
+					UE_LOG(RTSLog, Log, TEXT("Actor %s returned %f %s without returning to drain."),
+						*GetOwner()->GetName(),
+						ReturnedResources,
+						*CarriedResourceType->GetName());
+
+					// Notify listeners.
+					OnResourcesReturned.Broadcast(nullptr, CarriedResourceType, ReturnedResources);
+				}
+			}
+		}
+
+		if (!IsValid(ResourceSource))
+		{
+			// Stop gathering.
+			PreviousResourceSource = CurrentResourceSource;
+			CurrentResourceSource = nullptr;
+		}
+	}
+
 	return GatheredResources;
 }
 
