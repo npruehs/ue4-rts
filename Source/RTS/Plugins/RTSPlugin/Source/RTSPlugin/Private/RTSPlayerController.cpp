@@ -3,7 +3,7 @@
 
 #include "EngineUtils.h"
 #include "Components/InputComponent.h"
-#include "Components/PrimitiveComponent.h"
+#include "Components/ShapeComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
@@ -18,9 +18,11 @@
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSConstructionSiteComponent.h"
+#include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
+#include "RTSResourceSourceComponent.h"
 #include "RTSSelectableComponent.h"
 #include "RTSUtilities.h"
 
@@ -326,6 +328,12 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 				return;
 			}
 			
+			// Issue gather order.
+			if (IssueGatherOrder(HitResult.Actor.Get()))
+			{
+				return;
+			}
+
 			// Issue construct order.
 			if (IssueContinueConstructionOrder(HitResult.Actor.Get()))
 			{
@@ -546,6 +554,80 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 	}
 
 	return bSuccess;
+}
+
+bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
+{
+	if (!ResourceSource)
+	{
+		return false;
+	}
+
+	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
+
+	if (!ResourceSourceComponent)
+	{
+		return false;
+	}
+
+	// Issue gather orders.
+	bool bSuccess = false;
+
+	for (auto SelectedActor : SelectedActors)
+	{
+		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+		if (!SelectedPawn)
+		{
+			continue;
+		}
+
+		if (SelectedPawn->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Verify gatherer.
+		auto GathererComponent = SelectedActor->FindComponentByClass<URTSGathererComponent>();
+		if (!GathererComponent || !GathererComponent->CanGatherFrom(ResourceSource))
+		{
+			continue;
+		}
+
+		// Send gather order to server.
+		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
+		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
+
+		// Notify listeners.
+		NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
+
+		bSuccess = true;
+	}
+
+	return bSuccess;
+}
+
+void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedPawn, AActor* ResourceSource)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue gather order.
+	PawnController->IssueGatherOrder(ResourceSource);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
+
+	// Notify listeners.
+	NotifyOnIssuedGatherOrder(OrderedPawn, ResourceSource);
+}
+
+bool ARTSPlayerController::ServerIssueGatherOrder_Validate(APawn* OrderedPawn, AActor* ResourceSourc)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
 }
 
 void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(APawn* OrderedPawn, AActor* ConstructionSite)
@@ -1215,6 +1297,11 @@ void ARTSPlayerController::NotifyOnIssuedBeginConstructionOrder(APawn* OrderedPa
 void ARTSPlayerController::NotifyOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite)
 {
 	ReceiveOnIssuedContinueConstructionOrder(OrderedPawn, ConstructionSite);
+}
+
+void ARTSPlayerController::NotifyOnIssuedGatherOrder(APawn* OrderedPawn, AActor* ResourceSource)
+{
+	ReceiveOnIssuedGatherOrder(OrderedPawn, ResourceSource);
 }
 
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation)

@@ -152,6 +152,24 @@ void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* Construct
 	ApplyOrders();
 }
 
+void ARTSCharacterAIController::IssueGatherOrder(AActor* ResourceSource)
+{
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
+	// Update blackboard.
+	SetOrderType(ERTSOrderType::ORDER_Gather);
+	ClearBuildingClass();
+	ClearHomeLocation();
+	SetTargetActor(ResourceSource);
+	ClearTargetLocation();
+
+	// Stop any current orders and start over.
+	ApplyOrders();
+}
+
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
 	if (!VerifyBlackboard())

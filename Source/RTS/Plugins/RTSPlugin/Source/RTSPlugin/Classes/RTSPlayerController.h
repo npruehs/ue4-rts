@@ -72,6 +72,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IssueContinueConstructionOrder(AActor* ConstructionSite);
 
+	/** Orders selected gatherers to gather resources from the specified source. */
+	UFUNCTION(BlueprintCallable)
+	bool IssueGatherOrder(AActor* ResourceSource);
+
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
 	bool IssueMoveOrder(const FVector& TargetLocation);
@@ -164,6 +168,9 @@ public:
 	/** Event when an actor has received a continue construction order. */
 	virtual void NotifyOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
+	/** Event when an actor has received a gather order. */
+	virtual void NotifyOnIssuedGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
+
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
@@ -207,6 +214,10 @@ public:
 	/** Event when an actor has received a continue construction order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedContinueConstructionOrder"))
 	void ReceiveOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
+
+	/** Event when an actor has received a gather order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedGatherOrder"))
+	void ReceiveOnIssuedGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
 
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
@@ -316,6 +327,10 @@ private:
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
+	
+	/** Orders selected gatherers to gather resources from the specified source. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
 
 	/** Orders selected builders to finish constructing the specified building. */
 	UFUNCTION(Reliable, Server, WithValidation)
