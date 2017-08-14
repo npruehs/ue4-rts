@@ -13,7 +13,8 @@ class AActor;
 class URTSResourceType;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesGatheredSignature, const FRTSGatherData&, GatherData, AActor*, ResourceSource, float, GatheredAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesGatheredSignature, AActor*, ResourceSource, const FRTSGatherData&, GatherData, float, GatheredAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesReturnedSignature, AActor*, ResourceDrain, TSubclassOf<class URTSResourceType>, ResourceType, float, ReturnedAmount);
 
 
 /**
@@ -59,6 +60,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanGatherFrom(AActor* ResourceSource);
 
+	/** Finds the closest resource drain for returning currently carried resources. */
+	UFUNCTION(BlueprintCallable)
+	AActor* FindClosestResourceDrain() const;
+
+	/** Gets the resource source the actor has recently been gathering from. */
+	UFUNCTION(BlueprintCallable)
+	AActor* GetPreviousResourceSource() const;
+
 	/** Gets the maximum distance for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
 	float GetGatherRange(AActor* ResourceSource);
@@ -69,17 +78,27 @@ public:
 
 	/** Gathers resources from the specified source and starts the cooldown timer. */
 	UFUNCTION(BlueprintCallable)
-	virtual void GatherResources(AActor* ResourceSource);
+	virtual float GatherResources(AActor* ResourceSource);
+
+	/** Returns resources to the specified drain. */
+	UFUNCTION(BlueprintCallable)
+	virtual float ReturnResources(AActor* ResourceDrain);
 
 
 	/** Event when the actor has gathered resources from a source. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSGathererComponentResourcesGatheredSignature OnResourcesGathered;
 
+	/** Event when the actor has returned resources to a drain. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSGathererComponentResourcesReturnedSignature OnResourcesReturned;
+
 private:
 	/** Resource source the actor is currently gathering from .*/
 	AActor* CurrentResourceSource;
 
+	/** Resource source the actor has been gathering from before.*/
+	AActor* PreviousResourceSource;
 
 	bool GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData);
 	bool GetGatherDataForResourceType(TSubclassOf<URTSResourceType> ResourceType, FRTSGatherData* OutGatherData);

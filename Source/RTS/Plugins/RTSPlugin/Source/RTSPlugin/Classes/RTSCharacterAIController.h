@@ -54,6 +54,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& Location);
 
+	/** Makes the pawn move towards the closest resource drain and return all carried resources. */
+	UFUNCTION(BlueprintCallable)
+	void IssueReturnResourcesOrder();
+
 	/** Makes the pawn stop all actions immediately. */
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();

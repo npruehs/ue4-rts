@@ -24,5 +24,8 @@ enum class ERTSOrderType : uint8
 	ORDER_ContinueConstruction,
 
 	/** Gather resources. */
-	ORDER_Gather
+	ORDER_Gather,
+
+	/** Return carried resources. */
+	ORDER_ReturnResources
 };

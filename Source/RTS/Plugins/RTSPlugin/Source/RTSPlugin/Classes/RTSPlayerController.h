@@ -12,6 +12,7 @@ class USkeletalMesh;
 class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
 class ARTSPlayerState;
+class URTSResourceType;
 
 
 /**
@@ -30,6 +31,10 @@ public:
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
+
+	/** Resources currently available to this player. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources")
+	TMap<TSubclassOf<URTSResourceType>, float> Resources;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
@@ -143,6 +148,9 @@ public:
 	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 
+	/** Adds the specified resources to the stock of this player. */
+	virtual float AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -179,6 +187,9 @@ public:
 
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
+	/** Event when the current resource stock amount for the player has changed. */
+	virtual void NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
@@ -228,8 +239,12 @@ public:
 	void ReceiveOnIssuedStopOrder(APawn* OrderedPawn);
 
 	/** Event when the player has clicked a spot on the minimap. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "NotifyOnMinimapClicked"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
+	/** Event when the current resource stock amount for the player has changed. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Resources", meta = (DisplayName = "OnOnResourcesChanged"))
+	void ReceiveOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))

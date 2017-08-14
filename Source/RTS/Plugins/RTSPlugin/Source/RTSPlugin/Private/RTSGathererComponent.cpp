@@ -4,9 +4,11 @@
 #include "GameFramework/Actor.h"
 
 #include "RTSResourceSourceComponent.h"
+#include "RTSResourceDrainComponent.h"
 
 
 URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -48,6 +50,57 @@ bool URTSGathererComponent::CanGatherFrom(AActor* ResourceSource)
 	return CarriedResourceAmount < GatherData.Capacity;
 }
 
+AActor* URTSGathererComponent::FindClosestResourceDrain() const
+{
+	// Find nearby actors.
+	AActor* ClosestResourceDrain = nullptr;
+	float ClosestResourceDrainDistance;
+
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		auto Gatherer = GetOwner();
+		auto ResourceDrain = *ActorItr;
+
+		// Check if found resource drain.
+		auto ResourceDrainComponent = ResourceDrain->FindComponentByClass<URTSResourceDrainComponent>();
+
+		if (!ResourceDrainComponent)
+		{
+			continue;
+		}
+
+		// Check owner.
+		auto GathererOwnerComponent = Gatherer->FindComponentByClass<URTSOwnerComponent>();
+
+		if (!GathererOwnerComponent || !GathererOwnerComponent->IsSameTeamAsActor(ResourceDrain))
+		{
+			continue;
+		}
+
+		// Check resource type.
+		if (!ResourceDrainComponent->ResourceTypes.Contains(CarriedResourceType))
+		{
+			continue;
+		}
+	
+		// Check distance.
+		float Distance = Gatherer->GetDistanceTo(ResourceDrain);
+
+		if (!ClosestResourceDrain || Distance < ClosestResourceDrainDistance)
+		{
+			ClosestResourceDrain = ResourceDrain;
+			ClosestResourceDrainDistance = Distance;
+		}
+	}
+
+	return ClosestResourceDrain;
+}
+
+AActor* URTSGathererComponent::GetPreviousResourceSource() const
+{
+	return PreviousResourceSource;
+}
+
 float URTSGathererComponent::GetGatherRange(AActor* ResourceSource)
 {
 	FRTSGatherData GatherData;
@@ -65,6 +118,13 @@ void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 	{
 		return;
 	}
+
+	if (CurrentResourceSource == ResourceSource)
+	{
+		return;
+	}
+
+	CurrentResourceSource = ResourceSource;
 
 	// Get resource type.
 	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
@@ -88,32 +148,37 @@ void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 	RemainingCooldown = GatherData.Cooldown;
 }
 
-void URTSGathererComponent::GatherResources(AActor* ResourceSource)
+float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 {
 	if (!IsValid(ResourceSource))
 	{
-		return;
+		return 0.0f;
 	}
 
 	// Check cooldown.
 	if (RemainingCooldown > 0)
 	{
-		return;
+		return 0.0f;
 	}
 
 	// Check resource type.
 	FRTSGatherData GatherData;
 	if (!GetGatherDataForResourceSource(ResourceSource, &GatherData))
 	{
-		return;
+		return 0.0f;
 	}
 
 	// Determine amount to gather.
 	float AmountToGather = GatherData.AmountPerGathering;
 
-	if (CarriedResourceAmount + AmountToGather > GatherData.Capacity)
+	if (CarriedResourceAmount + AmountToGather >= GatherData.Capacity)
 	{
+		// Capacity limit hit. Clamp gathered resources.
 		AmountToGather = GatherData.Capacity - CarriedResourceAmount;
+
+		// Stop gathering.
+		PreviousResourceSource = CurrentResourceSource;
+		CurrentResourceSource = nullptr;
 	}
 
 	// Gather resources.
@@ -132,11 +197,41 @@ void URTSGathererComponent::GatherResources(AActor* ResourceSource)
 		*ResourceSource->GetName());
 
 	// Notify listeners.
-	OnResourcesGathered.Broadcast(GatherData, ResourceSource, GatheredResources);
+	OnResourcesGathered.Broadcast(ResourceSource, GatherData, GatheredResources);
+	return GatheredResources;
+}
+
+float URTSGathererComponent::ReturnResources(AActor* ResourceDrain)
+{
+	if (!IsValid(ResourceDrain))
+	{
+		return 0.0f;
+	}
+
+	// Return resources.
+	auto ResourceDrainComponent = ResourceDrain->FindComponentByClass<URTSResourceDrainComponent>();
+	float ReturnedResources = ResourceDrainComponent->ReturnResources(GetOwner(), CarriedResourceType, CarriedResourceAmount);
+
+	CarriedResourceAmount -= ReturnedResources;
+
+	UE_LOG(RTSLog, Log, TEXT("Actor %s returned %f %s to %s."),
+		*GetOwner()->GetName(),
+		ReturnedResources,
+		*CarriedResourceType->GetName(),
+		*ResourceDrain->GetName());
+
+	// Notify listeners.
+	OnResourcesReturned.Broadcast(ResourceDrain, CarriedResourceType, ReturnedResources);
+	return ReturnedResources;
 }
 
 bool URTSGathererComponent::GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData)
 {
+	if (!IsValid(ResourceSource))
+	{
+		return false;
+	}
+
 	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
 
 	if (!ResourceSourceComponent)

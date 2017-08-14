@@ -8,6 +8,7 @@
 #include "RTSAttackableComponent.h"
 #include "RTSBuilderComponent.h"
 #include "RTSCharacter.h"
+#include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
 
 
@@ -185,6 +186,38 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 	SetTargetLocation(Location);
 
     // Stop any current orders and start over.
+	ApplyOrders();
+}
+
+void ARTSCharacterAIController::IssueReturnResourcesOrder()
+{
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
+	auto GathererComponent = GetPawn()->FindComponentByClass<URTSGathererComponent>();
+
+	if (!GathererComponent)
+	{
+		return;
+	}
+
+	AActor* ResourceDrain = GathererComponent->FindClosestResourceDrain();
+
+	if (!ResourceDrain)
+	{
+		return;
+	}
+
+	// Update blackboard.
+	SetOrderType(ERTSOrderType::ORDER_ReturnResources);
+	ClearBuildingClass();
+	ClearHomeLocation();
+	SetTargetActor(ResourceDrain);
+	ClearTargetLocation();
+
+	// Stop any current orders and start over.
 	ApplyOrders();
 }
 

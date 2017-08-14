@@ -897,6 +897,30 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		ShapeComponent->GetCollisionShape());
 }
 
+float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	// Get current resource amount.
+	float* OldResourceAmount = Resources.Find(ResourceType);
+
+	if (!OldResourceAmount)
+	{
+		return 0.0f;
+	}
+
+	// Add resources.
+	float NewResourceAmount = *OldResourceAmount + ResourceAmount;
+	Resources[ResourceType] = NewResourceAmount;
+
+	UE_LOG(RTSLog, Log, TEXT("Player %s stock of %s has changed to %f."),
+		*GetName(),
+		*ResourceType->GetName(),
+		NewResourceAmount);
+
+	// Notify listeners.
+	NotifyOnResourcesChanged(ResourceType, NewResourceAmount);
+	return ResourceAmount;
+}
+
 void ARTSPlayerController::StartSelectActors()
 {
 	if (BuildingCursor)
@@ -1349,6 +1373,11 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 	
 	// Notify listeners.
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
+}
+
+void ARTSPlayerController::NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	ReceiveOnResourcesChanged(ResourceType, ResourceAmount);
 }
 
 void ARTSPlayerController::PlayerTick(float DeltaTime)
