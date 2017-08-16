@@ -8,6 +8,7 @@
 #include "RTSAttackableComponent.h"
 #include "RTSBuilderComponent.h"
 #include "RTSCharacter.h"
+#include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
 
 
@@ -80,6 +81,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.Actor.Get());
 
 		UE_LOG(RTSLog, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
+		return;
 	}
 }
 
@@ -152,6 +154,24 @@ void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* Construct
 	ApplyOrders();
 }
 
+void ARTSCharacterAIController::IssueGatherOrder(AActor* ResourceSource)
+{
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
+	// Update blackboard.
+	SetOrderType(ERTSOrderType::ORDER_Gather);
+	ClearBuildingClass();
+	ClearHomeLocation();
+	SetTargetActor(ResourceSource);
+	ClearTargetLocation();
+
+	// Stop any current orders and start over.
+	ApplyOrders();
+}
+
 void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 {
 	if (!VerifyBlackboard())
@@ -167,6 +187,38 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 	SetTargetLocation(Location);
 
     // Stop any current orders and start over.
+	ApplyOrders();
+}
+
+void ARTSCharacterAIController::IssueReturnResourcesOrder()
+{
+	if (!VerifyBlackboard())
+	{
+		return;
+	}
+
+	auto GathererComponent = GetPawn()->FindComponentByClass<URTSGathererComponent>();
+
+	if (!GathererComponent)
+	{
+		return;
+	}
+
+	AActor* ResourceDrain = GathererComponent->FindClosestResourceDrain();
+
+	if (!ResourceDrain)
+	{
+		return;
+	}
+
+	// Update blackboard.
+	SetOrderType(ERTSOrderType::ORDER_ReturnResources);
+	ClearBuildingClass();
+	ClearHomeLocation();
+	SetTargetActor(ResourceDrain);
+	ClearTargetLocation();
+
+	// Stop any current orders and start over.
 	ApplyOrders();
 }
 

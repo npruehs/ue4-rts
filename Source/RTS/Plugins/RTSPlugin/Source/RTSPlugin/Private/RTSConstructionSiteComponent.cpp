@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 
 #include "RTSBuilderComponent.h"
+#include "RTSContainerComponent.h"
 
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer)
@@ -27,6 +28,15 @@ void URTSConstructionSiteComponent::BeginPlay()
 {
 	UActorComponent::BeginPlay();
 
+	// Set container size.
+	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
+
+	if (ContainerComponent)
+	{
+		ContainerComponent->Capacity = MaxAssignedBuilders;
+	}
+
+	// Check for autostart.
 	if (bStartImmediately)
 	{
 		StartConstruction();

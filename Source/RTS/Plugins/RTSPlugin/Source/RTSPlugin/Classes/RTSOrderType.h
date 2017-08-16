@@ -21,5 +21,11 @@ enum class ERTSOrderType : uint8
 	ORDER_BeginConstruction,
 
 	/** Finish a building construction. */
-	ORDER_ContinueConstruction
+	ORDER_ContinueConstruction,
+
+	/** Gather resources. */
+	ORDER_Gather,
+
+	/** Return carried resources. */
+	ORDER_ReturnResources
 };

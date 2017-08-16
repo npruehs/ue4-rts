@@ -12,6 +12,7 @@ class USkeletalMesh;
 class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
 class ARTSPlayerState;
+class URTSResourceType;
 
 
 /**
@@ -30,6 +31,15 @@ public:
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
+
+	/** Resources currently available to this player. Num must match ResourceTypes. Need to use an array here instead of map for replication. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", ReplicatedUsing=ReceivedResourceAmounts)
+	TArray<float> ResourceAmounts;
+
+	/** Types of resources currently available to this player. Num must match ResourceAmounts. Need to use an array here instead of map for replication. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", replicated)
+	TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
+
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
@@ -71,6 +81,10 @@ public:
 	/** Orders selected builders to finish constructing the specified building. */
 	UFUNCTION(BlueprintCallable)
 	bool IssueContinueConstructionOrder(AActor* ConstructionSite);
+
+	/** Orders selected gatherers to gather resources from the specified source. */
+	UFUNCTION(BlueprintCallable)
+	bool IssueGatherOrder(AActor* ResourceSource);
 
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
@@ -139,6 +153,9 @@ public:
 	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 
+	/** Adds the specified resources to the stock of this player. */
+	virtual float AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -164,6 +181,9 @@ public:
 	/** Event when an actor has received a continue construction order. */
 	virtual void NotifyOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
+	/** Event when an actor has received a gather order. */
+	virtual void NotifyOnIssuedGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
+
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
@@ -172,6 +192,9 @@ public:
 
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
+	/** Event when the current resource stock amount for the player has changed. */
+	virtual void NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
@@ -208,6 +231,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedContinueConstructionOrder"))
 	void ReceiveOnIssuedContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
 
+	/** Event when an actor has received a gather order. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedGatherOrder"))
+	void ReceiveOnIssuedGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
+
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
     void ReceiveOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
@@ -217,8 +244,12 @@ public:
 	void ReceiveOnIssuedStopOrder(APawn* OrderedPawn);
 
 	/** Event when the player has clicked a spot on the minimap. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "NotifyOnMinimapClicked"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
+	/** Event when the current resource stock amount for the player has changed. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Resources", meta = (DisplayName = "OnResourcesChanged"))
+	void ReceiveOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
@@ -233,6 +264,7 @@ public:
 protected:
     virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
     /** Volume that restricts the camera movement of this player. */
@@ -316,6 +348,10 @@ private:
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
+	
+	/** Orders selected gatherers to gather resources from the specified source. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
 
 	/** Orders selected builders to finish constructing the specified building. */
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -414,4 +450,7 @@ private:
 	/** Cancels the current production of the first selected building. */
 	UFUNCTION()
 	void CancelProduction();
+
+	UFUNCTION()
+	void ReceivedResourceAmounts();
 };

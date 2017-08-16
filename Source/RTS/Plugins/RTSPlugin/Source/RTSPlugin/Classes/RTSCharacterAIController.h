@@ -46,9 +46,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IssueContinueConstructionOrder(AActor* ConstructionSite);
 
+	/** Makes the pawn gather resources from the specified source. */
+	UFUNCTION(BlueprintCallable)
+	void IssueGatherOrder(AActor* ResourceSource);
+
     /** Makes the pawn move towards the specified location. */
     UFUNCTION(BlueprintCallable)
     void IssueMoveOrder(const FVector& Location);
+
+	/** Makes the pawn move towards the closest resource drain and return all carried resources. */
+	UFUNCTION(BlueprintCallable)
+	void IssueReturnResourcesOrder();
 
 	/** Makes the pawn stop all actions immediately. */
 	UFUNCTION(BlueprintCallable)

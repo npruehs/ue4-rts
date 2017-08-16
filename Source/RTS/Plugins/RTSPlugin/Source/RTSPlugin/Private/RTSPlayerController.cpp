@@ -3,7 +3,7 @@
 
 #include "EngineUtils.h"
 #include "Components/InputComponent.h"
-#include "Components/PrimitiveComponent.h"
+#include "Components/ShapeComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
@@ -18,16 +18,31 @@
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSConstructionSiteComponent.h"
+#include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
+#include "RTSResourceSourceComponent.h"
 #include "RTSSelectableComponent.h"
 #include "RTSUtilities.h"
 
 
 void ARTSPlayerController::BeginPlay()
 {
-    Super::BeginPlay();  
+    Super::BeginPlay();
+
+	// Check resource types.
+	int32 ResourceTypeNum = ResourceTypes.Num();
+	int32 ResourceAmountNum = ResourceAmounts.Num();
+
+	for (int32 Index = ResourceAmountNum; Index < ResourceTypeNum; ++Index)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("Starting amount for resource type %s not set for player %s, assuming zero."),
+			*ResourceTypes[Index]->GetName(),
+			*GetName());
+
+		ResourceAmounts.Add(0);
+	}
 }
 
 void ARTSPlayerController::SetupInputComponent()
@@ -105,6 +120,14 @@ void ARTSPlayerController::SetupInputComponent()
 
 	// Setup control groups.
 	ControlGroups.SetNum(10);
+}
+
+void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARTSPlayerController, ResourceAmounts);
+	DOREPLIFETIME(ARTSPlayerController, ResourceTypes);
 }
 
 void ARTSPlayerController::TransferOwnership(AActor* Actor)
@@ -326,6 +349,12 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 				return;
 			}
 			
+			// Issue gather order.
+			if (IssueGatherOrder(HitResult.Actor.Get()))
+			{
+				return;
+			}
+
 			// Issue construct order.
 			if (IssueContinueConstructionOrder(HitResult.Actor.Get()))
 			{
@@ -546,6 +575,80 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 	}
 
 	return bSuccess;
+}
+
+bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
+{
+	if (!ResourceSource)
+	{
+		return false;
+	}
+
+	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
+
+	if (!ResourceSourceComponent)
+	{
+		return false;
+	}
+
+	// Issue gather orders.
+	bool bSuccess = false;
+
+	for (auto SelectedActor : SelectedActors)
+	{
+		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+		if (!SelectedPawn)
+		{
+			continue;
+		}
+
+		if (SelectedPawn->GetOwner() != this)
+		{
+			continue;
+		}
+
+		// Verify gatherer.
+		auto GathererComponent = SelectedActor->FindComponentByClass<URTSGathererComponent>();
+		if (!GathererComponent || !GathererComponent->CanGatherFrom(ResourceSource))
+		{
+			continue;
+		}
+
+		// Send gather order to server.
+		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
+		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
+
+		// Notify listeners.
+		NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
+
+		bSuccess = true;
+	}
+
+	return bSuccess;
+}
+
+void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedPawn, AActor* ResourceSource)
+{
+	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+
+	if (!PawnController)
+	{
+		return;
+	}
+
+	// Issue gather order.
+	PawnController->IssueGatherOrder(ResourceSource);
+	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
+
+	// Notify listeners.
+	NotifyOnIssuedGatherOrder(OrderedPawn, ResourceSource);
+}
+
+bool ARTSPlayerController::ServerIssueGatherOrder_Validate(APawn* OrderedPawn, AActor* ResourceSourc)
+{
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
 }
 
 void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(APawn* OrderedPawn, AActor* ConstructionSite)
@@ -813,6 +916,36 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		FQuat::Identity,
 		Params,
 		ShapeComponent->GetCollisionShape());
+}
+
+float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	// Get current resource amount.
+	int ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
+
+	if (ResourceIndex == INDEX_NONE)
+	{
+		UE_LOG(RTSLog, Error, TEXT("Unknown resource type %s for player %s."),
+			*ResourceType->GetName(),
+			*GetName());
+
+		return 0.0f;
+	}
+
+	float OldResourceAmount = ResourceAmounts[ResourceIndex];
+
+	// Add resources.
+	float NewResourceAmount = OldResourceAmount + ResourceAmount;
+	ResourceAmounts[ResourceIndex] = NewResourceAmount;
+
+	UE_LOG(RTSLog, Log, TEXT("Player %s stock of %s has changed to %f."),
+		*GetName(),
+		*ResourceType->GetName(),
+		NewResourceAmount);
+
+	// Notify listeners.
+	NotifyOnResourcesChanged(ResourceType, NewResourceAmount);
+	return ResourceAmount;
 }
 
 void ARTSPlayerController::StartSelectActors()
@@ -1217,6 +1350,11 @@ void ARTSPlayerController::NotifyOnIssuedContinueConstructionOrder(APawn* Ordere
 	ReceiveOnIssuedContinueConstructionOrder(OrderedPawn, ConstructionSite);
 }
 
+void ARTSPlayerController::NotifyOnIssuedGatherOrder(APawn* OrderedPawn, AActor* ResourceSource)
+{
+	ReceiveOnIssuedGatherOrder(OrderedPawn, ResourceSource);
+}
+
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation)
 {
     ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
@@ -1262,6 +1400,11 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 	
 	// Notify listeners.
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
+}
+
+void ARTSPlayerController::NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	ReceiveOnResourcesChanged(ResourceType, ResourceAmount);
 }
 
 void ARTSPlayerController::PlayerTick(float DeltaTime)
@@ -1366,4 +1509,12 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
 	// Verify selection.
 	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->bHidden; });
+}
+
+void ARTSPlayerController::ReceivedResourceAmounts()
+{
+	for (int32 Index = 0; Index < ResourceTypes.Num(); ++Index)
+	{
+		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
+	}
 }
