@@ -24,6 +24,7 @@ Note that we're still in heavy development. Some things are already in place, su
 * Teams
 * Constructions
 * Unit Production/Tech Research
+* Resource Gathering
 
 All of this is already completely working in multiplayer as well, and has been fully exposed to scripting, enabling you to update UI and play animations and sounds.
 
@@ -100,6 +101,7 @@ _Note that you may use any class derived from Actor, if you want to. The plugin 
 1. Set Max Assigned Builders if you want to require a builder to work at the construction site to make progress, and/or to allow multi-building (similar to Age of Empires).
 1. Set the Progress Made Automatically and Progress Made Per Builder factors.
 1. Set the Start Immediately flag unless you want to trigger construction start from script.
+1. Add an RTSContainerComponent if you want builders to enter the building site while building.
 
 ### Selecting Units
 
@@ -239,6 +241,26 @@ Example: Drawing names of unit owners
 1. Bind the action CancelProduction (e.g. to Escape).
 
 _Note that, technically, producing units does not differ from researching technology. You can create actor blueprints without physical representation for each technology to research, and add them as products. Then, you can check whether any player owns an actor of that technology for checking a tech tree._
+
+### Add Resource Gathering
+
+1. Create an RTSResourceType blueprint for each resource in your game.
+1. Add the resource types to your player controller to enable players to keep resources in stock. Listen for the OnResourcesChanged event to update your UI.
+1. Create a unit (see above) and add an RTSResourceSourceComponent for each type of resource node in your game (e.g. gold mine, tree).
+    1. Set the resource type and maximum and current resources of the source.
+    1. Set the gathering factor for increaing the yield of any gatherers (e.g. golden minerals).
+    1. Add an RTSContainerComponent, check Gatherer Must Enter and set the Gatherer Capacity if you want gatherers to enter the resource source (e.g. Refinery in StarCraft).
+1. Create a unit (see above) and add an RTSResourceDrainComponent for each type of building gatherers may return resources to.
+    1. Set the resource types to all resources accepted by the drain.
+1. Create an RTSGathererComponent to any unit that should be able to gather resources.
+    1. Add any resource type the gatherer should be able to gather to Gathered Resources.
+        1. Gathering works similar to attacks, with "damage" and "cooldown". Set Amount Per Gathering to the value to add to the gatherers inventory each time the cooldown is finished.
+        1. Set the Cooldown to the time between two gatherings.
+        1. Set the Capacity to the amount of resources the gatherer can carry before returning to a resource drain.
+        1. Check Needs Return To Drain if the gatherer needs to move to another actor for returning resources (e.g. Age of Empires). Uncheck if they should return all gathered resources immediately when hitting the capacity limit (e.g. Undead in WarCraft).
+        1. Set Range as desired.
+    1. Add all Resource Source Actor Classes the gatherer may gather from (e.g. Undead in Warcraft need Haunted Gold Mine).
+    1. Set the Resource Sweep Radius to the radius in which the gatherer should look for similar resources if their current source is depleted.
 
 
 ## Bugs & Feature Requests
