@@ -57,7 +57,7 @@ public:
 
 	/** Extracts resources from this actor, applying gathering factor and checking remaining amount. */
 	UFUNCTION(BlueprintCallable)
-	float ExtractResources(AActor* Gatherer, float ResourceAmount);
+	virtual float ExtractResources(AActor* Gatherer, float ResourceAmount);
 
 	/** Checks whether the specified gatherer can enter the resource source right now. */
 	UFUNCTION(BlueprintCallable)

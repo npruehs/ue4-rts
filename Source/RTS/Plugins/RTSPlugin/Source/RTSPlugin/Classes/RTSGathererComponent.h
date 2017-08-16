@@ -62,15 +62,15 @@ public:
 
 	/** Finds the closest resource drain for returning currently carried resources. */
 	UFUNCTION(BlueprintCallable)
-	AActor* FindClosestResourceDrain() const;
+	virtual AActor* FindClosestResourceDrain() const;
 
 	/** Gets the resource source the actor has recently been gathering from, if available, or a similar one within its sweep radius. */
 	UFUNCTION(BlueprintCallable)
-	AActor* GetPreferredResourceSource() const;
+	virtual AActor* GetPreferredResourceSource() const;
 
 	/** Gets the maximum distance for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
-	float GetGatherRange(AActor* ResourceSource);
+	virtual float GetGatherRange(AActor* ResourceSource);
 
 	/** Whether this gatherer is currently gathering resources. */
 	UFUNCTION(BlueprintCallable)
