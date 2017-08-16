@@ -27,11 +27,11 @@ class URTSGathererComponent : public UActorComponent
 
 public:
 	/** Amount of resources the actor is carrying. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS", replicated)
 	float CarriedResourceAmount;
 
 	/** Type of resource the actor is carrying. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS", replicated)
 	TSubclassOf<class URTSResourceType> CarriedResourceType;
 
 	/** Resources that can be gathered by the actor. */
@@ -53,8 +53,10 @@ public:
 
 	URTSGathererComponent(const FObjectInitializer& ObjectInitializer);
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+
 
 	/** Checks whether the actor can gather from the specified source, e.g. is allowed to gather, and is not at capacity limit. */
 	UFUNCTION(BlueprintCallable)

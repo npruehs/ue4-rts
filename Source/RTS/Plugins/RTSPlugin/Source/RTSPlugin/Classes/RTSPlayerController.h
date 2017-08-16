@@ -32,9 +32,14 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
 
-	/** Resources currently available to this player. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources")
-	TMap<TSubclassOf<URTSResourceType>, float> Resources;
+	/** Resources currently available to this player. Num must match ResourceTypes. Need to use an array here instead of map for replication. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", ReplicatedUsing=ReceivedResourceAmounts)
+	TArray<float> ResourceAmounts;
+
+	/** Types of resources currently available to this player. Num must match ResourceAmounts. Need to use an array here instead of map for replication. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", replicated)
+	TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
+
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
@@ -259,6 +264,7 @@ public:
 protected:
     virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
     /** Volume that restricts the camera movement of this player. */
@@ -444,4 +450,7 @@ private:
 	/** Cancels the current production of the first selected building. */
 	UFUNCTION()
 	void CancelProduction();
+
+	UFUNCTION()
+	void ReceivedResourceAmounts();
 };

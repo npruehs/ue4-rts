@@ -29,7 +29,20 @@
 
 void ARTSPlayerController::BeginPlay()
 {
-    Super::BeginPlay();  
+    Super::BeginPlay();
+
+	// Check resource types.
+	int32 ResourceTypeNum = ResourceTypes.Num();
+	int32 ResourceAmountNum = ResourceAmounts.Num();
+
+	for (int32 Index = ResourceAmountNum; Index < ResourceTypeNum; ++Index)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("Starting amount for resource type %s not set for player %s, assuming zero."),
+			*ResourceTypes[Index]->GetName(),
+			*GetName());
+
+		ResourceAmounts.Add(0);
+	}
 }
 
 void ARTSPlayerController::SetupInputComponent()
@@ -107,6 +120,14 @@ void ARTSPlayerController::SetupInputComponent()
 
 	// Setup control groups.
 	ControlGroups.SetNum(10);
+}
+
+void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ARTSPlayerController, ResourceAmounts);
+	DOREPLIFETIME(ARTSPlayerController, ResourceTypes);
 }
 
 void ARTSPlayerController::TransferOwnership(AActor* Actor)
@@ -900,16 +921,22 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
 	// Get current resource amount.
-	float* OldResourceAmount = Resources.Find(ResourceType);
+	int ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
 
-	if (!OldResourceAmount)
+	if (ResourceIndex == INDEX_NONE)
 	{
+		UE_LOG(RTSLog, Error, TEXT("Unknown resource type %s for player %s."),
+			*ResourceType->GetName(),
+			*GetName());
+
 		return 0.0f;
 	}
 
+	float OldResourceAmount = ResourceAmounts[ResourceIndex];
+
 	// Add resources.
-	float NewResourceAmount = *OldResourceAmount + ResourceAmount;
-	Resources[ResourceType] = NewResourceAmount;
+	float NewResourceAmount = OldResourceAmount + ResourceAmount;
+	ResourceAmounts[ResourceIndex] = NewResourceAmount;
 
 	UE_LOG(RTSLog, Log, TEXT("Player %s stock of %s has changed to %f."),
 		*GetName(),
@@ -1482,4 +1509,12 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
 	// Verify selection.
 	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->bHidden; });
+}
+
+void ARTSPlayerController::ReceivedResourceAmounts()
+{
+	for (int32 Index = 0; Index < ResourceTypes.Num(); ++Index)
+	{
+		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
+	}
 }

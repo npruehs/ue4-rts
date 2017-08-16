@@ -13,6 +13,16 @@ URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectIni
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	SetIsReplicated(true);
+}
+
+void URTSGathererComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(URTSGathererComponent, CarriedResourceAmount);
+	DOREPLIFETIME(URTSGathererComponent, CarriedResourceType);
 }
 
 void URTSGathererComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -71,7 +81,7 @@ AActor* URTSGathererComponent::FindClosestResourceDrain() const
 {
 	// Find nearby actors.
 	AActor* ClosestResourceDrain = nullptr;
-	float ClosestResourceDrainDistance;
+	float ClosestResourceDrainDistance = 0.0f;
 
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -128,7 +138,7 @@ AActor* URTSGathererComponent::GetPreferredResourceSource() const
 
 	// Sweep for similar sources.
 	AActor* ClosestResourceSource = nullptr;
-	float ClosestResourceSourceDistance;
+	float ClosestResourceSourceDistance = 0.0f;
 
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
