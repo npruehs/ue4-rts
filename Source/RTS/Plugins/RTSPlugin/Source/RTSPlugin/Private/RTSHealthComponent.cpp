@@ -6,6 +6,7 @@
 
 
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	SetIsReplicated(true);
 }
