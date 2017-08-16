@@ -81,6 +81,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.Actor.Get());
 
 		UE_LOG(RTSLog, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
+		return;
 	}
 }
 
