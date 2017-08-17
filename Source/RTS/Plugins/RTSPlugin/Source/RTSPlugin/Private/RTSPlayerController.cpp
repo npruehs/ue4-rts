@@ -921,7 +921,7 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 bool ARTSPlayerController::GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount)
 {
 	// Get current resource amount.
-	int ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
+	int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
 
 	if (ResourceIndex == INDEX_NONE)
 	{
@@ -977,7 +977,7 @@ float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceT
 	}
 
 	// Add resources.
-	int ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
+	int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
 	float NewResourceAmount = OldResourceAmount + ResourceAmount;
 	ResourceAmounts[ResourceIndex] = NewResourceAmount;
 
