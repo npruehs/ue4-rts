@@ -43,6 +43,12 @@ void ARTSPlayerController::BeginPlay()
 
 		ResourceAmounts.Add(0);
 	}
+
+	// Allow immediate UI updates.
+	for (int32 Index = 0; Index < ResourceTypeNum; ++Index)
+	{
+		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
+	}
 }
 
 void ARTSPlayerController::SetupInputComponent()
