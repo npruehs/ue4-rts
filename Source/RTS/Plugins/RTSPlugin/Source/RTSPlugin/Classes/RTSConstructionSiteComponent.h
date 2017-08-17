@@ -5,8 +5,12 @@
 #include "Components/ActorComponent.h"
 
 #include "RTSConstructionState.h"
+#include "RTSProductionCostType.h"
 
 #include "RTSConstructionSiteComponent.generated.h"
+
+
+class URTSResourceType;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionStartedSignature, float, TotalConstructionTime);
@@ -24,6 +28,14 @@ class URTSConstructionSiteComponent : public UActorComponent
 public:
 	/** Builders currently working at this construction site. */
 	TArray<AActor*> AssignedBuilders;
+
+	/** When to pay resources for construction. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	ERTSProductionCostType ConstructionCostType;
+
+	/** Resources to pay for constructing the actor. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	TMap<TSubclassOf<URTSResourceType>, float> ConstructionCosts;
 
 	/** Time for constructing the actor, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")

@@ -7,6 +7,7 @@
 
 #include "RTSGameMode.h"
 #include "RTSProductionCostComponent.h"
+#include "RTSPlayerController.h"
 #include "RTSUtilities.h"
 
 
@@ -45,6 +46,58 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 	for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
 	{
 		if (ProductionQueues[QueueIndex].Num() <= 0)
+		{
+			continue;
+		}
+
+		// Check production costs.
+		auto ProductClass = GetCurrentProduction(QueueIndex);
+		auto ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+
+		bool bProductionCostPaid = false;
+
+		if (ProductionCostComponent && ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayOverTime)
+		{
+			auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+
+			if (!PlayerController)
+			{
+				UE_LOG(RTSLog, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
+				continue;
+			}
+
+			bool bCanPayAllProductionCosts = true;
+
+			for (auto& Resource : ProductionCostComponent->Resources)
+			{
+				float ResourceAmount = Resource.Value * DeltaTime / ProductionCostComponent->ProductionTime;
+
+				if (!PlayerController->CanPayResources(Resource.Key, ResourceAmount))
+				{
+					// Production stopped until resources become available again.
+					bCanPayAllProductionCosts = false;
+					break;
+				}
+			}
+
+			if (bCanPayAllProductionCosts)
+			{
+				// Pay production costs.
+				for (auto& Resource : ProductionCostComponent->Resources)
+				{
+					float ResourceAmount = Resource.Value * DeltaTime / ProductionCostComponent->ProductionTime;
+					PlayerController->PayResources(Resource.Key, ResourceAmount);
+				}
+
+				bProductionCostPaid = true;
+			}
+		}
+		else
+		{
+			bProductionCostPaid = true;
+		}
+
+		if (!bProductionCostPaid)
 		{
 			continue;
 		}
@@ -162,6 +215,7 @@ bool URTSProductionComponent::IsProducing() const
 
 void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 {
+	// Check production state.
 	if (!CanAssignProduction(ProductClass))
 	{
 		return;
@@ -174,6 +228,32 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 		return;
 	}
 
+	// Check production cost.
+	URTSProductionCostComponent* ProductionCostComponent =
+		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+
+	if (ProductionCostComponent && ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayImmediately)
+	{
+		auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+
+		if (!PlayerController)
+		{
+			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
+			return;
+		}
+
+		if (!PlayerController->CanPayAllResources(ProductionCostComponent->Resources))
+		{
+			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for producing %s, but does not have enough resources."),
+				*GetOwner()->GetName(),
+				*ProductClass->GetName());
+			return;
+		}
+
+		// Pay production costs.
+		PlayerController->PayAllResources(ProductionCostComponent->Resources);
+	}
+	
 	// Insert into queue.
 	FRTSProductionQueue& Queue = ProductionQueues[QueueIndex];
 	Queue.Add(ProductClass);

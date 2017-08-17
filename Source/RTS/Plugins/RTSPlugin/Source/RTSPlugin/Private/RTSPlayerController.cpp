@@ -918,7 +918,7 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		ShapeComponent->GetCollisionShape());
 }
 
-float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+bool ARTSPlayerController::GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount)
 {
 	// Get current resource amount.
 	int ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
@@ -929,12 +929,55 @@ float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceT
 			*ResourceType->GetName(),
 			*GetName());
 
+		*OutResourceAmount = 0.0f;
+		return false;
+	}
+
+	*OutResourceAmount = ResourceAmounts[ResourceIndex];
+	return true;
+}
+
+bool ARTSPlayerController::CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	float AvailableResources;
+
+	if (!GetResources(ResourceType, &AvailableResources))
+	{
+		return false;
+	}
+
+	if (AvailableResources < ResourceAmount)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool ARTSPlayerController::CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
+{
+	for (auto& Resource : Resources)
+	{
+		if (!CanPayResources(Resource.Key, Resource.Value))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	// Get current resource amount.
+	float OldResourceAmount;
+	if (!GetResources(ResourceType, &OldResourceAmount))
+	{
 		return 0.0f;
 	}
 
-	float OldResourceAmount = ResourceAmounts[ResourceIndex];
-
 	// Add resources.
+	int ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
 	float NewResourceAmount = OldResourceAmount + ResourceAmount;
 	ResourceAmounts[ResourceIndex] = NewResourceAmount;
 
@@ -946,6 +989,32 @@ float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceT
 	// Notify listeners.
 	NotifyOnResourcesChanged(ResourceType, NewResourceAmount);
 	return ResourceAmount;
+}
+
+float ARTSPlayerController::PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+	// Get current resource amount.
+	float OldResourceAmount;
+	if (!GetResources(ResourceType, &OldResourceAmount))
+	{
+		return 0.0f;
+	}
+
+	if (OldResourceAmount < ResourceAmount)
+	{
+		return 0.0f;
+	}
+
+	// Deduct resources.
+	return AddResources(ResourceType, -ResourceAmount);
+}
+
+void ARTSPlayerController::PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
+{
+	for (auto& Resource : Resources)
+	{
+		PayResources(Resource.Key, Resource.Value);
+	}
 }
 
 void ARTSPlayerController::StartSelectActors()
