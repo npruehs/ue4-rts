@@ -30,4 +30,11 @@ public:
 	/** Resources to pay for producing the actor. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	TMap<TSubclassOf<URTSResourceType>, float> Resources;
+
+	/** Resources to refund when canceling production. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	float RefundFactor;
+
+
+	URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer);
 };

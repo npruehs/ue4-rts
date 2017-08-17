@@ -16,6 +16,7 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 	SetIsReplicated(true);
 
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted;
+	RefundFactor = 0.5f;
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -205,6 +206,31 @@ void URTSConstructionSiteComponent::CancelConstruction()
 	}
 
 	UE_LOG(RTSLog, Log, TEXT("Construction %s canceled."), *GetName());
+
+	// Refund resources.
+	auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+
+	if (PlayerController)
+	{
+		float TimeRefundFactor = 0.0f;
+
+		if (ConstructionCostType == ERTSProductionCostType::COST_PayImmediately)
+		{
+			TimeRefundFactor = 1.0f;
+		}
+		else if (ConstructionCostType == ERTSProductionCostType::COST_PayOverTime)
+		{
+			TimeRefundFactor = GetProgressPercentage();
+		}
+
+		float ActualRefundFactor = RefundFactor * TimeRefundFactor;
+
+		// Refund construction costs.
+		for (auto& Resource : ConstructionCosts)
+		{
+			PlayerController->AddResources(Resource.Key, Resource.Value * ActualRefundFactor);
+		}
+	}
 
 	// Destroy construction site.
 	GetOwner()->Destroy();

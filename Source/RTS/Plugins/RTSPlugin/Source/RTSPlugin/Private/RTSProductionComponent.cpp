@@ -352,6 +352,39 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 
 	// Remove product from queue.
 	DequeueProduct(QueueIndex, ProductIndex);
+
+	// Refund resources.
+	URTSProductionCostComponent* ProductionCostComponent =
+		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+
+	if (ProductionCostComponent)
+	{
+		auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+
+		if (!PlayerController)
+		{
+			return;
+		}
+
+		float TimeRefundFactor = 0.0f;
+
+		if (ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayImmediately)
+		{
+			TimeRefundFactor = 1.0f;
+		}
+		else if (ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayOverTime)
+		{
+			TimeRefundFactor = ElapsedProductionTime / TotalProductionTime;
+		}
+
+		float ActualRefundFactor = ProductionCostComponent->RefundFactor * TimeRefundFactor;
+
+		// Refund production costs.
+		for (auto& Resource : ProductionCostComponent->Resources)
+		{
+			PlayerController->AddResources(Resource.Key, Resource.Value * ActualRefundFactor);
+		}
+	}
 }
 
 void URTSProductionComponent::DequeueProduct(int32 QueueIndex /*= 0*/, int32 ProductIndex /*= 0*/)

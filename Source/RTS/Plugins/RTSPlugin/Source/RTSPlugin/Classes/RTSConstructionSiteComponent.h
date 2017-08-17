@@ -61,6 +61,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", replicated)
 	float RemainingConstructionTime;
 
+	/** Resources to refund when canceling construction. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	float RefundFactor;
+
 	/** Whether to start construction immediately after spawn, or not. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	bool bStartImmediately;
