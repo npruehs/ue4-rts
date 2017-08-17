@@ -5,14 +5,19 @@
 #include "Components/ActorComponent.h"
 
 #include "RTSConstructionState.h"
+#include "RTSProductionCostType.h"
 
 #include "RTSConstructionSiteComponent.generated.h"
+
+
+class URTSResourceType;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionStartedSignature, float, TotalConstructionTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionFinishedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionCanceledSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentBuilderConsumedSignature, AActor*, Builder);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSConstructionSiteComponentConstructionCostRefundedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
 
 /** Allows constructing the actor over time. */
@@ -24,6 +29,14 @@ class URTSConstructionSiteComponent : public UActorComponent
 public:
 	/** Builders currently working at this construction site. */
 	TArray<AActor*> AssignedBuilders;
+
+	/** When to pay resources for construction. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	ERTSProductionCostType ConstructionCostType;
+
+	/** Resources to pay for constructing the actor. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	TMap<TSubclassOf<URTSResourceType>, float> ConstructionCosts;
 
 	/** Time for constructing the actor, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
@@ -48,6 +61,10 @@ public:
 	/** Time before the actor is constructed, in seconds. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", replicated)
 	float RemainingConstructionTime;
+
+	/** Resources to refund when canceling construction. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	float RefundFactor;
 
 	/** Whether to start construction immediately after spawn, or not. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
@@ -108,6 +125,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentBuilderConsumedSignature OnBuilderConsumed;
 
+	/** Event when any construction costs have been refunded. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSConstructionSiteComponentConstructionCostRefundedSignature OnConstructionCostRefunded;
 
 private:
 	/** Whether the construction timer is currently being ticked, or not. */

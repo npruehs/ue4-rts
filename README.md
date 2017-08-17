@@ -97,6 +97,9 @@ _Note that you may use any class derived from Actor, if you want to. The plugin 
 
 1. See Adding Units.
 1. Add an RTSConstructionSiteComponent and set the ConstructionTime.
+1. Set the Construction Costs to any resources required for construction.
+1. Set the Construction Cost Type to to Pay Immediately if all costs should be paid in full when starting construction, or to Pay Over Time for continuously paying costs (similar to Command & Conquer).
+1. Set the Refund Factor to the factor to multiply refunded resources with after cancelation.
 1. Set the Consumes Builders flag if builders working at the construction site should be destroyed when finished (similar to Zerg in StarCraft).
 1. Set Max Assigned Builders if you want to require a builder to work at the construction site to make progress, and/or to allow multi-building (similar to Age of Empires).
 1. Set the Progress Made Automatically and Progress Made Per Builder factors.
@@ -238,6 +241,9 @@ Example: Drawing names of unit owners
 1. Set the Capacity Per Queue, specifying how many products can be produced one after another.
 1. Add the RTSProductionCostComponent to everything you want to be produced.
 1. Set the Production Time for these products.
+1. Set the Resources to any resources required for production.
+1. Set the Production Cost Type to to Pay Immediately if all costs should be paid in full when starting production, or to Pay Over Time for continuously paying costs (similar to Command & Conquer).
+1. Set the Refund Factor to the factor to multiply refunded resources with after cancelation.
 1. Bind the action CancelProduction (e.g. to Escape).
 
 _Note that, technically, producing units does not differ from researching technology. You can create actor blueprints without physical representation for each technology to research, and add them as products. Then, you can check whether any player owns an actor of that technology for checking a tech tree._

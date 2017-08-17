@@ -153,8 +153,24 @@ public:
 	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 
+
+	/** Gets the amount of resources in stock of this player. */
+	bool GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount);
+
+	/** Checks the amount of resources in stock of this player. */
+	bool CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+
+	/** Checks the amount of resources in stock of this player. */
+	bool CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
+
 	/** Adds the specified resources to the stock of this player. */
 	virtual float AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+
+	/** Removes the specified resources from the stock of this player. */
+	virtual float PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+
+	/** Removes the specified resources from the stock of this player. */
+	virtual void PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
 
 
 	/** Event when this player is now owning the specified actor. */
