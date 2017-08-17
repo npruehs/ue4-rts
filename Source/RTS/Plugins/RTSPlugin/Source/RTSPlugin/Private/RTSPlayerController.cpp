@@ -1323,6 +1323,11 @@ void ARTSPlayerController::CancelProduction()
 			continue;
 		}
 
+		if (!URTSUtilities::IsReadyToUse(SelectedActor))
+		{
+			continue;
+		}
+
 		// Send message to server.
 		ServerCancelProduction(SelectedActor);
 
