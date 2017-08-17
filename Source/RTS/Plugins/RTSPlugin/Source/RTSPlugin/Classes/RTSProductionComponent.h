@@ -13,6 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductQueue
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionStartedSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, TotalProductionTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionFinishedSignature, AActor*, Product, int32, QueueIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionCanceledSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, ElapsedProductionTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionCostRefundedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
 
 /** Allows producing actors over time. */
@@ -108,6 +109,10 @@ public:
 	/** Event when the production has been canceled. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSProductionComponentProductionCanceledSignature OnProductionCanceled;
+
+	/** Event when any production costs have been refunded. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSProductionComponentProductionCostRefundedSignature OnProductionCostRefunded;
 
 private:
 	void DequeueProduct(int32 QueueIndex = 0, int32 ProductIndex = 0);

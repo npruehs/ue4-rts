@@ -17,6 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstru
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionFinishedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionCanceledSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentBuilderConsumedSignature, AActor*, Builder);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSConstructionSiteComponentConstructionCostRefundedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
 
 /** Allows constructing the actor over time. */
@@ -124,6 +125,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentBuilderConsumedSignature OnBuilderConsumed;
 
+	/** Event when any construction costs have been refunded. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSConstructionSiteComponentConstructionCostRefundedSignature OnConstructionCostRefunded;
 
 private:
 	/** Whether the construction timer is currently being ticked, or not. */

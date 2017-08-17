@@ -228,7 +228,15 @@ void URTSConstructionSiteComponent::CancelConstruction()
 		// Refund construction costs.
 		for (auto& Resource : ConstructionCosts)
 		{
-			PlayerController->AddResources(Resource.Key, Resource.Value * ActualRefundFactor);
+			TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
+			float ResourceAmount = Resource.Value * ActualRefundFactor;
+
+			PlayerController->AddResources(ResourceType, ResourceAmount);
+
+			UE_LOG(RTSLog, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
+
+			// Notify listeners.
+			OnConstructionCostRefunded.Broadcast(ResourceType, ResourceAmount);
 		}
 	}
 

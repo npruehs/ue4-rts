@@ -382,7 +382,15 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 		// Refund production costs.
 		for (auto& Resource : ProductionCostComponent->Resources)
 		{
-			PlayerController->AddResources(Resource.Key, Resource.Value * ActualRefundFactor);
+			TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
+			float ResourceAmount = Resource.Value * ActualRefundFactor;
+
+			PlayerController->AddResources(ResourceType, ResourceAmount);
+
+			UE_LOG(RTSLog, Log, TEXT("%f %s of production costs refunded."), ResourceAmount, *ResourceType->GetName());
+
+			// Notify listeners.
+			OnProductionCostRefunded.Broadcast(ResourceType, ResourceAmount);
 		}
 	}
 }
