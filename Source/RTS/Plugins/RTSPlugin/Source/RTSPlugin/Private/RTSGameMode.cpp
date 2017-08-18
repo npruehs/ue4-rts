@@ -9,6 +9,7 @@
 #include "RTSPlayerController.h"
 #include "RTSPlayerStart.h"
 #include "RTSTeamInfo.h"
+#include "RTSVisionInfo.h"
 
 
 void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -21,11 +22,16 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 		TeamClass = ARTSTeamInfo::StaticClass();
 	}
 
-	for (uint8 i = 0; i < NumTeams; ++i)
+	for (uint8 TeamIndex = 0; TeamIndex < NumTeams; ++TeamIndex)
 	{
+		// Add team.
 		ARTSTeamInfo* NewTeam = GetWorld()->SpawnActor<ARTSTeamInfo>(TeamClass);
-		NewTeam->TeamIndex = i;
+		NewTeam->TeamIndex = TeamIndex;
 		Teams.Add(NewTeam);
+
+		// Setup vision.
+		ARTSVisionInfo* TeamVision = GetWorld()->SpawnActor<ARTSVisionInfo>();
+		TeamVision->TeamIndex = TeamIndex;
 	}
 }
 
