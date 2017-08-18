@@ -26,13 +26,12 @@ public:
 	/** Index of the team this actor tracks the vision of. */
 	uint8 TeamIndex;
 
-	/** Which tiles are currently unknown, known and visible. */
-	TArray<ERTSVisionState> Tiles;
-
 
 	virtual void Tick(float DeltaSeconds) override;
 
 
+	ERTSVisionState GetVision(int32 X, int32 Y) const;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -40,6 +39,9 @@ protected:
 private:
 	ARTSVisionVolume* VisionVolume;
 
+	/** Which tiles are currently unknown, known and visible. */
+	TArray<ERTSVisionState> Tiles;
 
-	int32 GetTileIndex(int X, int Y);
+	bool GetTileCoordinates(int Index, int* OutX, int* OutY) const;
+	int32 GetTileIndex(int X, int Y) const;
 };

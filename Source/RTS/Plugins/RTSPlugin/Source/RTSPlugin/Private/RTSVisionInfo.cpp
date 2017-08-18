@@ -96,11 +96,17 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 					int32 TileIndex = GetTileIndex(TileX, TileY);
 					Tiles[TileIndex] = ERTSVisionState::VISION_Visible;
 
-					UE_LOG(RTSLog, Log, TEXT("Revealed tile (%i, %i)."), TileX, TileY);
+					//UE_LOG(RTSLog, Log, TEXT("Revealed tile (%i, %i)."), TileX, TileY);
 				}
 			}
 		}
 	}
+}
+
+ERTSVisionState ARTSVisionInfo::GetVision(int32 X, int32 Y) const
+{
+	int32 TileIndex = GetTileIndex(X, Y);
+	return Tiles[TileIndex];
 }
 
 void ARTSVisionInfo::BeginPlay()
@@ -117,7 +123,21 @@ void ARTSVisionInfo::BeginPlay()
 	}
 }
 
-int32 ARTSVisionInfo::GetTileIndex(int X, int Y)
+bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const
+{
+	if (Index < 0 || Index >= Tiles.Num())
+	{
+		return false;
+	}
+
+	FIntVector TileSize = VisionVolume->GetTileSize();
+
+	*OutX = Index % TileSize.X;
+	*OutY = Index / TileSize.X;
+	return true;
+}
+
+int32 ARTSVisionInfo::GetTileIndex(int X, int Y) const
 {
 	return Y * VisionVolume->GetTileSize().X + X;
 }
