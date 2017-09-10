@@ -40,6 +40,8 @@ void ARTSCharacter::BeginPlay()
 
 void ARTSCharacter::Tick(float DeltaSeconds)
 {
+	Super::Tick(DeltaSeconds);
+
 	if (SelectableComponent && SelectableComponent->IsSelected())
 	{
 		// Show selection circle.
