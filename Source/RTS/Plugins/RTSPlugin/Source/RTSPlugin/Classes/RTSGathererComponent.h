@@ -74,6 +74,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float GetGatherRange(AActor* ResourceSource);
 
+	/** Whether the gatherer is currently carrying any resources that could be returned. */
+	UFUNCTION(BlueprintCallable)
+	bool IsCarryingResources() const;
+
 	/** Whether this gatherer is currently gathering resources. */
 	UFUNCTION(BlueprintCallable)
 	bool IsGathering() const;

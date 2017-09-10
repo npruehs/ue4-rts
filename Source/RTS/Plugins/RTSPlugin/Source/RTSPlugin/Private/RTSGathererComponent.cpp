@@ -188,6 +188,11 @@ float URTSGathererComponent::GetGatherRange(AActor* ResourceSource)
 	return GatherData.Range;
 }
 
+bool URTSGathererComponent::IsCarryingResources() const
+{
+	return CarriedResourceAmount > 0;
+}
+
 bool URTSGathererComponent::IsGathering() const
 {
 	return CurrentResourceSource != nullptr;
