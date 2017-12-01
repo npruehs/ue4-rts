@@ -162,7 +162,11 @@ void ARTSVisionInfo::BeginPlay()
 	if (!VisionVolume)
 	{
 		UE_LOG(RTSLog, Warning, TEXT("No vision volume found, won't update vision."));
+		return;
 	}
+
+	FIntVector TileSize = VisionVolume->GetTileSize();
+	Tiles.SetNumZeroed(TileSize.X * TileSize.Y);
 }
 
 bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const
