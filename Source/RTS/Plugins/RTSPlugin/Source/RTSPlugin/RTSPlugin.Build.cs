@@ -21,7 +21,9 @@ namespace UnrealBuildTool.Rules
                     "AIModule",
                     "UMG",
                     "Slate",
-                    "SlateCore"
+                    "SlateCore",
+                    "RHI",
+                    "RenderCore"
                 });
 		}
 	}
