@@ -218,6 +218,18 @@ Example: Drawing names of unit owners
 1. Add your RTSMinimapWidget to your UI, with a matching size (e.g. 256 x 256).
 1. Set its Behaviour > Visibility to Visible if the player should be able to move the camera and give orders using the minimap.
 
+#### Minimap Fog of War Layer
+
+1. Setup fog of war (see below).
+1. Setup the unknown areas brush:
+    1. Set the Image to some Translucent material with User Interface domain.
+    1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
+    1. Set the Tint to black (0, 0, 0, 1).
+1. Setup the known areas brush:
+    1. Set the Image to some Translucent material with User Interface domain.
+    1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
+    1. Set the Tint to black with low alpha (e.g. (0, 0, 0, 0.2)).
+
 ### Setup Building Placement
 
 1. Create an RTSBuildingCursor, setting its valid and invalid materials.
@@ -268,6 +280,15 @@ _Note that, technically, producing units does not differ from researching techno
     1. Add all Resource Source Actor Classes the gatherer may gather from (e.g. Undead in Warcraft need Haunted Gold Mine).
     1. Set the Resource Sweep Radius to the radius in which the gatherer should look for similar resources if their current source is depleted.
 
+### Setup Fog of War
+
+1. Add the RTSVision component to your units and set their Sight Radius (e.g. 1000).
+1. Add an RTSVisionVolume to your map, encompassing the whole valid visible map area (e.g. 4096x4096).
+1. Set the Size Per Tile of the vision volume (e.g. 16).
+1. Add a PostProcessVolume to your map, encompassing the whole valid camera area.
+1. Add an RTSFogOfWarActor to your map.
+1. Set the Fog Of War Material of the actor (e.g. to the FogOfWarMaterial shipped with the plugin).
+1. Set the Fog Of War Volume reference to the post process volume created before.
 
 ## Bugs & Feature Requests
 
