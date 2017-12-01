@@ -9,6 +9,8 @@
 #include "RTSVisionInfo.generated.h"
 
 
+class UWorld;
+
 class ARTSVisionVolume;
 
 
@@ -29,9 +31,12 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-
+	/** Gets the state of the tile with the specified coordinates. */
 	ERTSVisionState GetVision(int32 X, int32 Y) const;
 	
+	/** Gets vision information for the local player. */
+	static ARTSVisionInfo* GetLocalVisionInfo(UWorld* World);
+
 protected:
 	virtual void BeginPlay() override;
 

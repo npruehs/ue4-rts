@@ -1,6 +1,8 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSVisionInfo.h"
 
+#include "EngineUtils.h"
+
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSVisionComponent.h"
@@ -107,6 +109,46 @@ ERTSVisionState ARTSVisionInfo::GetVision(int32 X, int32 Y) const
 {
 	int32 TileIndex = GetTileIndex(X, Y);
 	return Tiles[TileIndex];
+}
+
+ARTSVisionInfo* ARTSVisionInfo::GetLocalVisionInfo(UWorld* World)
+{
+	APlayerController* Player = World->GetFirstPlayerController();
+
+	if (Player)
+	{
+		ARTSPlayerState* PlayerState = Cast<ARTSPlayerState>(Player->PlayerState);
+
+		if (PlayerState)
+		{
+			if (PlayerState->Team)
+			{
+				for (TActorIterator<ARTSVisionInfo> It(World); It; ++It)
+				{
+					if (PlayerState->Team->TeamIndex == (*It)->TeamIndex)
+					{
+						return *It;
+					}
+				}
+
+				UE_LOG(RTSLog, Warning, TEXT("No vision info found for team %i."), PlayerState->Team->TeamIndex);
+			}
+			else
+			{
+				UE_LOG(RTSLog, Warning, TEXT("Local player has no team, unable to get vision info."));
+			}
+		}
+		else
+		{
+			UE_LOG(RTSLog, Warning, TEXT("Local player has no ARTSPlayerState, unable to get vision info."));
+		}
+	}
+	else
+	{
+		UE_LOG(RTSLog, Warning, TEXT("No local player, unable to get vision info."));
+	}
+
+	return nullptr;
 }
 
 void ARTSVisionInfo::BeginPlay()

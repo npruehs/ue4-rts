@@ -61,48 +61,16 @@ void URTSMinimapWidget::NativeConstruct()
 
 	if (VisionVolume)
 	{
-		APlayerController* Player = GetOwningPlayer();
+		VisionInfo = ARTSVisionInfo::GetLocalVisionInfo(GetWorld());
 
-		if (Player)
+		if (!VisionInfo)
 		{
-			ARTSPlayerState* PlayerState = Cast<ARTSPlayerState>(Player->PlayerState);
-
-			if (PlayerState)
-			{
-				if (PlayerState->Team)
-				{
-					for (TActorIterator<ARTSVisionInfo> It(GetWorld()); It; ++It)
-					{
-						if (PlayerState->Team->TeamIndex == (*It)->TeamIndex)
-						{
-							VisionInfo = *It;
-							break;
-						}
-					}
-
-					if (!VisionInfo)
-					{
-						UE_LOG(RTSLog, Warning, TEXT("No vision info found for team %i, won't draw vision on minimap."), PlayerState->Team->TeamIndex);
-					}
-				}
-				else
-				{
-					UE_LOG(RTSLog, Warning, TEXT("Owning player has no team, won't draw vision on minimap."));
-				}
-			}
-			else
-			{
-				UE_LOG(RTSLog, Warning, TEXT("Owning player has no ARTSPlayerState, won't draw vision on minimap."));
-			}
-		}
-		else
-		{
-			UE_LOG(RTSLog, Warning, TEXT("No owning player, won't draw vision on minimap."));
+			UE_LOG(RTSLog, Warning, TEXT("No vision info found, won't draw vision on minimap."));
 		}
 	}
 	else
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No RTSVisionVolume, won't draw vision on minimap."));
+		UE_LOG(RTSLog, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
 	}
 }
 
@@ -361,9 +329,9 @@ FVector URTSMinimapWidget::MinimapToWorld(const FVector2D& MinimapPosition) cons
 	float RelativeMinimapY = MinimapPosition.Y / MinimapBackground.ImageSize.Y;
 
 	// Rotate to match UI coordinate system.
-	float temp = RelativeMinimapX;
+	float Temp = RelativeMinimapX;
 	RelativeMinimapX = 1 - RelativeMinimapY;
-	RelativeMinimapY = temp;
+	RelativeMinimapY = Temp;
 
 	// Convert to world coordinates.
 	float WorldX = (RelativeMinimapX - 0.5) * MinimapWorldSize.X;
