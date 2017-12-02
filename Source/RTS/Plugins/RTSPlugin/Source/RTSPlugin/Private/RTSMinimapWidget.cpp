@@ -19,6 +19,31 @@ URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer
 {
 }
 
+void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
+{
+	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
+	{
+		VisionVolume = *It;
+		break;
+	}
+
+	if (!VisionVolume)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
+		return;
+	}
+
+	VisionInfo = InVisionInfo;
+
+	if (!VisionInfo)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("No vision info found, won't draw vision on minimap."));
+		return;
+	}
+
+	UE_LOG(RTSLog, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->TeamIndex);
+}
+
 void URTSMinimapWidget::NotifyOnDrawUnit(
 	FPaintContext& Context,
 	AActor* Actor,
@@ -50,27 +75,6 @@ void URTSMinimapWidget::NativeConstruct()
 	else
 	{
 		UE_LOG(RTSLog, Warning, TEXT("No RTSMinimapVolume found. Minimap won't be showing unit positions."));
-	}
-
-	// Get vision info.
-	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
-	{
-		VisionVolume = *It;
-		break;
-	}
-
-	if (VisionVolume)
-	{
-		VisionInfo = ARTSVisionInfo::GetLocalVisionInfo(GetWorld());
-
-		if (!VisionInfo)
-		{
-			UE_LOG(RTSLog, Warning, TEXT("No vision info found, won't draw vision on minimap."));
-		}
-	}
-	else
-	{
-		UE_LOG(RTSLog, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
 	}
 }
 

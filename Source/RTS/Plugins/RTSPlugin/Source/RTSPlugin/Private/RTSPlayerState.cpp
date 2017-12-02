@@ -1,6 +1,7 @@
 #include "RTSPluginPrivatePCH.h"
 #include "RTSPlayerState.h"
 
+#include "RTSPlayerController.h"
 #include "RTSTeamInfo.h"
 
 
@@ -22,11 +23,32 @@ bool ARTSPlayerState::IsSameTeamAs(ARTSPlayerState* Other)
 	return FirstTeam->TeamIndex == SecondTeam->TeamIndex;
 }
 
-void ARTSPlayerState::NotifyOnTeamChanged()
+void ARTSPlayerState::OnTeamChanged()
 {
-	UE_LOG(RTSLog, Log, TEXT("Player %s added to team %d."), *GetName(), Team->TeamIndex);
+	NotifyOnTeamChanged(Team);
+}
 
-	ReceiveOnTeamChanged();
+void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
+{
+	if (NewTeam)
+	{
+		UE_LOG(RTSLog, Log, TEXT("Player %s added to team %d."), *GetName(), NewTeam->TeamIndex);
+	}
+	else
+	{
+		UE_LOG(RTSLog, Log, TEXT("Player %s added to team None."), *GetName());
+	}
+
+	// Notify listeners.
+	ReceiveOnTeamChanged(NewTeam);
+
+	// Notify player.
+	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner());
+
+	if (PlayerController)
+	{
+		PlayerController->NotifyOnTeamChanged(NewTeam);
+	}
 }
 
 void ARTSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

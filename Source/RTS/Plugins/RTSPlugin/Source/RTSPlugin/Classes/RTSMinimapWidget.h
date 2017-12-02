@@ -63,6 +63,11 @@ public:
 	bool bDrawViewFrustum = true;
 
 
+	/** Sets the vision info to draw on the minimap. */
+	UFUNCTION(BlueprintCallable)
+	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
+
+
 	/** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnDrawUnit"))
 	void ReceiveOnDrawUnit(

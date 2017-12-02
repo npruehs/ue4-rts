@@ -25,6 +25,7 @@
 #include "RTSResourceSourceComponent.h"
 #include "RTSSelectableComponent.h"
 #include "RTSUtilities.h"
+#include "RTSVisionInfo.h"
 
 
 void ARTSPlayerController::BeginPlay()
@@ -219,6 +220,18 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 		FIntPoint(MouseX, MouseY));
 
 	return true;
+}
+
+ARTSTeamInfo* ARTSPlayerController::GetTeamInfo() const
+{
+	ARTSPlayerState* CurrentPlayerState = Cast<ARTSPlayerState>(PlayerState);
+
+	if (CurrentPlayerState)
+	{
+		return CurrentPlayerState->Team;
+	}
+	
+	return nullptr;
 }
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults)
@@ -1448,6 +1461,38 @@ void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)
 {
     ReceiveOnSelectionChanged(Selection);
+}
+
+void ARTSPlayerController::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
+{
+	if (NewTeam)
+	{
+		// Notify listeners that new vision info is available now.
+		ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetVisionInfoForTeam(GetWorld(), NewTeam->TeamIndex);
+		NotifyOnVisionInfoAvailable(VisionInfo);
+	}
+}
+
+void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInfo)
+{
+	// On server side, we're only interested in our own vision info.
+	// Other player controllers that exist on the server for replication to the clients
+	// should not affect rendering vision for the local player.
+	if (this != GetWorld()->GetFirstPlayerController())
+	{
+		return;
+	}
+
+	// Setup fog of war.
+	for (TActorIterator<ARTSFogOfWarActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+	{
+		ARTSFogOfWarActor* FogOfWarActor = *ActorIt;
+		FogOfWarActor->SetupVisionInfo(VisionInfo);
+		break;
+	}
+
+	// Allow others to setup vision.
+	ReceiveOnVisionInfoAvailable(VisionInfo);
 }
 
 void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition)

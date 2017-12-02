@@ -25,22 +25,25 @@ class ARTSVisionInfo : public AInfo
 	ARTSVisionInfo();
 
 public:
-	/** Index of the team this actor tracks the vision of. */
+	virtual void Tick(float DeltaSeconds) override;
+
+	/** Index of the team this actor keeps track of the vision for. */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = ReceivedTeamIndex, Category = "Team")
 	uint8 TeamIndex;
 
-
-	virtual void Tick(float DeltaSeconds) override;
+	/** Sets the index of the team this actor keeps track of the vision for. */
+	void SetTeamIndex(uint8 NewTeamIndex);
 
 	/** Gets the state of the tile with the specified coordinates. */
 	ERTSVisionState GetVision(int32 X, int32 Y) const;
 	
-	/** Gets vision information for the local player. */
-	static ARTSVisionInfo* GetLocalVisionInfo(UWorld* World);
+	/** Gets vision information for the specified team. */
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static ARTSVisionInfo* GetVisionInfoForTeam(UObject* WorldContextObject, uint8 InTeamIndex);
 
 protected:
 	virtual void BeginPlay() override;
 
-	
 private:
 	ARTSVisionVolume* VisionVolume;
 
@@ -49,4 +52,9 @@ private:
 
 	bool GetTileCoordinates(int Index, int* OutX, int* OutY) const;
 	int32 GetTileIndex(int X, int Y) const;
+
+	void NotifyPlayerVisionInfoAvailable();
+
+	UFUNCTION()
+	virtual void ReceivedTeamIndex();
 };

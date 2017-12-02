@@ -69,7 +69,11 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 	AActor::Tick(DeltaTime);
 
 	// Update texture.
-	ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetLocalVisionInfo(GetWorld());
+	if (!VisionInfo)
+	{
+		return;
+	}
+
 	FIntVector TileSize = VisionVolume->GetTileSize();
 
 	for (int32 Y = 0; Y < TileSize.Y; ++Y)
@@ -111,6 +115,11 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 
 	UpdateTextureRegions(FogOfWarTexture, 0, 1, FogOfWarUpdateTextureRegion, 256 * 4, (uint32)4, FogOfWarTextureBuffer, false);
 	FogOfWarMaterialInstance->SetTextureParameterValue(FName("VisibilityMask"), FogOfWarTexture);
+}
+
+void ARTSFogOfWarActor::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
+{
+	VisionInfo = InVisionInfo;
 }
 
 void ARTSFogOfWarActor::UpdateTextureRegions(UTexture2D* Texture, int32 MipIndex, uint32 NumRegions, FUpdateTextureRegion2D* Regions, uint32 SrcPitch, uint32 SrcBpp, uint8* SrcData, bool bFreeData)

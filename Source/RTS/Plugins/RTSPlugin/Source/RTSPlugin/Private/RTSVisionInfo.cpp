@@ -4,13 +4,23 @@
 #include "EngineUtils.h"
 
 #include "RTSOwnerComponent.h"
+#include "RTSPlayerController.h"
 #include "RTSPlayerState.h"
+#include "RTSTeamInfo.h"
 #include "RTSVisionComponent.h"
 #include "RTSVisionVolume.h"
 
 
 ARTSVisionInfo::ARTSVisionInfo()
 {
+	// Enable replication.
+	SetReplicates(true);
+	bAlwaysRelevant = true;
+	NetUpdateFrequency = 1.0f;
+
+	// Force ReceivedTeamIndex() on clients.
+	TeamIndex = 255;
+
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -105,47 +115,30 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 	}
 }
 
+void ARTSVisionInfo::SetTeamIndex(uint8 NewTeamIndex)
+{
+	TeamIndex = NewTeamIndex;
+	NotifyPlayerVisionInfoAvailable();
+}
+
 ERTSVisionState ARTSVisionInfo::GetVision(int32 X, int32 Y) const
 {
 	int32 TileIndex = GetTileIndex(X, Y);
 	return Tiles[TileIndex];
 }
 
-ARTSVisionInfo* ARTSVisionInfo::GetLocalVisionInfo(UWorld* World)
+ARTSVisionInfo* ARTSVisionInfo::GetVisionInfoForTeam(UObject* WorldContextObject, uint8 InTeamIndex)
 {
-	APlayerController* Player = World->GetFirstPlayerController();
+	UWorld* World = WorldContextObject->GetWorld();
 
-	if (Player)
+	for (TActorIterator<ARTSVisionInfo> It(World); It; ++It)
 	{
-		ARTSPlayerState* PlayerState = Cast<ARTSPlayerState>(Player->PlayerState);
+		ARTSVisionInfo* VisionInfo = *It;
 
-		if (PlayerState)
+		if (VisionInfo->TeamIndex == InTeamIndex)
 		{
-			if (PlayerState->Team)
-			{
-				for (TActorIterator<ARTSVisionInfo> It(World); It; ++It)
-				{
-					if (PlayerState->Team->TeamIndex == (*It)->TeamIndex)
-					{
-						return *It;
-					}
-				}
-
-				UE_LOG(RTSLog, Warning, TEXT("No vision info found for team %i."), PlayerState->Team->TeamIndex);
-			}
-			else
-			{
-				UE_LOG(RTSLog, Warning, TEXT("Local player has no team, unable to get vision info."));
-			}
+			return VisionInfo;
 		}
-		else
-		{
-			UE_LOG(RTSLog, Warning, TEXT("Local player has no ARTSPlayerState, unable to get vision info."));
-		}
-	}
-	else
-	{
-		UE_LOG(RTSLog, Warning, TEXT("No local player, unable to get vision info."));
 	}
 
 	return nullptr;
@@ -186,4 +179,43 @@ bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const
 int32 ARTSVisionInfo::GetTileIndex(int X, int Y) const
 {
 	return Y * VisionVolume->GetTileSize().X + X;
+}
+
+void ARTSVisionInfo::NotifyPlayerVisionInfoAvailable()
+{
+	// Notify local player.
+	UWorld* World = GetWorld();
+
+	if (!World)
+	{
+		return;
+	}
+
+	ARTSPlayerController* Player = Cast<ARTSPlayerController>(World->GetFirstPlayerController());
+
+	if (!Player)
+	{
+		return;
+	}
+
+	ARTSTeamInfo* Team = Player->GetTeamInfo();
+
+	if (!Team || Team->TeamIndex != TeamIndex)
+	{
+		return;
+	}
+
+	Player->NotifyOnVisionInfoAvailable(this);
+}
+
+void ARTSVisionInfo::ReceivedTeamIndex()
+{
+	NotifyPlayerVisionInfoAvailable();
+}
+
+void ARTSVisionInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ARTSVisionInfo, TeamIndex, COND_InitialOnly);
 }

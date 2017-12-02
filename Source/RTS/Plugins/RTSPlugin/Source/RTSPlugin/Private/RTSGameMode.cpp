@@ -31,7 +31,7 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 
 		// Setup vision.
 		ARTSVisionInfo* TeamVision = GetWorld()->SpawnActor<ARTSVisionInfo>();
-		TeamVision->TeamIndex = TeamIndex;
+		TeamVision->SetTeamIndex(TeamIndex);
 	}
 }
 

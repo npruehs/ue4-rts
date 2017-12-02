@@ -13,7 +13,9 @@ class UDynamicMaterialInstance;
 class UMaterialInterface;
 class APostProcessVolume;
 
+class ARTSVisionInfo;
 class ARTSVisionVolume;
+
 
 /** Renders fog of war in 3D space. */
 UCLASS()
@@ -27,6 +29,9 @@ public:
 	void BeginPlay() override;
 	void Tick(float DeltaTime) override;
 
+	/** Sets the vision info to render in 3D space. */
+	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
+
 	void UpdateTextureRegions(UTexture2D* Texture, int32 MipIndex, uint32 NumRegions, FUpdateTextureRegion2D* Regions, uint32 SrcPitch, uint32 SrcBpp, uint8* SrcData, bool bFreeData);
 
 private:
@@ -39,6 +44,9 @@ private:
 	APostProcessVolume* FogOfWarVolume;
 
 	/** Provides visibility information for how to render the fog of war. */
+	ARTSVisionInfo* VisionInfo;
+
+	/** Provides world size information for how to render the fog of war. */
 	ARTSVisionVolume* VisionVolume;
 
 	/** Texture containing visibility information to be rendered in 3D space. */

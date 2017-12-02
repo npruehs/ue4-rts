@@ -34,7 +34,7 @@ void ARTSTeamInfo::AddToTeam(AController* Player)
 	}
 
 	PlayerState->Team = this;
-	PlayerState->NotifyOnTeamChanged();
+	PlayerState->NotifyOnTeamChanged(this);
 
 	TeamMembers.Add(Player);
 }
@@ -58,7 +58,7 @@ void ARTSTeamInfo::RemoveFromTeam(AController* Player)
 	if (PlayerState != nullptr)
 	{
 		PlayerState->Team = nullptr;
-		PlayerState->NotifyOnTeamChanged();
+		PlayerState->NotifyOnTeamChanged(nullptr);
 	}
 }
 
