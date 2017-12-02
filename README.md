@@ -25,12 +25,11 @@ Note that we're still in heavy development. Some things are already in place, su
 * Constructions
 * Unit Production/Tech Research
 * Resource Gathering
+* Fog of War
 
 All of this is already completely working in multiplayer as well, and has been fully exposed to scripting, enabling you to update UI and play animations and sounds.
 
-We're now moving on to [more advanced stuff](https://github.com/npruehs/ue4-rts/issues), such as fog of war.
-
-Also, we're going to add it to the Unreal Marketplace for free soon (tm).
+We're going to add all of this to the Unreal Marketplace for free as well soon (tm).
 
 
 ## Adding The Plugin
@@ -229,6 +228,11 @@ Example: Drawing names of unit owners
     1. Set the Image to some Translucent material with User Interface domain.
     1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
     1. Set the Tint to black with low alpha (e.g. (0, 0, 0, 0.2)).
+1. In your player controller blueprint (or whichever owns the minimap widget), when setting up (e.g. in BeginPlay):
+    1. Use the blueprint function RTSPlayerController::GetTeamInfo to get the team of the local player.
+    1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
+    1. Call SetupVisionInfo for the minimap widget.
+1. In your player controller blueprint (or whichever owns the minimap widget), handle the OnVisionInfoAvailable event and call SetupVisionInfo for the minimap widget. This is required for properly setting up vision info on clients where replication may cause a different initialization order.
 
 ### Setup Building Placement
 
