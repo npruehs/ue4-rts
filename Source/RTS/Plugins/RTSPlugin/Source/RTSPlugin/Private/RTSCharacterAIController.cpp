@@ -80,7 +80,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		// Acquire target.
 		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.Actor.Get());
 
-		UE_LOG(RTSLog, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
+		UE_LOG(LogRTS, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
 		return;
 	}
 }
@@ -325,7 +325,7 @@ bool ARTSCharacterAIController::VerifyBlackboard()
 {
 	if (!Blackboard)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
+		UE_LOG(LogRTS, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
 		return false;
 	}
 

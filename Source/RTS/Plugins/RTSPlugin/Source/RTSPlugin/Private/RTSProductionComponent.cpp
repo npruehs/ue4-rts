@@ -62,7 +62,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 			if (!PlayerController)
 			{
-				UE_LOG(RTSLog, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
+				UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
 				continue;
 			}
 
@@ -238,13 +238,13 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 
 		if (!PlayerController)
 		{
-			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
 			return;
 		}
 
 		if (!PlayerController->CanPayAllResources(ProductionCostComponent->Resources))
 		{
-			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for producing %s, but does not have enough resources."),
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for producing %s, but does not have enough resources."),
 				*GetOwner()->GetName(),
 				*ProductClass->GetName());
 			return;
@@ -258,7 +258,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 	FRTSProductionQueue& Queue = ProductionQueues[QueueIndex];
 	Queue.Add(ProductClass);
 
-	UE_LOG(RTSLog, Log, TEXT("%s queued %s for production in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
+	UE_LOG(LogRTS, Log, TEXT("%s queued %s for production in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
 
 	// Notify listeners.
 	OnProductQueued.Broadcast(ProductClass, QueueIndex);
@@ -308,7 +308,7 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 		return;
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("%s finished producing %s in queue %i."), *GetOwner()->GetName(), *Product->GetName(), QueueIndex);
+	UE_LOG(LogRTS, Log, TEXT("%s finished producing %s in queue %i."), *GetOwner()->GetName(), *Product->GetName(), QueueIndex);
 
 	// Notify listeners.
 	OnProductionFinished.Broadcast(Product, QueueIndex);
@@ -340,7 +340,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 	float RemainingProductionTime = ProductIndex == 0 ? ProductionQueues[QueueIndex].RemainingProductionTime : TotalProductionTime;
 	float ElapsedProductionTime = TotalProductionTime - RemainingProductionTime;
 
-	UE_LOG(RTSLog, Log, TEXT("%s canceled producing product %i of class %s in queue %i after %f seconds."),
+	UE_LOG(LogRTS, Log, TEXT("%s canceled producing product %i of class %s in queue %i after %f seconds."),
 		*GetOwner()->GetName(),
 		ProductIndex,
 		*ProductClass->GetName(),
@@ -387,7 +387,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 
 			PlayerController->AddResources(ResourceType, ResourceAmount);
 
-			UE_LOG(RTSLog, Log, TEXT("%f %s of production costs refunded."), ResourceAmount, *ResourceType->GetName());
+			UE_LOG(LogRTS, Log, TEXT("%f %s of production costs refunded."), ResourceAmount, *ResourceType->GetName());
 
 			// Notify listeners.
 			OnProductionCostRefunded.Broadcast(ResourceType, ResourceAmount);
@@ -441,7 +441,7 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 	float ProductionTime = GetProductionTimeForProduct(ProductClass);
 	Queue.RemainingProductionTime = ProductionTime;
 
-	UE_LOG(RTSLog, Log, TEXT("%s started producing %s in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
+	UE_LOG(LogRTS, Log, TEXT("%s started producing %s in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
 
 	// Notify listeners.
 	OnProductionStarted.Broadcast(ProductClass, QueueIndex, ProductionTime);

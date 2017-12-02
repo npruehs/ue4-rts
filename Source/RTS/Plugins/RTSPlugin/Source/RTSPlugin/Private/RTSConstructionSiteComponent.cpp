@@ -65,7 +65,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 
 		if (!PlayerController)
 		{
-			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for construction, but has no owning player."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owning player."), *GetOwner()->GetName());
 			return;
 		}
 
@@ -149,14 +149,14 @@ void URTSConstructionSiteComponent::StartConstruction()
 
 		if (!PlayerController)
 		{
-			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for construction, but has no owning player."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owning player."), *GetOwner()->GetName());
 			CancelConstruction();
 			return;
 		}
 
 		if (!PlayerController->CanPayAllResources(ConstructionCosts))
 		{
-			UE_LOG(RTSLog, Error, TEXT("%s needs to pay for constructing %s, but does not have enough resources."),
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for constructing %s, but does not have enough resources."),
 				*GetOwner()->GetName(),
 				*GetName());
 			CancelConstruction();
@@ -171,7 +171,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 	RemainingConstructionTime = ConstructionTime;
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_Constructing;
 
-	UE_LOG(RTSLog, Log, TEXT("Construction %s started."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("Construction %s started."), *GetName());
 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(ConstructionTime);
@@ -182,7 +182,7 @@ void URTSConstructionSiteComponent::FinishConstruction()
 	RemainingConstructionTime = 0;
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
 
-	UE_LOG(RTSLog, Log, TEXT("Construction %s finished."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("Construction %s finished."), *GetName());
 
 	// Notify builders.
 	if (bConsumesBuilders)
@@ -205,7 +205,7 @@ void URTSConstructionSiteComponent::CancelConstruction()
 		return;
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Construction %s canceled."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("Construction %s canceled."), *GetName());
 
 	// Refund resources.
 	auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
@@ -233,7 +233,7 @@ void URTSConstructionSiteComponent::CancelConstruction()
 
 			PlayerController->AddResources(ResourceType, ResourceAmount);
 
-			UE_LOG(RTSLog, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
+			UE_LOG(LogRTS, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
 
 			// Notify listeners.
 			OnConstructionCostRefunded.Broadcast(ResourceType, ResourceAmount);

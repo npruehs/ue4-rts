@@ -29,7 +29,7 @@ void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
 
 	if (!VisionVolume)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
+		UE_LOG(LogRTS, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
 		return;
 	}
 
@@ -37,11 +37,11 @@ void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
 
 	if (!VisionInfo)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No vision info found, won't draw vision on minimap."));
+		UE_LOG(LogRTS, Warning, TEXT("No vision info found, won't draw vision on minimap."));
 		return;
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->TeamIndex);
+	UE_LOG(LogRTS, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->TeamIndex);
 }
 
 void URTSMinimapWidget::NotifyOnDrawUnit(
@@ -74,7 +74,7 @@ void URTSMinimapWidget::NativeConstruct()
 	}
 	else
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No RTSMinimapVolume found. Minimap won't be showing unit positions."));
+		UE_LOG(LogRTS, Warning, TEXT("No RTSMinimapVolume found. Minimap won't be showing unit positions."));
 	}
 }
 

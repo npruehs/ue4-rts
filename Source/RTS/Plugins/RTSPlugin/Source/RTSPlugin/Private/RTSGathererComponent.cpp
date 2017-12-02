@@ -283,7 +283,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 	// Start cooldown timer.
 	RemainingCooldown = GatherData.Cooldown;
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s gathered %f %s from %s."),
+	UE_LOG(LogRTS, Log, TEXT("Actor %s gathered %f %s from %s."),
 		*GetOwner()->GetName(),
 		GatheredResources,
 		*GatherData.ResourceType->GetName(),
@@ -317,7 +317,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 				{
 					CarriedResourceAmount -= ReturnedResources;
 
-					UE_LOG(RTSLog, Log, TEXT("Actor %s returned %f %s without returning to drain."),
+					UE_LOG(LogRTS, Log, TEXT("Actor %s returned %f %s without returning to drain."),
 						*GetOwner()->GetName(),
 						ReturnedResources,
 						*CarriedResourceType->GetName());
@@ -351,7 +351,7 @@ float URTSGathererComponent::ReturnResources(AActor* ResourceDrain)
 
 	CarriedResourceAmount -= ReturnedResources;
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s returned %f %s to %s."),
+	UE_LOG(LogRTS, Log, TEXT("Actor %s returned %f %s to %s."),
 		*GetOwner()->GetName(),
 		ReturnedResources,
 		*CarriedResourceType->GetName(),

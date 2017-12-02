@@ -51,5 +51,5 @@ void ARTSVisionVolume::BeginPlay()
 		FMath::FloorToInt(WorldSize.Y / SizePerTile),
 		FMath::FloorToInt(WorldSize.Z / SizePerTile));
 
-	UE_LOG(RTSLog, Log, TEXT("Vision tile grid has size %i x %i x %i."), TileSize.X, TileSize.Y, TileSize.Z);
+	UE_LOG(LogRTS, Log, TEXT("Vision tile grid has size %i x %i x %i."), TileSize.X, TileSize.Y, TileSize.Z);
 }

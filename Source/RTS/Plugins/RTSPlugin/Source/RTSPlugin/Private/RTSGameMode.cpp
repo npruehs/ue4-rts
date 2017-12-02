@@ -101,14 +101,14 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 
 	if (PlayerStart)
 	{
-		UE_LOG(RTSLog, Log, TEXT("Start spot %s is now occupied by player %s."), *PlayerStart->GetName(), *NewPlayer->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Start spot %s is now occupied by player %s."), *PlayerStart->GetName(), *NewPlayer->GetName());
 		PlayerStart->Player = NewPlayer;
 	}
 
 	// Set team.
 	if (PlayerStart->TeamIndex >= Teams.Num())
 	{
-		UE_LOG(RTSLog, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->TeamIndex, Teams.Num());
+		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->TeamIndex, Teams.Num());
 	}
 	else
 	{
@@ -143,7 +143,7 @@ AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPl
 	// Set owning player.
 	if (SpawnedActor && ActorOwner)
 	{
-		UE_LOG(RTSLog, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *ActorOwner->GetName(), *SpawnTransform.GetLocation().ToString());
+		UE_LOG(LogRTS, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *ActorOwner->GetName(), *SpawnTransform.GetLocation().ToString());
 
 		// Set owning player.
 		ActorOwner->TransferOwnership(SpawnedActor);
@@ -175,7 +175,7 @@ void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 		}
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *OwningPlayer->GetName(), *DefeatConditionActor->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *OwningPlayer->GetName(), *DefeatConditionActor->GetName());
 
 	// Notify listeners.
 	NotifyOnPlayerDefeated(OwningPlayer);

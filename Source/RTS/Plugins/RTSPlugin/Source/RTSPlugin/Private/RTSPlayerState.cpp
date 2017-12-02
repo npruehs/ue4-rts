@@ -32,11 +32,11 @@ void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 {
 	if (NewTeam)
 	{
-		UE_LOG(RTSLog, Log, TEXT("Player %s added to team %d."), *GetName(), NewTeam->TeamIndex);
+		UE_LOG(LogRTS, Log, TEXT("Player %s added to team %d."), *GetName(), NewTeam->TeamIndex);
 	}
 	else
 	{
-		UE_LOG(RTSLog, Log, TEXT("Player %s added to team None."), *GetName());
+		UE_LOG(LogRTS, Log, TEXT("Player %s added to team None."), *GetName());
 	}
 
 	// Notify listeners.

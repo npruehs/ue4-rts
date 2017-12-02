@@ -24,7 +24,7 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 	CurrentHealth -= Damage;
 	float NewHealth = CurrentHealth;
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s has taken %f damage from %s, reducing health to %f."),
+	UE_LOG(LogRTS, Log, TEXT("Actor %s has taken %f damage from %s, reducing health to %f."),
 		*GetOwner()->GetName(),
 		Damage,
 		*DamageCauser->GetName(),
@@ -36,7 +36,7 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 	// Check if we've just died.
 	if (CurrentHealth <= 0)
 	{
-		UE_LOG(RTSLog, Log, TEXT("Actor %s has been killed."), *GetOwner()->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *GetOwner()->GetName());
 
 		// Get owner before destruction.
 		AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());

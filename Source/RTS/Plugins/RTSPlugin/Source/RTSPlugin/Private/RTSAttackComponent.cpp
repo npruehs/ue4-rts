@@ -19,7 +19,7 @@ void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 		if (RemainingCooldown <= 0)
 		{
-			UE_LOG(RTSLog, Log, TEXT("Actor %s attack is ready again."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Log, TEXT("Actor %s attack is ready again."), *GetOwner()->GetName());
 
 			// Notify listeners.
 			OnCooldownReady.Broadcast();
@@ -45,7 +45,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 	}
 
 	// Use attack.
-	UE_LOG(RTSLog, Log, TEXT("Actor %s attacks %s."), *Owner->GetName(), *Target->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Actor %s attacks %s."), *Owner->GetName(), *Target->GetName());
 
 	const FRTSAttackData& Attack = Attacks[0];
 
@@ -69,7 +69,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 
 		if (SpawnedProjectile)
 		{
-			UE_LOG(RTSLog, Log, TEXT("%s fired projectile %s at target %s."), *Owner->GetName(), *SpawnedProjectile->GetName(), *Target->GetName());
+			UE_LOG(LogRTS, Log, TEXT("%s fired projectile %s at target %s."), *Owner->GetName(), *SpawnedProjectile->GetName(), *Target->GetName());
 
 			// Aim at target.
 			SpawnedProjectile->FireAt(

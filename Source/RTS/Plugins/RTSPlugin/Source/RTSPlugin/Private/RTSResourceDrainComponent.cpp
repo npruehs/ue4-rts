@@ -29,7 +29,7 @@ float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<
 		return 0.0f;
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),
+	UE_LOG(LogRTS, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),
 		*Gatherer->GetName(),
 		ReturnedResources,
 		*ResourceType->GetName(),

@@ -38,7 +38,7 @@ void ARTSPlayerController::BeginPlay()
 
 	for (int32 Index = ResourceAmountNum; Index < ResourceTypeNum; ++Index)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("Starting amount for resource type %s not set for player %s, assuming zero."),
+		UE_LOG(LogRTS, Warning, TEXT("Starting amount for resource type %s not set for player %s, assuming zero."),
 			*ResourceTypes[Index]->GetName(),
 			*GetName());
 
@@ -122,7 +122,7 @@ void ARTSPlayerController::SetupInputComponent()
 
 	if (!CameraBoundsVolume)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
+		UE_LOG(LogRTS, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
 	}
 
 	// Setup control groups.
@@ -154,7 +154,7 @@ void ARTSPlayerController::TransferOwnership(AActor* Actor)
 		OwnerComponent->SetPlayerOwner(this);
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
 
 	// Notify listeners.
 	NotifyOnActorOwnerChanged(Actor);
@@ -435,7 +435,7 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 
 		// Send attack order to server.
 		ServerIssueAttackOrder(SelectedPawn, Target);
-		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
 
 		// Notify listeners.
 		NotifyOnIssuedAttackOrder(SelectedPawn, Target);
@@ -457,7 +457,7 @@ void ARTSPlayerController::ServerIssueAttackOrder_Implementation(APawn* OrderedP
 
 	// Issue attack order.
 	PawnController->IssueAttackOrder(Target);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to attack %s."), *OrderedPawn->GetName(), *Target->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *OrderedPawn->GetName(), *Target->GetName());
 
 	// Notify listeners.
 	NotifyOnIssuedAttackOrder(OrderedPawn, Target);
@@ -502,7 +502,7 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
 
 		// Send construction order to server.
 		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
+		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
 
 		// Notify listeners.
 		NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
@@ -531,7 +531,7 @@ void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APaw
 
 	// Issue construction order.
 	PawnController->IssueBeginConstructionOrder(BuildingClass, TargetLocation);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *OrderedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
+	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *OrderedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
 
 	// Notify listeners.
 	NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, TargetLocation);
@@ -585,7 +585,7 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 
 		// Send construction order to server.
 		ServerIssueContinueConstructionOrder(SelectedPawn, ConstructionSite);
-		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
 
 		// Notify listeners.
 		NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
@@ -636,7 +636,7 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 
 		// Send gather order to server.
 		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
-		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
 
 		// Notify listeners.
 		NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
@@ -658,7 +658,7 @@ void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedP
 
 	// Issue gather order.
 	PawnController->IssueGatherOrder(ResourceSource);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
 
 	// Notify listeners.
 	NotifyOnIssuedGatherOrder(OrderedPawn, ResourceSource);
@@ -681,7 +681,7 @@ void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(A
 
 	// Issue construction order.
 	PawnController->IssueContinueConstructionOrder(ConstructionSite);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to continue constructing %s."), *OrderedPawn->GetName(), *ConstructionSite->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *OrderedPawn->GetName(), *ConstructionSite->GetName());
 
 	// Notify listeners.
 	NotifyOnIssuedContinueConstructionOrder(OrderedPawn, ConstructionSite);
@@ -715,7 +715,7 @@ bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 
 		// Send move order to server.
 		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
-        UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
+        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
 
         // Notify listeners.
         NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
@@ -737,7 +737,7 @@ void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPaw
 
 	// Issue move order.
 	PawnController->IssueMoveOrder(TargetLocation);
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
+	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
 
 	// Notify listeners.
 	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
@@ -769,7 +769,7 @@ void ARTSPlayerController::IssueStopOrder()
 
 		// Send stop order to server.
 		ServerIssueStopOrder(SelectedPawn);
-		UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
 
 		// Notify listeners.
 		NotifyOnIssuedStopOrder(SelectedPawn);
@@ -787,7 +787,7 @@ void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPaw
 
 	// Issue stop order.
 	PawnController->IssueStopOrder();
-	UE_LOG(RTSLog, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
 
 	// Notify listeners.
 	NotifyOnIssuedStopOrder(OrderedPawn);
@@ -839,7 +839,7 @@ void ARTSPlayerController::SaveControlGroup(int32 Index)
 	// Save control group.
 	ControlGroups[Index] = SelectedActors;
 
-	UE_LOG(RTSLog, Log, TEXT("Saved selection to control group %d."), Index);
+	UE_LOG(LogRTS, Log, TEXT("Saved selection to control group %d."), Index);
 }
 
 void ARTSPlayerController::SaveControlGroup0() { SaveControlGroup(0); }
@@ -862,7 +862,7 @@ void ARTSPlayerController::LoadControlGroup(int32 Index)
 
 	SelectActors(ControlGroups[Index]);
 
-	UE_LOG(RTSLog, Log, TEXT("Loaded selection from control group %d."), Index);
+	UE_LOG(LogRTS, Log, TEXT("Loaded selection from control group %d."), Index);
 }
 
 void ARTSPlayerController::LoadControlGroup0() { LoadControlGroup(0); }
@@ -906,7 +906,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 
 	BuildingBeingPlacedClass = BuildingClass;
 
-	UE_LOG(RTSLog, Log, TEXT("Beginning placement of building %s."), *BuildingClass->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Beginning placement of building %s."), *BuildingClass->GetName());
 
 	// Notify listeners.
 	NotifyOnBuildingPlacementStarted(BuildingClass);
@@ -944,7 +944,7 @@ bool ARTSPlayerController::GetResources(TSubclassOf<URTSResourceType> ResourceTy
 
 	if (ResourceIndex == INDEX_NONE)
 	{
-		UE_LOG(RTSLog, Error, TEXT("Unknown resource type %s for player %s."),
+		UE_LOG(LogRTS, Error, TEXT("Unknown resource type %s for player %s."),
 			*ResourceType->GetName(),
 			*GetName());
 
@@ -1000,7 +1000,7 @@ float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceT
 	float NewResourceAmount = OldResourceAmount + ResourceAmount;
 	ResourceAmounts[ResourceIndex] = NewResourceAmount;
 
-	UE_LOG(RTSLog, Log, TEXT("Player %s stock of %s has changed to %f."),
+	UE_LOG(LogRTS, Log, TEXT("Player %s stock of %s has changed to %f."),
 		*GetName(),
 		*ResourceType->GetName(),
 		NewResourceAmount);
@@ -1089,14 +1089,14 @@ void ARTSPlayerController::FinishSelectActors()
 				// Deselect actor.
 				ActorsToSelect.Remove(HitResult.Actor.Get());
 
-				UE_LOG(RTSLog, Log, TEXT("Deselected actor %s."), *HitResult.Actor->GetName());
+				UE_LOG(LogRTS, Log, TEXT("Deselected actor %s."), *HitResult.Actor->GetName());
 			}
 			else if (!ActorsToSelect.Contains(HitResult.Actor))
 			{
 				// Select actor.
 				ActorsToSelect.Add(HitResult.Actor.Get());
 
-				UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+				UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
 			}
 		}
 		else
@@ -1109,7 +1109,7 @@ void ARTSPlayerController::FinishSelectActors()
 			// Select actor.
 			ActorsToSelect.Add(HitResult.Actor.Get());
 
-			UE_LOG(RTSLog, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+			UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
 		}
     }
 
@@ -1208,14 +1208,14 @@ void ARTSPlayerController::ConfirmBuildingPlacement()
 
 	if (!CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition))
 	{
-		UE_LOG(RTSLog, Log, TEXT("Can't place building %s at %s."), *BuildingBeingPlacedClass->GetName(), *HoveredWorldPosition.ToString());
+		UE_LOG(LogRTS, Log, TEXT("Can't place building %s at %s."), *BuildingBeingPlacedClass->GetName(), *HoveredWorldPosition.ToString());
 
 		// Notify listeners.
 		NotifyOnBuildingPlacementError(BuildingBeingPlacedClass, HoveredWorldPosition);
 		return;
 	}
 
-	UE_LOG(RTSLog, Log, TEXT("Placed building %s at %s."), *BuildingBeingPlacedClass->GetName(), *HoveredWorldPosition.ToString());
+	UE_LOG(LogRTS, Log, TEXT("Placed building %s at %s."), *BuildingBeingPlacedClass->GetName(), *HoveredWorldPosition.ToString());
 
 	// Remove dummy building.
 	BuildingCursor->Destroy();
@@ -1239,7 +1239,7 @@ void ARTSPlayerController::CancelBuildingPlacement()
 	BuildingCursor->Destroy();
 	BuildingCursor = nullptr;
 
-	UE_LOG(RTSLog, Log, TEXT("Cancelled placement of building %s."), *BuildingBeingPlacedClass->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Cancelled placement of building %s."), *BuildingBeingPlacedClass->GetName());
 
 	// Notify listeners.
 	NotifyOnBuildingPlacementCancelled(BuildingBeingPlacedClass);

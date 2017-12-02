@@ -38,7 +38,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		// Notify listeners.
 		OnAssignedToConstructionSite.Broadcast(ConstructionSite);
 
-		UE_LOG(RTSLog, Log, TEXT("Builder %s assigned to construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Builder %s assigned to construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
 
 		if (bEnterConstructionSite)
 		{
@@ -85,7 +85,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(Building);
 
-	UE_LOG(RTSLog, Log, TEXT("Builder %s has created construction site %s."), *GetOwner()->GetName(), *Building->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Builder %s has created construction site %s."), *GetOwner()->GetName(), *Building->GetName());
 
 	// Issue construction order.
 	auto Pawn = Cast<APawn>(GetOwner());
@@ -142,7 +142,7 @@ void URTSBuilderComponent::LeaveConstructionSite()
 	// Notify listeners.
 	OnRemovedFromConstructionSite.Broadcast(ConstructionSite);
 
-	UE_LOG(RTSLog, Log, TEXT("Builder %s has been unassigned from construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Builder %s has been unassigned from construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
 
 	if (bEnterConstructionSite)
 	{

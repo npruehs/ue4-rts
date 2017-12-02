@@ -28,7 +28,7 @@ void ARTSProjectile::FireAt(
 {
 	if (!ProjectileTarget)
 	{
-		UE_LOG(RTSLog, Error, TEXT("No target set for projectile %s!"), *GetName());
+		UE_LOG(LogRTS, Error, TEXT("No target set for projectile %s!"), *GetName());
 		return;
 	}
 
@@ -62,7 +62,7 @@ void ARTSProjectile::Tick(float DeltaSeconds)
 	{
 		if (IsValid(Target))
 		{
-			UE_LOG(RTSLog, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
+			UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
 
 			// Deal damage.
 			Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);

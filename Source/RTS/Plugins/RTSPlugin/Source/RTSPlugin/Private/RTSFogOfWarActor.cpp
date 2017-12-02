@@ -29,13 +29,13 @@ void ARTSFogOfWarActor::BeginPlay()
 
 	if (!VisionVolume)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No vision volume found, won't update vision."));
+		UE_LOG(LogRTS, Warning, TEXT("No vision volume found, won't update vision."));
 		return;
 	}
 
 	if (!FogOfWarVolume)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No fog of war volume found, won't render vision."));
+		UE_LOG(LogRTS, Warning, TEXT("No fog of war volume found, won't render vision."));
 		return;
 	}
 

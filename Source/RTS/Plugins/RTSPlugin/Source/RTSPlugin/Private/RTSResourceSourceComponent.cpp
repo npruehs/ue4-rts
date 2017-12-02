@@ -47,7 +47,7 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 	CurrentResources -= GatheredAmount;
 	float NewResources = CurrentResources;
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s has gathered %f resources of type %s from %s, reducing remaining resources to %f."),
+	UE_LOG(LogRTS, Log, TEXT("Actor %s has gathered %f resources of type %s from %s, reducing remaining resources to %f."),
 		*Gatherer->GetName(),
 		GatheredAmount,
 		*ResourceType->GetName(),
@@ -60,7 +60,7 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 	// Check if we're depleted.
 	if (CurrentResources <= 0)
 	{
-		UE_LOG(RTSLog, Log, TEXT("Actor %s has been depleted."), *GetOwner()->GetName());
+		UE_LOG(LogRTS, Log, TEXT("Actor %s has been depleted."), *GetOwner()->GetName());
 
 		// Destroy this actor.
 		GetOwner()->Destroy();

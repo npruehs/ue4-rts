@@ -36,7 +36,7 @@ void URTSContainerComponent::LoadActor(AActor* Actor)
 	// Notify listeners.
 	OnActorEntered.Broadcast(Actor);
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s has entered %s."), *Actor->GetName(), *GetOwner()->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Actor %s has entered %s."), *Actor->GetName(), *GetOwner()->GetName());
 }
 
 void URTSContainerComponent::UnloadActor(AActor* Actor)
@@ -56,5 +56,5 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
 	// Notify listeners.
 	OnActorLeft.Broadcast(Actor);
 
-	UE_LOG(RTSLog, Log, TEXT("Actor %s has left %s."), *Actor->GetName(), *GetOwner()->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Actor %s has left %s."), *Actor->GetName(), *GetOwner()->GetName());
 }

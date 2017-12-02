@@ -84,11 +84,11 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 		FIntVector ActorLocationTile = VisionVolume->WorldToTile(ActorLocationWorld);
 		int32 ActorSightRadiusTile = FMath::FloorToInt(VisionComponent->SightRadius / VisionVolume->SizePerTile);
 
-		/*UE_LOG(RTSLog, Log, TEXT("ActorLocationWorld: %s"), *ActorLocationWorld.ToString());
-		UE_LOG(RTSLog, Log, TEXT("ActorLocationTile: %s"), *ActorLocationTile.ToString());
-		UE_LOG(RTSLog, Log, TEXT("VisionComponent->SightRadius: %f"), VisionComponent->SightRadius);
-		UE_LOG(RTSLog, Log, TEXT("VisionVolume->SizePerTile: %f"), VisionVolume->SizePerTile);
-		UE_LOG(RTSLog, Log, TEXT("ActorSightRadiusTile: %i"), ActorSightRadiusTile);*/
+		/*UE_LOG(LogRTS, Log, TEXT("ActorLocationWorld: %s"), *ActorLocationWorld.ToString());
+		UE_LOG(LogRTS, Log, TEXT("ActorLocationTile: %s"), *ActorLocationTile.ToString());
+		UE_LOG(LogRTS, Log, TEXT("VisionComponent->SightRadius: %f"), VisionComponent->SightRadius);
+		UE_LOG(LogRTS, Log, TEXT("VisionVolume->SizePerTile: %f"), VisionVolume->SizePerTile);
+		UE_LOG(LogRTS, Log, TEXT("ActorSightRadiusTile: %i"), ActorSightRadiusTile);*/
 
 		// XXX VERY simple circle algorithm.
 		for (int32 RadiusY = -ActorSightRadiusTile; RadiusY < ActorSightRadiusTile; RadiusY++)
@@ -108,7 +108,7 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 					int32 TileIndex = GetTileIndex(TileX, TileY);
 					Tiles[TileIndex] = ERTSVisionState::VISION_Visible;
 
-					//UE_LOG(RTSLog, Log, TEXT("Revealed tile (%i, %i)."), TileX, TileY);
+					//UE_LOG(LogRTS, Log, TEXT("Revealed tile (%i, %i)."), TileX, TileY);
 				}
 			}
 		}
@@ -154,7 +154,7 @@ void ARTSVisionInfo::BeginPlay()
 
 	if (!VisionVolume)
 	{
-		UE_LOG(RTSLog, Warning, TEXT("No vision volume found, won't update vision."));
+		UE_LOG(LogRTS, Warning, TEXT("No vision volume found, won't update vision."));
 		return;
 	}
 
