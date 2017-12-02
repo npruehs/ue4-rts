@@ -9,11 +9,39 @@
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerState.h"
+#include "RTSVisionInfo.h"
+#include "RTSVisionState.h"
+#include "RTSVisionVolume.h"
 
 
 URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+}
+
+void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
+{
+	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
+	{
+		VisionVolume = *It;
+		break;
+	}
+
+	if (!VisionVolume)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
+		return;
+	}
+
+	VisionInfo = InVisionInfo;
+
+	if (!VisionInfo)
+	{
+		UE_LOG(RTSLog, Warning, TEXT("No vision info found, won't draw vision on minimap."));
+		return;
+	}
+
+	UE_LOG(RTSLog, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->TeamIndex);
 }
 
 void URTSMinimapWidget::NotifyOnDrawUnit(
@@ -37,16 +65,17 @@ void URTSMinimapWidget::NativeConstruct()
 		break;
 	}
 
-	if (!MinimapVolume)
+	if (MinimapVolume)
+	{
+		UBrushComponent* MinimapBrushComponent = MinimapVolume->GetBrushComponent();
+		FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->GetComponentTransform());
+
+		MinimapWorldSize = MinimapBounds.BoxExtent * 2;
+	}
+	else
 	{
 		UE_LOG(RTSLog, Warning, TEXT("No RTSMinimapVolume found. Minimap won't be showing unit positions."));
-		return;
 	}
-
-	UBrushComponent* MinimapBrushComponent = MinimapVolume->GetBrushComponent();
-	FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->GetComponentTransform());
-
-	MinimapWorldSize = MinimapBounds.BoxExtent * 2;
 }
 
 void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
@@ -57,6 +86,7 @@ void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 
 	DrawBackground(InContext);
 	DrawUnits(InContext);
+	DrawVision(InContext);
 	DrawViewFrustum(InContext);
 }
 
@@ -165,6 +195,50 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 	}
 }
 
+void URTSMinimapWidget::DrawVision(FPaintContext& InContext) const
+{
+	if (!bDrawVision)
+	{
+		return;
+	}
+
+	if (!VisionVolume || !VisionInfo)
+	{
+		return;
+	}
+
+	// Check all vision tiles.
+	FIntVector VisionTileSize = VisionVolume->GetTileSize();
+
+	for (int32 VisionY = 0; VisionY < VisionTileSize.Y; ++VisionY)
+	{
+		int32 MinimapY = MinimapBackground.ImageSize.Y * VisionY / VisionTileSize.Y;
+
+		for (int32 VisionX = 0; VisionX < VisionTileSize.X; ++VisionX)
+		{
+			ERTSVisionState VisionState = VisionInfo->GetVision(VisionX, VisionY);
+			int32 MinimapX = MinimapBackground.ImageSize.X * VisionX / VisionTileSize.X;
+
+			// Rotate to match UI coordinate system.
+			float RotatedMinimapX = MinimapY;
+			float RotatedMinimapY = MinimapBackground.ImageSize.X - MinimapX;
+
+			FVector2D TileLocationMinimap = FVector2D(RotatedMinimapX, RotatedMinimapY);
+
+			switch (VisionState)
+			{
+				case ERTSVisionState::VISION_Unknown:
+					DrawBoxWithBrush(InContext, TileLocationMinimap, UnknownAreasBrush);
+					break;
+
+				case ERTSVisionState::VISION_Known:
+					DrawBoxWithBrush(InContext, TileLocationMinimap, KnownAreasBrush);
+					break;
+			}
+		}
+	}
+}
+
 void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 {
 	if (!bDrawViewFrustum)
@@ -259,9 +333,9 @@ FVector URTSMinimapWidget::MinimapToWorld(const FVector2D& MinimapPosition) cons
 	float RelativeMinimapY = MinimapPosition.Y / MinimapBackground.ImageSize.Y;
 
 	// Rotate to match UI coordinate system.
-	float temp = RelativeMinimapX;
+	float Temp = RelativeMinimapX;
 	RelativeMinimapX = 1 - RelativeMinimapY;
-	RelativeMinimapY = temp;
+	RelativeMinimapY = Temp;
 
 	// Convert to world coordinates.
 	float WorldX = (RelativeMinimapX - 0.5) * MinimapWorldSize.X;
@@ -295,9 +369,9 @@ FVector2D URTSMinimapWidget::WorldToMinimap(const FVector& WorldPosition) const
 	float RelativeWorldY = WorldPosition.Y / MinimapWorldSize.Y + 0.5f;
 
 	// Rotate to match UI coordinate system.
-	float temp = RelativeWorldX;
+	float Temp = RelativeWorldX;
 	RelativeWorldX = RelativeWorldY;
-	RelativeWorldY = 1 - temp;
+	RelativeWorldY = 1 - Temp;
 
 	// Convert to minimap coordinates.
 	float MinimapX = RelativeWorldX * MinimapBackground.ImageSize.X;

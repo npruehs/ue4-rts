@@ -13,6 +13,8 @@ class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
 class ARTSPlayerState;
 class URTSResourceType;
+class ARTSTeamInfo;
+class ARTSVisionInfo;
 
 
 /**
@@ -69,6 +71,9 @@ public:
 	/** Gets the current selection frame, in screen space. */
 	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
 
+	/** Gets the team this player belongs to. */
+	UFUNCTION(BlueprintPure)
+	ARTSTeamInfo* GetTeamInfo() const;
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
@@ -215,6 +220,12 @@ public:
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
 
+	/** Event when the team of this player has changed. */
+	virtual void NotifyOnTeamChanged(ARTSTeamInfo* NewTeam);
+
+	/** Event when vision info for this player has been replicated and is available. */
+	virtual void NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInfo);
+
 	/** Event when this player is now owning the specified actor. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Ownership", meta = (DisplayName = "OnActorOwnerChanged"))
 	void ReceiveOnActorOwnerChanged(AActor* Actor);
@@ -271,6 +282,13 @@ public:
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
     void ReceiveOnSelectionChanged(const TArray<AActor*>& Selection);
 
+	/** Event when the team of this player has changed. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Team", meta = (DisplayName = "OnTeamChanged"))
+	void ReceiveOnTeamChanged(ARTSTeamInfo* NewTeam);
+
+	/** Event when vision info for this player has been replicated and is available. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Vision", meta = (DisplayName = "OnVisionInfoAvailable"))
+	void ReceiveOnVisionInfoAvailable(ARTSVisionInfo* VisionInfo);
 
 	/** Sets this player as the owner of the specified actor. */
 	UFUNCTION(BlueprintCallable)

@@ -9,6 +9,8 @@
 
 class ARTSMinimapVolume;
 class ARTSPlayerController;
+class ARTSVisionInfo;
+class ARTSVisionVolume;
 
 
 /**
@@ -36,6 +38,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Units")
 	FSlateBrush NeutralUnitsBrush;
 
+	/** Brush for drawing unknown areas on the minimap. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Vision")
+	FSlateBrush UnknownAreasBrush;
+
+	/** Brush for drawing known but not visible areas on the minimap. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Vision")
+	FSlateBrush KnownAreasBrush;
+
 	/** Whether to draw the minimap background layer. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Background")
 	bool bDrawBackground = true;
@@ -44,9 +54,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Units")
 	bool bDrawUnitsWithTeamColors = true;
 
+	/** Whether to draw vision on the minimap, with UnknownAreasBrush, KnownAreasBrush and VisibleAreasBrush. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Vision")
+	bool bDrawVision = true;
+
 	/** Whether to show the current camera frustum on the minimap. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
 	bool bDrawViewFrustum = true;
+
+
+	/** Sets the vision info to draw on the minimap. */
+	UFUNCTION(BlueprintCallable)
+	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
 
 
 	/** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
@@ -77,9 +96,12 @@ private:
 	bool bMouseDown;
 	ARTSMinimapVolume* MinimapVolume;
 	FVector MinimapWorldSize;
+	ARTSVisionInfo* VisionInfo;
+	ARTSVisionVolume* VisionVolume;
 
 	void DrawBackground(FPaintContext& InContext) const;
 	void DrawUnits(FPaintContext& InContext) const;
+	void DrawVision(FPaintContext& InContext) const;
 	void DrawViewFrustum(FPaintContext& InContext) const;
 
 	void DrawBoxWithBrush(FPaintContext& InContext, const FVector2D& Position, const FSlateBrush& Brush) const;

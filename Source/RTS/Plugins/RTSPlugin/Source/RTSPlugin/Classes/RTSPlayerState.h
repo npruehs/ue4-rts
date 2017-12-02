@@ -20,7 +20,7 @@ class ARTSPlayerState : public APlayerState
 
 public:
 	/** Team this player belongs to. */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = NotifyOnTeamChanged, Category = "Team")
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnTeamChanged, Category = "Team")
 	ARTSTeamInfo* Team;
 
 
@@ -29,11 +29,13 @@ public:
 	bool IsSameTeamAs(ARTSPlayerState* Other);
 
 
-	/** Event when this player changed team. */
 	UFUNCTION()
-	virtual void NotifyOnTeamChanged();
+	void OnTeamChanged();
+
+	/** Event when this player changed team. */
+	virtual void NotifyOnTeamChanged(ARTSTeamInfo* NewTeam);
 
 	/** Event when this player changed team. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Team", meta = (DisplayName = "OnTeamChanged"))
-	void ReceiveOnTeamChanged();
+	void ReceiveOnTeamChanged(ARTSTeamInfo* NewTeam);
 };
