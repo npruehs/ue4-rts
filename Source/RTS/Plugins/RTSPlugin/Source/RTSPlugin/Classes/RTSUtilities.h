@@ -22,7 +22,10 @@ public:
 
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
 	template<class T>
-	static T* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass);
+	static T* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass)
+	{
+		return (T*)FindDefaultComponentByClass(InActorClass, T::StaticClass());
+	}
 
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
 	UFUNCTION(BlueprintCallable, Category = "RTS")

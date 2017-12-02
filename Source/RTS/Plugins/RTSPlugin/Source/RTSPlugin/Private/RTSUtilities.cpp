@@ -24,12 +24,6 @@ bool URTSUtilities::IsReadyToUse(AActor* Actor)
 	return ConstructionSiteComponent == nullptr || ConstructionSiteComponent->IsFinished();
 }
 
-template<class T>
-T* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass)
-{
-	return (T*)FindDefaultComponentByClass(InActorClass, T::StaticClass());
-}
-
 UActorComponent* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)
 {
 	// Check CDO.
