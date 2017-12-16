@@ -34,6 +34,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FindTargetInAcquisitionRadius();
 
+    /** Checks whether the pawn is idle, or has any orders. */
+    UFUNCTION(BlueprintPure)
+    bool IsIdle() const;
+
 	/** Makes the pawn attack the specified target. */
 	UFUNCTION(BlueprintCallable)
 	void IssueAttackOrder(AActor* Target);
