@@ -95,6 +95,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IssueMoveOrder(const FVector& TargetLocation);
 
+    /** Orders the selected production actor to start producing the product with the specified index. */
+    UFUNCTION(BlueprintCallable)
+    void IssueProductionOrder(int32 ProductIndex);
+
 	/** Orders all selected units to stop all current actions. */
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();

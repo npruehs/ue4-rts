@@ -756,6 +756,46 @@ bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, con
 	return OrderedPawn->GetOwner() == this;
 }
 
+void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
+{
+    // Find suitable selected actor.
+    for (auto SelectedActor : SelectedActors)
+    {
+        // Verify owner.
+        if (SelectedActor->GetOwner() != this)
+        {
+            continue;
+        }
+
+        // Check if production actor.
+        auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+
+        if (!ProductionComponent)
+        {
+            continue;
+        }
+
+        if (ProductionComponent->AvailableProducts.Num() <= 0)
+        {
+            continue;
+        }
+
+        // Begin production.
+        ServerStartProduction(SelectedActor, ProductIndex);
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %i."), *SelectedActor->GetName(), ProductIndex);
+        }
+
+        // Notify listeners.
+        NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
+
+        // Only assign production once.
+        return;
+    }
+}
+
 void ARTSPlayerController::IssueStopOrder()
 {
 	// Issue stop orders.
@@ -1302,32 +1342,7 @@ bool ARTSPlayerController::ServerCancelConstruction_Validate(AActor* Constructio
 
 void ARTSPlayerController::StartDefaultProduction()
 {
-	// Find suitable selected actor.
-	for (auto SelectedActor : SelectedActors)
-	{
-		// Verify owner.
-		if (SelectedActor->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Check if production actor.
-		auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
-
-		if (!ProductionComponent)
-		{
-			continue;
-		}
-
-		if (ProductionComponent->AvailableProducts.Num() <= 0)
-		{
-			continue;
-		}
-
-		// Begin production.
-		ServerStartProduction(SelectedActor, 0);
-		return;
-	}
+    IssueProductionOrder(0);
 }
 
 void ARTSPlayerController::CancelProduction()
