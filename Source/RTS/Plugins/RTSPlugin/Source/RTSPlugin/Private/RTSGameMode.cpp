@@ -117,18 +117,25 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 
 	// Build spawn transform.
 	// Don't allow initial actors to be spawned with any pitch or roll.
-	FVector SpawnLocation = StartSpot->GetActorLocation();
-
 	FRotator SpawnRotation(ForceInit);
 	SpawnRotation.Yaw = StartSpot->GetActorRotation().Yaw;
 
-	FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
-
 	// Build spawn info.
-	for (TSubclassOf<AActor> ActorClass : InitialActors)
+	for (int32 i = 0; i < InitialActors.Num(); ++i)
 	{
+        TSubclassOf<AActor> ActorClass = InitialActors[i];
+
 		// Spawn actor.
-		SpawnActorForPlayer(ActorClass, PlayerController, SpawnTransform);
+        FVector SpawnLocation = StartSpot->GetActorLocation();
+
+        if (i < InitialActorPositions.Num())
+        {
+            SpawnLocation += InitialActorPositions[i];
+        }
+        
+        FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
+		AActor* SpawnedActor = SpawnActorForPlayer(ActorClass, NewPlayer, SpawnTransform);
+
 	}
 }
 
