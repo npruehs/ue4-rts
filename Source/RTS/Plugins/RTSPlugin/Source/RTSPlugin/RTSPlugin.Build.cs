@@ -23,7 +23,8 @@ namespace UnrealBuildTool.Rules
                     "Slate",
                     "SlateCore",
                     "RHI",
-                    "RenderCore"
+                    "RenderCore",
+                    "Landscape"
                 });
 		}
 	}
