@@ -7,6 +7,7 @@
 #include "RTSGameMode.generated.h"
 
 
+class AController;
 class ARTSPlayerController;
 class ARTSPlayerStart;
 class ARTSTeamInfo;
@@ -56,6 +57,9 @@ public:
 	/** Spawns an actor of the specified type and transfers ownership to the specified player. */
 	virtual AActor* SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform);
 
+    /** Sets the specified player as the owner of the passed actor. */
+    UFUNCTION(BlueprintCallable)
+    void TransferOwnership(AActor* Actor, AController* NewOwner);
 
 	/** Event when an actor has been killed. */
 	virtual void NotifyOnActorKilled(AActor* Actor, AController* ActorOwner);

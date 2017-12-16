@@ -163,10 +163,38 @@ AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPl
 		UE_LOG(LogRTS, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *ActorOwner->GetName(), *SpawnTransform.GetLocation().ToString());
 
 		// Set owning player.
-		ActorOwner->TransferOwnership(SpawnedActor);
+		TransferOwnership(SpawnedActor, ActorOwner);
 	}
 
 	return SpawnedActor;
+}
+
+void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
+{
+    if (!Actor || !NewOwner)
+    {
+        return;
+    }
+
+    // Set owning player.
+    Actor->SetOwner(NewOwner);
+
+    URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+    if (OwnerComponent)
+    {
+        OwnerComponent->SetPlayerOwner(NewOwner);
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *NewOwner->GetName(), *Actor->GetName());
+
+    // Notify listeners.
+    ARTSPlayerController* NewPlayerOwner = Cast<ARTSPlayerController>(NewOwner);
+    
+    if (NewPlayerOwner != nullptr)
+    {
+        NewPlayerOwner->NotifyOnActorOwnerChanged(Actor);
+    }    
 }
 
 void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)

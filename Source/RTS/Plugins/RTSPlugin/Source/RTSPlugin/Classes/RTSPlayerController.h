@@ -290,10 +290,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Vision", meta = (DisplayName = "OnVisionInfoAvailable"))
 	void ReceiveOnVisionInfoAvailable(ARTSVisionInfo* VisionInfo);
 
-	/** Sets this player as the owner of the specified actor. */
-	UFUNCTION(BlueprintCallable)
-	void TransferOwnership(AActor* Actor);
-
 
 protected:
     virtual void BeginPlay() override;

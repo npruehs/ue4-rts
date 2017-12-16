@@ -138,29 +138,6 @@ void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ARTSPlayerController, ResourceTypes);
 }
 
-void ARTSPlayerController::TransferOwnership(AActor* Actor)
-{
-	if (!Actor)
-	{
-		return;
-	}
-
-	// Set owning player.
-	Actor->SetOwner(this);
-
-	URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
-
-	if (OwnerComponent)
-	{
-		OwnerComponent->SetPlayerOwner(this);
-	}
-
-	UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
-
-	// Notify listeners.
-	NotifyOnActorOwnerChanged(Actor);
-}
-
 AActor* ARTSPlayerController::GetHoveredActor()
 {
 	return HoveredActor;
