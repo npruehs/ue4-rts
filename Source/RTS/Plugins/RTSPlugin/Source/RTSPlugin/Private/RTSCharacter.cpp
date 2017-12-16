@@ -33,7 +33,7 @@ void ARTSCharacter::BeginPlay()
 	// Setup selection circle.
 	FCollisionShape CollisionShape = GetCapsuleComponent()->GetCollisionShape();
 	float DecalHeight = CollisionShape.Capsule.HalfHeight * 2;
-	float DecalRadius = CollisionShape.Capsule.Radius * 2;
+	float DecalRadius = CollisionShape.Capsule.Radius;
 
 	SelectionCircleDecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
 }
