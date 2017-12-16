@@ -11,7 +11,7 @@
 * Allows the actor to reveal areas covered by fog of war.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSVisionComponent : public UActorComponent
+class RTSPLUGIN_API URTSVisionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

@@ -19,7 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSOwnerComponentOwnerChangedSignat
 * Specifies the owning player of the actor.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSOwnerComponent : public UActorComponent
+class RTSPLUGIN_API URTSOwnerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

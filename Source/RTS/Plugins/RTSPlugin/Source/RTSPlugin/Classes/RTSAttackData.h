@@ -9,7 +9,7 @@ class ARTSProjectile;
 
 
 USTRUCT(BlueprintType)
-struct FRTSAttackData
+struct RTSPLUGIN_API FRTSAttackData
 {
 	GENERATED_USTRUCT_BODY()
 

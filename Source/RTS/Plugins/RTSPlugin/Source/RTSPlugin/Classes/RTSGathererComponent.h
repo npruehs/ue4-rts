@@ -21,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesRet
 * Allows the actor to gather resources.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSGathererComponent : public UActorComponent
+class RTSPLUGIN_API URTSGathererComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

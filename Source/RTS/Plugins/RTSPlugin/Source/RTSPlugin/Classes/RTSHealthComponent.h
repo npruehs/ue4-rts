@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSHealthComponentKilledSignature, 
 * Adds health to the actor, e.g. for taking damage and dying.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSHealthComponent : public UActorComponent
+class RTSPLUGIN_API URTSHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

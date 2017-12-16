@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionStar
  * Allows the actor to construct buildings.
  */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSBuilderComponent : public UActorComponent
+class RTSPLUGIN_API URTSBuilderComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

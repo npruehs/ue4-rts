@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionCo
 
 /** Allows producing actors over time. */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSProductionComponent : public UActorComponent
+class RTSPLUGIN_API URTSProductionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

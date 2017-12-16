@@ -11,7 +11,7 @@
 * Volume that defines the size and resolution of vision provided by units.
 */
 UCLASS(Blueprintable)
-class ARTSVisionVolume : public AVolume
+class RTSPLUGIN_API ARTSVisionVolume : public AVolume
 {
 	GENERATED_UCLASS_BODY()
 

@@ -11,7 +11,7 @@ class AActor;
 * Various utility functions.
 */
 UCLASS()
-class URTSUtilities : public UBlueprintFunctionLibrary
+class RTSPLUGIN_API URTSUtilities : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 

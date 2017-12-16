@@ -11,7 +11,7 @@
 * HUD with RTS features, such as showing a selection frame.
 */
 UCLASS()
-class ARTSHUD : public AHUD
+class RTSPLUGIN_API ARTSHUD : public AHUD
 {
 	GENERATED_BODY()
 

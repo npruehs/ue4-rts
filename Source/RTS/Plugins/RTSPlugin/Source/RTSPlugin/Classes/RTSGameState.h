@@ -14,7 +14,7 @@ class ARTSTeamInfo;
 * Game state with RTS features, such as teams.
 */
 UCLASS()
-class ARTSGameState : public AGameStateBase
+class RTSPLUGIN_API ARTSGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 

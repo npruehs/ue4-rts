@@ -16,7 +16,7 @@ class ARTSTeamInfo;
 * Game mode with RTS features, such as spawning initial units for each player.
 */
 UCLASS()
-class ARTSGameMode : public AGameModeBase
+class RTSPLUGIN_API ARTSGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 

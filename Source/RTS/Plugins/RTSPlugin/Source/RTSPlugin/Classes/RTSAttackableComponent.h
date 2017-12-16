@@ -11,7 +11,7 @@
 * Allows choosing the actor as target for an attack order.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSAttackableComponent : public UActorComponent
+class RTSPLUGIN_API URTSAttackableComponent : public UActorComponent
 {
 	GENERATED_BODY()
 };

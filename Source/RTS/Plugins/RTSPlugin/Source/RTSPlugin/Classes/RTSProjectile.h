@@ -14,7 +14,7 @@ class UProjectileMovementComponent;
 * Projectile with RTS features, such as following a target and dealing damage.
 */
 UCLASS()
-class ARTSProjectile : public AActor
+class RTSPLUGIN_API ARTSProjectile : public AActor
 {
 	GENERATED_BODY()
 

@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSAttackComponentAttackedUsedSi
 * These can also be used for healing.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSAttackComponent : public UActorComponent
+class RTSPLUGIN_API URTSAttackComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

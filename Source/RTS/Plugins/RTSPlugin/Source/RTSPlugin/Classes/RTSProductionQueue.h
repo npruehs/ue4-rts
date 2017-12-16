@@ -6,7 +6,7 @@
 
 
 USTRUCT(BlueprintType)
-struct FRTSProductionQueue
+struct RTSPLUGIN_API FRTSProductionQueue
 {
 	GENERATED_USTRUCT_BODY()
 

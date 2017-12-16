@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSResourceSourceComponentDepletedSignature)
 * Adds resources to be gathered from the actor.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSResourceSourceComponent : public UActorComponent
+class RTSPLUGIN_API URTSResourceSourceComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

@@ -11,7 +11,7 @@
 * Player start with RTS features, such as which player has been spawned at this start.
 */
 UCLASS()
-class ARTSPlayerStart : public APlayerStart
+class RTSPLUGIN_API ARTSPlayerStart : public APlayerStart
 {
 	GENERATED_BODY()
 

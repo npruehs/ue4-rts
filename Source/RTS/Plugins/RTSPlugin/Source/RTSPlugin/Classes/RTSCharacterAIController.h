@@ -16,7 +16,7 @@ class URTSAttackComponent;
 * AI controller that drives RTS unit movement and orders.
 */
 UCLASS()
-class ARTSCharacterAIController : public AAIController
+class RTSPLUGIN_API ARTSCharacterAIController : public AAIController
 {
     GENERATED_BODY()
 

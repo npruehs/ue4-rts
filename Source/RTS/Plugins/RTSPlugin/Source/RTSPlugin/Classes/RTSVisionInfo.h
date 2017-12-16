@@ -18,7 +18,7 @@ class ARTSVisionVolume;
 * Defines the visible areas for a player or team.
 */
 UCLASS()
-class ARTSVisionInfo : public AInfo
+class RTSPLUGIN_API ARTSVisionInfo : public AInfo
 {
 	GENERATED_BODY()
 
