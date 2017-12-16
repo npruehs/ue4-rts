@@ -131,50 +131,55 @@ AActor* URTSGathererComponent::FindClosestResourceDrain() const
 
 AActor* URTSGathererComponent::GetPreferredResourceSource() const
 {
-	if (IsValid(PreviousResourceSource))
-	{
-		return PreviousResourceSource;
-	}
+    if (IsValid(PreviousResourceSource))
+    {
+        return PreviousResourceSource;
+    }
 
-	// Sweep for similar sources.
-	AActor* ClosestResourceSource = nullptr;
-	float ClosestResourceSourceDistance = 0.0f;
+    return GetClosestResourceSource(PreviousResourceType, ResourceSweepRadius);
+}
 
-	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-		auto Gatherer = GetOwner();
-		auto ResourceSource = *ActorItr;
+AActor* URTSGathererComponent::GetClosestResourceSource(TSubclassOf<class URTSResourceType> DesiredResourceType, float MaxDistance) const
+{
+    // Sweep for sources.
+    AActor* ClosestResourceSource = nullptr;
+    float ClosestResourceSourceDistance = 0.0f;
 
-		// Check if found resource source.
-		auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
+    for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+    {
+        auto Gatherer = GetOwner();
+        auto ResourceSource = *ActorItr;
 
-		if (!ResourceSourceComponent)
-		{
-			continue;
-		}
+        // Check if found resource source.
+        auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
 
-		// Check resource type.
-		if (ResourceSourceComponent->ResourceType != PreviousResourceType)
-		{
-			continue;
-		}
+        if (!ResourceSourceComponent)
+        {
+            continue;
+        }
 
-		// Check distance.
-		float Distance = Gatherer->GetDistanceTo(ResourceSource);
+        // Check resource type.
+        if (ResourceSourceComponent->ResourceType != DesiredResourceType)
+        {
+            continue;
+        }
 
-		if (Distance > ResourceSweepRadius)
-		{
-			continue;
-		}
+        // Check distance.
+        float Distance = Gatherer->GetDistanceTo(ResourceSource);
 
-		if (!ClosestResourceSource || Distance < ClosestResourceSourceDistance)
-		{
-			ClosestResourceSource = ResourceSource;
-			ClosestResourceSourceDistance = Distance;
-		}
-	}
+        if (MaxDistance > 0.0f && Distance > MaxDistance)
+        {
+            continue;
+        }
+        
+        if (!ClosestResourceSource || Distance < ClosestResourceSourceDistance)
+        {
+            ClosestResourceSource = ResourceSource;
+            ClosestResourceSourceDistance = Distance;
+        }
+    }
 
-	return ClosestResourceSource;
+    return ClosestResourceSource;
 }
 
 float URTSGathererComponent::GetGatherRange(AActor* ResourceSource)

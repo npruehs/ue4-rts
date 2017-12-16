@@ -70,6 +70,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual AActor* GetPreferredResourceSource() const;
 
+    /** Gets the closest resource source of the specified type within the passed maximum distance around the actor (0 means anywhere). */
+    UFUNCTION(BlueprintCallable)
+    virtual AActor* GetClosestResourceSource(TSubclassOf<class URTSResourceType> DesiredResourceType, float MaxDistance) const;
+
 	/** Gets the maximum distance for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
 	virtual float GetGatherRange(AActor* ResourceSource);
