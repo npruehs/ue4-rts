@@ -8,6 +8,8 @@
 
 
 class AController;
+
+class ARTSPlayerAIController;
 class ARTSPlayerController;
 class ARTSPlayerStart;
 class ARTSTeamInfo;
@@ -46,7 +48,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Team")
 	TSubclassOf<ARTSTeamInfo> TeamClass;
 
+    /** AIController class to spawn for AI players. */
+    UPROPERTY(EditDefaultsOnly, Category = AI)
+    TSubclassOf<ARTSPlayerAIController> PlayerAIControllerClass;
 
+    
+    virtual void BeginPlay() override;
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
 	ARTSPlayerStart* FindRTSPlayerStart(AController* Player);
@@ -54,8 +61,10 @@ public:
 	virtual void RestartPlayer(AController* NewPlayer) override;
 	virtual void RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* StartSpot) override;
 
+    virtual ARTSPlayerAIController* StartAIPlayer();
+
 	/** Spawns an actor of the specified type and transfers ownership to the specified player. */
-	virtual AActor* SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform);
+	virtual AActor* SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, AController* ActorOwner, const FTransform& SpawnTransform);
 
     /** Sets the specified player as the owner of the passed actor. */
     UFUNCTION(BlueprintCallable)
@@ -65,9 +74,13 @@ public:
 	virtual void NotifyOnActorKilled(AActor* Actor, AController* ActorOwner);
 
 	/** Event when a player has been defeated. */
-	virtual void NotifyOnPlayerDefeated(APlayerController* Player);
+	virtual void NotifyOnPlayerDefeated(AController* Player);
 
 	/** Event when a player has been defeated. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnPlayerDefeated"))
-	void ReceiveOnPlayerDefeated(APlayerController* Player);
+	void ReceiveOnPlayerDefeated(AController* Player);
+
+private:
+    /** Number of AI players to spawn. */
+    int32 NumAIPlayers;
 };
