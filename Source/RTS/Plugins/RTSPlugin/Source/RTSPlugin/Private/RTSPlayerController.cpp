@@ -2,6 +2,7 @@
 #include "RTSPlayerController.h"
 
 #include "EngineUtils.h"
+#include "Landscape.h"
 #include "Components/InputComponent.h"
 #include "Components/ShapeComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -379,6 +380,15 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 			{
 				return;
 			}
+
+            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
+
+            if (Landscape != nullptr)
+            {
+                // Issue move order.
+                IssueMoveOrder(HitResult.Location);
+                return;
+            }
 
 			continue;
 		}
@@ -1597,7 +1607,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 		for (auto& HitResult : HitResults)
 		{
 			// Check if hit any actor.
-			if (HitResult.Actor == nullptr)
+			if (HitResult.Actor == nullptr || Cast<ALandscape>(HitResult.Actor.Get()) != nullptr)
 			{
 				// Store hovered world position.
 				HoveredWorldPosition = HitResult.Location;
