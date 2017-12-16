@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RTSPluginPCH.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "RTSUtilities.generated.h"
 
 

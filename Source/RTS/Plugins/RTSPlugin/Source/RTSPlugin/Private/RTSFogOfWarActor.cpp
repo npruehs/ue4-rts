@@ -2,8 +2,10 @@
 #include "RTSFogOfWarActor.h"
 
 #include "EngineUtils.h"
+#include "RHI.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/Texture2D.h"
+#include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "RTSVisionInfo.h"

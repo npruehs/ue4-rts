@@ -9,7 +9,7 @@
 
 class UTexture2D;
 struct FUpdateTextureRegion2D;
-class UDynamicMaterialInstance;
+class UMaterialInstanceDynamic;
 class UMaterialInterface;
 class APostProcessVolume;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RTSPluginPCH.h"
+#include "GameFramework/Actor.h"
 #include "RTSBuildingCursor.generated.h"
 
 

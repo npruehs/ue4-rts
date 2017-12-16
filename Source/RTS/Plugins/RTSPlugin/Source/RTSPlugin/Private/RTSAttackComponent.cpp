@@ -1,6 +1,9 @@
 #include "RTSAttackComponent.h"
 #include "RTSPluginPCH.h"
 
+#include "Engine/World.h"
+#include "GameFramework/Pawn.h"
+
 #include "RTSProjectile.h"
 
 
