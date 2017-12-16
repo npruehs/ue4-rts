@@ -1374,6 +1374,11 @@ void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVe
     ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
 }
 
+void ARTSPlayerController::NotifyOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex)
+{
+    ReceiveOnIssuedProductionOrder(OrderedActor, ProductIndex);
+}
+
 void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)
 {
 	ReceiveOnIssuedStopOrder(OrderedPawn);

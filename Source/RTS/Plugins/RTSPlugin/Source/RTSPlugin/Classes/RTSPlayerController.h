@@ -186,6 +186,9 @@ public:
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
+    /** Event when an actor has received a production order. */
+    virtual void NotifyOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex);
+
 	/** Event when an actor has received a stop order. */
 	virtual void NotifyOnIssuedStopOrder(APawn* OrderedPawn);
 
@@ -240,6 +243,10 @@ public:
     /** Event when an actor has received a move order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
     void ReceiveOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
+
+    /** Event when an actor has received a production order. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedProductionOrder"))
+    void ReceiveOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex);
 
 	/** Event when an actor has received a stop order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedStopOrder"))
