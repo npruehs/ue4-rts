@@ -2,6 +2,7 @@
 #include "RTSProductionComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "GameFramework/Controller.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 
@@ -300,7 +301,7 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 
 	AActor* Product = GameMode->SpawnActorForPlayer(
 		ProductClass,
-		Cast<ARTSPlayerController>(GetOwner()->GetOwner()),
+		Cast<AController>(GetOwner()->GetOwner()),
 		FTransform(FRotator::ZeroRotator, GetOwner()->GetActorLocation()));
 
 	if (!Product)

@@ -1,13 +1,13 @@
 #include "RTSPluginPCH.h"
 #include "RTSBuilderComponent.h"
 
+#include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSCharacterAIController.h"
 #include "RTSConstructionSiteComponent.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
-#include "RTSPlayerController.h"
 
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -57,14 +57,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	// Get game.
-	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return;
-	}
-
-	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(World));
+	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
 	if (!GameMode)
 	{
@@ -74,7 +67,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 	// Spawn building.
 	AActor* Building = GameMode->SpawnActorForPlayer(
 		BuildingClass,
-		Cast<ARTSPlayerController>(GetOwner()->GetOwner()),
+		Cast<AController>(GetOwner()->GetOwner()),
 		FTransform(FRotator::ZeroRotator, TargetLocation));
 
 	if (!Building)
