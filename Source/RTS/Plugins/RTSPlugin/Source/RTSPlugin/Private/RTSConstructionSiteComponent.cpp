@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSConstructionSiteComponent.h"
 
 #include "GameFramework/Actor.h"

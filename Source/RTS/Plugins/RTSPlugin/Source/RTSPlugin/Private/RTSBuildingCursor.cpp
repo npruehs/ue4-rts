@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSBuildingCursor.h"
 
 #include "Components/SkeletalMeshComponent.h"

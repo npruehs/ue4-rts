@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSCharacter.h"
 
 #include "Components/CapsuleComponent.h"

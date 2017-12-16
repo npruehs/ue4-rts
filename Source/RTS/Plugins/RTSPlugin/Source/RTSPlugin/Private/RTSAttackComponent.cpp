@@ -1,5 +1,5 @@
-#include "RTSPluginPrivatePCH.h"
 #include "RTSAttackComponent.h"
+#include "RTSPluginPCH.h"
 
 #include "RTSProjectile.h"
 

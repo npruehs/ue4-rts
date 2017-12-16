@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSCharacterAIController.h"
 
 #include "BehaviorTree/BehaviorTreeComponent.h"

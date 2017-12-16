@@ -1,7 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
-
+#include "RTSPluginPCH.h"
 #include "RTSUtilities.generated.h"
 
 

@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSBuilderComponent.h"
 
 #include "Kismet/GameplayStatics.h"

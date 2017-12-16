@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSProductionCostComponent.h"
 
 #include "RTSResourceType.h"

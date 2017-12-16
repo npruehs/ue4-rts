@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSHealthComponent.h"
 
 #include "Net/UnrealNetwork.h"
