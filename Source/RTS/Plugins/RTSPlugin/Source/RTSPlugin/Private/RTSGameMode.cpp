@@ -136,6 +136,16 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
         FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
 		AActor* SpawnedActor = SpawnActorForPlayer(ActorClass, NewPlayer, SpawnTransform);
 
+        // Finish construction of initial buildings immediately.
+        if (SpawnedActor != nullptr)
+        {
+            URTSConstructionSiteComponent* ConstructionSiteComponent = SpawnedActor->FindComponentByClass<URTSConstructionSiteComponent>();
+
+            if (ConstructionSiteComponent != nullptr)
+            {
+                ConstructionSiteComponent->FinishConstruction();
+            }
+        }
 	}
 }
 
