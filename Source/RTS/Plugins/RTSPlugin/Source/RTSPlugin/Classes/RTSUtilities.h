@@ -6,6 +6,7 @@
 
 
 class AActor;
+class UWorld;
 
 
 /**
@@ -19,6 +20,12 @@ class RTSPLUGIN_API URTSUtilities : public UBlueprintFunctionLibrary
 public:
 	/** Checks whether the specified actor is ready to use (e.g. finished construction). */
 	static bool IsReadyToUse(AActor* Actor);
+
+    /**
+    * Checks whether the specified actor can be placed at the passed location.
+    */
+    UFUNCTION(BlueprintCallable, Category = "RTS")
+    static bool IsSuitableLocationForActor(UWorld* World, TSubclassOf<AActor> ActorClass, const FVector& Location);
 
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
 	template<class T>

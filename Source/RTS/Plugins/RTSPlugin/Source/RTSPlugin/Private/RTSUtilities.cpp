@@ -1,6 +1,8 @@
 #include "RTSPluginPCH.h"
 #include "RTSUtilities.h"
 
+#include "Components/ShapeComponent.h"
+#include "Engine/World.h"
 #include "GameFramework/Actor.h"
 
 #include "RTSConstructionSiteComponent.h"
@@ -22,6 +24,29 @@ bool URTSUtilities::IsReadyToUse(AActor* Actor)
 	auto ConstructionSiteComponent = Actor->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	return ConstructionSiteComponent == nullptr || ConstructionSiteComponent->IsFinished();
+}
+
+bool URTSUtilities::IsSuitableLocationForActor(UWorld* World, TSubclassOf<AActor> ActorClass, const FVector& Location)
+{
+    if (!World)
+    {
+        return false;
+    }
+
+    UShapeComponent* ShapeComponent = FindDefaultComponentByClass<UShapeComponent>(ActorClass);
+
+    if (!ShapeComponent)
+    {
+        return true;
+    }
+
+    FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllDynamicObjects);
+
+    return !World->OverlapAnyTestByObjectType(
+        Location,
+        FQuat::Identity,
+        Params,
+        ShapeComponent->GetCollisionShape());
 }
 
 UActorComponent* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)

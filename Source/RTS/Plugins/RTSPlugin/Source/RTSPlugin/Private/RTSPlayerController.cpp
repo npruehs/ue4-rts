@@ -4,7 +4,6 @@
 #include "EngineUtils.h"
 #include "Landscape.h"
 #include "Components/InputComponent.h"
-#include "Components/ShapeComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
@@ -958,28 +957,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
 	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return false;
-	}
-
-	UShapeComponent* ShapeComponent = URTSUtilities::FindDefaultComponentByClass<UShapeComponent>(BuildingClass);
-
-	if (!ShapeComponent)
-	{
-		return true;
-	}
-
-	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllDynamicObjects);
-
-	return !World->OverlapAnyTestByObjectType(
-		Location,
-		FQuat::Identity,
-		Params,
-		ShapeComponent->GetCollisionShape());
-}
-
+    return URTSUtilities::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
 void ARTSPlayerController::StartSelectActors()
