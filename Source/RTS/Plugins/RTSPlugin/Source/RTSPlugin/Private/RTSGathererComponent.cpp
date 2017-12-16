@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSPlayerResourcesComponent.h"
 #include "RTSResourceSourceComponent.h"
 #include "RTSResourceDrainComponent.h"
 #include "RTSUtilities.h"
@@ -281,21 +282,21 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 
 	// Gather resources.
 	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
-	float GatheredResources = ResourceSourceComponent->ExtractResources(GetOwner(), AmountToGather);
+	float GatheredResourceAmount = ResourceSourceComponent->ExtractResources(GetOwner(), AmountToGather);
 
-	CarriedResourceAmount += GatheredResources;
+	CarriedResourceAmount += GatheredResourceAmount;
 
 	// Start cooldown timer.
 	RemainingCooldown = GatherData.Cooldown;
 
 	UE_LOG(LogRTS, Log, TEXT("Actor %s gathered %f %s from %s."),
 		*GetOwner()->GetName(),
-		GatheredResources,
+        GatheredResourceAmount,
 		*GatherData.ResourceType->GetName(),
 		*ResourceSource->GetName());
 
 	// Notify listeners.
-	OnResourcesGathered.Broadcast(ResourceSource, GatherData, GatheredResources);
+	OnResourcesGathered.Broadcast(ResourceSource, GatherData, GatheredResourceAmount);
 
 	if (GatherData.bNeedsReturnToDrain)
 	{
@@ -312,24 +313,29 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 		if (CarriedResourceAmount >= GatherData.Capacity || !IsValid(ResourceSource))
 		{
 			// Return immediately.
-			auto OwningPlayer = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+			auto Owner = GetOwner()->GetOwner();
 
-			if (OwningPlayer)
+			if (Owner)
 			{
-				float ReturnedResources = OwningPlayer->AddResources(CarriedResourceType, CarriedResourceAmount);
+                auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-				if (ReturnedResources > 0.0f)
-				{
-					CarriedResourceAmount -= ReturnedResources;
+                if (PlayerResourcesComponent)
+                {
+                    float ReturnedResources = PlayerResourcesComponent->AddResources(CarriedResourceType, CarriedResourceAmount);
 
-					UE_LOG(LogRTS, Log, TEXT("Actor %s returned %f %s without returning to drain."),
-						*GetOwner()->GetName(),
-						ReturnedResources,
-						*CarriedResourceType->GetName());
+                    if (ReturnedResources > 0.0f)
+                    {
+                        CarriedResourceAmount -= ReturnedResources;
 
-					// Notify listeners.
-					OnResourcesReturned.Broadcast(nullptr, CarriedResourceType, ReturnedResources);
-				}
+                        UE_LOG(LogRTS, Log, TEXT("Actor %s returned %f %s without returning to drain."),
+                            *GetOwner()->GetName(),
+                            ReturnedResources,
+                            *CarriedResourceType->GetName());
+
+                        // Notify listeners.
+                        OnResourcesReturned.Broadcast(nullptr, CarriedResourceType, ReturnedResources);
+                    }
+                }
 			}
 		}
 
@@ -340,7 +346,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 		}
 	}
 
-	return GatheredResources;
+	return GatheredResourceAmount;
 }
 
 float URTSGathererComponent::ReturnResources(AActor* ResourceDrain)

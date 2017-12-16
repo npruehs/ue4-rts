@@ -21,6 +21,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
+#include "RTSPlayerResourcesComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
 #include "RTSResourceSourceComponent.h"
@@ -29,28 +30,22 @@
 #include "RTSVisionInfo.h"
 
 
+ARTSPlayerController::ARTSPlayerController()
+{
+    PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
+}
+
 void ARTSPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-	// Check resource types.
-	int32 ResourceTypeNum = ResourceTypes.Num();
-	int32 ResourceAmountNum = ResourceAmounts.Num();
-
-	for (int32 Index = ResourceAmountNum; Index < ResourceTypeNum; ++Index)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("Starting amount for resource type %s not set for player %s, assuming zero."),
-			*ResourceTypes[Index]->GetName(),
-			*GetName());
-
-		ResourceAmounts.Add(0);
-	}
-
-	// Allow immediate UI updates.
-	for (int32 Index = 0; Index < ResourceTypeNum; ++Index)
-	{
-		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
-	}
+    // Allow immediate updates for interested listeners.
+    for (int32 Index = 0; Index < PlayerResourcesComponent->ResourceTypes.Num(); ++Index)
+    {
+        PlayerResourcesComponent->OnResourcesChanged.Broadcast(
+            PlayerResourcesComponent->ResourceTypes[Index],
+            PlayerResourcesComponent->ResourceAmounts[Index]);
+    }
 }
 
 void ARTSPlayerController::SetupInputComponent()
@@ -133,9 +128,6 @@ void ARTSPlayerController::SetupInputComponent()
 void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ARTSPlayerController, ResourceAmounts);
-	DOREPLIFETIME(ARTSPlayerController, ResourceTypes);
 }
 
 AActor* ARTSPlayerController::GetHoveredActor()
@@ -988,103 +980,6 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
 		ShapeComponent->GetCollisionShape());
 }
 
-bool ARTSPlayerController::GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount)
-{
-	// Get current resource amount.
-	int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
-
-	if (ResourceIndex == INDEX_NONE)
-	{
-		UE_LOG(LogRTS, Error, TEXT("Unknown resource type %s for player %s."),
-			*ResourceType->GetName(),
-			*GetName());
-
-		*OutResourceAmount = 0.0f;
-		return false;
-	}
-
-	*OutResourceAmount = ResourceAmounts[ResourceIndex];
-	return true;
-}
-
-bool ARTSPlayerController::CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	float AvailableResources;
-
-	if (!GetResources(ResourceType, &AvailableResources))
-	{
-		return false;
-	}
-
-	if (AvailableResources < ResourceAmount)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool ARTSPlayerController::CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
-{
-	for (auto& Resource : Resources)
-	{
-		if (!CanPayResources(Resource.Key, Resource.Value))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	// Get current resource amount.
-	float OldResourceAmount;
-	if (!GetResources(ResourceType, &OldResourceAmount))
-	{
-		return 0.0f;
-	}
-
-	// Add resources.
-	int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
-	float NewResourceAmount = OldResourceAmount + ResourceAmount;
-	ResourceAmounts[ResourceIndex] = NewResourceAmount;
-
-	UE_LOG(LogRTS, Log, TEXT("Player %s stock of %s has changed to %f."),
-		*GetName(),
-		*ResourceType->GetName(),
-		NewResourceAmount);
-
-	// Notify listeners.
-	NotifyOnResourcesChanged(ResourceType, NewResourceAmount);
-	return ResourceAmount;
-}
-
-float ARTSPlayerController::PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	// Get current resource amount.
-	float OldResourceAmount;
-	if (!GetResources(ResourceType, &OldResourceAmount))
-	{
-		return 0.0f;
-	}
-
-	if (OldResourceAmount < ResourceAmount)
-	{
-		return 0.0f;
-	}
-
-	// Deduct resources.
-	return AddResources(ResourceType, -ResourceAmount);
-}
-
-void ARTSPlayerController::PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
-{
-	for (auto& Resource : Resources)
-	{
-		PayResources(Resource.Key, Resource.Value);
-	}
 }
 
 void ARTSPlayerController::StartSelectActors()
@@ -1553,11 +1448,6 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
 }
 
-void ARTSPlayerController::NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	ReceiveOnResourcesChanged(ResourceType, ResourceAmount);
-}
-
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
@@ -1660,12 +1550,4 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
 	// Verify selection.
 	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->bHidden; });
-}
-
-void ARTSPlayerController::ReceivedResourceAmounts()
-{
-	for (int32 Index = 0; Index < ResourceTypes.Num(); ++Index)
-	{
-		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
-	}
 }

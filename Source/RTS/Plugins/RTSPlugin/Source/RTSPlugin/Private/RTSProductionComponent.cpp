@@ -9,6 +9,7 @@
 #include "RTSGameMode.h"
 #include "RTSProductionCostComponent.h"
 #include "RTSPlayerController.h"
+#include "RTSPlayerResourcesComponent.h"
 #include "RTSUtilities.h"
 
 
@@ -59,13 +60,21 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 		if (ProductionCostComponent && ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayOverTime)
 		{
-			auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+			auto Owner = GetOwner()->GetOwner();
 
-			if (!PlayerController)
+			if (!Owner)
 			{
-				UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
+				UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no owner."), *GetOwner()->GetName());
 				continue;
 			}
+
+            auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+
+            if (!PlayerResourcesComponent)
+            {
+                UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no PlayerResourcesComponent."), *Owner->GetName());
+                continue;
+            }
 
 			bool bCanPayAllProductionCosts = true;
 
@@ -73,7 +82,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 			{
 				float ResourceAmount = Resource.Value * DeltaTime / ProductionCostComponent->ProductionTime;
 
-				if (!PlayerController->CanPayResources(Resource.Key, ResourceAmount))
+				if (!PlayerResourcesComponent->CanPayResources(Resource.Key, ResourceAmount))
 				{
 					// Production stopped until resources become available again.
 					bCanPayAllProductionCosts = false;
@@ -87,7 +96,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 				for (auto& Resource : ProductionCostComponent->Resources)
 				{
 					float ResourceAmount = Resource.Value * DeltaTime / ProductionCostComponent->ProductionTime;
-					PlayerController->PayResources(Resource.Key, ResourceAmount);
+                    PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
 				}
 
 				bProductionCostPaid = true;
@@ -235,24 +244,32 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 
 	if (ProductionCostComponent && ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayImmediately)
 	{
-		auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+		auto Owner = GetOwner()->GetOwner();
 
-		if (!PlayerController)
+		if (!Owner)
 		{
-			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no owning player."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no owner."), *GetOwner()->GetName());
 			return;
 		}
 
-		if (!PlayerController->CanPayAllResources(ProductionCostComponent->Resources))
+        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+
+        if (!PlayerResourcesComponent)
+        {
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no PlayerResourcesComponent."), *Owner->GetName());
+            return;
+        }
+
+		if (!PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->Resources))
 		{
 			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for producing %s, but does not have enough resources."),
-				*GetOwner()->GetName(),
+				*Owner->GetName(),
 				*ProductClass->GetName());
 			return;
 		}
 
 		// Pay production costs.
-		PlayerController->PayAllResources(ProductionCostComponent->Resources);
+        PlayerResourcesComponent->PayAllResources(ProductionCostComponent->Resources);
 	}
 	
 	// Insert into queue.
@@ -360,12 +377,19 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 
 	if (ProductionCostComponent)
 	{
-		auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+		auto Owner = GetOwner()->GetOwner();
 
-		if (!PlayerController)
+		if (!Owner)
 		{
 			return;
 		}
+
+        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+
+        if (!PlayerResourcesComponent)
+        {
+            return;
+        }
 
 		float TimeRefundFactor = 0.0f;
 
@@ -386,7 +410,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 			TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
 			float ResourceAmount = Resource.Value * ActualRefundFactor;
 
-			PlayerController->AddResources(ResourceType, ResourceAmount);
+            PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
 			UE_LOG(LogRTS, Log, TEXT("%f %s of production costs refunded."), ResourceAmount, *ResourceType->GetName());
 

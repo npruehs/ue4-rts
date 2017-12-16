@@ -11,6 +11,7 @@ class USkeletalMesh;
 
 class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
+class URTSPlayerResourcesComponent;
 class ARTSPlayerState;
 class URTSResourceType;
 class ARTSTeamInfo;
@@ -34,19 +35,11 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
 
-	/** Resources currently available to this player. Num must match ResourceTypes. Need to use an array here instead of map for replication. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", ReplicatedUsing=ReceivedResourceAmounts)
-	TArray<float> ResourceAmounts;
-
-	/** Types of resources currently available to this player. Num must match ResourceAmounts. Need to use an array here instead of map for replication. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", replicated)
-	TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
-
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
 
 
+    ARTSPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 
 
@@ -163,25 +156,6 @@ public:
 	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 
 
-	/** Gets the amount of resources in stock of this player. */
-	bool GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount);
-
-	/** Checks the amount of resources in stock of this player. */
-	bool CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
-
-	/** Checks the amount of resources in stock of this player. */
-	bool CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
-
-	/** Adds the specified resources to the stock of this player. */
-	virtual float AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
-
-	/** Removes the specified resources from the stock of this player. */
-	virtual float PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
-
-	/** Removes the specified resources from the stock of this player. */
-	virtual void PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
-
-
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
 
@@ -217,9 +191,6 @@ public:
 
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
-
-	/** Event when the current resource stock amount for the player has changed. */
-	virtual void NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
@@ -277,10 +248,6 @@ public:
 	/** Event when the player has clicked a spot on the minimap. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
-
-	/** Event when the current resource stock amount for the player has changed. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Resources", meta = (DisplayName = "OnResourcesChanged"))
-	void ReceiveOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
@@ -350,6 +317,11 @@ private:
 
 	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
 	bool bToggleSelectionHotkeyPressed;
+
+
+    /** Stores the resources available for this player. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    URTSPlayerResourcesComponent* PlayerResourcesComponent;
 
 
     /** Casts a ray from the current mouse position and collects the results. */
@@ -484,7 +456,4 @@ private:
 	/** Cancels the current production of the first selected building. */
 	UFUNCTION()
 	void CancelProduction();
-
-	UFUNCTION()
-	void ReceivedResourceAmounts();
 };
