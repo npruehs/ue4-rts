@@ -49,7 +49,11 @@ void ARTSFogOfWarActor::BeginPlay()
 
 	// Setup fog of war texture.
 	FogOfWarTexture = UTexture2D::CreateTransient(TileSize.X, TileSize.Y);
+
+#if WITH_EDITORONLY_DATA
 	FogOfWarTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+#endif
+
 	FogOfWarTexture->AddToRoot();
 
 	FogOfWarTexture->UpdateResource();
