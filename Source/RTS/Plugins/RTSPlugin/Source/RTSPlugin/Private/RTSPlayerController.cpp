@@ -445,7 +445,11 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 
 		// Send attack order to server.
 		ServerIssueAttackOrder(SelectedPawn, Target);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
+        }
 
 		// Notify listeners.
 		NotifyOnIssuedAttackOrder(SelectedPawn, Target);
@@ -512,7 +516,11 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
 
 		// Send construction order to server.
 		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
+        }
 
 		// Notify listeners.
 		NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
@@ -595,7 +603,11 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 
 		// Send construction order to server.
 		ServerIssueContinueConstructionOrder(SelectedPawn, ConstructionSite);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
+        }
 
 		// Notify listeners.
 		NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
@@ -646,7 +658,11 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 
 		// Send gather order to server.
 		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
+        }
 
 		// Notify listeners.
 		NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
@@ -725,7 +741,11 @@ bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 
 		// Send move order to server.
 		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
-        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
+        }
 
         // Notify listeners.
         NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
@@ -779,7 +799,11 @@ void ARTSPlayerController::IssueStopOrder()
 
 		// Send stop order to server.
 		ServerIssueStopOrder(SelectedPawn);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
+
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
+        }
 
 		// Notify listeners.
 		NotifyOnIssuedStopOrder(SelectedPawn);
