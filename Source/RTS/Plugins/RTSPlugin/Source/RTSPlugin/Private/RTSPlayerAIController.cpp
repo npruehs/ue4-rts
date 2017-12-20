@@ -2,7 +2,6 @@
 #include "RTSPlayerAIController.h"
 
 #include "EngineUtils.h"
-#include "Landscape.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Pawn.h"
@@ -256,35 +255,19 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
         FVector TargetLocation = OwnBuilding != nullptr ? OwnBuilding->GetActorLocation() : SomePawn->GetActorLocation();
         TargetLocation.X += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
         TargetLocation.Y += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
-        TargetLocation.Z = 10000.0f;
+        
+        TargetLocation = URTSUtilities::GetGroundLocation(this, TargetLocation);
 
-        // Cast ray to hit world.
-        FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
-        TArray<FHitResult> HitResults;
+        // If there's a primary resource drain, prevent blocking its path.
+        AActor* PrimaryResourceSource = GetPrimaryResourceSource();
+        AActor* PrimaryResourceDrain = GetPrimaryResourceDrain();
 
-        World->LineTraceMultiByObjectType(
-            HitResults,
-            TargetLocation,
-            FVector(TargetLocation.X, TargetLocation.Y, -TargetLocation.Z),
-            Params);
-
-        for (auto& HitResult : HitResults)
+        if (PrimaryResourceSource != nullptr &&
+            PrimaryResourceDrain != nullptr &&
+            FVector::DistSquaredXY(PrimaryResourceSource->GetActorLocation(), TargetLocation) <
+            FVector::DistSquaredXY(PrimaryResourceSource->GetActorLocation(), PrimaryResourceDrain->GetActorLocation()))
         {
-            if (HitResult.Actor != nullptr)
-            {
-                ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
-
-                if (Landscape != nullptr)
-                {
-                    TargetLocation = HitResult.Location;
-                    break;;
-                }
-
-                continue;
-            }
-
-            TargetLocation = HitResult.Location;
-            break;
+            continue;
         }
 
         // Issue construction order.
