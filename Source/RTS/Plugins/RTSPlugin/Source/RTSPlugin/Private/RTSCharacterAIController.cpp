@@ -85,9 +85,14 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 	}
 }
 
+bool ARTSCharacterAIController::HasOrder(ERTSOrderType OrderType) const
+{
+    return Blackboard->GetValueAsEnum(TEXT("OrderType")) == (uint8)OrderType;
+}
+
 bool ARTSCharacterAIController::IsIdle() const
 {
-    return Blackboard->GetValueAsEnum(TEXT("OrderType")) == (uint8)ERTSOrderType::ORDER_None;
+    return HasOrder(ERTSOrderType::ORDER_None);
 }
 
 void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)

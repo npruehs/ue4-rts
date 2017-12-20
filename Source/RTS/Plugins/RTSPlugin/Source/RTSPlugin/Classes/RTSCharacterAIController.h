@@ -34,6 +34,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FindTargetInAcquisitionRadius();
 
+    /** Checks whether the pawn has an order of the specified type. */
+    UFUNCTION(BlueprintPure)
+    bool HasOrder(ERTSOrderType OrderType) const;
+
     /** Checks whether the pawn is idle, or has any orders. */
     UFUNCTION(BlueprintPure)
     bool IsIdle() const;
