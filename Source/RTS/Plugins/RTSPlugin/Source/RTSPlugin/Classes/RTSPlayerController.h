@@ -36,6 +36,7 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
 
+    /** Preview to use for placing buildings. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
 
@@ -88,6 +89,13 @@ public:
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
 	bool IssueMoveOrder(const FVector& TargetLocation);
+
+    /** Gets a selected actor suitable for production. */
+    AActor* GetSelectedProductionActor();
+
+    /** Checks whether this player can begin producing the product with the specified index (e.g. can pay for it), and shows an error message otherwise. */
+    UFUNCTION(BlueprintCallable)
+    bool CheckCanIssueProductionOrder(int32 ProductIndex);
 
     /** Orders the selected production actor to start producing the product with the specified index. */
     UFUNCTION(BlueprintCallable)
@@ -143,6 +151,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsProductionProgressBarHotkeyPressed();
 
+    /** Checks whether this player can begin placing a building of the specified class (e.g. can pay for it), and shows an error message otherwise. */
+    UFUNCTION(BlueprintCallable)
+    bool CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass);
+
 	/** Begin finding a suitable location for constructing a building of the specified type. */
 	UFUNCTION(BlueprintCallable)
 	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass);
@@ -171,6 +183,9 @@ public:
 
 	/** Event when the player cancels placing a building. */
 	virtual void NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingClass);
+
+    /** Event when an error has occurred that can be presented to the user. */
+    virtual void NotifyOnErrorOccurred(const FString& ErrorMessage);
 
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
@@ -224,6 +239,10 @@ public:
 	/** Event when the player cancels placing a building. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Construction", meta = (DisplayName = "OnBuildingPlacementCancelled"))
 	void ReceiveOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingClass);
+
+    /** Event when an error has occurred that can be presented to the user. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Error", meta = (DisplayName = "OnErrorOccurred"))
+    void ReceiveOnErrorOccurred(const FString& ErrorMessage);
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))

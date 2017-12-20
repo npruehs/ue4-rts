@@ -18,14 +18,18 @@
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSConstructionSiteComponent.h"
+#include "RTSFogOfWarActor.h"
 #include "RTSGathererComponent.h"
+#include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerResourcesComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
+#include "RTSProductionCostComponent.h"
 #include "RTSResourceSourceComponent.h"
 #include "RTSSelectableComponent.h"
+#include "RTSTeamInfo.h"
 #include "RTSUtilities.h"
 #include "RTSVisionInfo.h"
 
@@ -749,7 +753,7 @@ bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, con
 	return OrderedPawn->GetOwner() == this;
 }
 
-void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
+AActor* ARTSPlayerController::GetSelectedProductionActor()
 {
     // Find suitable selected actor.
     for (auto SelectedActor : SelectedActors)
@@ -773,20 +777,82 @@ void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
             continue;
         }
 
-        // Begin production.
-        ServerStartProduction(SelectedActor, ProductIndex);
+        return SelectedActor;
+    }
 
-        if (IsNetMode(NM_Client))
+    return nullptr;
+}
+
+bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
+{
+    AActor* SelectedActor = GetSelectedProductionActor();
+
+    if (!SelectedActor)
+    {
+        return true;
+    }
+
+    URTSProductionComponent* ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+
+    if (ProductIndex >= ProductionComponent->AvailableProducts.Num())
+    {
+        return true;
+    }
+
+    TSubclassOf<AActor> ProductClass = ProductionComponent->AvailableProducts[ProductIndex];
+
+    // Check costs.
+    URTSProductionCostComponent* ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+
+    if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->Resources))
+    {
+        NotifyOnErrorOccurred(TEXT("Not enough resources."));
+        return false;
+    }
+
+    // Check requirements.
+    TSubclassOf<AActor> MissingRequirement;
+
+    if (URTSUtilities::GetMissingRequirementFor(this, SelectedActor, ProductClass, MissingRequirement))
+    {
+        URTSNameComponent* NameComponent = URTSUtilities::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+
+        if (NameComponent)
         {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %i."), *SelectedActor->GetName(), ProductIndex);
+            FString ErrorMessage = TEXT("Missing requirement: ");
+            ErrorMessage.Append(NameComponent->Name.ToString());
+            NotifyOnErrorOccurred(ErrorMessage);
+        }
+        else
+        {
+            NotifyOnErrorOccurred("Missing requirement.");
         }
 
-        // Notify listeners.
-        NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
+        return false;
+    }
 
-        // Only assign production once.
+    return true;
+}
+
+void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
+{
+    AActor* SelectedActor = GetSelectedProductionActor();
+
+    if (!SelectedActor)
+    {
         return;
     }
+
+    // Begin production.
+    ServerStartProduction(SelectedActor, ProductIndex);
+
+    if (IsNetMode(NM_Client))
+    {
+        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %i."), *SelectedActor->GetName(), ProductIndex);
+    }
+
+    // Notify listeners.
+    NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
 }
 
 void ARTSPlayerController::IssueStopOrder()
@@ -933,6 +999,44 @@ bool ARTSPlayerController::IsHealthBarHotkeyPressed()
 bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed()
 {
 	return bProductionProgressBarHotkeyPressed;
+}
+
+bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
+{
+    // Check resources.
+    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSUtilities::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
+
+    if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->ConstructionCosts))
+    {
+        NotifyOnErrorOccurred(TEXT("Not enough resources."));
+        return false;
+    }
+
+    // Check requirements.
+    if (SelectedActors.Num() > 0)
+    {
+        TSubclassOf<AActor> MissingRequirement;
+
+        if (URTSUtilities::GetMissingRequirementFor(this, SelectedActors[0], BuildingClass, MissingRequirement))
+        {
+            URTSNameComponent* NameComponent = URTSUtilities::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+
+            if (NameComponent)
+            {
+                FString ErrorMessage = TEXT("Missing requirement: ");
+                ErrorMessage.Append(NameComponent->Name.ToString());
+                NotifyOnErrorOccurred(ErrorMessage);
+            }
+            else
+            {
+                NotifyOnErrorOccurred("Missing requirement.");
+            }
+
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
@@ -1327,6 +1431,11 @@ void ARTSPlayerController::NotifyOnBuildingPlacementError(TSubclassOf<AActor> Bu
 void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingClass)
 {
 	ReceiveOnBuildingPlacementCancelled(BuildingClass);
+}
+
+void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
+{
+    ReceiveOnErrorOccurred(ErrorMessage);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
