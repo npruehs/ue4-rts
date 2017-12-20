@@ -65,4 +65,11 @@ public:
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
 	UFUNCTION(BlueprintCallable, Category = "RTS")
 	static UActorComponent* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass);
+
+    /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
+    UFUNCTION(BlueprintCallable, Category = "RTS", meta = (WorldContext = "WorldContextObject"))
+    static bool OwnerMeetsAllRequirementsFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct);
+
+    /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
+    static bool GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement);
 };

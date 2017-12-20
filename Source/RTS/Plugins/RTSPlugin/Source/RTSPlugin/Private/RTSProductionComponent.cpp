@@ -238,6 +238,15 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 		return;
 	}
 
+    // Check requirements.
+    TSubclassOf<AActor> MissingRequirement;
+
+    if (URTSUtilities::GetMissingRequirementFor(this, GetOwner(), ProductClass, MissingRequirement))
+    {
+        UE_LOG(LogRTS, Error, TEXT("%s wants to produce %s, but is missing requirement %s."), *GetOwner()->GetName(), *ProductClass->GetName(), *MissingRequirement->GetName());
+        return;
+    }
+
 	// Check production cost.
 	URTSProductionCostComponent* ProductionCostComponent =
 		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);

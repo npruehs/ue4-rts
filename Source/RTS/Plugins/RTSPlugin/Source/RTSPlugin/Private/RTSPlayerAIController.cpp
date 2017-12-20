@@ -13,6 +13,8 @@
 #include "RTSPlayerResourcesComponent.h"
 #include "RTSProductionComponent.h"
 #include "RTSProductionCostComponent.h"
+#include "RTSResourceSourceComponent.h"
+#include "RTSResourceDrainComponent.h"
 #include "RTSUtilities.h"
 
 
@@ -61,6 +63,75 @@ TSubclassOf<APawn> ARTSPlayerAIController::GetNextPawnToProduce() const
     return APawn::StaticClass();
 }
 
+AActor* ARTSPlayerAIController::GetPrimaryResourceDrain() const
+{
+    APawn* PrimaryResourceDrain = nullptr;
+
+    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
+    {
+        APawn* SomePawn = *PawnItr;
+
+        if (SomePawn->GetOwner() != this)
+        {
+            continue;
+        }
+
+        if (SomePawn->FindComponentByClass<URTSResourceDrainComponent>() == nullptr)
+        {
+            continue;
+        }
+
+        return SomePawn;
+    }
+
+    return nullptr;
+}
+
+AActor* ARTSPlayerAIController::GetPrimaryResourceSource() const
+{
+    // Get resource drain.
+    AActor* PrimaryResourceDrain = GetPrimaryResourceDrain();
+
+    if (PrimaryResourceDrain == nullptr)
+    {
+        return nullptr;
+    }
+
+    // Sweep for sources.
+    AActor* ClosestResourceSource = nullptr;
+    float ClosestResourceSourceDistance = 0.0f;
+
+    for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+    {
+        auto ResourceSource = *ActorItr;
+
+        // Check if found resource source.
+        auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
+
+        if (!ResourceSourceComponent)
+        {
+            continue;
+        }
+
+        // Check resource type.
+        if (ResourceSourceComponent->ResourceType != PrimaryResourceType)
+        {
+            continue;
+        }
+
+        // Check distance.
+        float Distance = PrimaryResourceDrain->GetDistanceTo(ResourceSource);
+
+        if (!ClosestResourceSource || Distance < ClosestResourceSourceDistance)
+        {
+            ClosestResourceSource = ResourceSource;
+            ClosestResourceSourceDistance = Distance;
+        }
+    }
+
+    return ClosestResourceSource;
+}
+
 bool ARTSPlayerAIController::CanPayFor(TSubclassOf<APawn> PawnClass) const
 {
     URTSProductionCostComponent* ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(PawnClass);
@@ -78,6 +149,12 @@ bool ARTSPlayerAIController::CanPayFor(TSubclassOf<APawn> PawnClass) const
     }
 
     return true;
+}
+
+bool ARTSPlayerAIController::MeetsAllRequirementsFor(TSubclassOf<APawn> PawnClass) const
+{
+    AActor* AnyOwnActor = GetPrimaryResourceDrain();
+    return URTSUtilities::OwnerMeetsAllRequirementsFor(AnyOwnActor, AnyOwnActor, PawnClass);
 }
 
 bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)

@@ -1,11 +1,16 @@
 #include "RTSPluginPCH.h"
 #include "RTSUtilities.h"
 
+#include "EngineUtils.h"
 #include "Components/ShapeComponent.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/SCS_Node.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 
 #include "RTSConstructionSiteComponent.h"
+#include "RTSOwnerComponent.h"
+#include "RTSRequirementsComponent.h"
 
 
 URTSUtilities::URTSUtilities(const FObjectInitializer& ObjectInitializer)
@@ -158,4 +163,57 @@ UActorComponent* URTSUtilities::FindDefaultComponentByClass(const TSubclassOf<AA
 	}
 
 	return nullptr;
+}
+
+bool URTSUtilities::OwnerMeetsAllRequirementsFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct)
+{
+    TSubclassOf<AActor> MissingRequirement;
+    return !GetMissingRequirementFor(WorldContextObject, OwnedActor, DesiredProduct, MissingRequirement);
+}
+
+bool URTSUtilities::GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement)
+{
+    if (!WorldContextObject || !OwnedActor || !OwnedActor->GetOwner())
+    {
+        return false;
+    }
+
+    // Check owner.
+    URTSOwnerComponent* OwnerComponent = OwnedActor->FindComponentByClass<URTSOwnerComponent>();
+
+    if (OwnerComponent == nullptr)
+    {
+        return false;
+    }
+
+    // Check if any requirements.
+    URTSRequirementsComponent* RequirementsComponent = FindDefaultComponentByClass<URTSRequirementsComponent>(DesiredProduct);
+
+    if (!RequirementsComponent || RequirementsComponent->RequiredActors.Num() <= 0)
+    {
+        return false;
+    }
+
+    // Check if owning player owns all required actors.
+    TArray<TSubclassOf<AActor>> RequiredActors = RequirementsComponent->RequiredActors;
+
+    for (TActorIterator<AActor> ActorItr(WorldContextObject->GetWorld()); ActorItr; ++ActorItr)
+    {
+        AActor* SomeActor = *ActorItr;
+        URTSOwnerComponent* OtherOwnerComponent = SomeActor->FindComponentByClass<URTSOwnerComponent>();
+
+        if (OtherOwnerComponent && OtherOwnerComponent->GetPlayerOwner() == OwnerComponent->GetPlayerOwner() && IsReadyToUse(SomeActor))
+        {
+            RequiredActors.Remove(SomeActor->GetClass());
+
+            if (RequiredActors.Num() == 0)
+            {
+                // All requirements checked.
+                return false;
+            }
+        }
+    }
+
+    OutMissingRequirement = RequiredActors[0];
+    return true;
 }

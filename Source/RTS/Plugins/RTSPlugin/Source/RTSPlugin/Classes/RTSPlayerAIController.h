@@ -41,14 +41,30 @@ public:
     UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
     float MaximumBaseBuildingDistance;
 
+    /** Type of the primary resource for the AI to gather (e.g. used for placing resource drains). */
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
+    TSubclassOf<class URTSResourceType> PrimaryResourceType;
+
 
     /** Checks the build order and returns the class of the next pawn to produce, or the Pawn class if nothing needs to be produced. */
     UFUNCTION(BlueprintPure)
     TSubclassOf<APawn> GetNextPawnToProduce() const;
 
+    /** Gets the primary resource drain of the AI. */
+    UFUNCTION(BlueprintCallable)
+    virtual AActor* GetPrimaryResourceDrain() const;
+
+    /** Gets the closest resource source of the primary resource type around the first resource drain of the AI. */
+    UFUNCTION(BlueprintCallable)
+    virtual AActor* GetPrimaryResourceSource() const;
+
     /** Checks the available resources for the AI and whether it can pay for a pawn of the specified class. */
     UFUNCTION(BlueprintPure)
     bool CanPayFor(TSubclassOf<APawn> PawnClass) const;
+
+    /** Checks whether the AI meets all tech tree requirements for a pawn of the specified class. */
+    UFUNCTION(BlueprintPure)
+    bool MeetsAllRequirementsFor(TSubclassOf<APawn> PawnClass) const;
 
     /** Selects an arbitrary production actor for producing a pawn of the specified class and starts production. */
     UFUNCTION(BlueprintCallable)

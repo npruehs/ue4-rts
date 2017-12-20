@@ -8,6 +8,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
+#include "RTSUtilities.h"
 
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -56,13 +57,39 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 
 void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	// Get game.
+	// Get game, pawn and controller.
 	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
 	if (!GameMode)
 	{
 		return;
 	}
+
+    auto Pawn = Cast<APawn>(GetOwner());
+
+    if (!Pawn)
+    {
+        return;
+    }
+
+    auto PawnController = Cast<ARTSCharacterAIController>(Pawn->GetController());
+
+    if (!PawnController)
+    {
+        return;
+    }
+
+    // Check requirements.
+    TSubclassOf<AActor> MissingRequirement;
+
+    if (URTSUtilities::GetMissingRequirementFor(this, GetOwner(), BuildingClass, MissingRequirement))
+    {
+        UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
+
+        // Player is missing a required actor. Stop.
+        PawnController->IssueStopOrder();
+        return;
+    }
 
 	// Spawn building.
 	AActor* Building = GameMode->SpawnActorForPlayer(
@@ -81,20 +108,6 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 	UE_LOG(LogRTS, Log, TEXT("Builder %s has created construction site %s."), *GetOwner()->GetName(), *Building->GetName());
 
 	// Issue construction order.
-	auto Pawn = Cast<APawn>(GetOwner());
-
-	if (!Pawn)
-	{
-		return;
-	}
-
-	auto PawnController = Cast<ARTSCharacterAIController>(Pawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
 	PawnController->IssueContinueConstructionOrder(Building);
 }
 
