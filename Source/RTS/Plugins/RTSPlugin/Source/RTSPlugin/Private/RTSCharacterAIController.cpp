@@ -8,6 +8,7 @@
 #include "RTSAttackableComponent.h"
 #include "RTSBuilderComponent.h"
 #include "RTSCharacter.h"
+#include "RTSCharacterAIEventComponent.h"
 #include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
 
@@ -257,6 +258,13 @@ void ARTSCharacterAIController::ApplyOrders()
 	{
 		BehaviorTreeComponent->RestartTree();
 	}
+
+    URTSCharacterAIEventComponent* CharacterAIEventComponent = GetPawn()->FindComponentByClass<URTSCharacterAIEventComponent>();
+    if (CharacterAIEventComponent)
+    {
+        uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
+        CharacterAIEventComponent->OnOrderChanged.Broadcast((ERTSOrderType)NewOrder);
+    }
 }
 
 void ARTSCharacterAIController::ClearBuildingClass()
