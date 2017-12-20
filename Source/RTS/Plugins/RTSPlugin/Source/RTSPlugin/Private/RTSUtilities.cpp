@@ -14,6 +14,85 @@ URTSUtilities::URTSUtilities(const FObjectInitializer& ObjectInitializer)
 }
 
 
+float URTSUtilities::GetActorDistance(AActor* First, AActor* Second, bool bConsiderCollisionSize)
+{
+    if (!First || !Second)
+    {
+        return 0.0f;
+    }
+
+    float Distance = First->GetDistanceTo(Second);
+
+    if (bConsiderCollisionSize)
+    {
+        Distance -= GetActorCollisionSize(First) / 2.0f;
+        Distance -= GetActorCollisionSize(Second) / 2.0f;
+    }
+
+    return Distance;
+}
+
+float URTSUtilities::GetCollisionSize(TSubclassOf<AActor> ActorClass)
+{
+    UShapeComponent* ShapeComponent = FindDefaultComponentByClass<UShapeComponent>(ActorClass);
+    return GetShapeCollisionSize(ShapeComponent);
+}
+
+float URTSUtilities::GetCollisionHeight(TSubclassOf<AActor> ActorClass)
+{
+    UShapeComponent* ShapeComponent = FindDefaultComponentByClass<UShapeComponent>(ActorClass);
+    return GetShapeCollisionHeight(ShapeComponent);
+}
+
+float URTSUtilities::GetActorCollisionSize(AActor* Actor)
+{
+    if (!Actor)
+    {
+        return 0.0f;
+    }
+
+    UShapeComponent* ShapeComponent = Actor->FindComponentByClass<UShapeComponent>();
+    return GetShapeCollisionSize(ShapeComponent);
+}
+
+float URTSUtilities::GetActorCollisionHeight(AActor* Actor)
+{
+    if (!Actor)
+    {
+        return 0.0f;
+    }
+
+    UShapeComponent* ShapeComponent = Actor->FindComponentByClass<UShapeComponent>();
+    return GetShapeCollisionHeight(ShapeComponent);
+}
+
+float URTSUtilities::GetShapeCollisionSize(UShapeComponent* ShapeComponent)
+{
+    if (!ShapeComponent)
+    {
+        return 0.0f;
+    }
+
+    FCollisionShape CollisionShape = ShapeComponent->GetCollisionShape();
+
+    return CollisionShape.IsCapsule() ?
+        CollisionShape.Capsule.Radius * 2 :
+        FMath::Max(CollisionShape.Box.HalfExtentX, CollisionShape.Box.HalfExtentY) * 2;
+}
+
+float URTSUtilities::GetShapeCollisionHeight(UShapeComponent* ShapeComponent)
+{
+    if (!ShapeComponent)
+    {
+        return 0.0f;
+    }
+
+    FCollisionShape CollisionShape = ShapeComponent->GetCollisionShape();
+
+    return CollisionShape.IsCapsule() ?
+        CollisionShape.Capsule.HalfHeight * 2 :
+        CollisionShape.Box.HalfExtentZ * 2;
+}
 bool URTSUtilities::IsReadyToUse(AActor* Actor)
 {
 	if (!Actor)
