@@ -67,6 +67,19 @@ public:
 	bool bShowHotkeyProductionProgressBars = true;
 
 
+    /** Whether to show floating combat texts above actors. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Floating Combat Texts")
+    bool bShowFloatingCombatTexts = true;
+
+    /** How many pixels the floating combat text should rise, per second. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Floating Combat Texts")
+    float FloatingCombatTextSpeed = 20.0f;
+
+    /** Whether to automatically adjust the alpha value of the color of floating combat texts depending on their elapsed lifetime. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Floating Combat Texts")
+    bool bFadeOutFloatingCombatTexts = true;
+
+
 	virtual void DrawHUD() override;
 
 
@@ -80,6 +93,18 @@ public:
 		float SuggestedProgressBarTop,
 		float SuggestedProgressBarWidth,
 		float SuggestedProgressBarHeight);
+
+    /** Event for drawaing a floating combat text. */
+    virtual void NotifyDrawFloatingCombatText(
+        AActor* Actor,
+        const FString& Text,
+        const FLinearColor& Color,
+        float Scale,
+        float Lifetime,
+        float RemainingLifetime,
+        float LifetimePercentage,
+        float SuggestedTextLeft,
+        float SuggestedTextTop);
 
 	/** Event for drawing an effect for the currently hovered actor. */
 	virtual void NotifyDrawHoveredActorEffect(AActor* HoveredActor);
@@ -120,6 +145,19 @@ public:
 		float SuggestedProgressBarTop,
 		float SuggestedProgressBarWidth,
 		float SuggestedProgressBarHeight);
+
+    /** Event for drawaing a floating combat text. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawFloatingCombatText"))
+    void ReceiveDrawFloatingCombatText(
+        AActor* Actor,
+        const FString& Text,
+        const FLinearColor& Color,
+        float Scale,
+        float Lifetime,
+        float RemainingLifetime,
+        float LifetimePercentage,
+        float SuggestedTextLeft,
+        float SuggestedTextTop);
 
 	/** Event for drawing an effect for the currently hovered actor. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHoveredActorEffect"))
@@ -163,6 +201,9 @@ public:
 private:
 	/** Draws the current selection frame if mouse is being dragged. */
 	void DrawSelectionFrame();
+
+    /** Draws floating combat texts. */
+    void DrawFloatingCombatTexts();
 
 	/** Draws unit health bars. */
 	void DrawHealthBars();
