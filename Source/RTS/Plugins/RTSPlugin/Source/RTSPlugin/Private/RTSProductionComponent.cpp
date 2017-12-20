@@ -5,6 +5,7 @@
 #include "GameFramework/Controller.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "RTSGameMode.h"
 #include "RTSProductionCostComponent.h"
@@ -328,27 +329,36 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 	Queue.RemainingProductionTime = 0.0f;
 
 	// Get game.
-	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return;
-	}
-
-	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(World));
+	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
 	if (!GameMode)
 	{
 		return;
 	}
 
-	// Spawn product.
-	TSubclassOf<AActor> ProductClass = Queue[0];
+    TSubclassOf<AActor> ProductClass = Queue[0];
 
+    // Determine spawn location: Start at producing actor location.
+    FVector SpawnLocation = GetOwner()->GetActorLocation();
+
+    // Spawn next to production actor.
+    float SpawnOffset = 0.0f;
+    SpawnOffset += URTSUtilities::GetActorCollisionSize(GetOwner()) / 2;
+    SpawnOffset += URTSUtilities::GetCollisionSize(ProductClass) / 2;
+    SpawnOffset *= 1.05f;
+    SpawnLocation.X -= SpawnOffset;
+
+    // Calculate location on the ground.
+    SpawnLocation = URTSUtilities::GetGroundLocation(this, SpawnLocation);
+
+    // Prevent spawn collision or spawning at wrong side of the world.
+    SpawnLocation.Z += URTSUtilities::GetCollisionHeight(ProductClass) + 1.0f;
+
+	// Spawn product.
 	AActor* Product = GameMode->SpawnActorForPlayer(
 		ProductClass,
 		Cast<AController>(GetOwner()->GetOwner()),
-		FTransform(FRotator::ZeroRotator, GetOwner()->GetActorLocation()));
+		FTransform(FRotator::ZeroRotator, SpawnLocation));
 
 	if (!Product)
 	{
