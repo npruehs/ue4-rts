@@ -5,6 +5,7 @@
 
 #include "RTSBuilderComponent.h"
 #include "RTSContainerComponent.h"
+#include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerResourcesComponent.h"
 #include "RTSResourceType.h"
 
@@ -54,8 +55,29 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		return;
 	}
 
+    // Check for speed boosts.
+    float SpeedBoostFactor = 1.0f;
+    AActor* OwningActor = GetOwner();
+
+    if (OwningActor)
+    {
+        AActor* OwningPlayer = OwningActor->GetOwner();
+
+        if (OwningPlayer)
+        {
+            URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+            if (PlayerAdvantageComponent)
+            {
+                SpeedBoostFactor = PlayerAdvantageComponent->SpeedBoostFactor;
+            }
+        }
+    }
+
 	// Compute construction progress based on number of assigned builders.
-	float ConstructionProgress = (DeltaTime * ProgressMadeAutomatically) + (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num());
+	float ConstructionProgress =
+        (DeltaTime * ProgressMadeAutomatically * SpeedBoostFactor) +
+        (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num() * SpeedBoostFactor);
 
 	// Check construction costs.
 	bool bConstructionCostPaid = false;

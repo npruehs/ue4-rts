@@ -9,6 +9,7 @@
 #include "RTSGameMode.h"
 #include "RTSProductionCostComponent.h"
 #include "RTSPlayerController.h"
+#include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerResourcesComponent.h"
 #include "RTSUtilities.h"
 
@@ -43,6 +44,25 @@ void URTSProductionComponent::BeginPlay()
 void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    // Check for speed boosts.
+    float SpeedBoostFactor = 1.0f;
+    AActor* OwningActor = GetOwner();
+
+    if (OwningActor)
+    {
+        AActor* OwningPlayer = OwningActor->GetOwner();
+
+        if (OwningPlayer)
+        {
+            URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+            if (PlayerAdvantageComponent)
+            {
+                SpeedBoostFactor = PlayerAdvantageComponent->SpeedBoostFactor;
+            }
+        }
+    }
 
 	// Process all queues.
 	for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
@@ -80,7 +100,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 			for (auto& Resource : ProductionCostComponent->Resources)
 			{
-				float ResourceAmount = Resource.Value * DeltaTime / ProductionCostComponent->ProductionTime;
+				float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->ProductionTime;
 
 				if (!PlayerResourcesComponent->CanPayResources(Resource.Key, ResourceAmount))
 				{
@@ -95,7 +115,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 				// Pay production costs.
 				for (auto& Resource : ProductionCostComponent->Resources)
 				{
-					float ResourceAmount = Resource.Value * DeltaTime / ProductionCostComponent->ProductionTime;
+					float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->ProductionTime;
                     PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
 				}
 
@@ -113,7 +133,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 		}
 
 		// Update production progress.
-		ProductionQueues[QueueIndex].RemainingProductionTime -= DeltaTime;
+		ProductionQueues[QueueIndex].RemainingProductionTime -= SpeedBoostFactor * DeltaTime;
 
 		// Check if finished.
 		if (ProductionQueues[QueueIndex].RemainingProductionTime <= 0)

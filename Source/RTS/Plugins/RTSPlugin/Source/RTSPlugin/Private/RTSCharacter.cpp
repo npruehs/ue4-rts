@@ -65,5 +65,5 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	return HealthComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	return HealthComponent->TakeDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 }

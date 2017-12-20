@@ -20,6 +20,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
+#include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerResourcesComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
@@ -31,6 +32,7 @@
 
 ARTSPlayerController::ARTSPlayerController()
 {
+    PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
     PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
 }
 

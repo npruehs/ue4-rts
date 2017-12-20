@@ -11,6 +11,7 @@ class USkeletalMesh;
 
 class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
+class URTSPlayerAdvantageComponent;
 class URTSPlayerResourcesComponent;
 class ARTSPlayerState;
 class URTSResourceType;
@@ -325,6 +326,10 @@ private:
 	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
 	bool bToggleSelectionHotkeyPressed;
 
+
+    /** Provides bonuses for various gameplay elements for this player. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent;
 
     /** Stores the resources available for this player. */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

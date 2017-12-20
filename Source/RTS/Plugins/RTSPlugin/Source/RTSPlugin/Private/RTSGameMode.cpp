@@ -13,6 +13,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAIController.h"
+#include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerStart.h"
 #include "RTSTeamInfo.h"
@@ -237,6 +238,19 @@ void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
     }
 
     UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *NewOwner->GetName(), *Actor->GetName());
+
+    // Check for god mode.
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = NewOwner->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+    if (PlayerAdvantageComponent)
+    {
+        APawn* Pawn = Cast<APawn>(Actor);
+
+        if (Pawn)
+        {
+            Pawn->bCanBeDamaged = !PlayerAdvantageComponent->bGodModeEnabled;
+        }
+    }
 
     // Notify listeners.
     ARTSPlayerController* NewPlayerOwner = Cast<ARTSPlayerController>(NewOwner);
