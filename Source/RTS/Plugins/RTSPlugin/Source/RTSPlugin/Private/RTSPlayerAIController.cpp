@@ -245,6 +245,13 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
             continue;
         }
 
+        if (PawnController->HasOrder(ERTSOrderType::ORDER_BeginConstruction) ||
+            PawnController->HasOrder(ERTSOrderType::ORDER_ContinueConstruction))
+        {
+            // Don't take builders away from constructing other buildings.
+            continue;
+        }
+
         // Find suitable building location: Get random nearby location.
         FVector TargetLocation = OwnBuilding != nullptr ? OwnBuilding->GetActorLocation() : SomePawn->GetActorLocation();
         TargetLocation.X += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
