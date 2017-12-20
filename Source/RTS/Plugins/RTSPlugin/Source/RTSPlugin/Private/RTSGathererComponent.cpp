@@ -36,7 +36,7 @@ void URTSGathererComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 	// Check range.
 	float GatherRange = GetGatherRange(CurrentResourceSource);
 
-	if (GetOwner()->GetDistanceTo(CurrentResourceSource) > GatherRange)
+	if (URTSUtilities::GetActorDistance(GetOwner(), CurrentResourceSource, true) > GatherRange)
 	{
 		// Stop gathering.
 		CurrentResourceSource = nullptr;
