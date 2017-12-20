@@ -46,7 +46,13 @@ public:
     /** Gets the approximated collision height of the specified shape. */
     UFUNCTION(BlueprintPure, Category = "RTS")
     static float GetShapeCollisionHeight(UShapeComponent* ShapeComponent);
+
+    /** Casts a ray to determine the z coordinate of the specified location on ground level. */
+    UFUNCTION(BlueprintPure, Category = "RTS", meta = (WorldContext = "WorldContextObject"))
+    static FVector GetGroundLocation(UObject* WorldContextObject, FVector Location);
+
 	/** Checks whether the specified actor is ready to use (e.g. finished construction). */
+    UFUNCTION(BlueprintPure, Category = "RTS")
 	static bool IsReadyToUse(AActor* Actor);
 
     /**

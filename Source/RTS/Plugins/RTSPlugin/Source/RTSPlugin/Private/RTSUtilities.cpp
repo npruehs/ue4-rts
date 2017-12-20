@@ -2,6 +2,7 @@
 #include "RTSUtilities.h"
 
 #include "EngineUtils.h"
+#include "Landscape.h"
 #include "Components/ShapeComponent.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
@@ -98,6 +99,44 @@ float URTSUtilities::GetShapeCollisionHeight(UShapeComponent* ShapeComponent)
         CollisionShape.Capsule.HalfHeight * 2 :
         CollisionShape.Box.HalfExtentZ * 2;
 }
+
+FVector URTSUtilities::GetGroundLocation(UObject* WorldContextObject, FVector Location)
+{
+    if (!WorldContextObject)
+    {
+        return Location;
+    }
+
+    // Cast ray to hit world.
+    FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
+    TArray<FHitResult> HitResults;
+
+    WorldContextObject->GetWorld()->LineTraceMultiByObjectType(
+        HitResults,
+        FVector(Location.X, Location.Y, 10000.0f),
+        FVector(Location.X, Location.Y, -10000.0f),
+        Params);
+
+    for (auto& HitResult : HitResults)
+    {
+        if (HitResult.Actor != nullptr)
+        {
+            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
+
+            if (Landscape != nullptr)
+            {
+                return HitResult.Location;
+            }
+
+            continue;
+        }
+
+        return HitResult.Location;
+    }
+
+    return Location;
+}
+
 bool URTSUtilities::IsReadyToUse(AActor* Actor)
 {
 	if (!Actor)
