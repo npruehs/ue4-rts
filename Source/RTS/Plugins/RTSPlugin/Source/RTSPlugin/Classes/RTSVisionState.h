@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "RTSVisionState.generated.h"
 

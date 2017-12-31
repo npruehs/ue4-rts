@@ -1,9 +1,11 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSFogOfWarActor.h"
 
 #include "EngineUtils.h"
+#include "RHI.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/Texture2D.h"
+#include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "RTSVisionInfo.h"
@@ -47,7 +49,11 @@ void ARTSFogOfWarActor::BeginPlay()
 
 	// Setup fog of war texture.
 	FogOfWarTexture = UTexture2D::CreateTransient(TileSize.X, TileSize.Y);
+
+#if WITH_EDITORONLY_DATA
 	FogOfWarTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+#endif
+
 	FogOfWarTexture->AddToRoot();
 
 	FogOfWarTexture->UpdateResource();

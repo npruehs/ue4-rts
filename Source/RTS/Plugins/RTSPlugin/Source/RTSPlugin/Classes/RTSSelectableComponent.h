@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSSelectableComponentDeselectedSignature);
  * Allows selecting the actor, e.g. by left-click.
  */
 UCLASS(meta=(BlueprintSpawnableComponent))
-class URTSSelectableComponent : public UActorComponent
+class RTSPLUGIN_API URTSSelectableComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

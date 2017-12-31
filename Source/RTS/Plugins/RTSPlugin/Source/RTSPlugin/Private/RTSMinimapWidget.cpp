@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSMinimapWidget.h"
 
 #include "Components/BrushComponent.h"

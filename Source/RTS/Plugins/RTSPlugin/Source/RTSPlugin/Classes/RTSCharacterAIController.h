@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "AIController.h"
 
@@ -16,7 +16,7 @@ class URTSAttackComponent;
 * AI controller that drives RTS unit movement and orders.
 */
 UCLASS()
-class ARTSCharacterAIController : public AAIController
+class RTSPLUGIN_API ARTSCharacterAIController : public AAIController
 {
     GENERATED_BODY()
 
@@ -33,6 +33,14 @@ public:
 	/** Makes the pawn look for a feasible target in its acquisition radius. */
 	UFUNCTION(BlueprintCallable)
 	void FindTargetInAcquisitionRadius();
+
+    /** Checks whether the pawn has an order of the specified type. */
+    UFUNCTION(BlueprintPure)
+    bool HasOrder(ERTSOrderType OrderType) const;
+
+    /** Checks whether the pawn is idle, or has any orders. */
+    UFUNCTION(BlueprintPure)
+    bool IsIdle() const;
 
 	/** Makes the pawn attack the specified target. */
 	UFUNCTION(BlueprintCallable)

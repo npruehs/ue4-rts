@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
-
+#include "RTSPluginPCH.h"
+#include "GameFramework/Actor.h"
 #include "RTSBuildingCursor.generated.h"
 
 
@@ -12,7 +12,7 @@ class USkeletalMeshComponent;
 
 /** 3D cursor for selecting a location for a building. */
 UCLASS()
-class ARTSBuildingCursor : public AActor
+class RTSPLUGIN_API ARTSBuildingCursor : public AActor
 {
 	GENERATED_BODY()
 

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "RTSProductionQueue.generated.h"
 
 
 USTRUCT(BlueprintType)
-struct FRTSProductionQueue
+struct RTSPLUGIN_API FRTSProductionQueue
 {
 	GENERATED_USTRUCT_BODY()
 

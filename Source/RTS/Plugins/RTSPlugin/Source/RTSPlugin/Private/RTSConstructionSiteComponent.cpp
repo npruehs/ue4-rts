@@ -1,10 +1,12 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSConstructionSiteComponent.h"
 
 #include "GameFramework/Actor.h"
 
 #include "RTSBuilderComponent.h"
 #include "RTSContainerComponent.h"
+#include "RTSPlayerAdvantageComponent.h"
+#include "RTSPlayerResourcesComponent.h"
 #include "RTSResourceType.h"
 
 
@@ -53,19 +55,48 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		return;
 	}
 
+    // Check for speed boosts.
+    float SpeedBoostFactor = 1.0f;
+    AActor* OwningActor = GetOwner();
+
+    if (OwningActor)
+    {
+        AActor* OwningPlayer = OwningActor->GetOwner();
+
+        if (OwningPlayer)
+        {
+            URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+            if (PlayerAdvantageComponent)
+            {
+                SpeedBoostFactor = PlayerAdvantageComponent->SpeedBoostFactor;
+            }
+        }
+    }
+
 	// Compute construction progress based on number of assigned builders.
-	float ConstructionProgress = (DeltaTime * ProgressMadeAutomatically) + (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num());
+	float ConstructionProgress =
+        (DeltaTime * ProgressMadeAutomatically * SpeedBoostFactor) +
+        (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num() * SpeedBoostFactor);
 
 	// Check construction costs.
 	bool bConstructionCostPaid = false;
 
 	if (ConstructionCostType == ERTSProductionCostType::COST_PayOverTime)
 	{
-		auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+        auto Owner = GetOwner()->GetOwner();
 
-		if (!PlayerController)
+        if (!Owner)
+        {
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
+            return;
+        }
+
+        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+
+		if (!PlayerResourcesComponent)
 		{
-			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owning player."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no PlayerResourcesComponent."), *Owner->GetName());
 			return;
 		}
 
@@ -75,7 +106,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		{
 			float ResourceAmount = Resource.Value * ConstructionProgress / ConstructionTime;
 
-			if (!PlayerController->CanPayResources(Resource.Key, ResourceAmount))
+			if (!PlayerResourcesComponent->CanPayResources(Resource.Key, ResourceAmount))
 			{
 				// Construction stopped until resources become available again.
 				bCanPayAllConstructionCosts = false;
@@ -89,7 +120,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 			for (auto& Resource : ConstructionCosts)
 			{
 				float ResourceAmount = Resource.Value * ConstructionProgress / ConstructionTime;
-				PlayerController->PayResources(Resource.Key, ResourceAmount);
+                PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
 			}
 
 			bConstructionCostPaid = true;
@@ -145,26 +176,34 @@ void URTSConstructionSiteComponent::StartConstruction()
 	// Check construction cost.
 	if (ConstructionCostType == ERTSProductionCostType::COST_PayImmediately)
 	{
-		auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+        auto Owner = GetOwner()->GetOwner();
 
-		if (!PlayerController)
+        if (!Owner)
+        {
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
+            return;
+        }
+
+        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+
+		if (!PlayerResourcesComponent)
 		{
-			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owning player."), *GetOwner()->GetName());
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no PlayerResourcesComponent."), *Owner->GetName());
 			CancelConstruction();
 			return;
 		}
 
-		if (!PlayerController->CanPayAllResources(ConstructionCosts))
+		if (!PlayerResourcesComponent->CanPayAllResources(ConstructionCosts))
 		{
 			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for constructing %s, but does not have enough resources."),
-				*GetOwner()->GetName(),
-				*GetName());
+				*Owner->GetName(),
+				*GetOwner()->GetName());
 			CancelConstruction();
 			return;
 		}
 
 		// Pay construction costs.
-		PlayerController->PayAllResources(ConstructionCosts);
+        PlayerResourcesComponent->PayAllResources(ConstructionCosts);
 	}
 
 	// Start construction.
@@ -182,7 +221,7 @@ void URTSConstructionSiteComponent::FinishConstruction()
 	RemainingConstructionTime = 0;
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_Finished;
 
-	UE_LOG(LogRTS, Log, TEXT("Construction %s finished."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("Construction %s finished."), *GetOwner()->GetName());
 
 	// Notify builders.
 	if (bConsumesBuilders)
@@ -208,37 +247,42 @@ void URTSConstructionSiteComponent::CancelConstruction()
 	UE_LOG(LogRTS, Log, TEXT("Construction %s canceled."), *GetName());
 
 	// Refund resources.
-	auto PlayerController = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+    auto Owner = GetOwner()->GetOwner();
 
-	if (PlayerController)
-	{
-		float TimeRefundFactor = 0.0f;
+    if (Owner)
+    {
+        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-		if (ConstructionCostType == ERTSProductionCostType::COST_PayImmediately)
-		{
-			TimeRefundFactor = 1.0f;
-		}
-		else if (ConstructionCostType == ERTSProductionCostType::COST_PayOverTime)
-		{
-			TimeRefundFactor = GetProgressPercentage();
-		}
+        if (!PlayerResourcesComponent)
+        {
+            float TimeRefundFactor = 0.0f;
 
-		float ActualRefundFactor = RefundFactor * TimeRefundFactor;
+            if (ConstructionCostType == ERTSProductionCostType::COST_PayImmediately)
+            {
+                TimeRefundFactor = 1.0f;
+            }
+            else if (ConstructionCostType == ERTSProductionCostType::COST_PayOverTime)
+            {
+                TimeRefundFactor = GetProgressPercentage();
+            }
 
-		// Refund construction costs.
-		for (auto& Resource : ConstructionCosts)
-		{
-			TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
-			float ResourceAmount = Resource.Value * ActualRefundFactor;
+            float ActualRefundFactor = RefundFactor * TimeRefundFactor;
 
-			PlayerController->AddResources(ResourceType, ResourceAmount);
+            // Refund construction costs.
+            for (auto& Resource : ConstructionCosts)
+            {
+                TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
+                float ResourceAmount = Resource.Value * ActualRefundFactor;
 
-			UE_LOG(LogRTS, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
+                PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
-			// Notify listeners.
-			OnConstructionCostRefunded.Broadcast(ResourceType, ResourceAmount);
-		}
-	}
+                UE_LOG(LogRTS, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
+
+                // Notify listeners.
+                OnConstructionCostRefunded.Broadcast(ResourceType, ResourceAmount);
+            }
+        }
+    }
 
 	// Destroy construction site.
 	GetOwner()->Destroy();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSResourceDrainComponentResourc
 * Allows resources to be returned to the actor.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSResourceDrainComponent : public UActorComponent
+class RTSPLUGIN_API URTSResourceDrainComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

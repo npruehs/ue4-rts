@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSCharacter.h"
 
 #include "Components/CapsuleComponent.h"
@@ -33,7 +33,7 @@ void ARTSCharacter::BeginPlay()
 	// Setup selection circle.
 	FCollisionShape CollisionShape = GetCapsuleComponent()->GetCollisionShape();
 	float DecalHeight = CollisionShape.Capsule.HalfHeight * 2;
-	float DecalRadius = CollisionShape.Capsule.Radius * 2;
+	float DecalRadius = CollisionShape.Capsule.Radius;
 
 	SelectionCircleDecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
 }
@@ -65,5 +65,5 @@ float ARTSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 		return 0.0f;
 	}
 
-	return HealthComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	return HealthComponent->TakeDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 }

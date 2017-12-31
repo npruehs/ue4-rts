@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionStar
  * Allows the actor to construct buildings.
  */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSBuilderComponent : public UActorComponent
+class RTSPLUGIN_API URTSBuilderComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -30,6 +30,10 @@ public:
 	/** Whether the builder enters the construction site while working on it, or not. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	bool bEnterConstructionSite;
+
+    /** Distance of the builder to the construction site while building. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+    float ConstructionSiteOffset;
 
 
 	/** Assigns the builder to the specified construction site. */

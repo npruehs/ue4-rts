@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -22,7 +22,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSConstructionSiteComponentConstr
 
 /** Allows constructing the actor over time. */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSConstructionSiteComponent : public UActorComponent
+class RTSPLUGIN_API URTSConstructionSiteComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

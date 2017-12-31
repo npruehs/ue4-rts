@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -21,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesRet
 * Allows the actor to gather resources.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSGathererComponent : public UActorComponent
+class RTSPLUGIN_API URTSGathererComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -69,6 +69,10 @@ public:
 	/** Gets the resource source the actor has recently been gathering from, if available, or a similar one within its sweep radius. */
 	UFUNCTION(BlueprintCallable)
 	virtual AActor* GetPreferredResourceSource() const;
+
+    /** Gets the closest resource source of the specified type within the passed maximum distance around the actor (0 means anywhere). */
+    UFUNCTION(BlueprintCallable)
+    virtual AActor* GetClosestResourceSource(TSubclassOf<class URTSResourceType> DesiredResourceType, float MaxDistance) const;
 
 	/** Gets the maximum distance for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)

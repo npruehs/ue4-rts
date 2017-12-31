@@ -1,9 +1,9 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSPlayerController.h"
 
 #include "EngineUtils.h"
+#include "Landscape.h"
 #include "Components/InputComponent.h"
-#include "Components/ShapeComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
@@ -18,38 +18,41 @@
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSConstructionSiteComponent.h"
+#include "RTSFogOfWarActor.h"
 #include "RTSGathererComponent.h"
+#include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
+#include "RTSPlayerAdvantageComponent.h"
+#include "RTSPlayerResourcesComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSProductionComponent.h"
+#include "RTSProductionCostComponent.h"
 #include "RTSResourceSourceComponent.h"
 #include "RTSSelectableComponent.h"
+#include "RTSTeamInfo.h"
 #include "RTSUtilities.h"
 #include "RTSVisionInfo.h"
 
+
+ARTSPlayerController::ARTSPlayerController()
+{
+    PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
+    PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
+}
 
 void ARTSPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-	// Check resource types.
-	int32 ResourceTypeNum = ResourceTypes.Num();
-	int32 ResourceAmountNum = ResourceAmounts.Num();
-
-	for (int32 Index = ResourceAmountNum; Index < ResourceTypeNum; ++Index)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("Starting amount for resource type %s not set for player %s, assuming zero."),
-			*ResourceTypes[Index]->GetName(),
-			*GetName());
-
-		ResourceAmounts.Add(0);
-	}
-
-	// Allow immediate UI updates.
-	for (int32 Index = 0; Index < ResourceTypeNum; ++Index)
-	{
-		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
-	}
+    // Allow immediate updates for interested listeners.
+    for (int32 Index = 0; Index < PlayerResourcesComponent->ResourceTypes.Num(); ++Index)
+    {
+        PlayerResourcesComponent->OnResourcesChanged.Broadcast(
+            PlayerResourcesComponent->ResourceTypes[Index],
+            0.0f,
+            PlayerResourcesComponent->ResourceAmounts[Index],
+            true);
+    }
 }
 
 void ARTSPlayerController::SetupInputComponent()
@@ -132,32 +135,6 @@ void ARTSPlayerController::SetupInputComponent()
 void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ARTSPlayerController, ResourceAmounts);
-	DOREPLIFETIME(ARTSPlayerController, ResourceTypes);
-}
-
-void ARTSPlayerController::TransferOwnership(AActor* Actor)
-{
-	if (!Actor)
-	{
-		return;
-	}
-
-	// Set owning player.
-	Actor->SetOwner(this);
-
-	URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
-
-	if (OwnerComponent)
-	{
-		OwnerComponent->SetPlayerOwner(this);
-	}
-
-	UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *GetName(), *Actor->GetName());
-
-	// Notify listeners.
-	NotifyOnActorOwnerChanged(Actor);
 }
 
 AActor* ARTSPlayerController::GetHoveredActor()
@@ -380,6 +357,15 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 				return;
 			}
 
+            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
+
+            if (Landscape != nullptr)
+            {
+                // Issue move order.
+                IssueMoveOrder(HitResult.Location);
+                return;
+            }
+
 			continue;
 		}
 
@@ -435,10 +421,14 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 
 		// Send attack order to server.
 		ServerIssueAttackOrder(SelectedPawn, Target);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
 
-		// Notify listeners.
-		NotifyOnIssuedAttackOrder(SelectedPawn, Target);
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
+
+            // Notify listeners.
+            NotifyOnIssuedAttackOrder(SelectedPawn, Target);
+        }
 
 		bSuccess = true;
 	}
@@ -502,10 +492,14 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
 
 		// Send construction order to server.
 		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
 
-		// Notify listeners.
-		NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
+
+            // Notify listeners.
+            NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
+        }
 
 		// Just send one builder.
 		return true;
@@ -585,10 +579,14 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 
 		// Send construction order to server.
 		ServerIssueContinueConstructionOrder(SelectedPawn, ConstructionSite);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
 
-		// Notify listeners.
-		NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
+
+            // Notify listeners.
+            NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
+        }
 
 		bSuccess = true;
 	}
@@ -636,10 +634,14 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 
 		// Send gather order to server.
 		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
 
-		// Notify listeners.
-		NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
+
+            // Notify listeners.
+            NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
+        }
 
 		bSuccess = true;
 	}
@@ -715,10 +717,14 @@ bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 
 		// Send move order to server.
 		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
-        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
 
-        // Notify listeners.
-        NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
+
+            // Notify listeners.
+            NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
+        }
 
 		bSuccess = true;
     }
@@ -749,6 +755,108 @@ bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, con
 	return OrderedPawn->GetOwner() == this;
 }
 
+AActor* ARTSPlayerController::GetSelectedProductionActor()
+{
+    // Find suitable selected actor.
+    for (auto SelectedActor : SelectedActors)
+    {
+        // Verify owner.
+        if (SelectedActor->GetOwner() != this)
+        {
+            continue;
+        }
+
+        // Check if production actor.
+        auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+
+        if (!ProductionComponent)
+        {
+            continue;
+        }
+
+        if (ProductionComponent->AvailableProducts.Num() <= 0)
+        {
+            continue;
+        }
+
+        return SelectedActor;
+    }
+
+    return nullptr;
+}
+
+bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
+{
+    AActor* SelectedActor = GetSelectedProductionActor();
+
+    if (!SelectedActor)
+    {
+        return true;
+    }
+
+    URTSProductionComponent* ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+
+    if (ProductIndex >= ProductionComponent->AvailableProducts.Num())
+    {
+        return true;
+    }
+
+    TSubclassOf<AActor> ProductClass = ProductionComponent->AvailableProducts[ProductIndex];
+
+    // Check costs.
+    URTSProductionCostComponent* ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+
+    if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->Resources))
+    {
+        NotifyOnErrorOccurred(TEXT("Not enough resources."));
+        return false;
+    }
+
+    // Check requirements.
+    TSubclassOf<AActor> MissingRequirement;
+
+    if (URTSUtilities::GetMissingRequirementFor(this, SelectedActor, ProductClass, MissingRequirement))
+    {
+        URTSNameComponent* NameComponent = URTSUtilities::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+
+        if (NameComponent)
+        {
+            FString ErrorMessage = TEXT("Missing requirement: ");
+            ErrorMessage.Append(NameComponent->Name.ToString());
+            NotifyOnErrorOccurred(ErrorMessage);
+        }
+        else
+        {
+            NotifyOnErrorOccurred("Missing requirement.");
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
+void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
+{
+    AActor* SelectedActor = GetSelectedProductionActor();
+
+    if (!SelectedActor)
+    {
+        return;
+    }
+
+    // Begin production.
+    ServerStartProduction(SelectedActor, ProductIndex);
+
+    if (IsNetMode(NM_Client))
+    {
+        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %i."), *SelectedActor->GetName(), ProductIndex);
+
+        // Notify listeners.
+        NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
+    }
+}
+
 void ARTSPlayerController::IssueStopOrder()
 {
 	// Issue stop orders.
@@ -769,10 +877,14 @@ void ARTSPlayerController::IssueStopOrder()
 
 		// Send stop order to server.
 		ServerIssueStopOrder(SelectedPawn);
-		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
 
-		// Notify listeners.
-		NotifyOnIssuedStopOrder(SelectedPawn);
+        if (IsNetMode(NM_Client))
+        {
+            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
+
+            // Notify listeners.
+            NotifyOnIssuedStopOrder(SelectedPawn);
+        }
 	}
 }
 
@@ -891,6 +1003,44 @@ bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed()
 	return bProductionProgressBarHotkeyPressed;
 }
 
+bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
+{
+    // Check resources.
+    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSUtilities::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
+
+    if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->ConstructionCosts))
+    {
+        NotifyOnErrorOccurred(TEXT("Not enough resources."));
+        return false;
+    }
+
+    // Check requirements.
+    if (SelectedActors.Num() > 0)
+    {
+        TSubclassOf<AActor> MissingRequirement;
+
+        if (URTSUtilities::GetMissingRequirementFor(this, SelectedActors[0], BuildingClass, MissingRequirement))
+        {
+            URTSNameComponent* NameComponent = URTSUtilities::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+
+            if (NameComponent)
+            {
+                FString ErrorMessage = TEXT("Missing requirement: ");
+                ErrorMessage.Append(NameComponent->Name.ToString());
+                NotifyOnErrorOccurred(ErrorMessage);
+            }
+            else
+            {
+                NotifyOnErrorOccurred("Missing requirement.");
+            }
+
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
 	// Spawn dummy building.
@@ -915,125 +1065,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
 	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return false;
-	}
-
-	UShapeComponent* ShapeComponent = URTSUtilities::FindDefaultComponentByClass<UShapeComponent>(BuildingClass);
-
-	if (!ShapeComponent)
-	{
-		return true;
-	}
-
-	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::AllDynamicObjects);
-
-	return !World->OverlapAnyTestByObjectType(
-		Location,
-		FQuat::Identity,
-		Params,
-		ShapeComponent->GetCollisionShape());
-}
-
-bool ARTSPlayerController::GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount)
-{
-	// Get current resource amount.
-	int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
-
-	if (ResourceIndex == INDEX_NONE)
-	{
-		UE_LOG(LogRTS, Error, TEXT("Unknown resource type %s for player %s."),
-			*ResourceType->GetName(),
-			*GetName());
-
-		*OutResourceAmount = 0.0f;
-		return false;
-	}
-
-	*OutResourceAmount = ResourceAmounts[ResourceIndex];
-	return true;
-}
-
-bool ARTSPlayerController::CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	float AvailableResources;
-
-	if (!GetResources(ResourceType, &AvailableResources))
-	{
-		return false;
-	}
-
-	if (AvailableResources < ResourceAmount)
-	{
-		return false;
-	}
-
-	return true;
-}
-
-bool ARTSPlayerController::CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
-{
-	for (auto& Resource : Resources)
-	{
-		if (!CanPayResources(Resource.Key, Resource.Value))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-float ARTSPlayerController::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	// Get current resource amount.
-	float OldResourceAmount;
-	if (!GetResources(ResourceType, &OldResourceAmount))
-	{
-		return 0.0f;
-	}
-
-	// Add resources.
-	int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
-	float NewResourceAmount = OldResourceAmount + ResourceAmount;
-	ResourceAmounts[ResourceIndex] = NewResourceAmount;
-
-	UE_LOG(LogRTS, Log, TEXT("Player %s stock of %s has changed to %f."),
-		*GetName(),
-		*ResourceType->GetName(),
-		NewResourceAmount);
-
-	// Notify listeners.
-	NotifyOnResourcesChanged(ResourceType, NewResourceAmount);
-	return ResourceAmount;
-}
-
-float ARTSPlayerController::PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	// Get current resource amount.
-	float OldResourceAmount;
-	if (!GetResources(ResourceType, &OldResourceAmount))
-	{
-		return 0.0f;
-	}
-
-	if (OldResourceAmount < ResourceAmount)
-	{
-		return 0.0f;
-	}
-
-	// Deduct resources.
-	return AddResources(ResourceType, -ResourceAmount);
-}
-
-void ARTSPlayerController::PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
-{
-	for (auto& Resource : Resources)
-	{
-		PayResources(Resource.Key, Resource.Value);
-	}
+    return URTSUtilities::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
 void ARTSPlayerController::StartSelectActors()
@@ -1291,32 +1323,7 @@ bool ARTSPlayerController::ServerCancelConstruction_Validate(AActor* Constructio
 
 void ARTSPlayerController::StartDefaultProduction()
 {
-	// Find suitable selected actor.
-	for (auto SelectedActor : SelectedActors)
-	{
-		// Verify owner.
-		if (SelectedActor->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Check if production actor.
-		auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
-
-		if (!ProductionComponent)
-		{
-			continue;
-		}
-
-		if (ProductionComponent->AvailableProducts.Num() <= 0)
-		{
-			continue;
-		}
-
-		// Begin production.
-		ServerStartProduction(SelectedActor, 0);
-		return;
-	}
+    IssueProductionOrder(0);
 }
 
 void ARTSPlayerController::CancelProduction()
@@ -1428,6 +1435,11 @@ void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor
 	ReceiveOnBuildingPlacementCancelled(BuildingClass);
 }
 
+void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
+{
+    ReceiveOnErrorOccurred(ErrorMessage);
+}
+
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
 {
 	ReceiveOnIssuedAttackOrder(OrderedPawn, Target);
@@ -1451,6 +1463,11 @@ void ARTSPlayerController::NotifyOnIssuedGatherOrder(APawn* OrderedPawn, AActor*
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation)
 {
     ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
+}
+
+void ARTSPlayerController::NotifyOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex)
+{
+    ReceiveOnIssuedProductionOrder(OrderedActor, ProductIndex);
 }
 
 void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)
@@ -1527,11 +1544,6 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
 }
 
-void ARTSPlayerController::NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
-{
-	ReceiveOnResourcesChanged(ResourceType, ResourceAmount);
-}
-
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
@@ -1597,7 +1609,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 		for (auto& HitResult : HitResults)
 		{
 			// Check if hit any actor.
-			if (HitResult.Actor == nullptr)
+			if (HitResult.Actor == nullptr || Cast<ALandscape>(HitResult.Actor.Get()) != nullptr)
 			{
 				// Store hovered world position.
 				HoveredWorldPosition = HitResult.Location;
@@ -1634,12 +1646,4 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
 	// Verify selection.
 	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->bHidden; });
-}
-
-void ARTSPlayerController::ReceivedResourceAmounts()
-{
-	for (int32 Index = 0; Index < ResourceTypes.Num(); ++Index)
-	{
-		NotifyOnResourcesChanged(ResourceTypes[Index], ResourceAmounts[Index]);
-	}
 }

@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSProjectile.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -12,7 +12,7 @@ ARTSProjectile::ARTSProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
-	ImpactThresholdSquared = 100.0f;
+    bFired = false;
 
 	// Enable replication.
 	// This might change in the future, as we don't really care about exact projectile positions on client-side.
@@ -49,31 +49,39 @@ void ARTSProjectile::FireAt(
 		// Set target.
 		ProjectileMovement->HomingTargetComponent = Target->GetRootComponent();
 	}
+
+    // Set time to impact.
+    TimeToImpact = Direction.Size() / ProjectileMovement->InitialSpeed;
+    bFired = true;
 }
 
 void ARTSProjectile::Tick(float DeltaSeconds)
 {
-	if (IsValid(Target))
+    if (!bFired)
+    {
+        return;
+    }
+
+    TimeToImpact -= DeltaSeconds;
+
+	if (TimeToImpact > 0.0f)
 	{
-		LastKnownTargetLocation = Target->GetActorLocation();
+        return;
 	}
 
-	if (FVector::DistSquared(GetActorLocation(), LastKnownTargetLocation) < ImpactThresholdSquared)
-	{
-		if (IsValid(Target))
-		{
-			UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
+    if (IsValid(Target))
+    {
+        UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
 
-			// Deal damage.
-			Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
+        // Deal damage.
+        Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
 
-			// Notify listeners.
-			NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
-		}
-		
-		// Destroy projectile.
-		Destroy();
-	}
+        // Notify listeners.
+        NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+    }
+
+    // Destroy projectile.
+    Destroy();
 }
 
 void ARTSProjectile::NotifyOnProjectileDetonated(

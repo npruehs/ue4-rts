@@ -1,10 +1,13 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSHUD.h"
 
 #include "EngineUtils.h"
+#include "Components/CapsuleComponent.h"
 
 #include "RTSCharacter.h"
 #include "RTSConstructionSiteComponent.h"
+#include "RTSFloatingCombatTextComponent.h"
+#include "RTSFloatingCombatTextData.h"
 #include "RTSHealthComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSProductionComponent.h"
@@ -14,6 +17,7 @@ void ARTSHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
+    DrawFloatingCombatTexts();
 	DrawSelectionFrame();
 	DrawHealthBars();
 	DrawConstructionProgressBars();
@@ -32,6 +36,20 @@ void ARTSHUD::NotifyDrawConstructionProgressBar(AActor* Actor, float Constructio
 		SuggestedProgressBarTop,
 		SuggestedProgressBarWidth,
 		SuggestedProgressBarHeight);
+}
+
+void ARTSHUD::NotifyDrawFloatingCombatText(AActor* Actor, const FString& Text, const FLinearColor& Color, float Scale, float Lifetime, float RemainingLifetime, float LifetimePercentage, float SuggestedTextLeft, float SuggestedTextTop)
+{
+    ReceiveDrawFloatingCombatText(
+        Actor,
+        Text,
+        Color,
+        Scale,
+        Lifetime,
+        RemainingLifetime,
+        LifetimePercentage,
+        SuggestedTextLeft,
+        SuggestedTextTop);
 }
 
 void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
@@ -130,6 +148,63 @@ void ARTSHUD::DrawSelectionFrame()
 		SelectionFrame.Min.Y,
 		SelectionFrame.Width(),
 		SelectionFrame.Height());
+}
+
+void ARTSHUD::DrawFloatingCombatTexts()
+{
+    if (!bShowFloatingCombatTexts)
+    {
+        return;
+    }
+
+    for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+    {
+        AActor* Actor = *ActorIt;
+
+        if (!IsValid(Actor))
+        {
+            return;
+        }
+
+        // Check floating combat texts.
+        URTSFloatingCombatTextComponent* FloatingCombatTextComponent = Actor->FindComponentByClass<URTSFloatingCombatTextComponent>();
+
+        if (!FloatingCombatTextComponent)
+        {
+            continue;
+        }
+
+        for (FRTSFloatingCombatTextData& TextData : FloatingCombatTextComponent->Texts)
+        {
+            // Calculate lifetime.
+            float ElapsedLifetime = TextData.Lifetime - TextData.RemainingLifetime;
+            float LifetimePercentage = ElapsedLifetime / TextData.Lifetime;
+
+            // Calculate position.
+            FVector2D Center = GetActorCenterOnScreen(Actor);
+            FVector2D Size = GetActorSizeOnScreen(Actor);
+
+            // Calculate color.
+            FLinearColor TextColor = TextData.Color;
+
+            if (bFadeOutFloatingCombatTexts)
+            {
+                TextColor.A = 1 - LifetimePercentage;
+            }
+
+            // Draw text.
+            NotifyDrawFloatingCombatText(
+                Actor,
+                TextData.Text,
+                TextColor,
+                TextData.Scale,
+                TextData.Lifetime,
+                TextData.RemainingLifetime,
+                LifetimePercentage,
+                Center.X,
+                Center.Y - (Size.Y / 2) - (FloatingCombatTextSpeed * ElapsedLifetime));
+        }
+    }
 }
 
 void ARTSHUD::DrawHealthBars()

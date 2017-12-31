@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/Info.h"
 
@@ -11,7 +11,7 @@
 * Team that consists of multiple players.
 */
 UCLASS()
-class ARTSTeamInfo : public AInfo
+class RTSPLUGIN_API ARTSTeamInfo : public AInfo
 {
 	GENERATED_BODY()
 

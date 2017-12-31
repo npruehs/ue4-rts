@@ -1,16 +1,46 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSGameMode.h"
 
+#include "CString.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerState.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "RTSCharacter.h"
+#include "RTSConstructionSiteComponent.h"
+#include "RTSOwnerComponent.h"
+#include "RTSPlayerAIController.h"
+#include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerStart.h"
 #include "RTSTeamInfo.h"
 #include "RTSVisionInfo.h"
 
+
+void ARTSGameMode::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // Parse options.
+    FString NumAIPlayersString = UGameplayStatics::ParseOption(OptionsString, TEXT("NumAIPlayers"));
+    NumAIPlayers = FCString::Atoi(*NumAIPlayersString);
+
+    UE_LOG(LogRTS, Log, TEXT("NumAIPlayers = %i"), NumAIPlayers);
+
+    // Spawn AI players.
+    for (int32 Index = 0; Index < NumAIPlayers; ++Index)
+    {
+        ARTSPlayerAIController* NewAI = StartAIPlayer();
+
+        if (NewAI != nullptr)
+        {
+            NewAI->PlayerState->SetPlayerName(FString::Printf(TEXT("AI Player %i"), Index + 1));
+        }
+    }
+}
 
 void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
@@ -94,8 +124,6 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 		return;
 	}
 
-	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(NewPlayer);
-
 	// Occupy start spot.
 	ARTSPlayerStart* PlayerStart = Cast<ARTSPlayerStart>(StartSpot);
 
@@ -117,22 +145,62 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 
 	// Build spawn transform.
 	// Don't allow initial actors to be spawned with any pitch or roll.
-	FVector SpawnLocation = StartSpot->GetActorLocation();
-
 	FRotator SpawnRotation(ForceInit);
 	SpawnRotation.Yaw = StartSpot->GetActorRotation().Yaw;
 
-	FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
-
 	// Build spawn info.
-	for (TSubclassOf<AActor> ActorClass : InitialActors)
+	for (int32 i = 0; i < InitialActors.Num(); ++i)
 	{
+        TSubclassOf<AActor> ActorClass = InitialActors[i];
+
 		// Spawn actor.
-		SpawnActorForPlayer(ActorClass, PlayerController, SpawnTransform);
+        FVector SpawnLocation = StartSpot->GetActorLocation();
+
+        if (i < InitialActorPositions.Num())
+        {
+            SpawnLocation += InitialActorPositions[i];
+        }
+        
+        FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
+		AActor* SpawnedActor = SpawnActorForPlayer(ActorClass, NewPlayer, SpawnTransform);
+
+        // Finish construction of initial buildings immediately.
+        if (SpawnedActor != nullptr)
+        {
+            URTSConstructionSiteComponent* ConstructionSiteComponent = SpawnedActor->FindComponentByClass<URTSConstructionSiteComponent>();
+
+            if (ConstructionSiteComponent != nullptr)
+            {
+                ConstructionSiteComponent->FinishConstruction();
+            }
+        }
 	}
 }
 
-AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPlayerController* ActorOwner, const FTransform& SpawnTransform)
+ARTSPlayerAIController* ARTSGameMode::StartAIPlayer()
+{
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.Instigator = Instigator;
+    SpawnInfo.ObjectFlags |= RF_Transient;	// We never want to save player controllers into a map
+    SpawnInfo.bDeferConstruction = true;
+    ARTSPlayerAIController* NewAI = GetWorld()->SpawnActor<ARTSPlayerAIController>(PlayerAIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
+    if (NewAI)
+    {
+        UGameplayStatics::FinishSpawningActor(NewAI, FTransform(FRotator::ZeroRotator, FVector::ZeroVector));
+
+        UE_LOG(LogRTS, Log, TEXT("Spawned AI player %s."), *NewAI->GetName());
+    }
+    else
+    {
+        UE_LOG(LogRTS, Error, TEXT("Failed to spawn AI player."));
+        return nullptr;
+    }
+
+    RestartPlayer(NewAI);
+    return NewAI;
+}
+
+AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, AController* ActorOwner, const FTransform& SpawnTransform)
 {
 	// Spawn actor.
 	FActorSpawnParameters SpawnParams;
@@ -146,10 +214,51 @@ AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, ARTSPl
 		UE_LOG(LogRTS, Log, TEXT("Spawned %s for player %s at %s."), *SpawnedActor->GetName(), *ActorOwner->GetName(), *SpawnTransform.GetLocation().ToString());
 
 		// Set owning player.
-		ActorOwner->TransferOwnership(SpawnedActor);
+		TransferOwnership(SpawnedActor, ActorOwner);
 	}
 
 	return SpawnedActor;
+}
+
+void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
+{
+    if (!Actor || !NewOwner)
+    {
+        return;
+    }
+
+    // Set owning player.
+    Actor->SetOwner(NewOwner);
+
+    URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+    if (OwnerComponent)
+    {
+        OwnerComponent->SetPlayerOwner(NewOwner);
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *NewOwner->GetName(), *Actor->GetName());
+
+    // Check for god mode.
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = NewOwner->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+    if (PlayerAdvantageComponent)
+    {
+        APawn* Pawn = Cast<APawn>(Actor);
+
+        if (Pawn)
+        {
+            Pawn->bCanBeDamaged = !PlayerAdvantageComponent->bGodModeEnabled;
+        }
+    }
+
+    // Notify listeners.
+    ARTSPlayerController* NewPlayerOwner = Cast<ARTSPlayerController>(NewOwner);
+    
+    if (NewPlayerOwner != nullptr)
+    {
+        NewPlayerOwner->NotifyOnActorOwnerChanged(Actor);
+    }    
 }
 
 void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
@@ -159,15 +268,20 @@ void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 		return;
 	}
 
-	APlayerController* OwningPlayer = Cast<APlayerController>(ActorOwner);
+	ARTSPlayerController* OwningPlayer = Cast<ARTSPlayerController>(ActorOwner);
 
 	if (OwningPlayer == nullptr)
 	{
-		return;
+        ARTSPlayerAIController* OwningAIPlayer = Cast<ARTSPlayerAIController>(ActorOwner);
+
+        if (OwningAIPlayer == nullptr)
+        {
+            return;
+        }
 	}
 
 	// Check if any required actors are still alive.
-	for (AActor* OwnedActor : OwningPlayer->Children)
+	for (AActor* OwnedActor : ActorOwner->Children)
 	{
 		if (OwnedActor->GetClass() == DefeatConditionActor)
 		{
@@ -175,13 +289,13 @@ void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 		}
 	}
 
-	UE_LOG(LogRTS, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *OwningPlayer->GetName(), *DefeatConditionActor->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *ActorOwner->GetName(), *DefeatConditionActor->GetName());
 
 	// Notify listeners.
-	NotifyOnPlayerDefeated(OwningPlayer);
+	NotifyOnPlayerDefeated(ActorOwner);
 }
 
-void ARTSGameMode::NotifyOnPlayerDefeated(APlayerController* Player)
+void ARTSGameMode::NotifyOnPlayerDefeated(AController* Player)
 {
 	ReceiveOnPlayerDefeated(Player);
 }

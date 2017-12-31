@@ -1,9 +1,9 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSResourceDrainComponent.h"
 
 #include "Net/UnrealNetwork.h"
 
-#include "RTSPlayerController.h"
+#include "RTSPlayerResourcesComponent.h"
 
 
 URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer)
@@ -15,14 +15,21 @@ URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer&
 float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
 	// Notify player.
-	auto OwningPlayer = Cast<ARTSPlayerController>(GetOwner()->GetOwner());
+	auto Owner = GetOwner()->GetOwner();
 
-	if (!OwningPlayer)
+	if (!Owner)
 	{
 		return 0.0f;
 	}
 
-	float ReturnedResources = OwningPlayer->AddResources(ResourceType, ResourceAmount);
+    auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+
+    if (!PlayerResourcesComponent)
+    {
+        return 0.0f;
+    }
+
+	float ReturnedResources = PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
 	if (ReturnedResources <= 0.0f)
 	{

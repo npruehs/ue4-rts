@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSCharacterAIController.h"
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
@@ -8,6 +8,7 @@
 #include "RTSAttackableComponent.h"
 #include "RTSBuilderComponent.h"
 #include "RTSCharacter.h"
+#include "RTSCharacterAIEventComponent.h"
 #include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
 
@@ -83,6 +84,16 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		UE_LOG(LogRTS, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
 		return;
 	}
+}
+
+bool ARTSCharacterAIController::HasOrder(ERTSOrderType OrderType) const
+{
+    return Blackboard->GetValueAsEnum(TEXT("OrderType")) == (uint8)OrderType;
+}
+
+bool ARTSCharacterAIController::IsIdle() const
+{
+    return HasOrder(ERTSOrderType::ORDER_None);
 }
 
 void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
@@ -247,6 +258,13 @@ void ARTSCharacterAIController::ApplyOrders()
 	{
 		BehaviorTreeComponent->RestartTree();
 	}
+
+    URTSCharacterAIEventComponent* CharacterAIEventComponent = GetPawn()->FindComponentByClass<URTSCharacterAIEventComponent>();
+    if (CharacterAIEventComponent)
+    {
+        uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
+        CharacterAIEventComponent->OnOrderChanged.Broadcast((ERTSOrderType)NewOrder);
+    }
 }
 
 void ARTSCharacterAIController::ClearBuildingClass()

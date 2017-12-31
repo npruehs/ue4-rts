@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSHealthComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -31,7 +31,7 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 		CurrentHealth);
 
 	// Notify listeners.
-	OnHealthChanged.Broadcast(OldHealth, NewHealth);
+	OnHealthChanged.Broadcast(OldHealth, NewHealth, DamageCauser);
 
 	// Check if we've just died.
 	if (CurrentHealth <= 0)
@@ -40,6 +40,9 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 
 		// Get owner before destruction.
 		AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());
+
+        // Notify listeners.
+        OnKilled.Broadcast(OwningPlayer, DamageCauser);
 
 		// Destroy this actor.
 		GetOwner()->Destroy();
@@ -51,9 +54,6 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 		{
 			GameMode->NotifyOnActorKilled(GetOwner(), OwningPlayer);
 		}
-
-		// Notify listeners.
-		OnKilled.Broadcast(OwningPlayer);
 	}
 
 	return Damage;

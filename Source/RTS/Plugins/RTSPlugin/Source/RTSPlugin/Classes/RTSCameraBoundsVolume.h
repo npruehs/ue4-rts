@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/Volume.h"
 
@@ -13,7 +13,7 @@
  * There should never be more than one camera bounds volume per level.
  */
 UCLASS()
-class ARTSCameraBoundsVolume : public AVolume
+class RTSPLUGIN_API ARTSCameraBoundsVolume : public AVolume
 {
     GENERATED_UCLASS_BODY()
 };

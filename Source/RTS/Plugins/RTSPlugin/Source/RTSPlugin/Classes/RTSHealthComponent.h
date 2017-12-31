@@ -1,21 +1,21 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
 #include "RTSHealthComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSHealthComponentHealthChangedSignature, float, OldHealth, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSHealthComponentKilledSignature, AController*, PreviousOwner);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSHealthComponentHealthChangedSignature, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSHealthComponentKilledSignature, AController*, PreviousOwner, AActor*, DamageCauser);
 
 
 /**
 * Adds health to the actor, e.g. for taking damage and dying.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSHealthComponent : public UActorComponent
+class RTSPLUGIN_API URTSHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

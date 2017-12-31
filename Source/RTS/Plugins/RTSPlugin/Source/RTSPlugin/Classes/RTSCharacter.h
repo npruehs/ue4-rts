@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/Character.h"
 
@@ -18,7 +18,7 @@ class URTSSelectableComponent;
 * Character with RTS features, such as taking damage.
 */
 UCLASS()
-class ARTSCharacter : public ACharacter
+class RTSPLUGIN_API ARTSCharacter : public ACharacter
 {
 	GENERATED_BODY()
 

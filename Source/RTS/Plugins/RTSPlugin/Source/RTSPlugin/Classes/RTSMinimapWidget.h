@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Blueprint/UserWidget.h"
 
@@ -17,7 +17,7 @@ class ARTSVisionVolume;
 * Widget for drawing a high-level overview of unit positions.
 */
 UCLASS(Blueprintable)
-class URTSMinimapWidget : public UUserWidget
+class RTSPLUGIN_API URTSMinimapWidget : public UUserWidget
 {
 	GENERATED_UCLASS_BODY()
 

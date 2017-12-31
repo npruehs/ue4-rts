@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/Actor.h"
 
@@ -14,16 +14,11 @@ class UProjectileMovementComponent;
 * Projectile with RTS features, such as following a target and dealing damage.
 */
 UCLASS()
-class ARTSProjectile : public AActor
+class RTSPLUGIN_API ARTSProjectile : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	/** Squared distance at which this projectile is detonated, in cm. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
-	float ImpactThresholdSquared;
-
-
 	ARTSProjectile();
 
 
@@ -57,12 +52,13 @@ public:
 		AActor* ProjectileDamageCauser);
 
 private:
+    bool bFired;
 	AActor* Target;
 	float Damage;
 	TSubclassOf<class UDamageType> DamageType;
 	AController* EventInstigator;
 	AActor* DamageCauser;
-	FVector LastKnownTargetLocation;
+    float TimeToImpact;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;

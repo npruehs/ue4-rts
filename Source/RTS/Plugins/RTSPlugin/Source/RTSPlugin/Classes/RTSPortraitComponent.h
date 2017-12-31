@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -14,7 +14,7 @@ class UTexture2D;
 * Adds a portrait to the actor that can be shown in the UI.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSPortraitComponent : public UActorComponent
+class RTSPLUGIN_API URTSPortraitComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

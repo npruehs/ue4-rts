@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "RTSGatherData.generated.h"
 
@@ -9,7 +9,7 @@ class URTSResourceType;
 
 
 USTRUCT(BlueprintType)
-struct FRTSGatherData
+struct RTSPLUGIN_API FRTSGatherData
 {
 	GENERATED_USTRUCT_BODY()
 

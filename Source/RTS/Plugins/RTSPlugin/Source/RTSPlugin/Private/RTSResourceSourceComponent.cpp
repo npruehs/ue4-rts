@@ -1,4 +1,4 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSResourceSourceComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -62,11 +62,11 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 	{
 		UE_LOG(LogRTS, Log, TEXT("Actor %s has been depleted."), *GetOwner()->GetName());
 
+        // Notify listeners.
+        OnDepleted.Broadcast();
+
 		// Destroy this actor.
 		GetOwner()->Destroy();
-
-		// Notify listeners.
-		OnDepleted.Broadcast();
 	}
 
 	return GatheredAmount;

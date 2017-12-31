@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/PlayerController.h"
 
@@ -11,6 +11,8 @@ class USkeletalMesh;
 
 class ARTSBuildingCursor;
 class ARTSCameraBoundsVolume;
+class URTSPlayerAdvantageComponent;
+class URTSPlayerResourcesComponent;
 class ARTSPlayerState;
 class URTSResourceType;
 class ARTSTeamInfo;
@@ -21,7 +23,7 @@ class ARTSVisionInfo;
  * Player controller with RTS features, such as selection and mouse camera movement.
  */
 UCLASS()
-class ARTSPlayerController : public APlayerController
+class RTSPLUGIN_API ARTSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
@@ -34,19 +36,12 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
 
-	/** Resources currently available to this player. Num must match ResourceTypes. Need to use an array here instead of map for replication. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", ReplicatedUsing=ReceivedResourceAmounts)
-	TArray<float> ResourceAmounts;
-
-	/** Types of resources currently available to this player. Num must match ResourceAmounts. Need to use an array here instead of map for replication. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", replicated)
-	TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
-
-
+    /** Preview to use for placing buildings. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
 	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
 
 
+    ARTSPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 
 
@@ -94,6 +89,17 @@ public:
 	/** Orders all selected units to move to the specified location. */
 	UFUNCTION(BlueprintCallable)
 	bool IssueMoveOrder(const FVector& TargetLocation);
+
+    /** Gets a selected actor suitable for production. */
+    AActor* GetSelectedProductionActor();
+
+    /** Checks whether this player can begin producing the product with the specified index (e.g. can pay for it), and shows an error message otherwise. */
+    UFUNCTION(BlueprintCallable)
+    bool CheckCanIssueProductionOrder(int32 ProductIndex);
+
+    /** Orders the selected production actor to start producing the product with the specified index. */
+    UFUNCTION(BlueprintCallable)
+    void IssueProductionOrder(int32 ProductIndex);
 
 	/** Orders all selected units to stop all current actions. */
 	UFUNCTION(BlueprintCallable)
@@ -145,6 +151,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsProductionProgressBarHotkeyPressed();
 
+    /** Checks whether this player can begin placing a building of the specified class (e.g. can pay for it), and shows an error message otherwise. */
+    UFUNCTION(BlueprintCallable)
+    bool CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass);
+
 	/** Begin finding a suitable location for constructing a building of the specified type. */
 	UFUNCTION(BlueprintCallable)
 	void BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass);
@@ -157,25 +167,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "RTS", meta = (DisplayName = "CanPlaceBuilding"))
 	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
-
-
-	/** Gets the amount of resources in stock of this player. */
-	bool GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount);
-
-	/** Checks the amount of resources in stock of this player. */
-	bool CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
-
-	/** Checks the amount of resources in stock of this player. */
-	bool CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
-
-	/** Adds the specified resources to the stock of this player. */
-	virtual float AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
-
-	/** Removes the specified resources from the stock of this player. */
-	virtual float PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
-
-	/** Removes the specified resources from the stock of this player. */
-	virtual void PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
 
 
 	/** Event when this player is now owning the specified actor. */
@@ -193,6 +184,9 @@ public:
 	/** Event when the player cancels placing a building. */
 	virtual void NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingClass);
 
+    /** Event when an error has occurred that can be presented to the user. */
+    virtual void NotifyOnErrorOccurred(const FString& ErrorMessage);
+
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
@@ -208,14 +202,14 @@ public:
     /** Event when an actor has received a move order. */
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
+    /** Event when an actor has received a production order. */
+    virtual void NotifyOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex);
+
 	/** Event when an actor has received a stop order. */
 	virtual void NotifyOnIssuedStopOrder(APawn* OrderedPawn);
 
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
-
-	/** Event when the current resource stock amount for the player has changed. */
-	virtual void NotifyOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
@@ -246,6 +240,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Construction", meta = (DisplayName = "OnBuildingPlacementCancelled"))
 	void ReceiveOnBuildingPlacementCancelled(TSubclassOf<AActor> BuildingClass);
 
+    /** Event when an error has occurred that can be presented to the user. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Error", meta = (DisplayName = "OnErrorOccurred"))
+    void ReceiveOnErrorOccurred(const FString& ErrorMessage);
+
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
 	void ReceiveOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
@@ -266,6 +264,10 @@ public:
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedMoveOrder"))
     void ReceiveOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
+    /** Event when an actor has received a production order. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedProductionOrder"))
+    void ReceiveOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex);
+
 	/** Event when an actor has received a stop order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedStopOrder"))
 	void ReceiveOnIssuedStopOrder(APawn* OrderedPawn);
@@ -273,10 +275,6 @@ public:
 	/** Event when the player has clicked a spot on the minimap. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
-
-	/** Event when the current resource stock amount for the player has changed. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Resources", meta = (DisplayName = "OnResourcesChanged"))
-	void ReceiveOnResourcesChanged(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
@@ -289,10 +287,6 @@ public:
 	/** Event when vision info for this player has been replicated and is available. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Vision", meta = (DisplayName = "OnVisionInfoAvailable"))
 	void ReceiveOnVisionInfoAvailable(ARTSVisionInfo* VisionInfo);
-
-	/** Sets this player as the owner of the specified actor. */
-	UFUNCTION(BlueprintCallable)
-	void TransferOwnership(AActor* Actor);
 
 
 protected:
@@ -350,6 +344,15 @@ private:
 
 	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
 	bool bToggleSelectionHotkeyPressed;
+
+
+    /** Provides bonuses for various gameplay elements for this player. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent;
+
+    /** Stores the resources available for this player. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    URTSPlayerResourcesComponent* PlayerResourcesComponent;
 
 
     /** Casts a ray from the current mouse position and collects the results. */
@@ -484,7 +487,4 @@ private:
 	/** Cancels the current production of the first selected building. */
 	UFUNCTION()
 	void CancelProduction();
-
-	UFUNCTION()
-	void ReceivedResourceAmounts();
 };

@@ -1,13 +1,14 @@
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 #include "RTSBuilderComponent.h"
 
+#include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSCharacterAIController.h"
 #include "RTSConstructionSiteComponent.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
-#include "RTSPlayerController.h"
+#include "RTSUtilities.h"
 
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -56,25 +57,59 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 
 void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	// Get game.
-	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return;
-	}
-
-	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(World));
+	// Get game, pawn and controller.
+	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
 	if (!GameMode)
 	{
 		return;
 	}
 
+    auto Pawn = Cast<APawn>(GetOwner());
+
+    if (!Pawn)
+    {
+        return;
+    }
+
+    auto PawnController = Cast<ARTSCharacterAIController>(Pawn->GetController());
+
+    if (!PawnController)
+    {
+        return;
+    }
+
+    // Check requirements.
+    TSubclassOf<AActor> MissingRequirement;
+
+    if (URTSUtilities::GetMissingRequirementFor(this, GetOwner(), BuildingClass, MissingRequirement))
+    {
+        UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
+
+        // Player is missing a required actor. Stop.
+        PawnController->IssueStopOrder();
+        return;
+    }
+
+    // Move builder away in order to avoid collision.
+    FVector BuilderLocation = Pawn->GetActorLocation();
+    FVector ToTargetLocation = TargetLocation - BuilderLocation;
+    ToTargetLocation.Z = 0.0f;
+    FVector ToTargetLocationNormalized = ToTargetLocation.GetSafeNormal();
+    float SafetyDistance = 
+        (URTSUtilities::GetActorCollisionSize(Pawn) / 2 +
+         URTSUtilities::GetCollisionSize(BuildingClass) / 2)
+        + ConstructionSiteOffset;
+
+    FVector SafeBuilderLocation = TargetLocation - ToTargetLocationNormalized * SafetyDistance;
+    SafeBuilderLocation.Z = BuilderLocation.Z;
+
+    Pawn->SetActorLocation(SafeBuilderLocation);
+
 	// Spawn building.
 	AActor* Building = GameMode->SpawnActorForPlayer(
 		BuildingClass,
-		Cast<ARTSPlayerController>(GetOwner()->GetOwner()),
+		Cast<AController>(GetOwner()->GetOwner()),
 		FTransform(FRotator::ZeroRotator, TargetLocation));
 
 	if (!Building)
@@ -88,20 +123,6 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 	UE_LOG(LogRTS, Log, TEXT("Builder %s has created construction site %s."), *GetOwner()->GetName(), *Building->GetName());
 
 	// Issue construction order.
-	auto Pawn = Cast<APawn>(GetOwner());
-
-	if (!Pawn)
-	{
-		return;
-	}
-
-	auto PawnController = Cast<ARTSCharacterAIController>(Pawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
 	PawnController->IssueContinueConstructionOrder(Building);
 }
 

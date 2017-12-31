@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/Actor.h"
 
@@ -9,7 +9,7 @@
 
 class UTexture2D;
 struct FUpdateTextureRegion2D;
-class UDynamicMaterialInstance;
+class UMaterialInstanceDynamic;
 class UMaterialInterface;
 class APostProcessVolume;
 
@@ -19,7 +19,7 @@ class ARTSVisionVolume;
 
 /** Renders fog of war in 3D space. */
 UCLASS()
-class ARTSFogOfWarActor : public AActor
+class RTSPLUGIN_API ARTSFogOfWarActor : public AActor
 {
 	GENERATED_BODY()
 

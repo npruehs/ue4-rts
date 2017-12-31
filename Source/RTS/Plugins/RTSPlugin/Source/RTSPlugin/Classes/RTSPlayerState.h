@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "GameFramework/PlayerState.h"
 
@@ -14,7 +14,7 @@ class ARTSTeamInfo;
 * Player state with RTS features, such as teams.
 */
 UCLASS()
-class ARTSPlayerState : public APlayerState
+class RTSPLUGIN_API ARTSPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 

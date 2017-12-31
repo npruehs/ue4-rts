@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RTSPluginPrivatePCH.h"
+#include "RTSPluginPCH.h"
 
 #include "Components/ActorComponent.h"
 
@@ -14,7 +14,7 @@ class URTSResourceType;
 
 /** Specifies the time and resources required to construct the actor. */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class URTSProductionCostComponent : public UActorComponent
+class RTSPLUGIN_API URTSProductionCostComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
