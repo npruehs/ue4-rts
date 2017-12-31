@@ -31,6 +31,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	bool bEnterConstructionSite;
 
+    /** Distance of the builder to the construction site while building. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+    float ConstructionSiteOffset;
+
 
 	/** Assigns the builder to the specified construction site. */
 	UFUNCTION(BlueprintCallable)

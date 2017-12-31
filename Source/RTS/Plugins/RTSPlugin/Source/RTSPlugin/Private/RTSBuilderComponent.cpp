@@ -91,6 +91,21 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
         return;
     }
 
+    // Move builder away in order to avoid collision.
+    FVector BuilderLocation = Pawn->GetActorLocation();
+    FVector ToTargetLocation = TargetLocation - BuilderLocation;
+    ToTargetLocation.Z = 0.0f;
+    FVector ToTargetLocationNormalized = ToTargetLocation.GetSafeNormal();
+    float SafetyDistance = 
+        (URTSUtilities::GetActorCollisionSize(Pawn) / 2 +
+         URTSUtilities::GetCollisionSize(BuildingClass) / 2)
+        + ConstructionSiteOffset;
+
+    FVector SafeBuilderLocation = TargetLocation - ToTargetLocationNormalized * SafetyDistance;
+    SafeBuilderLocation.Z = BuilderLocation.Z;
+
+    Pawn->SetActorLocation(SafeBuilderLocation);
+
 	// Spawn building.
 	AActor* Building = GameMode->SpawnActorForPlayer(
 		BuildingClass,
