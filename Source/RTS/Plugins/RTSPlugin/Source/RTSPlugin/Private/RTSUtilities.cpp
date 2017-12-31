@@ -11,6 +11,7 @@
 
 #include "RTSConstructionSiteComponent.h"
 #include "RTSOwnerComponent.h"
+#include "RTSPlayerState.h"
 #include "RTSRequirementsComponent.h"
 
 
@@ -135,6 +136,24 @@ FVector URTSUtilities::GetGroundLocation(UObject* WorldContextObject, FVector Lo
     }
 
     return Location;
+}
+
+bool URTSUtilities::IsAIUnit(AActor* Actor)
+{
+    if (!Actor)
+    {
+        return false;
+    }
+
+    // Check owner.
+    auto OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+    if (!OwnerComponent)
+    {
+        return false;
+    }
+
+    return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->bIsABot;
 }
 
 bool URTSUtilities::IsReadyToUse(AActor* Actor)

@@ -51,6 +51,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RTS", meta = (WorldContext = "WorldContextObject"))
     static FVector GetGroundLocation(UObject* WorldContextObject, FVector Location);
 
+    /** Checks whether the specified actor is owned by an AI player. */
+    UFUNCTION(BlueprintPure, Category = "RTS")
+    static bool IsAIUnit(AActor* Actor);
+
 	/** Checks whether the specified actor is ready to use (e.g. finished construction). */
     UFUNCTION(BlueprintPure, Category = "RTS")
 	static bool IsReadyToUse(AActor* Actor);
