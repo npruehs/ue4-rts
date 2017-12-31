@@ -425,10 +425,10 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
         if (IsNetMode(NM_Client))
         {
             UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
-        }
 
-		// Notify listeners.
-		NotifyOnIssuedAttackOrder(SelectedPawn, Target);
+            // Notify listeners.
+            NotifyOnIssuedAttackOrder(SelectedPawn, Target);
+        }
 
 		bSuccess = true;
 	}
@@ -496,10 +496,10 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
         if (IsNetMode(NM_Client))
         {
             UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
-        }
 
-		// Notify listeners.
-		NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
+            // Notify listeners.
+            NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
+        }
 
 		// Just send one builder.
 		return true;
@@ -583,10 +583,10 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
         if (IsNetMode(NM_Client))
         {
             UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
-        }
 
-		// Notify listeners.
-		NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
+            // Notify listeners.
+            NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
+        }
 
 		bSuccess = true;
 	}
@@ -638,10 +638,10 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
         if (IsNetMode(NM_Client))
         {
             UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
-        }
 
-		// Notify listeners.
-		NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
+            // Notify listeners.
+            NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
+        }
 
 		bSuccess = true;
 	}
@@ -721,10 +721,10 @@ bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
         if (IsNetMode(NM_Client))
         {
             UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
-        }
 
-        // Notify listeners.
-        NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
+            // Notify listeners.
+            NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
+        }
 
 		bSuccess = true;
     }
@@ -851,10 +851,10 @@ void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
     if (IsNetMode(NM_Client))
     {
         UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %i."), *SelectedActor->GetName(), ProductIndex);
-    }
 
-    // Notify listeners.
-    NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
+        // Notify listeners.
+        NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
+    }
 }
 
 void ARTSPlayerController::IssueStopOrder()
@@ -881,10 +881,10 @@ void ARTSPlayerController::IssueStopOrder()
         if (IsNetMode(NM_Client))
         {
             UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
-        }
 
-		// Notify listeners.
-		NotifyOnIssuedStopOrder(SelectedPawn);
+            // Notify listeners.
+            NotifyOnIssuedStopOrder(SelectedPawn);
+        }
 	}
 }
 
