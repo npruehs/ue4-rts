@@ -41,14 +41,14 @@ float URTSUtilities::GetActorDistance(AActor* First, AActor* Second, bool bConsi
 
 float URTSUtilities::GetCollisionSize(TSubclassOf<AActor> ActorClass)
 {
-    UShapeComponent* ShapeComponent = FindDefaultComponentByClass<UShapeComponent>(ActorClass);
-    return GetShapeCollisionSize(ShapeComponent);
+    AActor* DefaultActor = ActorClass->GetDefaultObject<AActor>();
+    return GetActorCollisionSize(DefaultActor) * DefaultActor->GetActorRelativeScale3D().X;
 }
 
 float URTSUtilities::GetCollisionHeight(TSubclassOf<AActor> ActorClass)
 {
-    UShapeComponent* ShapeComponent = FindDefaultComponentByClass<UShapeComponent>(ActorClass);
-    return GetShapeCollisionHeight(ShapeComponent);
+    AActor* DefaultActor = ActorClass->GetDefaultObject<AActor>();
+    return GetActorCollisionHeight(DefaultActor) * DefaultActor->GetActorRelativeScale3D().Z;
 }
 
 float URTSUtilities::GetActorCollisionSize(AActor* Actor)
