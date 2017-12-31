@@ -352,7 +352,7 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
     SpawnLocation = URTSUtilities::GetGroundLocation(this, SpawnLocation);
 
     // Prevent spawn collision or spawning at wrong side of the world.
-    SpawnLocation.Z += URTSUtilities::GetCollisionHeight(ProductClass) + 1.0f;
+    SpawnLocation.Z += URTSUtilities::GetCollisionHeight(ProductClass) * 1.1f;
 
 	// Spawn product.
 	AActor* Product = GameMode->SpawnActorForPlayer(
