@@ -10,7 +10,7 @@
 class URTSResourceType;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSPlayerResourcesComponentResourcesChangedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSPlayerResourcesComponentResourcesChangedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, OldResourceAmount, float, NewResourceAmount, bool, bSyncedFromServer);
 
 
 /**

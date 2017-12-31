@@ -49,7 +49,9 @@ void ARTSPlayerController::BeginPlay()
     {
         PlayerResourcesComponent->OnResourcesChanged.Broadcast(
             PlayerResourcesComponent->ResourceTypes[Index],
-            PlayerResourcesComponent->ResourceAmounts[Index]);
+            0.0f,
+            PlayerResourcesComponent->ResourceAmounts[Index],
+            true);
     }
 }
 

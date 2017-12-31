@@ -1,6 +1,8 @@
 #include "RTSPluginPCH.h"
 #include "RTSPlayerResourcesComponent.h"
 
+#include "GameFramework/Actor.h"
+
 #include "RTSResourceType.h"
 
 
@@ -104,7 +106,7 @@ float URTSPlayerResourcesComponent::AddResources(TSubclassOf<URTSResourceType> R
         NewResourceAmount);
 
     // Notify listeners.
-    OnResourcesChanged.Broadcast(ResourceType, NewResourceAmount);
+    OnResourcesChanged.Broadcast(ResourceType, OldResourceAmount, NewResourceAmount, false);
     return ResourceAmount;
 }
 
@@ -138,6 +140,6 @@ void URTSPlayerResourcesComponent::ReceivedResourceAmounts()
 {
     for (int32 Index = 0; Index < ResourceTypes.Num(); ++Index)
     {
-        OnResourcesChanged.Broadcast(ResourceTypes[Index], ResourceAmounts[Index]);
+        OnResourcesChanged.Broadcast(ResourceTypes[Index], 0.0f, ResourceAmounts[Index], true);
     }
 }
