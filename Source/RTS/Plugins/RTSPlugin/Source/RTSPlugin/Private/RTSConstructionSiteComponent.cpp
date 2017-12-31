@@ -88,7 +88,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 
         if (!Owner)
         {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
             return;
         }
 
@@ -180,7 +180,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 
         if (!Owner)
         {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
             return;
         }
 
@@ -197,7 +197,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 		{
 			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for constructing %s, but does not have enough resources."),
 				*Owner->GetName(),
-				*GetName());
+				*GetOwner()->GetName());
 			CancelConstruction();
 			return;
 		}
