@@ -20,6 +20,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSFogOfWarActor.h"
 #include "RTSGathererComponent.h"
+#include "RTSGameMode.h"
 #include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAdvantageComponent.h"
@@ -1068,6 +1069,16 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
     return URTSUtilities::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
+void ARTSPlayerController::Surrender()
+{
+    if (IsNetMode(NM_Client))
+    {
+        UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
+    }
+
+    ServerSurrender();
+}
+
 void ARTSPlayerController::StartSelectActors()
 {
 	if (BuildingCursor)
@@ -1398,6 +1409,24 @@ bool ARTSPlayerController::ServerStartProduction_Validate(AActor* ProductionActo
 {
 	// Verify owner to prevent cheating.
 	return ProductionActor->GetOwner() == this;
+}
+
+void ARTSPlayerController::ServerSurrender_Implementation()
+{
+    UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
+
+    // Notify game mode.
+    ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
+
+    if (GameMode != nullptr)
+    {
+        GameMode->NotifyOnPlayerDefeated(this);
+    }
+}
+
+bool ARTSPlayerController::ServerSurrender_Validate()
+{
+    return true;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)

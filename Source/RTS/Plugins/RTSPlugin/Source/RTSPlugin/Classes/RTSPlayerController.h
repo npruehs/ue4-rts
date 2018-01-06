@@ -168,6 +168,10 @@ public:
 	bool CanPlaceBuilding(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 	virtual bool CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const;
 
+    /** Surrenders the current game. */
+    UFUNCTION(BlueprintCallable)
+    void Surrender();
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -409,6 +413,10 @@ private:
 	/** Cancels the current production at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerCancelProduction(AActor* ProductionActor);
+
+    /** Surrenders the current match. */
+    UFUNCTION(Reliable, Server, WithValidation)
+    void ServerSurrender();
 
     /** Applies horizontal axis input to camera movement. */
     void MoveCameraLeftRight(float Value);
