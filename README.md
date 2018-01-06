@@ -31,6 +31,7 @@ All of this is already completely working in multiplayer as well, and has been f
 
 We're going to add all of this to the Unreal Marketplace for free as well soon (tm).
 
+For a quick look, just open RTSSampleGame/Maps/RTSGameSampleMap.umap in the editor and hit Play. We recommend taking a closer look at that map as reference for your own ones as well.
 
 ## Adding The Plugin
 
@@ -43,6 +44,8 @@ We're going to add all of this to the Unreal Marketplace for free as well soon (
 ## Usage
 
 ### Setting Up The Framewok
+
+Make sure View Plugin Content is enabled in your view options.
 
 1. Create a player controller deriving from RTSPlayerController.
 1. Create a game mode deriving from RTSGameMode using that player controller.
