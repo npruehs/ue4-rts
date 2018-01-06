@@ -187,7 +187,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 
         if (!Owner)
         {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
             return;
         }
 
