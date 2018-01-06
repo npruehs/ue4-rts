@@ -9,9 +9,10 @@
 URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	GathererCapacity = 1;
-
     SetIsReplicated(true);
+
+	// Set reasonable default values.
+	GathererCapacity = 1;
 }
 
 float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)

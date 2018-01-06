@@ -11,6 +11,17 @@ URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	// Set reasonable default values.
+	AcquisitionRadius = 1000.0f;
+	ChaseRadius = 1000.0f;
+	
+	FRTSAttackData DefaultAttack;
+	DefaultAttack.Cooldown = 0.5f;
+	DefaultAttack.Damage = 10.0f;
+	DefaultAttack.Range = 200.0f;
+
+	Attacks.Add(DefaultAttack);
 }
 
 void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)

@@ -23,6 +23,7 @@ ARTSPlayerAIController::ARTSPlayerAIController()
 
     bWantsPlayerState = true;
 
+	// Set reasonable default values.
     MaximumBaseBuildingDistance = 1500.0f;
 }
 

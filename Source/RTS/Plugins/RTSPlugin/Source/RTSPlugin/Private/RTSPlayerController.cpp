@@ -39,6 +39,10 @@ ARTSPlayerController::ARTSPlayerController()
 {
     PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
     PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
+
+	// Set reasonable default values.
+	CameraSpeed = 1000.0f;
+	CameraScrollThreshold = 20.0f;
 }
 
 void ARTSPlayerController::BeginPlay()
