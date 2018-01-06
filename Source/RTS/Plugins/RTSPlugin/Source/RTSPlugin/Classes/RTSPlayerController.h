@@ -172,6 +172,12 @@ public:
     UFUNCTION(BlueprintCallable)
     void Surrender();
 
+    virtual void GameHasEnded(class AActor* EndGameFocus = NULL, bool bIsWinner = false) override;
+
+    /** Notifies this client that the game has ended. */
+    UFUNCTION(Reliable, Client)
+    virtual void ClientGameHasEnded(bool bIsWinner);
+
 
 	/** Event when this player is now owning the specified actor. */
 	virtual void NotifyOnActorOwnerChanged(AActor* Actor);
@@ -190,6 +196,9 @@ public:
 
     /** Event when an error has occurred that can be presented to the user. */
     virtual void NotifyOnErrorOccurred(const FString& ErrorMessage);
+
+    /** Event when the game has ended. */
+    virtual void NotifyOnGameHasEnded(bool bIsWinner);
 
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
@@ -247,6 +256,10 @@ public:
     /** Event when an error has occurred that can be presented to the user. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Error", meta = (DisplayName = "OnErrorOccurred"))
     void ReceiveOnErrorOccurred(const FString& ErrorMessage);
+
+    /** Event when the game has ended. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Game", meta = (DisplayName = "OnGameHasEnded"))
+    void ReceiveOnGameHasEnded(bool bIsWinner);
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))

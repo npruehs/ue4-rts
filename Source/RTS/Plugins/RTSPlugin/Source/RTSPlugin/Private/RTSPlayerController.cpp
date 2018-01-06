@@ -1079,6 +1079,16 @@ void ARTSPlayerController::Surrender()
     ServerSurrender();
 }
 
+void ARTSPlayerController::GameHasEnded(class AActor* EndGameFocus /*= NULL*/, bool bIsWinner /*= false*/)
+{
+    ClientGameHasEnded(bIsWinner);
+}
+
+void ARTSPlayerController::ClientGameHasEnded_Implementation(bool bIsWinner)
+{
+    NotifyOnGameHasEnded(bIsWinner);
+}
+
 void ARTSPlayerController::StartSelectActors()
 {
 	if (BuildingCursor)
@@ -1467,6 +1477,11 @@ void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor
 void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
 {
     ReceiveOnErrorOccurred(ErrorMessage);
+}
+
+void ARTSPlayerController::NotifyOnGameHasEnded(bool bIsWinner)
+{
+    ReceiveOnGameHasEnded(bIsWinner);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
