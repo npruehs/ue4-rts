@@ -26,6 +26,7 @@ void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSConstructionSiteComponent, RemainingConstructionTime);
+    DOREPLIFETIME(URTSConstructionSiteComponent, State);
 }
 
 void URTSConstructionSiteComponent::BeginPlay()

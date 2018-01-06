@@ -131,5 +131,6 @@ public:
 
 private:
 	/** Whether the construction timer is currently being ticked, or not. */
+    UPROPERTY(replicated)
 	ERTSConstructionState State;
 };
