@@ -46,6 +46,12 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+    // Don't update construction progress on clients - will be replicated from server.
+    if (GetNetMode() == NM_Client)
+    {
+        return;
+    }
+
 	// Check for autostart.
 	if (State == ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted && bStartImmediately)
 	{
