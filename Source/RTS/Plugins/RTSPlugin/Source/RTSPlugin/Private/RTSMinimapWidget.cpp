@@ -314,7 +314,7 @@ FReply URTSMinimapWidget::HandleMinimapClick(const FGeometry& InGeometry, const 
 
 	if (!Player)
 	{
-		FReply::Unhandled();
+		return FReply::Unhandled();
 	}
 
 	// Convert clicked minimap position to world space.
