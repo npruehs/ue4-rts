@@ -20,6 +20,13 @@
 #include "RTSVisionInfo.h"
 
 
+ARTSGameMode::ARTSGameMode(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	// Set reasonable default values.
+	NumTeams = 2;
+}
+
 void ARTSGameMode::BeginPlay()
 {
     Super::BeginPlay();

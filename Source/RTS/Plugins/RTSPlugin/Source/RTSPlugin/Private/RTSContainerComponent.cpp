@@ -7,6 +7,8 @@
 URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	// Set reasonable default values.
+	Capacity = 1;
 }
 
 bool URTSContainerComponent::CanLoadActor(AActor* Actor) const

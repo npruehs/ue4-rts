@@ -20,6 +20,7 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSFogOfWarActor.h"
 #include "RTSGathererComponent.h"
+#include "RTSGameMode.h"
 #include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAdvantageComponent.h"
@@ -38,6 +39,10 @@ ARTSPlayerController::ARTSPlayerController()
 {
     PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
     PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
+
+	// Set reasonable default values.
+	CameraSpeed = 1000.0f;
+	CameraScrollThreshold = 20.0f;
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -1068,6 +1073,26 @@ bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> B
     return URTSUtilities::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
+void ARTSPlayerController::Surrender()
+{
+    if (IsNetMode(NM_Client))
+    {
+        UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
+    }
+
+    ServerSurrender();
+}
+
+void ARTSPlayerController::GameHasEnded(class AActor* EndGameFocus /*= NULL*/, bool bIsWinner /*= false*/)
+{
+    ClientGameHasEnded(bIsWinner);
+}
+
+void ARTSPlayerController::ClientGameHasEnded_Implementation(bool bIsWinner)
+{
+    NotifyOnGameHasEnded(bIsWinner);
+}
+
 void ARTSPlayerController::StartSelectActors()
 {
 	if (BuildingCursor)
@@ -1400,6 +1425,24 @@ bool ARTSPlayerController::ServerStartProduction_Validate(AActor* ProductionActo
 	return ProductionActor->GetOwner() == this;
 }
 
+void ARTSPlayerController::ServerSurrender_Implementation()
+{
+    UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
+
+    // Notify game mode.
+    ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
+
+    if (GameMode != nullptr)
+    {
+        GameMode->NotifyOnPlayerDefeated(this);
+    }
+}
+
+bool ARTSPlayerController::ServerSurrender_Validate()
+{
+    return true;
+}
+
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
 {
     CameraLeftRightAxisValue = Value;
@@ -1438,6 +1481,11 @@ void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor
 void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
 {
     ReceiveOnErrorOccurred(ErrorMessage);
+}
+
+void ARTSPlayerController::NotifyOnGameHasEnded(bool bIsWinner)
+{
+    ReceiveOnGameHasEnded(bIsWinner);
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)

@@ -11,6 +11,7 @@ ARTSProjectile::ARTSProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
+	ProjectileMovement->InitialSpeed = 1000.0f;
 
     bFired = false;
 

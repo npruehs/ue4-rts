@@ -7,6 +7,8 @@
 ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	// Set reasonable default values.
+	SizePerTile = 16.0f;
 }
 
 FVector ARTSVisionVolume::GetWorldSize() const

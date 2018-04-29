@@ -21,6 +21,10 @@ URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& Objec
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SetIsReplicated(true);
+
+	// Set reasonable default values.
+	CapacityPerQueue = 5;
+	QueueCount = 1;
 }
 
 void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
