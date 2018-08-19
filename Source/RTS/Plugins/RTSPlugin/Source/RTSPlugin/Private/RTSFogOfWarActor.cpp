@@ -119,8 +119,7 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 		}
 	}
 
-	UpdateTextureRegions(FogOfWarTexture, 0, 1, FogOfWarUpdateTextureRegion, 256 * 4, (uint32)4, FogOfWarTextureBuffer, false);
-	FogOfWarMaterialInstance->SetTextureParameterValue(FName("VisibilityMask"), FogOfWarTexture);
+	UpdateTextureRegions(FogOfWarTexture, 0, 1, FogOfWarUpdateTextureRegion, TileSize.X * 4, (uint32)4, FogOfWarTextureBuffer, false);
 }
 
 void ARTSFogOfWarActor::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
