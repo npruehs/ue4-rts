@@ -34,7 +34,6 @@ public:
     virtual void Boost();
 
     /** Invulnerability cheat. */
-    UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
     virtual void God() override;
 
     /** Adds resources. */
