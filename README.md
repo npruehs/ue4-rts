@@ -230,14 +230,7 @@ Example: Drawing names of unit owners
 #### Minimap Fog of War Layer
 
 1. Setup fog of war (see below).
-1. Setup the unknown areas brush:
-    1. Set the Image to some Translucent material with User Interface domain.
-    1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
-    1. Set the Tint to black (0, 0, 0, 1).
-1. Setup the known areas brush:
-    1. Set the Image to some Translucent material with User Interface domain.
-    1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
-    1. Set the Tint to black with low alpha (e.g. (0, 0, 0, 0.2)).
+1. Set the FogOfWarMaterial of your RTSMinimapWidget to M_RTSFogOfWarMinimap.
 1. In your player controller blueprint (or whichever owns the minimap widget), when setting up (e.g. in BeginPlay):
     1. Use the blueprint function RTSPlayerController::GetTeamInfo to get the team of the local player.
     1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
