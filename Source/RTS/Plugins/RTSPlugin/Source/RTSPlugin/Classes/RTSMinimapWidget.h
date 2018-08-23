@@ -38,14 +38,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Units")
 	FSlateBrush NeutralUnitsBrush;
 
-	/** Brush for drawing unknown areas on the minimap. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Vision")
-	FSlateBrush UnknownAreasBrush;
-
-	/** Brush for drawing known but not visible areas on the minimap. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RTS|Vision")
-	FSlateBrush KnownAreasBrush;
-
 	/** Whether to draw the minimap background layer. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Background")
 	bool bDrawBackground = true;
@@ -87,12 +79,27 @@ public:
 
 protected:
 	void NativeConstruct() override;
+    void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	void NativePaint(FPaintContext& InContext) const override;
 	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 private:
+    /** Provides visibility information. */
+    ARTSFogOfWarActor* FogOfWarActor;
+
+    /** Material to instance for rendering the fog of war effect. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    UMaterialInterface* FogOfWarMaterial;
+
+    /** User interface material instance for rendering fog of war on the minimap. */
+    UPROPERTY()
+    UMaterialInstanceDynamic* FogOfWarMaterialInstance;
+
+    /** Brush for drawing fog of war on the minimap. */
+    FSlateBrush FogOfWarBrush;
+
 	bool bMouseDown;
 	ARTSMinimapVolume* MinimapVolume;
 	FVector MinimapWorldSize;

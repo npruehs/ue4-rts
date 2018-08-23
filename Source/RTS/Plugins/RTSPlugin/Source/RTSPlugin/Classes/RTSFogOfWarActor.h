@@ -29,6 +29,9 @@ public:
 	void BeginPlay() override;
 	void Tick(float DeltaTime) override;
 
+    /** Gets the texture containing visibility information. */
+    UTexture2D* GetFogOfWarTexture() const;
+
 	/** Sets the vision info to render in 3D space. */
 	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
 
