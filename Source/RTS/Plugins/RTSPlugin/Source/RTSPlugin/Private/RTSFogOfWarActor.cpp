@@ -122,6 +122,11 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 	UpdateTextureRegions(FogOfWarTexture, 0, 1, FogOfWarUpdateTextureRegion, TileSize.X * 4, (uint32)4, FogOfWarTextureBuffer, false);
 }
 
+UTexture2D* ARTSFogOfWarActor::GetFogOfWarTexture() const
+{
+    return FogOfWarTexture;
+}
+
 void ARTSFogOfWarActor::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
 {
 	VisionInfo = InVisionInfo;
