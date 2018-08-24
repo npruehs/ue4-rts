@@ -35,8 +35,6 @@ public:
 	/** Sets the vision info to render in 3D space. */
 	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
 
-	void UpdateTextureRegions(UTexture2D* Texture, int32 MipIndex, uint32 NumRegions, FUpdateTextureRegion2D* Regions, uint32 SrcPitch, uint32 SrcBpp, uint8* SrcData, bool bFreeData);
-
 private:
 	/** Material to instance for rendering the fog of war effect. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
