@@ -3,6 +3,7 @@
 #include "RTSPluginPCH.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Launch/Resources/Version.h" // Included only for IntelliSense.
 
 #include "RTSMinimapWidget.generated.h"
 
@@ -11,6 +12,7 @@ class ARTSMinimapVolume;
 class ARTSPlayerController;
 class ARTSVisionInfo;
 class ARTSVisionVolume;
+class ARTSFogOfWarActor;
 
 
 /**
@@ -80,7 +82,13 @@ public:
 protected:
 	void NativeConstruct() override;
     void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 20)
+	int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
+#else
 	void NativePaint(FPaintContext& InContext) const override;
+#endif
+
 	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

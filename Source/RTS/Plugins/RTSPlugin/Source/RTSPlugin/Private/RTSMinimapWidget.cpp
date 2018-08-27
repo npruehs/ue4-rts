@@ -128,10 +128,26 @@ void URTSMinimapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
     FogOfWarBrush.SetResourceObject(FogOfWarMaterialInstance);
 }
 
+#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 20)
+int32 URTSMinimapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
+{
+	LayerId = UUserWidget::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+
+	FPaintContext Context(AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+
+	Context.MaxLayer++;
+
+	DrawBackground(Context);
+	DrawUnits(Context);
+	DrawVision(Context);
+	DrawViewFrustum(Context);
+
+	return FMath::Max(LayerId, Context.MaxLayer);
+}
+#else
 void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 {
 	UUserWidget::NativePaint(InContext);
-
 	InContext.MaxLayer++;
 
 	DrawBackground(InContext);
@@ -139,6 +155,7 @@ void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 	DrawVision(InContext);
 	DrawViewFrustum(InContext);
 }
+#endif
 
 FReply URTSMinimapWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
