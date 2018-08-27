@@ -91,9 +91,9 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 		UE_LOG(LogRTS, Log, TEXT("ActorSightRadiusTile: %i"), ActorSightRadiusTile);*/
 
 		// XXX VERY simple circle algorithm.
-		for (int32 RadiusY = -ActorSightRadiusTile; RadiusY < ActorSightRadiusTile; RadiusY++)
+		for (int32 RadiusY = -ActorSightRadiusTile; RadiusY <= ActorSightRadiusTile; RadiusY++)
 		{
-			for (int32 RadiusX = -ActorSightRadiusTile; RadiusX < ActorSightRadiusTile; RadiusX++)
+			for (int32 RadiusX = -ActorSightRadiusTile; RadiusX <= ActorSightRadiusTile; RadiusX++)
 			{
 				int32 TileX = ActorLocationTile.X + RadiusX;
 				int32 TileY = ActorLocationTile.Y + RadiusY;
