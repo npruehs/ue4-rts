@@ -31,18 +31,25 @@ All of this is already completely working in multiplayer as well, and has been f
 
 We're going to add all of this to the Unreal Marketplace for free as well soon (tm).
 
+For a quick look, just open RTSSampleGame/Maps/RTSGameSampleMap.umap in the editor and hit Play. We recommend taking a closer look at that map as reference for your own ones as well.
 
 ## Adding The Plugin
 
+Note that the plugin currently requires a C++ Unreal project, which in turn requires a working compiler.
+
+1. Clone the repository.
 1. Close the Unreal Editor.
 1. Copy the RTSPlugin folder to Plugins folder next to your .uproject file.
+1. Right-click your .uproject file and select Re-generate Visual Studio project files.
+1. Build the resulting solution in Visual Studio.
 1. Start the Unreal Editor.
 1. Enable the plugin in Edit > Plugins > RTS.
-
 
 ## Usage
 
 ### Setting Up The Framewok
+
+Make sure View Plugin Content is enabled in your view options.
 
 1. Create a player controller deriving from RTSPlayerController.
 1. Create a game mode deriving from RTSGameMode using that player controller.
@@ -84,13 +91,15 @@ We're going to add all of this to the Unreal Marketplace for free as well soon (
 
 _Note that you may use any class derived from Actor, if you want to. The plugin does not expect any kind of character whatsoever. Right now, RTSCharacter doesn't do much more than showing a nice selection circle, and relaying damage events. You can copy this functionality to any actor you like. Note that, for receiving orders such as Move or Attack, you need to derive from Pawn at least, because orders require AI._
 
-2. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual.
+2. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual. (If you're new to the Unreal animation system, we can readily recommend the tutorial at https://docs.unrealengine.com/latest/INT/Programming/Tutorials/FirstPersonShooter/4/index.html)
 1. At the CharacterMovement component, you may set the Max Acceleration property to a high value to avoid stuttering when changing move orders.
 1. Set pawn AI controller class to your RTSCharacterAIController.
 1. Add a SelectableComponent.
 1. Add a PortraitComponent.
 1. Add an OwnerComponent.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
+1. At the SelectionCircleDecalComponent of the RTSCharacter, set the Decal Material (e.g. to M_RTSSelectionCircle).
+1. You may want to disable the collision of the Mesh of your character and rely on its capsule instead.
 
 ### Adding Buildings
 
@@ -151,7 +160,8 @@ _Setting the Damage Type is optional. Remaining Cooldown is handled by the frame
 ### Adding Projectiles
 
 1. Create a new RTSProjectile blueprint.
-1. Set the Impact Threshold property.
+1. Add a static mesh and any visual effects.
+1. At the ProjectileMovement component, set its Initial Speed (e.g. to 1000).
 1. For all RTSAttackComponents that should use this projectile, reference the new projectile.
 
 ### Setup Victory Conditions
@@ -199,7 +209,7 @@ Example: Drawing names of unit owners
 1. Set its Compression Settings to User Interface and Texture Group to UI.
 1. Create a Material from your Render Target.
 1. Set its Material Domain to User Interface and make sure the texture is connected to Final Color.
-1. Add a SceneCapture2D at the very center of your map (X = 0, Y = 0).
+
 1. Set its height to a reasonable distance (e.g. Z = 2000).
 1. Rotate it, making it face your map (e.g. Rotation Y = -90).
 1. In the Scene Capture section, assign your render target to the Texture Target of the SceneCapture2D.
@@ -220,14 +230,7 @@ Example: Drawing names of unit owners
 #### Minimap Fog of War Layer
 
 1. Setup fog of war (see below).
-1. Setup the unknown areas brush:
-    1. Set the Image to some Translucent material with User Interface domain.
-    1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
-    1. Set the Tint to black (0, 0, 0, 1).
-1. Setup the known areas brush:
-    1. Set the Image to some Translucent material with User Interface domain.
-    1. Set the Image Size to the pixel size of a tile on your minimap (e.g. (4, 4)).
-    1. Set the Tint to black with low alpha (e.g. (0, 0, 0, 0.2)).
+1. Set the FogOfWarMaterial of your RTSMinimapWidget to M_RTSFogOfWarMinimap.
 1. In your player controller blueprint (or whichever owns the minimap widget), when setting up (e.g. in BeginPlay):
     1. Use the blueprint function RTSPlayerController::GetTeamInfo to get the team of the local player.
     1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
@@ -236,7 +239,7 @@ Example: Drawing names of unit owners
 
 ### Setup Building Placement
 
-1. Create an RTSBuildingCursor, setting its valid and invalid materials.
+1. Create an RTSBuildingCursor, setting its valid and invalid materials (or use BP_RTSBuildingCursor).
 1. In your player controller, set the building cursor reference.
 1. Bind any input or UI button to the BeginBuildingPlacement function of your RTSPlayerController.
 1. Bind the action ConfirmBuildingPlacement (e.g. to Left Mouse Button).
@@ -261,6 +264,7 @@ Example: Drawing names of unit owners
 1. Set the Production Cost Type to to Pay Immediately if all costs should be paid in full when starting production, or to Pay Over Time for continuously paying costs (similar to Command & Conquer).
 1. Set the Refund Factor to the factor to multiply refunded resources with after cancelation.
 1. Bind the action CancelProduction (e.g. to Escape).
+1. In your ingame UI, bind the actions of any of your buttons to call IssueProductionOrder on your player controller.
 
 _Note that, technically, producing units does not differ from researching technology. You can create actor blueprints without physical representation for each technology to research, and add them as products. Then, you can check whether any player owns an actor of that technology for checking a tech tree._
 
@@ -291,7 +295,7 @@ _Note that, technically, producing units does not differ from researching techno
 1. Set the Size Per Tile of the vision volume (e.g. 16).
 1. Add a PostProcessVolume to your map, encompassing the whole valid camera area.
 1. Add an RTSFogOfWarActor to your map.
-1. Set the Fog Of War Material of the actor (e.g. to the FogOfWarMaterial shipped with the plugin).
+1. Set the Fog Of War Material of the actor (e.g. to the M_RTSFogOfWar material shipped with the plugin).
 1. Set the Fog Of War Volume reference to the post process volume created before.
 
 ## Bugs & Feature Requests

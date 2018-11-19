@@ -1,10 +1,13 @@
 #include "RTSPluginPCH.h"
 #include "RTSMinimapWidget.h"
 
+#include "EngineUtils.h"
 #include "Components/BrushComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Rendering/DrawElements.h"
 
+#include "RTSFogOfWarActor.h"
 #include "RTSMinimapVolume.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerController.h"
@@ -75,9 +78,73 @@ void URTSMinimapWidget::NativeConstruct()
 	else
 	{
 		UE_LOG(LogRTS, Warning, TEXT("No RTSMinimapVolume found. Minimap won't be showing unit positions."));
-	}
+    }
+
+    // Get fog of war actor.
+    if (bDrawVision)
+    {
+        for (TActorIterator<ARTSFogOfWarActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+        {
+            FogOfWarActor = *ActorItr;
+            break;
+        }
+
+        if (FogOfWarActor)
+        {
+            // Setup fog of war material.
+            FogOfWarMaterialInstance = UMaterialInstanceDynamic::Create(FogOfWarMaterial, nullptr);
+        }
+        else
+        {
+            UE_LOG(LogRTS, Warning, TEXT("No fog of war actor found, won't draw vision on minimap."));
+            bDrawVision = false;
+        }
+    }
 }
 
+void URTSMinimapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+    if (!IsVisible())
+    {
+        return;
+    }
+
+    if (!bDrawVision)
+    {
+        return;
+    }
+
+    if (!IsValid(FogOfWarActor) || !IsValid(FogOfWarActor->GetFogOfWarTexture()) || !IsValid(FogOfWarMaterialInstance))
+    {
+        return;
+    }
+
+    // Update material.
+    FogOfWarMaterialInstance->SetTextureParameterValue(FName(TEXT("VisibilityMask")),
+        FogOfWarActor->GetFogOfWarTexture());
+
+    FogOfWarBrush.ImageSize =
+        FVector2D(FogOfWarActor->GetFogOfWarTexture()->GetSizeX(), FogOfWarActor->GetFogOfWarTexture()->GetSizeY());
+    FogOfWarBrush.SetResourceObject(FogOfWarMaterialInstance);
+}
+
+#if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 20)
+int32 URTSMinimapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
+{
+	LayerId = UUserWidget::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+
+	FPaintContext Context(AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+
+	Context.MaxLayer++;
+
+	DrawBackground(Context);
+	DrawUnits(Context);
+	DrawVision(Context);
+	DrawViewFrustum(Context);
+
+	return FMath::Max(LayerId, Context.MaxLayer);
+}
+#else
 void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 {
 	UUserWidget::NativePaint(InContext);
@@ -89,6 +156,7 @@ void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 	DrawVision(InContext);
 	DrawViewFrustum(InContext);
 }
+#endif
 
 FReply URTSMinimapWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
@@ -197,46 +265,17 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 
 void URTSMinimapWidget::DrawVision(FPaintContext& InContext) const
 {
-	if (!bDrawVision)
-	{
-		return;
-	}
+    if (!bDrawVision)
+    {
+        return;
+    }
 
-	if (!VisionVolume || !VisionInfo)
-	{
-		return;
-	}
+    if (!FogOfWarActor || !FogOfWarActor->GetFogOfWarTexture() || !FogOfWarMaterialInstance)
+    {
+        return;
+    }
 
-	// Check all vision tiles.
-	FIntVector VisionTileSize = VisionVolume->GetTileSize();
-
-	for (int32 VisionY = 0; VisionY < VisionTileSize.Y; ++VisionY)
-	{
-		int32 MinimapY = MinimapBackground.ImageSize.Y * VisionY / VisionTileSize.Y;
-
-		for (int32 VisionX = 0; VisionX < VisionTileSize.X; ++VisionX)
-		{
-			ERTSVisionState VisionState = VisionInfo->GetVision(VisionX, VisionY);
-			int32 MinimapX = MinimapBackground.ImageSize.X * VisionX / VisionTileSize.X;
-
-			// Rotate to match UI coordinate system.
-			float RotatedMinimapX = MinimapY;
-			float RotatedMinimapY = MinimapBackground.ImageSize.X - MinimapX;
-
-			FVector2D TileLocationMinimap = FVector2D(RotatedMinimapX, RotatedMinimapY);
-
-			switch (VisionState)
-			{
-				case ERTSVisionState::VISION_Unknown:
-					DrawBoxWithBrush(InContext, TileLocationMinimap, UnknownAreasBrush);
-					break;
-
-				case ERTSVisionState::VISION_Known:
-					DrawBoxWithBrush(InContext, TileLocationMinimap, KnownAreasBrush);
-					break;
-			}
-		}
-	}
+    DrawBoxWithBrush(InContext, FVector2D::ZeroVector, FogOfWarBrush);
 }
 
 void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const

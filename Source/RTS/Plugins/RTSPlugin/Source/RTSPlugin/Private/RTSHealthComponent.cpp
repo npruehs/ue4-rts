@@ -9,6 +9,10 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 	: Super(ObjectInitializer)
 {
 	SetIsReplicated(true);
+
+	// Set reasonable default values.
+	CurrentHealth = 100.0f;
+	MaximumHealth = 100.0f;
 }
 
 void URTSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

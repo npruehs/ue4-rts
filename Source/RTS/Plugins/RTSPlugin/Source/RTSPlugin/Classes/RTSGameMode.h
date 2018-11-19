@@ -53,6 +53,9 @@ public:
     TSubclassOf<ARTSPlayerAIController> PlayerAIControllerClass;
 
     
+	ARTSGameMode(const FObjectInitializer& ObjectInitializer);
+
+
     virtual void BeginPlay() override;
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 

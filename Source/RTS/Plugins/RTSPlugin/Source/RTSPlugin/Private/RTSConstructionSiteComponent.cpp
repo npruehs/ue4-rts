@@ -18,7 +18,16 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 	SetIsReplicated(true);
 
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted;
+
+	// Set reasonable default values.
+	ConstructionCostType = ERTSProductionCostType::COST_PayImmediately;
+	ConstructionTime = 10.0f;
+	bConsumesBuilders = false;
+	MaxAssignedBuilders = 1;
+	ProgressMadeAutomatically = 0.0f;
+	ProgressMadePerBuilder = 1.0f;
 	RefundFactor = 0.5f;
+	bStartImmediately = true;
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -26,6 +35,7 @@ void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSConstructionSiteComponent, RemainingConstructionTime);
+    DOREPLIFETIME(URTSConstructionSiteComponent, State);
 }
 
 void URTSConstructionSiteComponent::BeginPlay()
@@ -44,6 +54,12 @@ void URTSConstructionSiteComponent::BeginPlay()
 void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    // Don't update construction progress on clients - will be replicated from server.
+    if (GetNetMode() == NM_Client)
+    {
+        return;
+    }
 
 	// Check for autostart.
 	if (State == ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted && bStartImmediately)
@@ -180,7 +196,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 
         if (!Owner)
         {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
             return;
         }
 

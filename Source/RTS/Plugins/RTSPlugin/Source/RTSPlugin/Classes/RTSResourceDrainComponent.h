@@ -41,6 +41,11 @@ public:
 	/** Returns resources to this actor, notifying the owning player. */
 	virtual float ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
+    
+    /** Event when resources have been returned to the actor. */
+    UFUNCTION(NetMulticast, reliable)
+    virtual void NotifyOnResourcesReturned(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+
 
 	/** Event when resources have been returned to the actor. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")

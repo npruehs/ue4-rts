@@ -9,6 +9,9 @@
 URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+    SetIsReplicated(true);
+
+	// Set reasonable default values.
 	GathererCapacity = 1;
 }
 
@@ -36,13 +39,18 @@ float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<
 		return 0.0f;
 	}
 
-	UE_LOG(LogRTS, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),
-		*Gatherer->GetName(),
-		ReturnedResources,
-		*ResourceType->GetName(),
-		*GetOwner()->GetName());
-
 	// Notify listeners.
-	OnResourcesReturned.Broadcast(Gatherer, ResourceType, ReturnedResources);
+    NotifyOnResourcesReturned(Gatherer, ResourceType, ReturnedResources);
 	return ReturnedResources;
+}
+
+void URTSResourceDrainComponent::NotifyOnResourcesReturned_Implementation(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+{
+    UE_LOG(LogRTS, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),
+        *Gatherer->GetName(),
+        ResourceAmount,
+        *ResourceType->GetName(),
+        *GetOwner()->GetName());
+
+    OnResourcesReturned.Broadcast(Gatherer, ResourceType, ResourceAmount);
 }

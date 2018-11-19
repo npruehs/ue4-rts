@@ -16,6 +16,9 @@ URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectIni
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SetIsReplicated(true);
+
+	// Set reasonable default values.
+	ResourceSweepRadius = 1000.0f;
 }
 
 void URTSGathererComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

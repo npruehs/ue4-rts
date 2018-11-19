@@ -8,10 +8,13 @@
 
 URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer)
 {
+	SetIsReplicated(true);
+
+	// Set reasonable default values.
+	CurrentResources = 1000.0f;
+	MaximumResources = 1000.0f;
 	GatheringFactor = 1.0f;
 	GathererCapacity = 1;
-
-	SetIsReplicated(true);
 }
 
 void URTSResourceSourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

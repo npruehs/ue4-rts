@@ -1,6 +1,7 @@
 #include "RTSPluginPCH.h"
 #include "RTSCharacter.h"
 
+#include "WorldCollision.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/Controller.h"
