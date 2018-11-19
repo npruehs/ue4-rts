@@ -5,10 +5,12 @@
 #include "Landscape.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
@@ -40,9 +42,22 @@ ARTSPlayerController::ARTSPlayerController()
     PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
     PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
 
-	// Set reasonable default values.
-	CameraSpeed = 1000.0f;
-	CameraScrollThreshold = 20.0f;
+  	// Set reasonable default values.
+	  CameraRadius = 1000;
+	  CameraRadiusMin = 100;
+	  CameraRadiusMax = 10000;
+
+	  CameraZAngle = PI; //yaw
+	  CameraHeightAngle = 0;
+	  CameraHeightAngleMin = 0.2f;
+	  CameraHeightAngleMax = PI/2;
+
+	  CameraZoomSpeed = 200.f;
+	  CameraSpeed = 2000.f;
+	  CameraRotationSpeed = 0.2f;
+
+	  CameraSpeed = 1000.0f;
+	  CameraScrollThreshold = 20.0f;
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -104,6 +119,11 @@ void ARTSPlayerController::SetupInputComponent()
 
 	InputComponent->BindAxis(TEXT("MoveCameraLeftRight"), this, &ARTSPlayerController::MoveCameraLeftRight);
 	InputComponent->BindAxis(TEXT("MoveCameraUpDown"), this, &ARTSPlayerController::MoveCameraUpDown);
+
+	InputComponent->BindAction(TEXT("ZoomCameraIn"), IE_Pressed, this, &ARTSPlayerController::ZoomCameraIn);
+	InputComponent->BindAction(TEXT("ZoomCameraOut"), IE_Pressed, this, &ARTSPlayerController::ZoomCameraOut);
+	InputComponent->BindAction(TEXT("RotateCamera"), IE_Pressed, this, &ARTSPlayerController::StartRotateCamera);
+	InputComponent->BindAction(TEXT("RotateCamera"), IE_Released, this, &ARTSPlayerController::StopRotateCamera);
 
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
@@ -1453,6 +1473,62 @@ void ARTSPlayerController::MoveCameraUpDown(float Value)
     CameraUpDownAxisValue = Value;
 }
 
+void ARTSPlayerController::ZoomCameraIn()
+{
+	CameraRadius -= CameraZoomSpeed;
+	CameraRadius = FMath::Clamp(CameraRadius, CameraRadiusMin, CameraRadiusMax);
+	UpdateCameraLocationAndRotation();
+}
+
+void ARTSPlayerController::ZoomCameraOut()
+{
+	CameraRadius += CameraZoomSpeed;
+	CameraRadius = FMath::Clamp(CameraRadius, CameraRadiusMin, CameraRadiusMax);
+	UpdateCameraLocationAndRotation();
+}
+
+FVector ARTSPlayerController::PointOnASphere(float Radius, float AngleAroundZ, float AngleFromHorizontal)
+{
+	float XComp = Radius * FMath::Cos(AngleAroundZ) * FMath::Sin(AngleFromHorizontal);
+	float YComp = Radius * FMath::Sin(AngleAroundZ) * FMath::Sin(AngleFromHorizontal);
+	float ZComp = Radius * FMath::Cos(AngleFromHorizontal);
+	return FVector(XComp, YComp, ZComp);
+}
+
+void ARTSPlayerController::UpdateCameraLocationAndRotation()
+{
+	//Get the camera component of pawn
+	APawn* PlayerPawn = GetPawn();
+	if (!PlayerPawn)
+		return;
+	UCameraComponent* PlayerPawnCamera = (UCameraComponent*)PlayerPawn->GetComponentByClass(UCameraComponent::StaticClass());
+	if (!PlayerPawnCamera)
+		return;
+
+	PlayerPawnCamera->SetRelativeLocation(PointOnASphere(CameraRadius, CameraZAngle, CameraHeightAngle));
+	PlayerPawnCamera->SetRelativeRotation(UKismetMathLibrary::FindLookAtRotation(PlayerPawnCamera->RelativeLocation, FVector()));
+}
+
+void ARTSPlayerController::StartRotateCamera()
+{
+	bRotateCamera = true;
+
+	// Get mouse input.
+	float MouseX;
+	float MouseY;
+
+	if (GetMousePosition(MouseX, MouseY))
+	{
+		RotationMouseStartPosition = FVector2D(MouseX, MouseY);
+		bRotateCamera = true;
+	}
+}
+
+void ARTSPlayerController::StopRotateCamera()
+{
+	bRotateCamera = false;
+}
+
 void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
 {
 	ReceiveOnActorOwnerChanged(Actor);
@@ -1631,15 +1707,51 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
         {
             CameraUpDownAxisValue -= (MouseY - ScrollBorderTop) / CameraScrollThreshold;
         }
+
+		//Rotate Camera
+		if (bRotateCamera)
+		{
+			//Difference in mouse position to previous tick
+			float MouseXDiff = MouseX - RotationMouseStartPosition.X;
+			float MouseYDiff = MouseY - RotationMouseStartPosition.Y;
+
+			if (bInvertCameraRotationX)
+			{
+				CameraZAngle -= (MouseXDiff * CameraRotationSpeed);
+			}
+			else
+			{
+				CameraZAngle += (MouseXDiff * CameraRotationSpeed);
+			}
+			if (bInvertCameraRotationY)
+			{
+				CameraHeightAngle -= (MouseYDiff * CameraRotationSpeed);
+			}
+			else
+			{
+				CameraHeightAngle += (MouseYDiff * CameraRotationSpeed);
+			}
+
+			CameraHeightAngle = FMath::Clamp(CameraHeightAngle, CameraHeightAngleMin, CameraHeightAngleMax);
+
+			UpdateCameraLocationAndRotation();
+			RotationMouseStartPosition = FVector2D(MouseX, MouseY); //Update new mouse location for this tick
+		}
     }
 
     // Apply input.
     CameraLeftRightAxisValue = FMath::Clamp(CameraLeftRightAxisValue, -1.0f, +1.0f);
     CameraUpDownAxisValue = FMath::Clamp(CameraUpDownAxisValue, -1.0f, +1.0f);
-    
-    FVector Location = PlayerPawn->GetActorLocation();
-    Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
-    Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
+
+	UCameraComponent* PlayerPawnCamera = (UCameraComponent*)PlayerPawn->GetComponentByClass(UCameraComponent::StaticClass());
+	if (!PlayerPawnCamera)
+	{
+		return;
+	}
+	FRotator CameraRotation = FRotator(0, (PlayerPawnCamera->RelativeRotation).Yaw, 0); //isolate yaw component
+	FVector Location = PlayerPawn->GetActorLocation();
+    Location += UKismetMathLibrary::GetRightVector(CameraRotation) * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
+    Location += UKismetMathLibrary::GetForwardVector(CameraRotation) * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
 
     // Enforce camera bounds.
     if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))

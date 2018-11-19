@@ -32,6 +32,50 @@ public:
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
     float CameraSpeed;
 
+	/** Camera Rotation around Axis Z (Radians) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraZAngle;
+
+	/** Camera Height Angle (Radians) from vertical */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera", meta = (ClampMin = 0))
+	float CameraHeightAngle;
+
+	/** Camera Pitch Angle Max */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraHeightAngleMax;
+
+	/** Camera Pitch Angle Min */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraHeightAngleMin;
+
+	/** Camera Radius (Distance) From Pawn Position */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraRadius;
+
+	/** Camera Radius Max */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraRadiusMax;
+
+	/** Camera Radius Min */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera", meta = (ClampMin = 0))
+	float CameraRadiusMin;
+
+	/** Camera Zoom Speed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraZoomSpeed;
+
+	/** Camera Rotation Speed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	float CameraRotationSpeed;
+
+	/** Invert mouse X axis when rotating */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	bool bInvertCameraRotationX;
+
+	/** Invert mouse Y axis when rotating */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS|Camera")
+	bool bInvertCameraRotationY;
+
     /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
 	int32 CameraScrollThreshold;
@@ -321,6 +365,17 @@ private:
     /** Last vertical axis input applied to camera movement. */
     float CameraUpDownAxisValue;
 
+	/** Last zoom axis input applied to camera movement. */
+	float CameraZoomAxisValue;
+
+	/** Movement speed multiplier. =1 for default speed */
+	float FastMoveValue = 1;
+
+	/** Whether Camera should rotate with MouseXY input */
+	bool bRotateCamera;
+
+	/** Position of mouse when begining camera rotaion */
+	FVector2D RotationMouseStartPosition;
 
 	/** Saved selections of this player. */
 	TArray<TArray<AActor*>> ControlGroups;
@@ -436,6 +491,24 @@ private:
 
     /** Applies vertical axis input to camera movement. */
     void MoveCameraUpDown(float Value);
+
+	/** Applies zoom action input to camera movement. */
+	void ZoomCameraIn();
+
+	/** Applies zoom action input to camera movement. */
+	void ZoomCameraOut();
+
+	/** Allows camera to rotate through MouseXY input. */
+	void StartRotateCamera();
+
+	/** Prevents camera to rotate through MouseXY input. */
+	void StopRotateCamera();
+
+	/**Calculates the position on a sphere */
+	FVector PointOnASphere(float Radius, float AngleAroundZ, float AngleFromHorizontal);
+
+	/**Updates the camera location and rotation */
+	void UpdateCameraLocationAndRotation();
 
     /** Remembers the current mouse position for multi-selection, finished by FinishSelectActors. */
     UFUNCTION()
