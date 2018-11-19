@@ -204,9 +204,12 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
 		return false;
 	}
 
-	OutSelectionFrame = FIntRect(
-		FIntPoint(SelectionFrameMouseStartPosition.X, SelectionFrameMouseStartPosition.Y),
-		FIntPoint(MouseX, MouseY));
+    float MinX = FMath::Min(SelectionFrameMouseStartPosition.X, MouseX);
+    float MaxX = FMath::Max(SelectionFrameMouseStartPosition.X, MouseX);
+    float MinY = FMath::Min(SelectionFrameMouseStartPosition.Y, MouseY);
+    float MaxY = FMath::Max(SelectionFrameMouseStartPosition.Y, MouseY);
+
+	OutSelectionFrame = FIntRect(FIntPoint(MinX, MinY), FIntPoint(MaxX, MaxY));
 
 	return true;
 }
