@@ -8,11 +8,11 @@
 #include "RTSMinimapWidget.generated.h"
 
 
+class ARTSFogOfWarActor;
 class ARTSMinimapVolume;
 class ARTSPlayerController;
 class ARTSVisionInfo;
 class ARTSVisionVolume;
-class ARTSFogOfWarActor;
 
 
 /**

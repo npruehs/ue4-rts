@@ -5,6 +5,9 @@ namespace UnrealBuildTool.Rules
 		public RTSPlugin(ReadOnlyTargetRules Target)
             : base(Target)
 		{
+#if UE_4_21_OR_LATER
+            PrivatePCHHeaderFile = "Classes/RTSPluginPCH.h";
+#endif
             PrivateIncludePaths.AddRange(
                 new string[]
                 {

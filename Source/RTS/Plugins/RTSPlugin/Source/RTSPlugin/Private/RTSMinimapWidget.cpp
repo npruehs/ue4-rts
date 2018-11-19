@@ -148,6 +148,7 @@ int32 URTSMinimapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& Al
 void URTSMinimapWidget::NativePaint(FPaintContext& InContext) const
 {
 	UUserWidget::NativePaint(InContext);
+
 	InContext.MaxLayer++;
 
 	DrawBackground(InContext);
