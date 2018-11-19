@@ -124,6 +124,7 @@ _Note that you may use any class derived from Actor, if you want to. The plugin 
 1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 1. Add SelectableComponents to everything selectable.
 1. At every SelectableComponent, set the Selection Circle Material (e.g. to M_RTSSelectionCircle).
+1. At every SelectableComponent, set the Selected Sound as desired.
 1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController.
 
 #### Showing Selection Frames
