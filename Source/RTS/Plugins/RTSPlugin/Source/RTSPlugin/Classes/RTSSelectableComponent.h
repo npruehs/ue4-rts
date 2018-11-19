@@ -9,6 +9,7 @@
 
 class UMaterialInterface;
 class UMaterialInstanceDynamic;
+class USoundCue;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSSelectableComponentSelectedSignature);
@@ -27,6 +28,10 @@ public:
     /** Material for rendering the selection circle of the actor. */
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
     UMaterialInterface* SelectionCircleMaterial;
+
+    /** Sound to play when the actor is selected. */
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+    USoundCue* SelectedSound;
 
 
     virtual void BeginPlay() override;

@@ -354,7 +354,6 @@ private:
 	/** Current cursor for placing a new building. */
 	ARTSBuildingCursor* BuildingCursor;
 
-
 	/** Whether we're currently creating a selection frame by dragging the mouse. */
 	bool bCreatingSelectionFrame;
 
@@ -375,6 +374,9 @@ private:
 
 	/** Whether to add clicked units to the current selection, if they're not already selected, and deselect them otherwise. */
 	bool bToggleSelectionHotkeyPressed;
+
+    /** Time to wait before playing the next selection sound, in seconds. */
+    float SelectionSoundCooldownRemaining;
 
 
     /** Provides bonuses for various gameplay elements for this player. */

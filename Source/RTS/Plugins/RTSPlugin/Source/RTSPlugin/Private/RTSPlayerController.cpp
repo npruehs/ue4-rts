@@ -10,6 +10,7 @@
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSAttackComponent.h"
 #include "RTSAttackableComponent.h"
@@ -949,6 +950,13 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 		if (SelectableComponent)
 		{
 			SelectableComponent->SelectActor();
+
+            // Play selection sound.
+            if (SelectionSoundCooldownRemaining <= 0.0f && IsValid(SelectableComponent->SelectedSound))
+            {
+                UGameplayStatics::PlaySound2D(this, SelectableComponent->SelectedSound);
+                SelectionSoundCooldownRemaining = SelectableComponent->SelectedSound->GetDuration();
+            }
 		}
 	}
 
@@ -1610,6 +1618,12 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
+
+    // Update sound cooldowns.
+    if (SelectionSoundCooldownRemaining > 0.0f)
+    {
+        SelectionSoundCooldownRemaining -= DeltaTime;
+    }
 
     APawn* PlayerPawn = GetPawn();
 
