@@ -1,0 +1,26 @@
+{
+	"FileVersion" : 1,
+	"Version" : 1,
+	"VersionName" : "1.0",
+	"FriendlyName" : "Real-Time Strategy",
+	"Description" : "Provides a gameplay framework for developing real-time strategy games.",
+	"Category" : "RTS",
+	"CreatedBy" : "Nick Pruehs",
+	"CreatedByURL" : "https://github.com/npruehs",
+	"DocsURL" : "",
+	"MarketplaceURL" : "",
+	"SupportURL" : "",
+	"EnabledByDefault" : true,
+	"CanContainContent" : true,
+	"IsBetaVersion" : false,
+	"Installed" : false,
+	"Modules" :
+	[
+		{
+			"Name" : "RealTimeStrategy",
+			"Type" : "Runtime",
+			"LoadingPhase" : "Default",
+			"WhitelistPlatforms": [ "Win64" ]
+		}
+	]
+}
