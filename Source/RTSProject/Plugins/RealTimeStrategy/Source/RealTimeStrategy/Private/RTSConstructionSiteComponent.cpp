@@ -40,7 +40,7 @@ void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 
 void URTSConstructionSiteComponent::BeginPlay()
 {
-	UActorComponent::BeginPlay();
+	Super::BeginPlay();
 
 	// Set container size.
 	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();

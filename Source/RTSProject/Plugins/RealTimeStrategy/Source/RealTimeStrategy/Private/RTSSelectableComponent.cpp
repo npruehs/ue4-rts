@@ -10,6 +10,8 @@
 
 void URTSSelectableComponent::BeginPlay()
 {
+    Super::BeginPlay();
+
     AActor* Owner = GetOwner();
 
     if (!IsValid(Owner))

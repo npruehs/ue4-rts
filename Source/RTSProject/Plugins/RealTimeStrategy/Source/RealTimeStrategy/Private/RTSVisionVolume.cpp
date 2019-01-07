@@ -46,6 +46,8 @@ FIntVector ARTSVisionVolume::WorldToTile(const FVector& WorldPosition) const
 
 void ARTSVisionVolume::BeginPlay()
 {
+    Super::BeginPlay();
+
 	// Get vision world size.
 	UBrushComponent* VisionBrushComponent = GetBrushComponent();
 	FBoxSphereBounds VisionBounds = VisionBrushComponent->CalcBounds(VisionBrushComponent->GetComponentTransform());

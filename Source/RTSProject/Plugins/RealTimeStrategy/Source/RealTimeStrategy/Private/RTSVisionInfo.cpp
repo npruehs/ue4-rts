@@ -158,6 +158,8 @@ ARTSVisionInfo* ARTSVisionInfo::GetVisionInfoForTeam(UObject* WorldContextObject
 
 void ARTSVisionInfo::BeginPlay()
 {
+    Super::BeginPlay();
+
 	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
 	{
 		VisionVolume = *It;

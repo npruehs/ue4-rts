@@ -36,7 +36,7 @@ void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 void URTSProductionComponent::BeginPlay()
 {
-	UActorComponent::BeginPlay();
+	Super::BeginPlay();
 
 	// Setup queues.
 	for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)

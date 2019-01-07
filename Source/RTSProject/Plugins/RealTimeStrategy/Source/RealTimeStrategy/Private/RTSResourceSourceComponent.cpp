@@ -26,6 +26,8 @@ void URTSResourceSourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimePro
 
 void URTSResourceSourceComponent::BeginPlay()
 {
+    Super::BeginPlay();
+
 	// Set container size.
 	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
 

@@ -22,6 +22,8 @@ void URTSPlayerResourcesComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
 
 void URTSPlayerResourcesComponent::BeginPlay()
 {
+    Super::BeginPlay();
+
     // Check resource types.
     int32 ResourceTypeNum = ResourceTypes.Num();
     int32 ResourceAmountNum = ResourceAmounts.Num();

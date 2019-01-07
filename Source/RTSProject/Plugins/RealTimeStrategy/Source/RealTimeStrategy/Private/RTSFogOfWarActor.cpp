@@ -20,7 +20,7 @@ ARTSFogOfWarActor::ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer
 
 void ARTSFogOfWarActor::BeginPlay()
 {
-	AActor::BeginPlay();
+	Super::BeginPlay();
 
 	// Get vision size.
 	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
