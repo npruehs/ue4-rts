@@ -19,10 +19,23 @@ public:
     URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer);
 
     /** Whether units controlled by the player are invulnerable, or not. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Advantage")
+    bool IsGodModeEnabled() const;
+
+    /** Gets the factor to multiply all construction and production speed with. */
+    float GetSpeedBoostFactor() const;
+
+    /** Sets whether units controlled by the player are invulnerable, or not. */
+    void SetGodModeEnabled(bool bInGodModeEnabled);
+
+    /** Sets the factor to multiply all construction and production speed with. */
+    void SetSpeedBoostFactor(float InSpeedBoostFactor);
+
+private:
+    /** Whether units controlled by the player are invulnerable, or not. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Advantage")
     bool bGodModeEnabled;
 
     /** Factor to multiply all construction and production speed with. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Advantage")
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Advantage")
     float SpeedBoostFactor;
 };

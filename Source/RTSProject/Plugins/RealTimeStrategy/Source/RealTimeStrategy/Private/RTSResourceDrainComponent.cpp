@@ -44,6 +44,21 @@ float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<
 	return ReturnedResources;
 }
 
+TArray<TSubclassOf<URTSResourceType>> URTSResourceDrainComponent::GetResourceTypes() const
+{
+    return ResourceTypes;
+}
+
+bool URTSResourceDrainComponent::MustGathererEnter() const
+{
+    return bGathererMustEnter;
+}
+
+int32 URTSResourceDrainComponent::GetGathererCapacity() const
+{
+    return GathererCapacity;
+}
+
 void URTSResourceDrainComponent::NotifyOnResourcesReturned_Implementation(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
     UE_LOG(LogRTS, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),

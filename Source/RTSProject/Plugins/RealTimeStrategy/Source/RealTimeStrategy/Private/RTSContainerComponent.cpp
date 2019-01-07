@@ -60,3 +60,18 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
 
 	UE_LOG(LogRTS, Log, TEXT("Actor %s has left %s."), *Actor->GetName(), *GetOwner()->GetName());
 }
+
+int32 URTSContainerComponent::GetCapacity() const
+{
+    return Capacity;
+}
+
+void URTSContainerComponent::SetCapacity(int32 InCapacity)
+{
+    Capacity = InCapacity;
+}
+
+TArray<AActor*> URTSContainerComponent::GetContainedActors() const
+{
+    return ContainedActors;
+}

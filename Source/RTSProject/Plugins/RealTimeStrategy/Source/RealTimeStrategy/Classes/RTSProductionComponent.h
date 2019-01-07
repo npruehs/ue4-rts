@@ -23,23 +23,6 @@ class REALTIMESTRATEGY_API URTSProductionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	/** Types of actors the actor can produce. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<TSubclassOf<AActor>> AvailableProducts;
-
-	/** How many products may be queued per queue. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", meta = (ClampMin = 1))
-	int32 CapacityPerQueue;
-
-	/** Products queued for production. */
-	UPROPERTY(BlueprintReadOnly, Category = "RTS", replicated)
-	TArray<FRTSProductionQueue> ProductionQueues;
-
-	/** How many products can be produced simultaneously. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", meta = (ClampMin = 1))
-	int32 QueueCount;
-
-
 	URTSProductionComponent(const FObjectInitializer& ObjectInitializer);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -50,35 +33,35 @@ public:
 
 
 	/** Checks whether the actor can start producing the specified product. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	virtual bool CanAssignProduction(TSubclassOf<AActor> ProductClass) const;
 
 	/** Gets the index of the queue the specified product would be assigned to, or -1 all queues are at the capacity limit. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	virtual int32 FindQueueForProduct(TSubclassOf<AActor> ProductClass) const;
 
 	/** Gets the product currently being produced in the specified queue. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	TSubclassOf<AActor> GetCurrentProduction(int32 QueueIndex = 0) const;
 
 	/** Gets the required time for producing the current product in the specified queue. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	float GetProductionTime(int32 QueueIndex = 0) const;
 
 	/** Gets the required time for producing the specified product. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	virtual float GetProductionTimeForProduct(TSubclassOf<AActor> ProductClass) const;
 
 	/** Gets the current production progress [0..1] for the specified queue. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	float GetProgressPercentage(int32 QueueIndex = 0) const;
 
 	/** Gets the time before producing the current product in the specified queue has finished. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	float GetRemainingProductionTime(int32 QueueIndex = 0) const;
 
 	/** Whether any queue production timer is currently being ticked, or not. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	bool IsProducing() const;
 
 	/** Starts producing the specified product, setting the timer. */
@@ -92,6 +75,19 @@ public:
 	/** Cancels producing the product in the specified queue. */
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelProduction(int32 QueueIndex = 0, int32 ProductIndex = 0);
+
+
+    /** Gets the types of actors the actor can produce. */
+    UFUNCTION(BlueprintPure)
+    TArray<TSubclassOf<AActor>> GetAvailableProducts() const;
+
+    /** Gets how many products can be produced simultaneously. */
+    UFUNCTION(BlueprintPure)
+    int32 GetQueueCount() const;
+
+    /** Gets how many products may be queued per queue. */
+    UFUNCTION(BlueprintPure)
+    int32 GetCapacityPerQueue() const;
 
 
 	/** Event when a product has been queued for production. */
@@ -115,6 +111,22 @@ public:
 	FRTSProductionComponentProductionCostRefundedSignature OnProductionCostRefunded;
 
 private:
+    /** Types of actors the actor can produce. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TArray<TSubclassOf<AActor>> AvailableProducts;
+
+    /** How many products can be produced simultaneously. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
+    int32 QueueCount;
+
+    /** How many products may be queued per queue. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
+    int32 CapacityPerQueue;
+
+    /** Products queued for production. */
+    UPROPERTY(replicated)
+    TArray<FRTSProductionQueue> ProductionQueues;
+
 	void DequeueProduct(int32 QueueIndex = 0, int32 ProductIndex = 0);
 	void StartProductionInQueue(int32 QueueIndex = 0);
 };

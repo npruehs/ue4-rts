@@ -36,21 +36,24 @@ public:
 	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
 
 private:
+    /** Renders the fog of war. */
+    UPROPERTY(EditInstanceOnly, Category = "RTS")
+    APostProcessVolume* FogOfWarVolume;
+
 	/** Material to instance for rendering the fog of war effect. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY()
 	UMaterialInterface* FogOfWarMaterial;
 
-	/** Renders the fog of war. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	APostProcessVolume* FogOfWarVolume;
-
 	/** Provides visibility information for how to render the fog of war. */
+    UPROPERTY()
 	ARTSVisionInfo* VisionInfo;
 
 	/** Provides world size information for how to render the fog of war. */
+    UPROPERTY()
 	ARTSVisionVolume* VisionVolume;
 
 	/** Texture containing visibility information to be rendered in 3D space. */
+    UPROPERTY()
 	UTexture2D* FogOfWarTexture; 
 
 	/** Buffer for updating the contents of the fog of war texture. */
@@ -60,5 +63,6 @@ private:
 	FUpdateTextureRegion2D* FogOfWarUpdateTextureRegion;
 
 	/** Post-process material instance for rendering fog of war in 3D space. */
+    UPROPERTY()
 	UMaterialInstanceDynamic* FogOfWarMaterialInstance;
 };

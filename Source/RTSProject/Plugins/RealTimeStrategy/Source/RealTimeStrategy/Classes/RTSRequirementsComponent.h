@@ -17,7 +17,12 @@ class REALTIMESTRATEGY_API URTSRequirementsComponent : public UActorComponent
     GENERATED_BODY()
 
 public:
+    /** Gets the types of actors the player needs to own in order to create this actor. */
+    UFUNCTION(BlueprintPure)
+    TArray<TSubclassOf<AActor>> GetRequiredActors() const;
+
+private:
     /** Types of actors the player needs to own in order to create this actor. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
     TArray<TSubclassOf<AActor>> RequiredActors;
 };

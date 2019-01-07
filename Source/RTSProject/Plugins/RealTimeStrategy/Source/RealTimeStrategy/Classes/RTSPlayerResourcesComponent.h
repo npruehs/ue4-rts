@@ -28,31 +28,31 @@ public:
     void BeginPlay() override;
 
 
-    /** Resources currently available to this player. Num must match ResourceTypes. Need to use an array here instead of map for replication. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", ReplicatedUsing = ReceivedResourceAmounts)
-    TArray<float> ResourceAmounts;
-
-    /** Types of resources currently available to this player. Num must match ResourceAmounts. Need to use an array here instead of map for replication. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Resources", replicated)
-    TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
-
-
     /** Gets the amount of resources in stock of this player. */
-    bool GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount);
+    UFUNCTION(BlueprintPure)
+    float GetResources(TSubclassOf<URTSResourceType> ResourceType) const;
+
+    /** Gets the types of resources available to this player. */
+    TArray<TSubclassOf<URTSResourceType>> GetResourceTypes() const;
 
     /** Checks the amount of resources in stock of this player. */
-    bool CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+    UFUNCTION(BlueprintPure)
+    bool CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount) const;
 
     /** Checks the amount of resources in stock of this player. */
-    bool CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
+    UFUNCTION(BlueprintPure)
+    bool CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources) const;
 
     /** Adds the specified resources to the stock of this player. */
+    UFUNCTION(BlueprintCallable)
     virtual float AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Removes the specified resources from the stock of this player. */
+    UFUNCTION(BlueprintCallable)
     virtual float PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     /** Removes the specified resources from the stock of this player. */
+    UFUNCTION(BlueprintCallable)
     virtual void PayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources);
 
 
@@ -61,6 +61,14 @@ public:
     FRTSPlayerResourcesComponentResourcesChangedSignature OnResourcesChanged;
 
 private:
+    /** Types of resources currently available to this player. Num must match ResourceAmounts. Need to use an array here instead of map for replication. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Resources")
+    TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
+
+    /** Resources currently available to this player. Num must match ResourceTypes. Need to use an array here instead of map for replication. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Resources", ReplicatedUsing = ReceivedResourceAmounts)
+    TArray<float> ResourceAmounts;
+
     UFUNCTION()
     void ReceivedResourceAmounts();
 };

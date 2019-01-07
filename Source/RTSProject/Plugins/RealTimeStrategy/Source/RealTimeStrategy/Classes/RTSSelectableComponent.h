@@ -25,15 +25,6 @@ class REALTIMESTRATEGY_API URTSSelectableComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-    /** Material for rendering the selection circle of the actor. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    UMaterialInterface* SelectionCircleMaterial;
-
-    /** Sound to play when the actor is selected. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    USoundCue* SelectedSound;
-
-
     virtual void BeginPlay() override;
 
 
@@ -46,9 +37,11 @@ public:
 	void DeselectActor();
 
 	/** Checks whether the unit is currently selected by the local player, or not. */
-	UFUNCTION(BlueprintCallable)
-	bool IsSelected();
+	UFUNCTION(BlueprintPure)
+	bool IsSelected() const;
 
+    /** Gets the sound to play when the actor is selected. */
+    USoundCue* GetSelectedSound() const;
 
 	/** Event when the actor has been deselected. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -60,12 +53,22 @@ public:
 
 
 private:
+    /** Material for rendering the selection circle of the actor. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UMaterialInterface* SelectionCircleMaterial;
+
+    /** Sound to play when the actor is selected. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* SelectedSound;
+
 	/** Whether the unit is currently selected by the local player, or not. */
 	bool bSelected;
 
     /** Decal used for rendering the selection circle of this character. */
+    UPROPERTY()
     UDecalComponent* DecalComponent;
 
     /** Material instance for rendering the selection circle of the actor. */
+    UPROPERTY()
     UMaterialInstanceDynamic* SelectionCircleMaterialInstance;
 };

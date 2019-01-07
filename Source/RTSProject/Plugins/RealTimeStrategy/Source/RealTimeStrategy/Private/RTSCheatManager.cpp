@@ -29,8 +29,8 @@ void URTSCheatManager::Boost()
         return;
     }
 
-    PlayerAdvantageComponent->SpeedBoostFactor *= SpeedBoostFactor;
-    UE_LOG(LogRTS, Log, TEXT("Cheat: Set speed boost factor to %f."), PlayerAdvantageComponent->SpeedBoostFactor);
+    PlayerAdvantageComponent->SetSpeedBoostFactor(PlayerAdvantageComponent->GetSpeedBoostFactor() * SpeedBoostFactor);
+    UE_LOG(LogRTS, Log, TEXT("Cheat: Set speed boost factor to %f."), PlayerAdvantageComponent->GetSpeedBoostFactor());
 }
 
 void URTSCheatManager::God()
@@ -52,7 +52,7 @@ void URTSCheatManager::God()
     }
 
     // Toggle god mode.
-    PlayerAdvantageComponent->bGodModeEnabled = !PlayerAdvantageComponent->bGodModeEnabled;
+    PlayerAdvantageComponent->SetGodModeEnabled(!PlayerAdvantageComponent->IsGodModeEnabled());
 
     for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
     {
@@ -63,7 +63,7 @@ void URTSCheatManager::God()
             continue;
         }
 
-        Pawn->bCanBeDamaged = !PlayerAdvantageComponent->bGodModeEnabled;
+        Pawn->bCanBeDamaged = !PlayerAdvantageComponent->IsGodModeEnabled();
     }
 }
 

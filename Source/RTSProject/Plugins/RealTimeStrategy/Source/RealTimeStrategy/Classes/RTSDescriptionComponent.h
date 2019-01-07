@@ -16,7 +16,12 @@ class REALTIMESTRATEGY_API URTSDescriptionComponent : public UActorComponent
     GENERATED_BODY()
 
 public:
+    /** Gets the description of the actor. */
+    UFUNCTION(BlueprintPure)
+    FText GetDescription() const;
+
+private:
     /** Description of the actor. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
     FText Description;
 };

@@ -20,7 +20,6 @@ void URTSPlayerResourcesComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
     DOREPLIFETIME(URTSPlayerResourcesComponent, ResourceTypes);
 }
 
-
 void URTSPlayerResourcesComponent::BeginPlay()
 {
     // Check resource types.
@@ -37,7 +36,7 @@ void URTSPlayerResourcesComponent::BeginPlay()
     }
 }
 
-bool URTSPlayerResourcesComponent::GetResources(TSubclassOf<URTSResourceType> ResourceType, float* OutResourceAmount)
+float URTSPlayerResourcesComponent::GetResources(TSubclassOf<URTSResourceType> ResourceType) const
 {
     // Get current resource amount.
     int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
@@ -48,32 +47,24 @@ bool URTSPlayerResourcesComponent::GetResources(TSubclassOf<URTSResourceType> Re
             *ResourceType->GetName(),
             *GetOwner()->GetName());
 
-        *OutResourceAmount = 0.0f;
-        return false;
+        return 0.0f;
     }
 
-    *OutResourceAmount = ResourceAmounts[ResourceIndex];
-    return true;
+    return ResourceAmounts[ResourceIndex];
 }
 
-bool URTSPlayerResourcesComponent::CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
+TArray<TSubclassOf<URTSResourceType>> URTSPlayerResourcesComponent::GetResourceTypes() const
 {
-    float AvailableResources;
-
-    if (!GetResources(ResourceType, &AvailableResources))
-    {
-        return false;
-    }
-
-    if (AvailableResources < ResourceAmount)
-    {
-        return false;
-    }
-
-    return true;
+    return ResourceTypes;
 }
 
-bool URTSPlayerResourcesComponent::CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources)
+bool URTSPlayerResourcesComponent::CanPayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount) const
+{
+    float AvailableResources = GetResources(ResourceType);
+    return AvailableResources >= ResourceAmount;
+}
+
+bool URTSPlayerResourcesComponent::CanPayAllResources(TMap<TSubclassOf<URTSResourceType>, float> Resources) const
 {
     for (auto& Resource : Resources)
     {
@@ -88,15 +79,17 @@ bool URTSPlayerResourcesComponent::CanPayAllResources(TMap<TSubclassOf<URTSResou
 
 float URTSPlayerResourcesComponent::AddResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
-    // Get current resource amount.
-    float OldResourceAmount;
-    if (!GetResources(ResourceType, &OldResourceAmount))
+    int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
+
+    if (ResourceIndex == INDEX_NONE)
     {
         return 0.0f;
     }
 
+    // Get current resource amount.
+    float OldResourceAmount = GetResources(ResourceType);
+
     // Add resources.
-    int32 ResourceIndex = ResourceTypes.IndexOfByKey(ResourceType);
     float NewResourceAmount = OldResourceAmount + ResourceAmount;
     ResourceAmounts[ResourceIndex] = NewResourceAmount;
 
@@ -113,11 +106,7 @@ float URTSPlayerResourcesComponent::AddResources(TSubclassOf<URTSResourceType> R
 float URTSPlayerResourcesComponent::PayResources(TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
     // Get current resource amount.
-    float OldResourceAmount;
-    if (!GetResources(ResourceType, &OldResourceAmount))
-    {
-        return 0.0f;
-    }
+    float OldResourceAmount = GetResources(ResourceType);
 
     if (OldResourceAmount < ResourceAmount)
     {

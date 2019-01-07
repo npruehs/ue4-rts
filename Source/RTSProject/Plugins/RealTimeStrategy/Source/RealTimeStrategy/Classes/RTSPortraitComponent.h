@@ -19,7 +19,12 @@ class REALTIMESTRATEGY_API URTSPortraitComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+    /** Gets the portrait of the actor. Can be shown in the UI. */
+    UFUNCTION(BlueprintPure)
+    UTexture2D* GetPortrait() const;
+
+private:
 	/** Portrait of the actor. Can be shown in the UI. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	UTexture2D* Portrait;
 };

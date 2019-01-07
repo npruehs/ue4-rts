@@ -44,7 +44,7 @@ void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
 		return;
 	}
 
-	UE_LOG(LogRTS, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->TeamIndex);
+	UE_LOG(LogRTS, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->GetTeamIndex());
 }
 
 void URTSMinimapWidget::NotifyOnDrawUnit(

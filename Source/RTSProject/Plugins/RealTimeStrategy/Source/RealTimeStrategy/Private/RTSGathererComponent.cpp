@@ -109,7 +109,7 @@ AActor* URTSGathererComponent::FindClosestResourceDrain() const
 		}
 
 		// Check resource type.
-		if (!ResourceDrainComponent->ResourceTypes.Contains(CarriedResourceType))
+		if (!ResourceDrainComponent->GetResourceTypes().Contains(CarriedResourceType))
 		{
 			continue;
 		}
@@ -163,7 +163,7 @@ AActor* URTSGathererComponent::GetClosestResourceSource(TSubclassOf<class URTSRe
         }
 
         // Check resource type.
-        if (ResourceSourceComponent->ResourceType != DesiredResourceType)
+        if (ResourceSourceComponent->GetResourceType() != DesiredResourceType)
         {
             continue;
         }
@@ -237,12 +237,12 @@ void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 
 	// Reset carried amount.
 	CarriedResourceAmount = 0.0f;
-	CarriedResourceType = ResourceSourceComponent->ResourceType;
+	CarriedResourceType = ResourceSourceComponent->GetResourceType();
 
 	// Start cooldown before first gathering.
 	RemainingCooldown = GatherData.Cooldown;
 
-	if (ResourceSourceComponent->bGathererMustEnter)
+	if (ResourceSourceComponent->MustGathererEnter())
 	{
 		// Enter resource source.
 		auto ContainerComponent = ResourceSource->FindComponentByClass<URTSContainerComponent>();
@@ -376,6 +376,11 @@ float URTSGathererComponent::ReturnResources(AActor* ResourceDrain)
 	return ReturnedResources;
 }
 
+float URTSGathererComponent::GetRemainingCooldown() const
+{
+    return RemainingCooldown;
+}
+
 bool URTSGathererComponent::GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData) const
 {
 	if (!IsValid(ResourceSource))
@@ -390,7 +395,7 @@ bool URTSGathererComponent::GetGatherDataForResourceSource(AActor* ResourceSourc
 		return false;
 	}
 
-	return GetGatherDataForResourceType(ResourceSourceComponent->ResourceType, OutGatherData);
+	return GetGatherDataForResourceType(ResourceSourceComponent->GetResourceType(), OutGatherData);
 }
 
 bool URTSGathererComponent::GetGatherDataForResourceType(TSubclassOf<URTSResourceType> ResourceType, FRTSGatherData* OutGatherData) const

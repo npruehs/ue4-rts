@@ -53,13 +53,21 @@ public:
 
 private:
     bool bFired;
+
+    UPROPERTY()
 	AActor* Target;
+
 	float Damage;
 	TSubclassOf<class UDamageType> DamageType;
+
+    UPROPERTY()
 	AController* EventInstigator;
+
+    UPROPERTY()
 	AActor* DamageCauser;
+
     float TimeToImpact;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "RTS")
 	UProjectileMovementComponent* ProjectileMovement;
 };

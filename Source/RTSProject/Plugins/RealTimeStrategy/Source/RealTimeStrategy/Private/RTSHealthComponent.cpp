@@ -62,3 +62,13 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 
 	return Damage;
 }
+
+float URTSHealthComponent::GetMaximumHealth() const
+{
+    return MaximumHealth;
+}
+
+float URTSHealthComponent::GetCurrentHealth() const
+{
+    return CurrentHealth;
+}

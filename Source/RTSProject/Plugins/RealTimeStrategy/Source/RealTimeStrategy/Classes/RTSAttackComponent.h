@@ -23,23 +23,6 @@ class REALTIMESTRATEGY_API URTSAttackComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	/** Radius in which the actor will automatically select and attack targets, in cm. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float AcquisitionRadius;
-
-	/** Radius around the home location of the actor it won't leave when automatically attacking targets, in cm. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float ChaseRadius;
-
-	/** Attacks available for the actor. Different attacks might be used at different ranges, or against different types of targets. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<FRTSAttackData> Attacks;
-
-	/** Time before the next attack can be used, in seconds. This is shared between attacks.*/
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float RemainingCooldown;
-
-
 	URTSAttackComponent(const FObjectInitializer& ObjectInitializer);
 
 
@@ -50,6 +33,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UseAttack(int32 AttackIndex, AActor* Target);
 
+    /** Gets the radius in which the actor will automatically select and attack targets, in cm. */
+    UFUNCTION(BlueprintPure)
+    float GetAcquisitionRadius() const;
+
+    /** Gets the radius around the home location of the actor it won't leave when automatically attacking targets, in cm. */
+    UFUNCTION(BlueprintPure)
+    float GetChaseRadius() const;
+
+    /** Gets the attacks available for the actor. Different attacks might be used at different ranges, or against different types of targets. */
+    UFUNCTION(BlueprintPure)
+    TArray<FRTSAttackData> GetAttacks() const;
+
+    /** Gets the time before the next attack can be used, in seconds. This is shared between attacks.*/
+    UFUNCTION(BlueprintPure)
+    float GetRemainingCooldown() const;
+
 
 	/** Event when the attack cooldown has expired. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -58,4 +57,20 @@ public:
 	/** Event when an actor has used an attack. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSAttackComponentAttackedUsedSignature OnAttackUsed;
+
+private:
+    /** Radius in which the actor will automatically select and attack targets, in cm. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    float AcquisitionRadius;
+
+    /** Radius around the home location of the actor it won't leave when automatically attacking targets, in cm. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    float ChaseRadius;
+
+    /** Attacks available for the actor. Different attacks might be used at different ranges, or against different types of targets. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TArray<FRTSAttackData> Attacks;
+
+    /** Time before the next attack can be used, in seconds. This is shared between attacks.*/
+    float RemainingCooldown;
 };

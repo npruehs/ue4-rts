@@ -114,7 +114,7 @@ AActor* ARTSPlayerAIController::GetPrimaryResourceSource() const
         }
 
         // Check resource type.
-        if (ResourceSourceComponent->ResourceType != PrimaryResourceType)
+        if (ResourceSourceComponent->GetResourceType() != PrimaryResourceType)
         {
             continue;
         }
@@ -138,14 +138,14 @@ bool ARTSPlayerAIController::CanPayFor(TSubclassOf<APawn> PawnClass) const
 
     if (ProductionCostComponent)
     {
-        return PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->Resources);
+        return PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources());
     }
 
     URTSConstructionSiteComponent* ConstructionSiteComponent = URTSUtilities::FindDefaultComponentByClass<URTSConstructionSiteComponent>(PawnClass);
 
     if (ConstructionSiteComponent)
     {
-        return PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->ConstructionCosts);
+        return PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts());
     }
 
     return true;
@@ -176,7 +176,7 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
             continue;
         }
 
-        if (!ProductionComponent->AvailableProducts.Contains(PawnClass))
+        if (!ProductionComponent->GetAvailableProducts().Contains(PawnClass))
         {
             continue;
         }
@@ -233,7 +233,7 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
             continue;
         }
 
-        if (!BuilderComponent->ConstructibleBuildingClasses.Contains(PawnClass))
+        if (!BuilderComponent->GetConstructibleBuildingClasses().Contains(PawnClass))
         {
             continue;
         }

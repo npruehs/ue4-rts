@@ -33,3 +33,8 @@ void URTSFloatingCombatTextComponent::AddText(const FString& Text, const FLinear
 
     Texts.Add(TextData);
 }
+
+TArray<FRTSFloatingCombatTextData> URTSFloatingCombatTextComponent::GetTexts() const
+{
+    return Texts;
+}

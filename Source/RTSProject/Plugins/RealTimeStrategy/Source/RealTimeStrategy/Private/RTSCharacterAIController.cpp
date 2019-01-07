@@ -41,7 +41,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 
 	// Find nearby actors.
 	TArray<struct FHitResult> HitResults;
-	TraceSphere(GetPawn()->GetActorLocation(), AttackComponent->AcquisitionRadius, GetPawn(), ECC_Pawn, HitResults);
+	TraceSphere(GetPawn()->GetActorLocation(), AttackComponent->GetAcquisitionRadius(), GetPawn(), ECC_Pawn, HitResults);
 
 	// Find target to acquire.
 	for (auto& HitResult : HitResults)
@@ -129,7 +129,7 @@ void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> 
 		return;
 	}
 
-	int32 BuildingIndex = BuilderComponent->ConstructibleBuildingClasses.IndexOfByKey(BuildingClass);
+	int32 BuildingIndex = BuilderComponent->GetConstructibleBuildingClasses().IndexOfByKey(BuildingClass);
 
 	if (BuildingIndex == INDEX_NONE)
 	{

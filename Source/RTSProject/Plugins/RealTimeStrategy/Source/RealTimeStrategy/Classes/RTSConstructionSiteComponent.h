@@ -27,50 +27,6 @@ class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public UActorComponen
 	GENERATED_BODY()
 
 public:
-	/** Builders currently working at this construction site. */
-	TArray<AActor*> AssignedBuilders;
-
-	/** When to pay resources for construction. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	ERTSProductionCostType ConstructionCostType;
-
-	/** Resources to pay for constructing the actor. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TMap<TSubclassOf<URTSResourceType>, float> ConstructionCosts;
-
-	/** Time for constructing the actor, in seconds. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float ConstructionTime;
-
-	/** Whether any builders working at this construction site are destroyed when finished. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	bool bConsumesBuilders;
-
-	/** How many builders may be assigned to this construction site at the same time. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	int32 MaxAssignedBuilders;
-
-	/** Factor to multiply all passed construction time with, independent of any currently assigned builders. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float ProgressMadeAutomatically;
-
-	/** Factor to multiply all passed construction time with, multiplied with the number of currently assigned builders. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float ProgressMadePerBuilder;
-
-	/** Time before the actor is constructed, in seconds. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", replicated)
-	float RemainingConstructionTime;
-
-	/** Resources to refund when canceling construction. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	float RefundFactor;
-
-	/** Whether to start construction immediately after spawn, or not. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	bool bStartImmediately;
-
-
 	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer);
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -81,19 +37,19 @@ public:
 
 
 	/** Whether the specified builder can be assigned to this construction site. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	virtual bool CanAssignBuilder(AActor* Builder) const;
 
 	/** Gets the current construction progress [0..1]. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	float GetProgressPercentage() const;
 
 	/** Whether the construction timer is currently being ticked, or not. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	bool IsConstructing() const;
 
 	/** Whether the construction is finished and the actor ready to use. */
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	bool IsFinished() const;
 
 	/** Starts constructing the actor, setting the timer. */
@@ -107,6 +63,55 @@ public:
 	/** Cancels constructing the actor, destroying it. */
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelConstruction();
+
+
+    /** When to pay resources for construction. */
+    UFUNCTION(BlueprintPure)
+    ERTSProductionCostType GetConstructionCostType() const;
+
+    /** Gets the resources to pay for constructing the actor. */
+    UFUNCTION(BlueprintPure)
+    TMap<TSubclassOf<URTSResourceType>, float> GetConstructionCosts() const;
+
+    /** Gets the time for constructing the actor, in seconds. */
+    UFUNCTION(BlueprintPure)
+    float GetConstructionTime() const;
+
+    /** Whether any builders working at this construction site are destroyed when finished. */
+    UFUNCTION(BlueprintPure)
+    bool ConsumesBuilders() const;
+
+    /** Gets how many builders may be assigned to this construction site at the same time. */
+    UFUNCTION(BlueprintPure)
+    int32 GetMaxAssignedBuilders() const;
+
+    /** Gets the factor to multiply all passed construction time with, independent of any currently assigned builders. */
+    UFUNCTION(BlueprintPure)
+    float GetProgressMadeAutomatically() const;
+
+    /** Gets the factor to multiply all passed construction time with, multiplied with the number of currently assigned builders. */
+    UFUNCTION(BlueprintPure)
+    float GetProgressMadePerBuilder() const;
+
+    /** Gets the resources to refund when canceling construction. */
+    UFUNCTION(BlueprintPure)
+    float GetRefundFactor() const;
+
+    /** Whether to start construction immediately after spawn, or not. */
+    UFUNCTION(BlueprintPure)
+    bool DoesStartImmediately() const;
+
+    /** Whether the construction timer is currently being ticked, or not. */
+    UFUNCTION(BlueprintPure)
+    ERTSConstructionState GetState() const;
+
+    /** Gets the time before the actor is constructed, in seconds. */
+    UFUNCTION(BlueprintPure)
+    float GetRemainingConstructionTime() const;
+
+    /** Gets the builders currently working at this construction site. */
+    UFUNCTION(BlueprintPure)
+    TArray<AActor*> GetAssignedBuilders() const;
 
 
 	/** Event when the construction timer has been started. */
@@ -130,7 +135,51 @@ public:
 	FRTSConstructionSiteComponentConstructionCostRefundedSignature OnConstructionCostRefunded;
 
 private:
+    /** When to pay resources for construction. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    ERTSProductionCostType ConstructionCostType;
+
+    /** Resources to pay for constructing the actor. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TMap<TSubclassOf<URTSResourceType>, float> ConstructionCosts;
+
+    /** Time for constructing the actor, in seconds. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    float ConstructionTime;
+
+    /** Whether any builders working at this construction site are destroyed when finished. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bConsumesBuilders;
+
+    /** How many builders may be assigned to this construction site at the same time. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    int32 MaxAssignedBuilders;
+
+    /** Factor to multiply all passed construction time with, independent of any currently assigned builders. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    float ProgressMadeAutomatically;
+
+    /** Factor to multiply all passed construction time with, multiplied with the number of currently assigned builders. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    float ProgressMadePerBuilder;
+
+    /** Resources to refund when canceling construction. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    float RefundFactor;
+
+    /** Whether to start construction immediately after spawn, or not. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bStartImmediately;
+
 	/** Whether the construction timer is currently being ticked, or not. */
     UPROPERTY(replicated)
 	ERTSConstructionState State;
+
+    /** Time before the actor is constructed, in seconds. */
+    UPROPERTY(replicated)
+    float RemainingConstructionTime;
+
+    /** Builders currently working at this construction site. */
+    UPROPERTY()
+    TArray<AActor*> AssignedBuilders;
 };

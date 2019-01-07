@@ -24,6 +24,13 @@ ARTSVisionInfo::ARTSVisionInfo()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void ARTSVisionInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME_CONDITION(ARTSVisionInfo, TeamIndex, COND_InitialOnly);
+}
+
 void ARTSVisionInfo::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -69,12 +76,12 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 			continue;
 		}
 
-		if (!PlayerOwner->Team)
+		if (!PlayerOwner->GetTeam())
 		{
 			continue;
 		}
 
-		if (PlayerOwner->Team->TeamIndex != TeamIndex)
+		if (PlayerOwner->GetTeam()->GetTeamIndex() != TeamIndex)
 		{
 			continue;
 		}
@@ -82,7 +89,7 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 		// Convert location and sight radius to tile space.
 		FVector ActorLocationWorld = Actor->GetActorLocation();
 		FIntVector ActorLocationTile = VisionVolume->WorldToTile(ActorLocationWorld);
-		int32 ActorSightRadiusTile = FMath::FloorToInt(VisionComponent->SightRadius / VisionVolume->SizePerTile);
+		int32 ActorSightRadiusTile = FMath::FloorToInt(VisionComponent->GetSightRadius() / VisionVolume->GetSizePerTile());
 
 		/*UE_LOG(LogRTS, Log, TEXT("ActorLocationWorld: %s"), *ActorLocationWorld.ToString());
 		UE_LOG(LogRTS, Log, TEXT("ActorLocationTile: %s"), *ActorLocationTile.ToString());
@@ -113,6 +120,11 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 			}
 		}
 	}
+}
+
+uint8 ARTSVisionInfo::GetTeamIndex() const
+{
+    return TeamIndex;
 }
 
 void ARTSVisionInfo::SetTeamIndex(uint8 NewTeamIndex)
@@ -200,7 +212,7 @@ void ARTSVisionInfo::NotifyPlayerVisionInfoAvailable()
 
 	ARTSTeamInfo* Team = Player->GetTeamInfo();
 
-	if (!Team || Team->TeamIndex != TeamIndex)
+	if (!Team || Team->GetTeamIndex() != TeamIndex)
 	{
 		return;
 	}
@@ -211,11 +223,4 @@ void ARTSVisionInfo::NotifyPlayerVisionInfoAvailable()
 void ARTSVisionInfo::ReceivedTeamIndex()
 {
 	NotifyPlayerVisionInfoAvailable();
-}
-
-void ARTSVisionInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(ARTSVisionInfo, TeamIndex, COND_InitialOnly);
 }

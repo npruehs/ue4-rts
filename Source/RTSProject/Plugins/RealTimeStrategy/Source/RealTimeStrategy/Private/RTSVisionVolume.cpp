@@ -11,6 +11,11 @@ ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer)
 	SizePerTile = 16.0f;
 }
 
+float ARTSVisionVolume::GetSizePerTile() const
+{
+    return SizePerTile;
+}
+
 FVector ARTSVisionVolume::GetWorldSize() const
 {
 	return WorldSize;

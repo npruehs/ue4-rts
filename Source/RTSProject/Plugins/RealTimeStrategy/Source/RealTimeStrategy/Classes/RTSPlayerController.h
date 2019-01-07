@@ -28,55 +28,31 @@ class REALTIMESTRATEGY_API ARTSPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-    /** Movement speed of the camera when moved with keys or mouse, in cm/sec. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
-    float CameraSpeed;
-
-    /** How fast to zoom the camera in and out, in cm/sec. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera")
-    float CameraZoomSpeed;
-
-	/** Maximum distance of the camera from the player pawn, in cm. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
-	float MinCameraDistance;
-
-    /** Minimum distance of the camera from the player pawn, in cm. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
-	float MaxCameraDistance;
-
-    /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Camera", meta = (ClampMin = 0))
-	int32 CameraScrollThreshold;
-
-    /** Preview to use for placing buildings. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction")
-	TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
-
-
     ARTSPlayerController();
-	virtual void PlayerTick(float DeltaTime) override;
+    
+    virtual void PlayerTick(float DeltaTime) override;
 
 
 	/** Gets the actor currently hovered by this player. */
-	UFUNCTION(BlueprintCallable)
-	AActor* GetHoveredActor();
+	UFUNCTION(BlueprintPure)
+	AActor* GetHoveredActor() const;
 
 	/** Gets the replicated state of this player. */
-	UFUNCTION(BlueprintCallable)
-	ARTSPlayerState* GetPlayerState();
+	UFUNCTION(BlueprintPure)
+	ARTSPlayerState* GetPlayerState() const;
 
 	/** Gets the list of units currently selected by this player. */
-	UFUNCTION(BlueprintCallable)
-	TArray<AActor*> GetSelectedActors();
+	UFUNCTION(BlueprintPure)
+	TArray<AActor*> GetSelectedActors() const;
 
 	/** Casts a ray from the specified screen position and collects the results. */
-	bool GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults);
+	bool GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults) const;
 
 	/** Casts a ray to find any objects at the specified world position. */
-	bool GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults);
+	bool GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults) const;
 
 	/** Gets the current selection frame, in screen space. */
-	bool GetSelectionFrame(FIntRect& OutSelectionFrame);
+	bool GetSelectionFrame(FIntRect& OutSelectionFrame) const;
 
 	/** Gets the team this player belongs to. */
 	UFUNCTION(BlueprintPure)
@@ -103,10 +79,10 @@ public:
 	bool IssueMoveOrder(const FVector& TargetLocation);
 
     /** Gets a selected actor suitable for production. */
-    AActor* GetSelectedProductionActor();
+    AActor* GetSelectedProductionActor() const;
 
     /** Checks whether this player can begin producing the product with the specified index (e.g. can pay for it), and shows an error message otherwise. */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintPure)
     bool CheckCanIssueProductionOrder(int32 ProductIndex);
 
     /** Orders the selected production actor to start producing the product with the specified index. */
@@ -152,19 +128,19 @@ public:
 	UFUNCTION(BlueprintCallable) void LoadControlGroup9();
 
 	/** Whether the hotkey for showing all construction progress bars is currently pressed, or not. */
-	UFUNCTION(BlueprintCallable)
-	bool IsConstructionProgressBarHotkeyPressed();
+	UFUNCTION(BlueprintPure)
+	bool IsConstructionProgressBarHotkeyPressed() const;
 
 	/** Whether the hotkey for showing all health bars is currently pressed, or not. */
-	UFUNCTION(BlueprintCallable)
-	bool IsHealthBarHotkeyPressed();
+	UFUNCTION(BlueprintPure)
+	bool IsHealthBarHotkeyPressed() const;
 
 	/** Whether the hotkey for showing all production progress bars is currently pressed, or not. */
-	UFUNCTION(BlueprintCallable)
-	bool IsProductionProgressBarHotkeyPressed();
+	UFUNCTION(BlueprintPure)
+	bool IsProductionProgressBarHotkeyPressed() const;
 
     /** Checks whether this player can begin placing a building of the specified class (e.g. can pay for it), and shows an error message otherwise. */
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintPure)
     bool CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass);
 
 	/** Begin finding a suitable location for constructing a building of the specified type. */
@@ -324,7 +300,40 @@ protected:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+    /** Movement speed of the camera when moved with keys or mouse, in cm/sec. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
+    float CameraSpeed;
+
+    /** How fast to zoom the camera in and out, in cm/sec. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
+    float CameraZoomSpeed;
+
+    /** Maximum distance of the camera from the player pawn, in cm. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
+    float MinCameraDistance;
+
+    /** Minimum distance of the camera from the player pawn, in cm. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
+    float MaxCameraDistance;
+
+    /** Distance from the screen border at which the mouse cursor causes the camera to move, in pixels. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
+    int32 CameraScrollThreshold;
+
+    /** Preview to use for placing buildings. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction")
+    TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
+
+    /** Provides bonuses for various gameplay elements for this player. */
+    UPROPERTY(VisibleAnywhere, Category = "RTS")
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent;
+
+    /** Stores the resources available for this player. */
+    UPROPERTY(VisibleAnywhere, Category = "RTS")
+    URTSPlayerResourcesComponent* PlayerResourcesComponent;
+
     /** Volume that restricts the camera movement of this player. */
+    UPROPERTY()
     ARTSCameraBoundsVolume* CameraBoundsVolume;
 
     /** Last horizontal axis input applied to camera movement. */
@@ -340,18 +349,21 @@ private:
 	TArray<TArray<AActor*>> ControlGroups;
 
 	/** Actor currently hovered by this player. */
+    UPROPERTY()
 	AActor* HoveredActor;
 
 	/** World position currently hovered by this player. */
 	FVector HoveredWorldPosition;
 
     /** Actors selected by this player. */
+    UPROPERTY()
     TArray<AActor*> SelectedActors;
 
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingBeingPlacedClass;
 
 	/** Current cursor for placing a new building. */
+    UPROPERTY()
 	ARTSBuildingCursor* BuildingCursor;
 
 	/** Whether we're currently creating a selection frame by dragging the mouse. */
@@ -379,26 +391,17 @@ private:
     float SelectionSoundCooldownRemaining;
 
 
-    /** Provides bonuses for various gameplay elements for this player. */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    URTSPlayerAdvantageComponent* PlayerAdvantageComponent;
-
-    /** Stores the resources available for this player. */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    URTSPlayerResourcesComponent* PlayerResourcesComponent;
-
-
     /** Casts a ray from the current mouse position and collects the results. */
-    bool GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults);
+    bool GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults) const;
 	
 	/** Casts a box from the current selection frame and collects the results. */
-	bool GetObjectsInSelectionFrame(TArray<FHitResult>& OutHitResults);
+	bool GetObjectsInSelectionFrame(TArray<FHitResult>& OutHitResults) const;
 
 	/** Traces all relevant objects using the specified ray. */
-	bool TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults);
+	bool TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults) const;
 
 	/** Checks whether the specified actor is valid and selectable. */
-	bool IsSelectableActor(AActor* Actor);
+	bool IsSelectableActor(AActor* Actor) const;
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()

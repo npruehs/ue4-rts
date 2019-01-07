@@ -16,7 +16,12 @@ class REALTIMESTRATEGY_API URTSNameComponent : public UActorComponent
     GENERATED_BODY()
 
 public:
+    /** Gets the name of the actor. */
+    UFUNCTION(BlueprintPure)
+    FText GetName() const;
+
+private:
     /** Name of the actor. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
     FText Name;
 };

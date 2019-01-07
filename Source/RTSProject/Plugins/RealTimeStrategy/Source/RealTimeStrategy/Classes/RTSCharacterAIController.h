@@ -21,15 +21,6 @@ class REALTIMESTRATEGY_API ARTSCharacterAIController : public AAIController
     GENERATED_BODY()
 
 public:
-    /** Behavior tree to use for driving the character AI. */
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
-    UBehaviorTree* CharacterBehaviorTreeAsset;
-
-    /** Blackboard to use for holding all data relevant to the character AI. */
-    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RTS")
-    UBlackboardData* CharacterBlackboardAsset;
-
-
 	/** Makes the pawn look for a feasible target in its acquisition radius. */
 	UFUNCTION(BlueprintCallable)
 	void FindTargetInAcquisitionRadius();
@@ -74,6 +65,14 @@ protected:
 	virtual void Possess(APawn* InPawn) override;
 
 private:
+    /** Behavior tree to use for driving the character AI. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UBehaviorTree* CharacterBehaviorTreeAsset;
+
+    /** Blackboard to use for holding all data relevant to the character AI. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UBlackboardData* CharacterBlackboardAsset;
+
 	URTSAttackComponent* AttackComponent;
 
 	void ApplyOrders();

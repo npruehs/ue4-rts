@@ -47,7 +47,7 @@ void URTSConstructionSiteComponent::BeginPlay()
 
 	if (ContainerComponent)
 	{
-		ContainerComponent->Capacity = MaxAssignedBuilders;
+		ContainerComponent->SetCapacity(MaxAssignedBuilders);
 	}
 }
 
@@ -85,7 +85,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 
             if (PlayerAdvantageComponent)
             {
-                SpeedBoostFactor = PlayerAdvantageComponent->SpeedBoostFactor;
+                SpeedBoostFactor = PlayerAdvantageComponent->GetSpeedBoostFactor();
             }
         }
     }
@@ -305,4 +305,64 @@ void URTSConstructionSiteComponent::CancelConstruction()
 
 	// Notify listeners.
 	OnConstructionCanceled.Broadcast();
+}
+
+ERTSProductionCostType URTSConstructionSiteComponent::GetConstructionCostType() const
+{
+    return ConstructionCostType;
+}
+
+TMap<TSubclassOf<URTSResourceType>, float> URTSConstructionSiteComponent::GetConstructionCosts() const
+{
+    return ConstructionCosts;
+}
+
+float URTSConstructionSiteComponent::GetConstructionTime() const
+{
+    return ConstructionTime;
+}
+
+bool URTSConstructionSiteComponent::ConsumesBuilders() const
+{
+    return bConsumesBuilders;
+}
+
+int32 URTSConstructionSiteComponent::GetMaxAssignedBuilders() const
+{
+    return MaxAssignedBuilders;
+}
+
+float URTSConstructionSiteComponent::GetProgressMadeAutomatically() const
+{
+    return ProgressMadeAutomatically;
+}
+
+float URTSConstructionSiteComponent::GetProgressMadePerBuilder() const
+{
+    return ProgressMadePerBuilder;
+}
+
+float URTSConstructionSiteComponent::GetRefundFactor() const
+{
+    return RefundFactor;
+}
+
+bool URTSConstructionSiteComponent::DoesStartImmediately() const
+{
+    return bStartImmediately;
+}
+
+ERTSConstructionState URTSConstructionSiteComponent::GetState() const
+{
+    return State;
+}
+
+float URTSConstructionSiteComponent::GetRemainingConstructionTime() const
+{
+    return RemainingConstructionTime;
+}
+
+TArray<AActor*> URTSConstructionSiteComponent::GetAssignedBuilders() const
+{
+    return AssignedBuilders;
 }

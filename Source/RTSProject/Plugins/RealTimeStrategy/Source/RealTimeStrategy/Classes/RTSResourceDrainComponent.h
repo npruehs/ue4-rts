@@ -22,19 +22,6 @@ class REALTIMESTRATEGY_API URTSResourceDrainComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	/** Types of resources that can be returned to the actor. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
-
-	/** Whether gatherers must enter the resource drain for returning resources. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	bool bGathererMustEnter;
-
-	/** How many gatherers may enter at the same time. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	int32 GathererCapacity;
-
-
 	URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer);
 
 
@@ -42,6 +29,19 @@ public:
 	virtual float ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
     
+    /** Gets the types of resources that can be returned to the actor. */
+    UFUNCTION(BlueprintPure)
+    TArray<TSubclassOf<URTSResourceType>> GetResourceTypes() const;
+
+    /** Whether gatherers must enter the resource drain for returning resources. */
+    UFUNCTION(BlueprintPure)
+    bool MustGathererEnter() const;
+
+    /** Gets how many gatherers may enter at the same time. */
+    UFUNCTION(BlueprintPure)
+    int32 GetGathererCapacity() const;
+
+
     /** Event when resources have been returned to the actor. */
     UFUNCTION(NetMulticast, reliable)
     virtual void NotifyOnResourcesReturned(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
@@ -50,4 +50,17 @@ public:
 	/** Event when resources have been returned to the actor. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSResourceDrainComponentResourcesReturnedSignature OnResourcesReturned;
+
+private:
+    /** Types of resources that can be returned to the actor. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
+
+    /** Whether gatherers must enter the resource drain for returning resources. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bGathererMustEnter;
+
+    /** How many gatherers may enter at the same time. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
+    int32 GathererCapacity;
 };

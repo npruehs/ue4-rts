@@ -19,7 +19,15 @@ class REALTIMESTRATEGY_API ARTSGameState : public AGameStateBase
 	GENERATED_BODY()
 
 public:
+    /** Gets the teams of the current match. */
+    UFUNCTION(BlueprintPure)
+    TArray<ARTSTeamInfo*> GetTeams() const;
+
+    /** Sets the team with the specified index. */
+    void AddTeam(ARTSTeamInfo* Team);
+
+private:
 	/** Teams of the current match. */
-	UPROPERTY(BlueprintReadOnly, Category = "Team")
+	UPROPERTY()
 	TArray<ARTSTeamInfo*> Teams;
 };

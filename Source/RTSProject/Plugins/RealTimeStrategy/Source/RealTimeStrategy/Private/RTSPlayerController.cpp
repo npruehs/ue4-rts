@@ -57,12 +57,12 @@ void ARTSPlayerController::BeginPlay()
     Super::BeginPlay();
 
     // Allow immediate updates for interested listeners.
-    for (int32 Index = 0; Index < PlayerResourcesComponent->ResourceTypes.Num(); ++Index)
+    for (int32 Index = 0; Index < PlayerResourcesComponent->GetResourceTypes().Num(); ++Index)
     {
         PlayerResourcesComponent->OnResourcesChanged.Broadcast(
-            PlayerResourcesComponent->ResourceTypes[Index],
+            PlayerResourcesComponent->GetResourceTypes()[Index],
             0.0f,
-            PlayerResourcesComponent->ResourceAmounts[Index],
+            PlayerResourcesComponent->GetResources(PlayerResourcesComponent->GetResourceTypes()[Index]),
             true);
     }
 }
@@ -150,22 +150,22 @@ void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-AActor* ARTSPlayerController::GetHoveredActor()
+AActor* ARTSPlayerController::GetHoveredActor() const
 {
 	return HoveredActor;
 }
 
-ARTSPlayerState* ARTSPlayerController::GetPlayerState()
+ARTSPlayerState* ARTSPlayerController::GetPlayerState() const
 {
 	return Cast<ARTSPlayerState>(PlayerState);
 }
 
-TArray<AActor*> ARTSPlayerController::GetSelectedActors()
+TArray<AActor*> ARTSPlayerController::GetSelectedActors() const
 {
 	return SelectedActors;
 }
 
-bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults)
+bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, TArray<FHitResult>& OutHitResults) const
 {
 	// Get ray.
 	FVector WorldOrigin;
@@ -179,7 +179,7 @@ bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, 
 	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
 }
 
-bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults)
+bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults) const
 {
 	// Get ray.
 	FVector WorldOrigin = FVector(WorldPositionXY.X, WorldPositionXY.Y, HitResultTraceDistance / 2);
@@ -189,7 +189,7 @@ bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositio
 	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
 }
 
-bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame)
+bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame) const
 {
 	if (!bCreatingSelectionFrame)
 	{
@@ -221,13 +221,13 @@ ARTSTeamInfo* ARTSPlayerController::GetTeamInfo() const
 
 	if (CurrentPlayerState)
 	{
-		return CurrentPlayerState->Team;
+		return CurrentPlayerState->GetTeam();
 	}
 	
 	return nullptr;
 }
 
-bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults)
+bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults) const
 {
     // Get local player viewport.
     ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
@@ -247,7 +247,7 @@ bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHi
 	return GetObjectsAtScreenPosition(MousePosition, OutHitResults);
 }
 
-bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults)
+bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitResults) const
 {
 	UWorld* World = GetWorld();
 
@@ -292,7 +292,7 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 	return HitResults.Num() > 0;
 }
 
-bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults)
+bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults) const
 {
 	UWorld* World = GetWorld();
 
@@ -310,7 +310,7 @@ bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVecto
 		Params);
 }
 
-bool ARTSPlayerController::IsSelectableActor(AActor* Actor)
+bool ARTSPlayerController::IsSelectableActor(AActor* Actor) const
 {
 	// Check if valid.
 	if (!IsValid(Actor))
@@ -403,7 +403,7 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 		return false;
 	}
 
-	ARTSTeamInfo* MyTeam = GetPlayerState()->Team;
+	ARTSTeamInfo* MyTeam = GetPlayerState()->GetTeam();
 
 	// Issue attack orders.
 	bool bSuccess = false;
@@ -501,7 +501,7 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
 		}
 
 		// Check if builder knows about building.
-		if (!BuilderComponent->ConstructibleBuildingClasses.Contains(BuildingClass))
+		if (!BuilderComponent->GetConstructibleBuildingClasses().Contains(BuildingClass))
 		{
 			continue;
 		}
@@ -561,7 +561,7 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 		return false;
 	}
 
-	ARTSTeamInfo* MyTeam = GetPlayerState()->Team;
+	ARTSTeamInfo* MyTeam = GetPlayerState()->GetTeam();
 
 	// Issue construction orders.
 	bool bSuccess = false;
@@ -771,7 +771,7 @@ bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, con
 	return OrderedPawn->GetOwner() == this;
 }
 
-AActor* ARTSPlayerController::GetSelectedProductionActor()
+AActor* ARTSPlayerController::GetSelectedProductionActor() const
 {
     // Find suitable selected actor.
     for (auto SelectedActor : SelectedActors)
@@ -790,7 +790,7 @@ AActor* ARTSPlayerController::GetSelectedProductionActor()
             continue;
         }
 
-        if (ProductionComponent->AvailableProducts.Num() <= 0)
+        if (ProductionComponent->GetAvailableProducts().Num() <= 0)
         {
             continue;
         }
@@ -812,17 +812,17 @@ bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
 
     URTSProductionComponent* ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
 
-    if (ProductIndex >= ProductionComponent->AvailableProducts.Num())
+    if (ProductIndex >= ProductionComponent->GetAvailableProducts().Num())
     {
         return true;
     }
 
-    TSubclassOf<AActor> ProductClass = ProductionComponent->AvailableProducts[ProductIndex];
+    TSubclassOf<AActor> ProductClass = ProductionComponent->GetAvailableProducts()[ProductIndex];
 
     // Check costs.
     URTSProductionCostComponent* ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
-    if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->Resources))
+    if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources()))
     {
         NotifyOnErrorOccurred(TEXT("Not enough resources."));
         return false;
@@ -838,7 +838,7 @@ bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
         if (NameComponent)
         {
             FString ErrorMessage = TEXT("Missing requirement: ");
-            ErrorMessage.Append(NameComponent->Name.ToString());
+            ErrorMessage.Append(NameComponent->GetName().ToString());
             NotifyOnErrorOccurred(ErrorMessage);
         }
         else
@@ -952,10 +952,10 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 			SelectableComponent->SelectActor();
 
             // Play selection sound.
-            if (SelectionSoundCooldownRemaining <= 0.0f && IsValid(SelectableComponent->SelectedSound))
+            if (SelectionSoundCooldownRemaining <= 0.0f && IsValid(SelectableComponent->GetSelectedSound()))
             {
-                UGameplayStatics::PlaySound2D(this, SelectableComponent->SelectedSound);
-                SelectionSoundCooldownRemaining = SelectableComponent->SelectedSound->GetDuration();
+                UGameplayStatics::PlaySound2D(this, SelectableComponent->GetSelectedSound());
+                SelectionSoundCooldownRemaining = SelectableComponent->GetSelectedSound()->GetDuration();
             }
 		}
 	}
@@ -1011,17 +1011,17 @@ void ARTSPlayerController::LoadControlGroup7() { LoadControlGroup(7); }
 void ARTSPlayerController::LoadControlGroup8() { LoadControlGroup(8); }
 void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
 
-bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed()
+bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed() const
 {
 	return bConstructionProgressBarHotkeyPressed;
 }
 
-bool ARTSPlayerController::IsHealthBarHotkeyPressed()
+bool ARTSPlayerController::IsHealthBarHotkeyPressed() const
 {
 	return bHealthBarHotkeyPressed;
 }
 
-bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed()
+bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed() const
 {
 	return bProductionProgressBarHotkeyPressed;
 }
@@ -1031,7 +1031,7 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
     // Check resources.
     URTSConstructionSiteComponent* ConstructionSiteComponent = URTSUtilities::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
 
-    if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->ConstructionCosts))
+    if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts()))
     {
         NotifyOnErrorOccurred(TEXT("Not enough resources."));
         return false;
@@ -1049,7 +1049,7 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
             if (NameComponent)
             {
                 FString ErrorMessage = TEXT("Missing requirement: ");
-                ErrorMessage.Append(NameComponent->Name.ToString());
+                ErrorMessage.Append(NameComponent->GetName().ToString());
                 NotifyOnErrorOccurred(ErrorMessage);
             }
             else
@@ -1263,13 +1263,13 @@ void ARTSPlayerController::BeginDefaultBuildingPlacement()
 		}
 
 		// Check if builder knows about building.
-		if (BuilderComponent->ConstructibleBuildingClasses.Num() <= 0)
+		if (BuilderComponent->GetConstructibleBuildingClasses().Num() <= 0)
 		{
 			continue;
 		}
 
 		// Begin placement.
-		BeginBuildingPlacement(BuilderComponent->ConstructibleBuildingClasses[0]);
+		BeginBuildingPlacement(BuilderComponent->GetConstructibleBuildingClasses()[0]);
 		return;
 	}
 }
@@ -1427,13 +1427,13 @@ void ARTSPlayerController::ServerStartProduction_Implementation(AActor* Producti
 		return;
 	}
 
-	if (ProductionComponent->AvailableProducts.Num() <= ProductIndex)
+	if (ProductionComponent->GetAvailableProducts().Num() <= ProductIndex)
 	{
 		return;
 	}
 
 	// Begin production.
-	TSubclassOf<AActor> ProductClass = ProductionComponent->AvailableProducts[ProductIndex];
+	TSubclassOf<AActor> ProductClass = ProductionComponent->GetAvailableProducts()[ProductIndex];
 	ProductionComponent->StartProduction(ProductClass);
 }
 
@@ -1556,7 +1556,7 @@ void ARTSPlayerController::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 	if (NewTeam)
 	{
 		// Notify listeners that new vision info is available now.
-		ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetVisionInfoForTeam(GetWorld(), NewTeam->TeamIndex);
+		ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetVisionInfoForTeam(GetWorld(), NewTeam->GetTeamIndex());
 		NotifyOnVisionInfoAvailable(VisionInfo);
 	}
 }

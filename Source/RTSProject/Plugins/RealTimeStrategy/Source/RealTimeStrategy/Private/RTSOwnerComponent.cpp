@@ -18,7 +18,7 @@ void URTSOwnerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 }
 
 
-ARTSPlayerState* URTSOwnerComponent::GetPlayerOwner()
+ARTSPlayerState* URTSOwnerComponent::GetPlayerOwner() const
 {
 	return PlayerOwner;
 }
@@ -43,7 +43,7 @@ void URTSOwnerComponent::SetPlayerOwner(AController* Controller)
 	}
 }
 
-bool URTSOwnerComponent::IsSameTeamAsActor(AActor* Other)
+bool URTSOwnerComponent::IsSameTeamAsActor(AActor* Other) const
 {
 	if (!Other)
 	{
@@ -69,7 +69,7 @@ bool URTSOwnerComponent::IsSameTeamAsActor(AActor* Other)
 	return MyOwner->IsSameTeamAs(OtherOwner);
 }
 
-bool URTSOwnerComponent::IsSameTeamAsController(AController* C)
+bool URTSOwnerComponent::IsSameTeamAsController(AController* C) const
 {
 	ARTSPlayerState* MyOwner = GetPlayerOwner();
 	ARTSPlayerState* OtherPlayer = Cast<ARTSPlayerState>(C->PlayerState);

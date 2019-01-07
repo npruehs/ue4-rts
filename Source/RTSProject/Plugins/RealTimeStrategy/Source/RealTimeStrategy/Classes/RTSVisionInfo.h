@@ -22,14 +22,15 @@ class REALTIMESTRATEGY_API ARTSVisionInfo : public AInfo
 {
 	GENERATED_BODY()
 
-	ARTSVisionInfo();
-
 public:
+    ARTSVisionInfo();
+
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void Tick(float DeltaSeconds) override;
 
-	/** Index of the team this actor keeps track of the vision for. */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = ReceivedTeamIndex, Category = "Team")
-	uint8 TeamIndex;
+    /** Gets the index of the team this actor keeps track of the vision for. */
+    uint8 GetTeamIndex() const;
 
 	/** Sets the index of the team this actor keeps track of the vision for. */
 	void SetTeamIndex(uint8 NewTeamIndex);
@@ -38,13 +39,18 @@ public:
 	ERTSVisionState GetVision(int32 X, int32 Y) const;
 	
 	/** Gets vision information for the specified team. */
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"))
 	static ARTSVisionInfo* GetVisionInfoForTeam(UObject* WorldContextObject, uint8 InTeamIndex);
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+    /** Index of the team this actor keeps track of the vision for. */
+    UPROPERTY(ReplicatedUsing = ReceivedTeamIndex)
+    uint8 TeamIndex;
+
+    UPROPERTY()
 	ARTSVisionVolume* VisionVolume;
 
 	/** Which tiles are currently unknown, known and visible. */

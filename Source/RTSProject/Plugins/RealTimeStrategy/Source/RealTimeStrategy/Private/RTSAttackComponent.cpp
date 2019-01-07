@@ -106,3 +106,23 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 	// Notify listeners.
 	OnAttackUsed.Broadcast(Attack, Target, SpawnedProjectile);
 }
+
+float URTSAttackComponent::GetAcquisitionRadius() const
+{
+    return AcquisitionRadius;
+}
+
+float URTSAttackComponent::GetChaseRadius() const
+{
+    return ChaseRadius;
+}
+
+TArray<FRTSAttackData> URTSAttackComponent::GetAttacks() const
+{
+    return Attacks;
+}
+
+float URTSAttackComponent::GetRemainingCooldown() const
+{
+    return RemainingCooldown;
+}

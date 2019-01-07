@@ -17,15 +17,6 @@ class REALTIMESTRATEGY_API ARTSBuildingCursor : public AActor
 	GENERATED_BODY()
 
 public:
-	/** Material to apply while the current location is valid. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	UMaterial* ValidLocationMaterial;
-
-	/** Material to apply while the current location is invalid. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	UMaterial* InvalidLocationMaterial;
-
-
 	ARTSBuildingCursor();
 
 
@@ -40,6 +31,14 @@ public:
 
 private:
 	/** Current preview mesh of this cursor. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class USkeletalMeshComponent* Mesh;
+	UPROPERTY(VisibleAnywhere, Category = "RTS")
+	USkeletalMeshComponent* Mesh;
+
+    /** Material to apply while the current location is valid. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UMaterial* ValidLocationMaterial;
+
+    /** Material to apply while the current location is invalid. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UMaterial* InvalidLocationMaterial;
 };

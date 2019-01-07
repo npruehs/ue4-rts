@@ -24,35 +24,6 @@ class REALTIMESTRATEGY_API ARTSGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	/** Actors to spawn for each player in the game. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<TSubclassOf<AActor>> InitialActors;
-
-    /** Relative locations of the actors to spawn for each player in the game, relative to their respetive start spot. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    TArray<FVector> InitialActorPositions;
-
-	/** Optional type of actor that is required for a player to be alive. As soon as no actor of the specified type is alive, the player is defeated. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TSubclassOf<AActor> DefeatConditionActor;
-
-	/** Number of teams to create. */
-	UPROPERTY(EditDefaultsOnly, Category = "Team")
-	uint8 NumTeams;
-
-	/** Teams of the current match. */
-	UPROPERTY(BlueprintReadOnly, Category = "Team")
-	TArray<ARTSTeamInfo*> Teams;
-
-	/** Class of TeamInfo to spawn. */
-	UPROPERTY(EditDefaultsOnly, Category = "Team")
-	TSubclassOf<ARTSTeamInfo> TeamClass;
-
-    /** AIController class to spawn for AI players. */
-    UPROPERTY(EditDefaultsOnly, Category = AI)
-    TSubclassOf<ARTSPlayerAIController> PlayerAIControllerClass;
-
-    
 	ARTSGameMode(const FObjectInitializer& ObjectInitializer);
 
 
@@ -84,6 +55,30 @@ public:
 	void ReceiveOnPlayerDefeated(AController* Player);
 
 private:
+    /** Actors to spawn for each player in the game. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TArray<TSubclassOf<AActor>> InitialActors;
+
+    /** Relative locations of the actors to spawn for each player in the game, relative to their respetive start spot. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TArray<FVector> InitialActorPositions;
+
+    /** Optional type of actor that is required for a player to be alive. As soon as no actor of the specified type is alive, the player is defeated. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TSubclassOf<AActor> DefeatConditionActor;
+
+    /** Class of TeamInfo to spawn. */
+    UPROPERTY(EditDefaultsOnly, Category = "Team")
+    TSubclassOf<ARTSTeamInfo> TeamClass;
+
+    /** Number of teams to create. */
+    UPROPERTY(EditDefaultsOnly, Category = "Team", meta = (ClampMin = 0))
+    uint8 NumTeams;
+
+    /** AIController class to spawn for AI players. */
+    UPROPERTY(EditDefaultsOnly, Category = AI)
+    TSubclassOf<ARTSPlayerAIController> PlayerAIControllerClass;
+
     /** Number of AI players to spawn. */
     int32 NumAIPlayers;
 };

@@ -19,22 +19,40 @@ class REALTIMESTRATEGY_API URTSProductionCostComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+    URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer);
+
+
+    /** When to pay resources for production. */
+    UFUNCTION(BlueprintPure)
+    ERTSProductionCostType GetProductionCostType() const;
+
+    /** Gets the tme for producing the actor, in seconds. */
+    UFUNCTION(BlueprintPure)
+    float GetProductionTime() const;
+
+    /** Gets the resources to pay for producing the actor. */
+    UFUNCTION(BlueprintPure)
+    TMap<TSubclassOf<URTSResourceType>, float> GetResources() const;
+
+    /** Gets the resources to refund when canceling production. */
+    UFUNCTION(BlueprintPure)
+    float GetRefundFactor() const;
+
+
+private:
 	/** When to pay resources for production. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	ERTSProductionCostType ProductionCostType;
 
 	/** Time for producing the actor, in seconds. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
 	float ProductionTime;
 
 	/** Resources to pay for producing the actor. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	TMap<TSubclassOf<URTSResourceType>, float> Resources;
 
 	/** Resources to refund when canceling production. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	float RefundFactor;
-
-
-	URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer);
 };

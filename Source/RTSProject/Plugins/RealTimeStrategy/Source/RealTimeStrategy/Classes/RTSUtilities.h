@@ -62,7 +62,7 @@ public:
     /**
     * Checks whether the specified actor can be placed at the passed location.
     */
-    UFUNCTION(BlueprintCallable, Category = "RTS")
+    UFUNCTION(BlueprintPure, Category = "RTS")
     static bool IsSuitableLocationForActor(UWorld* World, TSubclassOf<AActor> ActorClass, const FVector& Location);
 
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
@@ -73,11 +73,11 @@ public:
 	}
 
 	/** Searches the components attached to the specified actor class and returns the first encountered component of the specified class. */
-	UFUNCTION(BlueprintCallable, Category = "RTS")
+	UFUNCTION(BlueprintPure, Category = "RTS")
 	static UActorComponent* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass);
 
     /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
-    UFUNCTION(BlueprintCallable, Category = "RTS", meta = (WorldContext = "WorldContextObject"))
+    UFUNCTION(BlueprintPure, Category = "RTS", meta = (WorldContext = "WorldContextObject"))
     static bool OwnerMeetsAllRequirementsFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct);
 
     /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */

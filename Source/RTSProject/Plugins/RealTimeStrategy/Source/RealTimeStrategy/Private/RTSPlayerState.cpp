@@ -5,7 +5,24 @@
 #include "RTSTeamInfo.h"
 
 
-bool ARTSPlayerState::IsSameTeamAs(ARTSPlayerState* Other)
+void ARTSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ARTSPlayerState, Team);
+}
+
+ARTSTeamInfo* ARTSPlayerState::GetTeam() const
+{
+    return Team;
+}
+
+void ARTSPlayerState::SetTeam(ARTSTeamInfo* InTeam)
+{
+    Team = InTeam;
+}
+
+bool ARTSPlayerState::IsSameTeamAs(ARTSPlayerState* Other) const
 {
 	if (!Other)
 	{
@@ -20,19 +37,14 @@ bool ARTSPlayerState::IsSameTeamAs(ARTSPlayerState* Other)
 		return false;
 	}
 
-	return FirstTeam->TeamIndex == SecondTeam->TeamIndex;
-}
-
-void ARTSPlayerState::OnTeamChanged()
-{
-	NotifyOnTeamChanged(Team);
+	return FirstTeam->GetTeamIndex() == SecondTeam->GetTeamIndex();
 }
 
 void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 {
 	if (NewTeam)
 	{
-		UE_LOG(LogRTS, Log, TEXT("Player %s added to team %d."), *GetName(), NewTeam->TeamIndex);
+		UE_LOG(LogRTS, Log, TEXT("Player %s added to team %d."), *GetName(), NewTeam->GetTeamIndex());
 	}
 	else
 	{
@@ -51,9 +63,7 @@ void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 	}
 }
 
-void ARTSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ARTSPlayerState::OnTeamChanged()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ARTSPlayerState, Team);
+    NotifyOnTeamChanged(Team);
 }

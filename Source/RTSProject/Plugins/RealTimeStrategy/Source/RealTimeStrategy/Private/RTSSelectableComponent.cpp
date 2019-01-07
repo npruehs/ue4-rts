@@ -90,7 +90,12 @@ void URTSSelectableComponent::DeselectActor()
 	OnDeselected.Broadcast();
 }
 
-bool URTSSelectableComponent::IsSelected()
+bool URTSSelectableComponent::IsSelected() const
 {
 	return bSelected;
+}
+
+USoundCue* URTSSelectableComponent::GetSelectedSound() const
+{
+    return SelectedSound;
 }

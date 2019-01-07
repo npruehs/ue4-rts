@@ -18,10 +18,6 @@ class REALTIMESTRATEGY_API URTSFloatingCombatTextComponent : public UActorCompon
     GENERATED_BODY()
 
 public:
-    /** Floating combat texts currently being displayed to the player. */
-    TArray<FRTSFloatingCombatTextData> Texts;
-
-
     URTSFloatingCombatTextComponent(const FObjectInitializer& ObjectInitializer);
 
 
@@ -31,4 +27,11 @@ public:
     /** Adds the specified text to be displayed above the actor in the HUD for a short time. */
     UFUNCTION(BlueprintCallable)
     void AddText(const FString& Text, const FLinearColor& Color, float Scale, float Lifetime);
+
+    /** Gets the floating combat texts currently being displayed to the player. */
+    TArray<FRTSFloatingCombatTextData> GetTexts() const;
+
+private:
+    /** Floating combat texts currently being displayed to the player. */
+    TArray<FRTSFloatingCombatTextData> Texts;
 };

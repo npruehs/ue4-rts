@@ -174,7 +174,7 @@ void ARTSHUD::DrawFloatingCombatTexts()
             continue;
         }
 
-        for (FRTSFloatingCombatTextData& TextData : FloatingCombatTextComponent->Texts)
+        for (FRTSFloatingCombatTextData& TextData : FloatingCombatTextComponent->GetTexts())
         {
             // Calculate lifetime.
             float ElapsedLifetime = TextData.Lifetime - TextData.RemainingLifetime;
@@ -262,7 +262,7 @@ void ARTSHUD::DrawHealthBar(AActor* Actor)
 		return;
 	}
 
-	const float HealthPercentage = HealthComponent->CurrentHealth / HealthComponent->MaximumHealth;
+	const float HealthPercentage = HealthComponent->GetCurrentHealth() / HealthComponent->GetMaximumHealth();
 
 	// Suggest health bar size.
 	float SuggestedHealthBarLeft;
@@ -275,8 +275,8 @@ void ARTSHUD::DrawHealthBar(AActor* Actor)
 	// Draw health bar.
 	NotifyDrawHealthBar(
 		Actor,
-		HealthComponent->CurrentHealth,
-		HealthComponent->MaximumHealth,
+		HealthComponent->GetCurrentHealth(),
+		HealthComponent->GetMaximumHealth(),
 		HealthPercentage,
 		SuggestedHealthBarLeft,
 		SuggestedHealthBarTop,
@@ -357,8 +357,8 @@ void ARTSHUD::DrawConstructionProgressBar(AActor* Actor)
 	// Draw progress bar.
 	NotifyDrawConstructionProgressBar(
 		Actor,
-		ConstructionSiteComponent->ConstructionTime,
-		ConstructionSiteComponent->RemainingConstructionTime,
+		ConstructionSiteComponent->GetConstructionTime(),
+		ConstructionSiteComponent->GetRemainingConstructionTime(),
 		ProgressPercentage,
 		SuggestedProgressBarLeft,
 		SuggestedProgressBarTop,

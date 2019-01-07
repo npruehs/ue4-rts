@@ -34,7 +34,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 	{
 		// Assign builder.
 		AssignedConstructionSite = ConstructionSite;
-		ConstructionSiteComponent->AssignedBuilders.Add(GetOwner());
+		ConstructionSiteComponent->GetAssignedBuilders().Add(GetOwner());
 
 		// Notify listeners.
 		OnAssignedToConstructionSite.Broadcast(ConstructionSite);
@@ -136,11 +136,6 @@ void URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const F
 	BeginConstruction(ConstructibleBuildingClasses[BuildingIndex], TargetLocation);
 }
 
-AActor* URTSBuilderComponent::GetAssignedConstructionSite() const
-{
-	return AssignedConstructionSite;
-}
-
 void URTSBuilderComponent::LeaveConstructionSite()
 {
 	if (!AssignedConstructionSite)
@@ -158,7 +153,7 @@ void URTSBuilderComponent::LeaveConstructionSite()
 
 	// Remove builder.
 	AssignedConstructionSite = nullptr;
-	ConstructionSiteComponent->AssignedBuilders.Remove(GetOwner());
+	ConstructionSiteComponent->GetAssignedBuilders().Remove(GetOwner());
 
 	// Notify listeners.
 	OnRemovedFromConstructionSite.Broadcast(ConstructionSite);
@@ -176,4 +171,24 @@ void URTSBuilderComponent::LeaveConstructionSite()
 			OnConstructionSiteLeft.Broadcast(ConstructionSite);
 		}
 	}
+}
+
+TArray<TSubclassOf<AActor>> URTSBuilderComponent::GetConstructibleBuildingClasses() const
+{
+    return ConstructibleBuildingClasses;
+}
+
+bool URTSBuilderComponent::DoesEnterConstructionSite() const
+{
+    return bEnterConstructionSite;
+}
+
+float URTSBuilderComponent::GetConstructionSiteOffset() const
+{
+    return ConstructionSiteOffset;
+}
+
+AActor* URTSBuilderComponent::GetAssignedConstructionSite() const
+{
+    return AssignedConstructionSite;
 }

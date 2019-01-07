@@ -11,6 +11,7 @@
 
 #include "RTSCharacter.h"
 #include "RTSConstructionSiteComponent.h"
+#include "RTSGameState.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAIController.h"
 #include "RTSPlayerAdvantageComponent.h"
@@ -54,6 +55,13 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 	AGameModeBase::InitGame(MapName, Options, ErrorMessage);
 
 	// Set up teams.
+    ARTSGameState* GameState = GetGameState<ARTSGameState>();
+
+    if (!IsValid(GameState))
+    {
+        return;
+    }
+
 	if (TeamClass == nullptr)
 	{
 		TeamClass = ARTSTeamInfo::StaticClass();
@@ -63,8 +71,8 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 	{
 		// Add team.
 		ARTSTeamInfo* NewTeam = GetWorld()->SpawnActor<ARTSTeamInfo>(TeamClass);
-		NewTeam->TeamIndex = TeamIndex;
-		Teams.Add(NewTeam);
+		NewTeam->SetTeamIndex(TeamIndex);
+        GameState->AddTeam(NewTeam);
 
 		// Setup vision.
 		ARTSVisionInfo* TeamVision = GetWorld()->SpawnActor<ARTSVisionInfo>();
@@ -82,7 +90,7 @@ ARTSPlayerStart* ARTSGameMode::FindRTSPlayerStart(AController* Player)
 	{
 		ARTSPlayerStart* PlayerStart = *It;
 
-		if (PlayerStart->Player == nullptr)
+		if (PlayerStart->GetPlayer() == nullptr)
 		{
 			UnOccupiedStartPoints.Add(PlayerStart);
 		}
@@ -131,23 +139,30 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 		return;
 	}
 
+    ARTSGameState* GameState = GetGameState<ARTSGameState>();
+
+    if (!IsValid(GameState))
+    {
+        return;
+    }
+
 	// Occupy start spot.
 	ARTSPlayerStart* PlayerStart = Cast<ARTSPlayerStart>(StartSpot);
 
 	if (PlayerStart)
 	{
 		UE_LOG(LogRTS, Log, TEXT("Start spot %s is now occupied by player %s."), *PlayerStart->GetName(), *NewPlayer->GetName());
-		PlayerStart->Player = NewPlayer;
+		PlayerStart->SetPlayer(NewPlayer);
 	}
 
 	// Set team.
-	if (PlayerStart->TeamIndex >= Teams.Num())
+	if (PlayerStart->GetTeamIndex() >= GameState->GetTeams().Num())
 	{
-		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->TeamIndex, Teams.Num());
+		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->GetTeamIndex(), GameState->GetTeams().Num());
 	}
 	else
 	{
-		Teams[PlayerStart->TeamIndex]->AddToTeam(NewPlayer);
+		GameState->GetTeams()[PlayerStart->GetTeamIndex()]->AddToTeam(NewPlayer);
 	}
 
 	// Build spawn transform.
@@ -255,7 +270,7 @@ void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
 
         if (Pawn)
         {
-            Pawn->bCanBeDamaged = !PlayerAdvantageComponent->bGodModeEnabled;
+            Pawn->bCanBeDamaged = !PlayerAdvantageComponent->IsGodModeEnabled();
         }
     }
 

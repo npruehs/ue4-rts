@@ -16,12 +16,14 @@ class REALTIMESTRATEGY_API URTSVisionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	/** Radius in which the actor reveals areas covered by fog of war, in cm. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS", meta = (ClampMin = 0), replicated)
-	float SightRadius;
-
-
 	URTSVisionComponent(const FObjectInitializer& ObjectInitializer);
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+    /** Gets the radius in which the actor reveals areas covered by fog of war, in cm. */
+    UFUNCTION(BlueprintPure)
+    float GetSightRadius() const;
+
+private:
+    /** Radius in which the actor reveals areas covered by fog of war, in cm. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    float SightRadius;
 };

@@ -31,7 +31,7 @@ void URTSResourceSourceComponent::BeginPlay()
 
 	if (ContainerComponent)
 	{
-		ContainerComponent->Capacity = GathererCapacity;
+		ContainerComponent->SetCapacity(GathererCapacity);
 	}
 }
 
@@ -78,5 +78,35 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 bool URTSResourceSourceComponent::CanGathererEnter(AActor* Gatherer) const
 {
 	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
-	return !ContainerComponent || ContainerComponent->ContainedActors.Contains(Gatherer) || ContainerComponent->CanLoadActor(Gatherer);
+	return !ContainerComponent || ContainerComponent->GetContainedActors().Contains(Gatherer) || ContainerComponent->CanLoadActor(Gatherer);
+}
+
+TSubclassOf<URTSResourceType> URTSResourceSourceComponent::GetResourceType() const
+{
+    return ResourceType;
+}
+
+float URTSResourceSourceComponent::GetMaximumResources() const
+{
+    return MaximumResources;
+}
+
+float URTSResourceSourceComponent::GetGatheringFactor() const
+{
+    return GatheringFactor;
+}
+
+bool URTSResourceSourceComponent::MustGathererEnter() const
+{
+    return bGathererMustEnter;
+}
+
+int32 URTSResourceSourceComponent::GetGathererCapacity() const
+{
+    return GathererCapacity;
+}
+
+float URTSResourceSourceComponent::GetCurrentResources() const
+{
+    return CurrentResources;
 }

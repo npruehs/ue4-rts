@@ -247,13 +247,13 @@ bool URTSUtilities::GetMissingRequirementFor(UObject* WorldContextObject, AActor
     // Check if any requirements.
     URTSRequirementsComponent* RequirementsComponent = FindDefaultComponentByClass<URTSRequirementsComponent>(DesiredProduct);
 
-    if (!RequirementsComponent || RequirementsComponent->RequiredActors.Num() <= 0)
+    if (!RequirementsComponent || RequirementsComponent->GetRequiredActors().Num() <= 0)
     {
         return false;
     }
 
     // Check if owning player owns all required actors.
-    TArray<TSubclassOf<AActor>> RequiredActors = RequirementsComponent->RequiredActors;
+    TArray<TSubclassOf<AActor>> RequiredActors = RequirementsComponent->GetRequiredActors();
 
     for (TActorIterator<AActor> ActorItr(WorldContextObject->GetWorld()); ActorItr; ++ActorItr)
     {

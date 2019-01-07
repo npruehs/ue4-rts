@@ -1,6 +1,8 @@
 #include "RealTimeStrategyPCH.h"
 #include "RTSTeamInfo.h"
 
+#include "Engine/World.h"
+
 #include "RTSGameState.h"
 #include "RTSPlayerState.h"
 
@@ -13,6 +15,13 @@ ARTSTeamInfo::ARTSTeamInfo()
 
 	// Force ReceivedTeamIndex() on clients.
 	TeamIndex = 255;
+}
+
+void ARTSTeamInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME_CONDITION(ARTSTeamInfo, TeamIndex, COND_InitialOnly);
 }
 
 void ARTSTeamInfo::AddToTeam(AController* Player)
@@ -28,12 +37,12 @@ void ARTSTeamInfo::AddToTeam(AController* Player)
 		return;
 	}
 
-	if (PlayerState->Team != nullptr)
+	if (PlayerState->GetTeam() != nullptr)
 	{
 		RemoveFromTeam(Player);
 	}
 
-	PlayerState->Team = this;
+	PlayerState->SetTeam(this);
 	PlayerState->NotifyOnTeamChanged(this);
 
 	TeamMembers.Add(Player);
@@ -57,14 +66,24 @@ void ARTSTeamInfo::RemoveFromTeam(AController* Player)
 
 	if (PlayerState != nullptr)
 	{
-		PlayerState->Team = nullptr;
+		PlayerState->SetTeam(nullptr);
 		PlayerState->NotifyOnTeamChanged(nullptr);
 	}
 }
 
-TArray<AController*> ARTSTeamInfo::GetTeamMembers()
+uint8 ARTSTeamInfo::GetTeamIndex() const
+{
+    return TeamIndex;
+}
+
+TArray<AController*> ARTSTeamInfo::GetTeamMembers() const
 {
 	return TeamMembers;
+}
+
+void ARTSTeamInfo::SetTeamIndex(uint8 InTeamIndex)
+{
+    TeamIndex = InTeamIndex;
 }
 
 void ARTSTeamInfo::ReceivedTeamIndex()
@@ -79,18 +98,6 @@ void ARTSTeamInfo::ReceivedTeamIndex()
 	{
 		return;
 	}
-
-	if (GameState->Teams.Num() <= TeamIndex)
-	{
-		GameState->Teams.SetNum(TeamIndex + 1);
-	}
-
-	GameState->Teams[TeamIndex] = this;
-}
-
-void ARTSTeamInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(ARTSTeamInfo, TeamIndex, COND_InitialOnly);
+    
+    GameState->AddTeam(this);
 }

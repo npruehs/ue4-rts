@@ -23,19 +23,6 @@ class REALTIMESTRATEGY_API URTSBuilderComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	/** Types of buildings the builder can construct. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	TArray<TSubclassOf<AActor>> ConstructibleBuildingClasses;
-
-	/** Whether the builder enters the construction site while working on it, or not. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-	bool bEnterConstructionSite;
-
-    /** Distance of the builder to the construction site while building. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    float ConstructionSiteOffset;
-
-
 	/** Assigns the builder to the specified construction site. */
 	UFUNCTION(BlueprintCallable)
 	virtual void AssignToConstructionSite(AActor* ConstructionSite);
@@ -48,13 +35,26 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation);
 
-	/** Gets the construction site the builder is currently working on. */
-	UFUNCTION(BlueprintPure)
-	AActor* GetAssignedConstructionSite() const;
-
 	/** Removes the builder from its assigned construction site. */
 	UFUNCTION(BlueprintCallable)
 	virtual void LeaveConstructionSite();
+
+
+    /** Gets the types of buildings the builder can construct. */
+    UFUNCTION(BlueprintPure)
+    TArray<TSubclassOf<AActor>> GetConstructibleBuildingClasses() const;
+
+    /** Whether the builder enters the construction site while working on it, or not. */
+    UFUNCTION(BlueprintPure)
+    bool DoesEnterConstructionSite() const;
+
+    /** Gets the distance of the builder to the construction site while building. */
+    UFUNCTION(BlueprintPure)
+    float GetConstructionSiteOffset() const;
+
+    /** Gets the construction site the builder is currently working on. */
+    UFUNCTION(BlueprintPure)
+    AActor* GetAssignedConstructionSite() const;
 
 
 	/** Event when the builder has been assigned to a construction site. */
@@ -79,6 +79,19 @@ public:
 
 
 private:
+    /** Types of buildings the builder can construct. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    TArray<TSubclassOf<AActor>> ConstructibleBuildingClasses;
+
+    /** Whether the builder enters the construction site while working on it, or not. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bEnterConstructionSite;
+
+    /** Distance of the builder to the construction site while building. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    float ConstructionSiteOffset;
+
 	/** Construction site the builder is currently working on. */
+    UPROPERTY()
 	AActor* AssignedConstructionSite;
 };

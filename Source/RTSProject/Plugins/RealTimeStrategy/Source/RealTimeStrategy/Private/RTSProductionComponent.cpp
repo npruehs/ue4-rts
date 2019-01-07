@@ -64,7 +64,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
             if (PlayerAdvantageComponent)
             {
-                SpeedBoostFactor = PlayerAdvantageComponent->SpeedBoostFactor;
+                SpeedBoostFactor = PlayerAdvantageComponent->GetSpeedBoostFactor();
             }
         }
     }
@@ -83,7 +83,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 		bool bProductionCostPaid = false;
 
-		if (ProductionCostComponent && ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayOverTime)
+		if (ProductionCostComponent && ProductionCostComponent->GetProductionCostType() == ERTSProductionCostType::COST_PayOverTime)
 		{
 			auto Owner = GetOwner()->GetOwner();
 
@@ -103,9 +103,9 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 			bool bCanPayAllProductionCosts = true;
 
-			for (auto& Resource : ProductionCostComponent->Resources)
+			for (auto& Resource : ProductionCostComponent->GetResources())
 			{
-				float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->ProductionTime;
+				float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->GetProductionTime();
 
 				if (!PlayerResourcesComponent->CanPayResources(Resource.Key, ResourceAmount))
 				{
@@ -118,9 +118,9 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 			if (bCanPayAllProductionCosts)
 			{
 				// Pay production costs.
-				for (auto& Resource : ProductionCostComponent->Resources)
+				for (auto& Resource : ProductionCostComponent->GetResources())
 				{
-					float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->ProductionTime;
+					float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->GetProductionTime();
                     PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
 				}
 
@@ -201,7 +201,7 @@ float URTSProductionComponent::GetProductionTimeForProduct(TSubclassOf<AActor> P
 {
 	URTSProductionCostComponent* ProductionCostComponent =
 		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
-	return ProductionCostComponent ? ProductionCostComponent->ProductionTime : 0.0f;
+	return ProductionCostComponent ? ProductionCostComponent->GetProductionTime() : 0.0f;
 }
 
 float URTSProductionComponent::GetProgressPercentage(int32 QueueIndex /*= 0*/) const
@@ -276,7 +276,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 	URTSProductionCostComponent* ProductionCostComponent =
 		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
-	if (ProductionCostComponent && ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayImmediately)
+	if (ProductionCostComponent && ProductionCostComponent->GetProductionCostType() == ERTSProductionCostType::COST_PayImmediately)
 	{
 		auto Owner = GetOwner()->GetOwner();
 
@@ -294,7 +294,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
             return;
         }
 
-		if (!PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->Resources))
+		if (!PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources()))
 		{
 			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for producing %s, but does not have enough resources."),
 				*Owner->GetName(),
@@ -303,7 +303,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 		}
 
 		// Pay production costs.
-        PlayerResourcesComponent->PayAllResources(ProductionCostComponent->Resources);
+        PlayerResourcesComponent->PayAllResources(ProductionCostComponent->GetResources());
 	}
 	
 	// Insert into queue.
@@ -436,19 +436,19 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 
 		float TimeRefundFactor = 0.0f;
 
-		if (ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayImmediately)
+		if (ProductionCostComponent->GetProductionCostType() == ERTSProductionCostType::COST_PayImmediately)
 		{
 			TimeRefundFactor = 1.0f;
 		}
-		else if (ProductionCostComponent->ProductionCostType == ERTSProductionCostType::COST_PayOverTime)
+		else if (ProductionCostComponent->GetProductionCostType() == ERTSProductionCostType::COST_PayOverTime)
 		{
 			TimeRefundFactor = ElapsedProductionTime / TotalProductionTime;
 		}
 
-		float ActualRefundFactor = ProductionCostComponent->RefundFactor * TimeRefundFactor;
+		float ActualRefundFactor = ProductionCostComponent->GetRefundFactor() * TimeRefundFactor;
 
 		// Refund production costs.
-		for (auto& Resource : ProductionCostComponent->Resources)
+		for (auto& Resource : ProductionCostComponent->GetResources())
 		{
 			TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
 			float ResourceAmount = Resource.Value * ActualRefundFactor;
@@ -461,6 +461,21 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 			OnProductionCostRefunded.Broadcast(ResourceType, ResourceAmount);
 		}
 	}
+}
+
+TArray<TSubclassOf<AActor>> URTSProductionComponent::GetAvailableProducts() const
+{
+    return AvailableProducts;
+}
+
+int32 URTSProductionComponent::GetQueueCount() const
+{
+    return QueueCount;
+}
+
+int32 URTSProductionComponent::GetCapacityPerQueue() const
+{
+    return CapacityPerQueue;
 }
 
 void URTSProductionComponent::DequeueProduct(int32 QueueIndex /*= 0*/, int32 ProductIndex /*= 0*/)

@@ -16,70 +16,6 @@ class REALTIMESTRATEGY_API ARTSHUD : public AHUD
 	GENERATED_BODY()
 
 public:
-	/** Whether to always show all health bars. You may expose this in your own Options window: Some professional players might want this for perfect micro-management. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Health Bars")
-	bool bAlwaysShowHealthBars;
-
-	/** Whether to show health bars for hovered units. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Health Bars")
-	bool bShowHoverHealthBars = true;
-
-	/** Whether to show health bars for selected units. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Health Bars")
-	bool bShowSelectionHealthBars = true;
-
-	/** Whether to show health bars while the respective hotkey is pressed. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Health Bars")
-	bool bShowHotkeyHealthBars = true;
-
-
-	/** Whether to always show all construction progress bars. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-	bool bAlwaysShowConstructionProgressBars;
-
-	/** Whether to show construction progress bars for hovered units. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-	bool bShowHoverConstructionProgressBars = true;
-
-	/** Whether to show construction progress bars for selected units. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-	bool bShowSelectionConstructionProgressBars = true;
-
-	/** Whether to show construction progress bars while the respective hotkey is pressed. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Construction Progress Bars")
-	bool bShowHotkeyConstructionProgressBars = true;
-
-
-	/** Whether to always show all production progress bars. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
-	bool bAlwaysShowProductionProgressBars;
-
-	/** Whether to show production progress bars for hovered units. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
-	bool bShowHoverProductionProgressBars = true;
-
-	/** Whether to show production progress bars for selected units. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
-	bool bShowSelectionProductionProgressBars = true;
-
-	/** Whether to show production progress bars while the respective hotkey is pressed. */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Production Progress Bars")
-	bool bShowHotkeyProductionProgressBars = true;
-
-
-    /** Whether to show floating combat texts above actors. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Floating Combat Texts")
-    bool bShowFloatingCombatTexts = true;
-
-    /** How many pixels the floating combat text should rise, per second. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Floating Combat Texts")
-    float FloatingCombatTextSpeed = 20.0f;
-
-    /** Whether to automatically adjust the alpha value of the color of floating combat texts depending on their elapsed lifetime. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS|Floating Combat Texts")
-    bool bFadeOutFloatingCombatTexts = true;
-
-
 	virtual void DrawHUD() override;
 
 
@@ -192,13 +128,77 @@ public:
 	void ReceiveDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
 
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	FVector2D GetActorCenterOnScreen(AActor* Actor) const;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintPure)
 	FVector2D GetActorSizeOnScreen(AActor* Actor) const;
 
 private:
+    /** Whether to always show all health bars. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Health Bars")
+    bool bAlwaysShowHealthBars;
+
+    /** Whether to show health bars for hovered units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Health Bars")
+    bool bShowHoverHealthBars = true;
+
+    /** Whether to show health bars for selected units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Health Bars")
+    bool bShowSelectionHealthBars = true;
+
+    /** Whether to show health bars while the respective hotkey is pressed. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Health Bars")
+    bool bShowHotkeyHealthBars = true;
+
+
+    /** Whether to always show all construction progress bars. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction Progress Bars")
+    bool bAlwaysShowConstructionProgressBars;
+
+    /** Whether to show construction progress bars for hovered units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction Progress Bars")
+    bool bShowHoverConstructionProgressBars = true;
+
+    /** Whether to show construction progress bars for selected units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction Progress Bars")
+    bool bShowSelectionConstructionProgressBars = true;
+
+    /** Whether to show construction progress bars while the respective hotkey is pressed. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction Progress Bars")
+    bool bShowHotkeyConstructionProgressBars = true;
+
+
+    /** Whether to always show all production progress bars. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Production Progress Bars")
+    bool bAlwaysShowProductionProgressBars;
+
+    /** Whether to show production progress bars for hovered units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Production Progress Bars")
+    bool bShowHoverProductionProgressBars = true;
+
+    /** Whether to show production progress bars for selected units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Production Progress Bars")
+    bool bShowSelectionProductionProgressBars = true;
+
+    /** Whether to show production progress bars while the respective hotkey is pressed. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Production Progress Bars")
+    bool bShowHotkeyProductionProgressBars = true;
+
+
+    /** Whether to show floating combat texts above actors. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Floating Combat Texts")
+    bool bShowFloatingCombatTexts = true;
+
+    /** How many pixels the floating combat text should rise, per second. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Floating Combat Texts")
+    float FloatingCombatTextSpeed = 20.0f;
+
+    /** Whether to automatically adjust the alpha value of the color of floating combat texts depending on their elapsed lifetime. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Floating Combat Texts")
+    bool bFadeOutFloatingCombatTexts = true;
+
+
 	/** Draws the current selection frame if mouse is being dragged. */
 	void DrawSelectionFrame();
 
