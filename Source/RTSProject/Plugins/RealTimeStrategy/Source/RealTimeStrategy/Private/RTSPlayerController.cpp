@@ -972,7 +972,9 @@ void ARTSPlayerController::SaveControlGroup(int32 Index)
 	}
 
 	// Save control group.
-	ControlGroups[Index] = SelectedActors;
+    FRTSControlGroup ControlGroup;
+    ControlGroup.Actors = SelectedActors;
+	ControlGroups[Index] = ControlGroup;
 
 	UE_LOG(LogRTS, Log, TEXT("Saved selection to control group %d."), Index);
 }
@@ -995,7 +997,7 @@ void ARTSPlayerController::LoadControlGroup(int32 Index)
 		return;
 	}
 
-	SelectActors(ControlGroups[Index]);
+	SelectActors(ControlGroups[Index].Actors);
 
 	UE_LOG(LogRTS, Log, TEXT("Loaded selection from control group %d."), Index);
 }

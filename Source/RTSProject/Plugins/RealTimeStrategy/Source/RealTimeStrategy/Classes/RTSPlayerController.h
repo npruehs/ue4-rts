@@ -4,6 +4,8 @@
 
 #include "GameFramework/PlayerController.h"
 
+#include "RTSControlGroup.h"
+
 #include "RTSPlayerController.generated.h"
 
 
@@ -346,7 +348,8 @@ private:
 	float CameraZoomAxisValue;
 
 	/** Saved selections of this player. */
-	TArray<TArray<AActor*>> ControlGroups;
+    UPROPERTY()
+	TArray<FRTSControlGroup> ControlGroups;
 
 	/** Actor currently hovered by this player. */
     UPROPERTY()
