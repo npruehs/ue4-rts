@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
@@ -1073,12 +1074,26 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	AActor* DefaultBuilding = BuildingClass->GetDefaultObject<AActor>();
-	USkeletalMeshComponent* SkeletalMeshComponent = DefaultBuilding->FindComponentByClass<USkeletalMeshComponent>();
+	UStaticMeshComponent* StaticMeshComponent = DefaultBuilding->FindComponentByClass<UStaticMeshComponent>();
 
-	BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
-	BuildingCursor->SetMesh(SkeletalMeshComponent->SkeletalMesh, DefaultBuilding->GetActorRelativeScale3D());
-	BuildingCursor->SetInvalidLocation();
+    if (IsValid(StaticMeshComponent))
+    {
+        BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
+        BuildingCursor->SetStaticMesh(StaticMeshComponent->GetStaticMesh(), StaticMeshComponent->GetRelativeTransform());
+        BuildingCursor->SetLocationValid(false);
+    }
+    else
+    {
+        USkeletalMeshComponent* SkeletalMeshComponent = DefaultBuilding->FindComponentByClass<USkeletalMeshComponent>();
 
+        if (IsValid(SkeletalMeshComponent))
+        {
+            BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
+            BuildingCursor->SetSkeletalMesh(SkeletalMeshComponent->SkeletalMesh, SkeletalMeshComponent->GetRelativeTransform());
+            BuildingCursor->SetLocationValid(false);
+        }
+    }
+	
 	BuildingBeingPlacedClass = BuildingClass;
 
 	UE_LOG(LogRTS, Log, TEXT("Beginning placement of building %s."), *BuildingClass->GetName());
@@ -1709,14 +1724,8 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 				{
 					BuildingCursor->SetActorLocation(HoveredWorldPosition);
 
-					if (CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition))
-					{
-						BuildingCursor->SetValidLocation();
-					}
-					else
-					{
-						BuildingCursor->SetInvalidLocation();
-					}
+					bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
+                    BuildingCursor->SetLocationValid(bLocationValid);
 				}
 				continue;
 			}
