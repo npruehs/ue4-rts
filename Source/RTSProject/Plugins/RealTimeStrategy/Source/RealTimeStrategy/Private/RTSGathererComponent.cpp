@@ -2,6 +2,7 @@
 #include "RTSGathererComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
 #include "RTSPlayerResourcesComponent.h"

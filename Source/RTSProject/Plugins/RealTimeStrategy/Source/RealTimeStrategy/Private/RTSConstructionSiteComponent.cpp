@@ -2,6 +2,7 @@
 #include "RTSConstructionSiteComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 
 #include "RTSBuilderComponent.h"
 #include "RTSContainerComponent.h"
