@@ -2,7 +2,7 @@
 #include "Vision/RTSVisionComponent.h"
 
 
-URTSVisionComponent::URTSVisionComponent(const FObjectInitializer& ObjectInitializer)
+URTSVisionComponent::URTSVisionComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.

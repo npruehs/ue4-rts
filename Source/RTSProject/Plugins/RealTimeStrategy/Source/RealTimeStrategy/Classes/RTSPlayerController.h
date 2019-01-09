@@ -30,7 +30,7 @@ class REALTIMESTRATEGY_API ARTSPlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-    ARTSPlayerController();
+    ARTSPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
     
     virtual void PlayerTick(float DeltaTime) override;
 

@@ -16,7 +16,7 @@ class REALTIMESTRATEGY_API ARTSVisionVolume : public AVolume
 	GENERATED_BODY()
 
 public:
-    ARTSVisionVolume(const FObjectInitializer& ObjectInitializer);
+    ARTSVisionVolume(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     float GetSizePerTile() const;
 	FVector GetWorldSize() const;

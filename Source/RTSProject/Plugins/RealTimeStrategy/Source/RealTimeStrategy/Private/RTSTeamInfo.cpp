@@ -7,7 +7,8 @@
 #include "RTSPlayerState.h"
 
 
-ARTSTeamInfo::ARTSTeamInfo()
+ARTSTeamInfo::ARTSTeamInfo(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	SetReplicates(true);
 	bAlwaysRelevant = true;

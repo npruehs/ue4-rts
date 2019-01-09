@@ -27,7 +27,7 @@ class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public UActorComponen
 	GENERATED_BODY()
 
 public:
-	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer);
+	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

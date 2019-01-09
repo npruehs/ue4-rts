@@ -18,7 +18,7 @@ class REALTIMESTRATEGY_API URTSFloatingCombatTextComponent : public UActorCompon
     GENERATED_BODY()
 
 public:
-    URTSFloatingCombatTextComponent(const FObjectInitializer& ObjectInitializer);
+    URTSFloatingCombatTextComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
     virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;

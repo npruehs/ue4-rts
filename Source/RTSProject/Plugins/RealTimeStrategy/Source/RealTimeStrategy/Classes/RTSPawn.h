@@ -19,7 +19,7 @@ class REALTIMESTRATEGY_API ARTSPawn : public APawn
     GENERATED_BODY()
 
 public:
-    ARTSPawn();
+    ARTSPawn(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

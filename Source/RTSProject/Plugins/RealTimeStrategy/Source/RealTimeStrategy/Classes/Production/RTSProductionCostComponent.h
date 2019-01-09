@@ -19,7 +19,7 @@ class REALTIMESTRATEGY_API URTSProductionCostComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-    URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer);
+    URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
     /** When to pay resources for production. */

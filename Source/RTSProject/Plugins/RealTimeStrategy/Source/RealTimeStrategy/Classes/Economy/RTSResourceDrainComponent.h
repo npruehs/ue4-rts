@@ -22,7 +22,7 @@ class REALTIMESTRATEGY_API URTSResourceDrainComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer);
+	URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 	/** Returns resources to this actor, notifying the owning player. */

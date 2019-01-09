@@ -4,7 +4,8 @@
 #include "Combat/RTSHealthComponent.h"
 
 
-ARTSCharacter::ARTSCharacter()
+ARTSCharacter::ARTSCharacter(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	// Enable replication.
 	bReplicates = true;

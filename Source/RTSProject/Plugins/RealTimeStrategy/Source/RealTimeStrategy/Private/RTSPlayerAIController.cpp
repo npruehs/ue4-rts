@@ -18,7 +18,8 @@
 #include "Production/RTSProductionCostComponent.h"
 
 
-ARTSPlayerAIController::ARTSPlayerAIController()
+ARTSPlayerAIController::ARTSPlayerAIController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
     PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
 

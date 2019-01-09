@@ -7,7 +7,7 @@
 #include "Combat/RTSProjectile.h"
 
 
-URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitializer)
+URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;

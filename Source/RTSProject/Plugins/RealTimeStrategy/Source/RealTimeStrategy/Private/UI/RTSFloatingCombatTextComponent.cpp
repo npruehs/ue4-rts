@@ -2,7 +2,7 @@
 #include "UI/RTSFloatingCombatTextComponent.h"
 
 
-URTSFloatingCombatTextComponent::URTSFloatingCombatTextComponent(const FObjectInitializer& ObjectInitializer)
+URTSFloatingCombatTextComponent::URTSFloatingCombatTextComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
     PrimaryComponentTick.bCanEverTick = true;

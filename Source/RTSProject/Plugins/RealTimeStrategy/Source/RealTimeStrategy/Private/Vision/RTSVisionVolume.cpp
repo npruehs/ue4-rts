@@ -4,7 +4,7 @@
 #include "Components/BrushComponent.h"
 
 
-ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer)
+ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.

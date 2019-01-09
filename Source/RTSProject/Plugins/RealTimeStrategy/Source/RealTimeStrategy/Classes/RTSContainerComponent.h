@@ -18,7 +18,7 @@ class REALTIMESTRATEGY_API URTSContainerComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	URTSContainerComponent(const FObjectInitializer& ObjectInitializer);
+	URTSContainerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 	/** Whether the specified actor can enter this container. */

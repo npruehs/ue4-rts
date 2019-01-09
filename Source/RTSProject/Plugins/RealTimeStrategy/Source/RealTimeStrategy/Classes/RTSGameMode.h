@@ -24,7 +24,7 @@ class REALTIMESTRATEGY_API ARTSGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	ARTSGameMode(const FObjectInitializer& ObjectInitializer);
+	ARTSGameMode(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
     virtual void BeginPlay() override;

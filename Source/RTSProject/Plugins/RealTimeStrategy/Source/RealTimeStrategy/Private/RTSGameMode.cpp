@@ -21,7 +21,7 @@
 #include "Vision/RTSVisionInfo.h"
 
 
-ARTSGameMode::ARTSGameMode(const FObjectInitializer& ObjectInitializer)
+ARTSGameMode::ARTSGameMode(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.

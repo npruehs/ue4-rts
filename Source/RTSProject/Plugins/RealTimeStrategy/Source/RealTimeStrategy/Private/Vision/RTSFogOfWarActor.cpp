@@ -12,8 +12,8 @@
 #include "Vision/RTSVisionVolume.h"
 
 
-ARTSFogOfWarActor::ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer)
-	: AActor(ObjectInitializer)
+ARTSFogOfWarActor::ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }

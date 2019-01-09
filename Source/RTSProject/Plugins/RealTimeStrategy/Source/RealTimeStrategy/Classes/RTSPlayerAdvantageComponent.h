@@ -16,7 +16,7 @@ class REALTIMESTRATEGY_API URTSPlayerAdvantageComponent : public UActorComponent
     GENERATED_BODY()
 
 public:
-    URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer);
+    URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     /** Whether units controlled by the player are invulnerable, or not. */
     bool IsGodModeEnabled() const;

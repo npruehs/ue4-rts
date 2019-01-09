@@ -8,7 +8,7 @@
 #include "RTSGameMode.h"
 
 
-URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer)
+URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	SetIsReplicated(true);

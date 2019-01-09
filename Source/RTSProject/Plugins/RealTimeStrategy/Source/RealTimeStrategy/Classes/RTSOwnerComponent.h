@@ -24,7 +24,7 @@ class REALTIMESTRATEGY_API URTSOwnerComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	URTSOwnerComponent(const FObjectInitializer& ObjectInitializer);
+	URTSOwnerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

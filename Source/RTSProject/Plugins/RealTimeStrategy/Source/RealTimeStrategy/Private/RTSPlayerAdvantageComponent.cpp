@@ -1,7 +1,7 @@
 #include "RealTimeStrategyPCH.h"
 #include "RTSPlayerAdvantageComponent.h"
 
-URTSPlayerAdvantageComponent::URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer)
+URTSPlayerAdvantageComponent::URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
     bGodModeEnabled = false;

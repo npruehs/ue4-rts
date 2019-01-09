@@ -16,7 +16,7 @@ class REALTIMESTRATEGY_API ARTSTeamInfo : public AInfo
 	GENERATED_BODY()
 
 public:
-    ARTSTeamInfo();
+    ARTSTeamInfo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

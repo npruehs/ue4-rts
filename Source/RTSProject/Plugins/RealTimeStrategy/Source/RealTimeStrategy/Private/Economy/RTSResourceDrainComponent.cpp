@@ -6,7 +6,7 @@
 #include "Economy/RTSPlayerResourcesComponent.h"
 
 
-URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer)
+URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
     SetIsReplicated(true);

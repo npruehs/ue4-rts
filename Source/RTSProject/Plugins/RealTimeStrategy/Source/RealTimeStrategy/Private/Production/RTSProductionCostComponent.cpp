@@ -4,7 +4,8 @@
 #include "Economy/RTSResourceType.h"
 
 
-URTSProductionCostComponent::URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer)
+URTSProductionCostComponent::URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	// Set reasonable default values.
 	ProductionCostType = ERTSPaymentType::PAYMENT_PayImmediately;

@@ -22,7 +22,7 @@ class REALTIMESTRATEGY_API URTSPlayerResourcesComponent : public UActorComponent
     GENERATED_BODY()
 
 public:
-    URTSPlayerResourcesComponent(const FObjectInitializer& ObjectInitializer);
+    URTSPlayerResourcesComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
     void BeginPlay() override;

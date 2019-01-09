@@ -24,7 +24,7 @@ class REALTIMESTRATEGY_API ARTSFogOfWarActor : public AActor
 	GENERATED_BODY()
 
 public:
-	ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer);
+	ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void BeginPlay() override;
 	void Tick(float DeltaTime) override;

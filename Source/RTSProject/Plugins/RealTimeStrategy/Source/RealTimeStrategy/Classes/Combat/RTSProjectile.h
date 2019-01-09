@@ -19,7 +19,7 @@ class REALTIMESTRATEGY_API ARTSProjectile : public AActor
 	GENERATED_BODY()
 
 public:
-	ARTSProjectile();
+	ARTSProjectile(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
 	/** Locks on to the specified target, dealing damage on impact. */

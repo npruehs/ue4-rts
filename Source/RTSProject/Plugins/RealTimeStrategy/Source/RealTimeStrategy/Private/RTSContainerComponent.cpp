@@ -4,7 +4,7 @@
 #include "GameFramework/Actor.h"
 
 
-URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectInitializer)
+URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.

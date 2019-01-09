@@ -5,7 +5,8 @@
 #include "RTSTeamInfo.h"
 
 
-URTSOwnerComponent::URTSOwnerComponent(const FObjectInitializer& ObjectInitializer)
+URTSOwnerComponent::URTSOwnerComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	SetIsReplicated(true);
 }

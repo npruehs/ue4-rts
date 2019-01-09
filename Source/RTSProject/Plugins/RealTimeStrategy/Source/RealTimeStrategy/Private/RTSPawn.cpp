@@ -3,7 +3,8 @@
 
 #include "Combat/RTSHealthComponent.h"
 
-ARTSPawn::ARTSPawn()
+ARTSPawn::ARTSPawn(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
     // Enable replication.
     bReplicates = true;

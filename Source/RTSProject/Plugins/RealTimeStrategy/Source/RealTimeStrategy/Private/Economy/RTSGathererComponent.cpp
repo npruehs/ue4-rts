@@ -14,7 +14,7 @@
 #include "Libraries/RTSGameplayLibrary.h"
 
 
-URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectInitializer)
+URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;

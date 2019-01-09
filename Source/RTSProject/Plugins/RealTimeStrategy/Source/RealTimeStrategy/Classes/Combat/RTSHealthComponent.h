@@ -20,7 +20,7 @@ class REALTIMESTRATEGY_API URTSHealthComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	URTSHealthComponent(const FObjectInitializer& ObjectInitializer);
+	URTSHealthComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

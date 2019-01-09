@@ -19,7 +19,7 @@ class REALTIMESTRATEGY_API ARTSCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	ARTSCharacter();
+	ARTSCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };

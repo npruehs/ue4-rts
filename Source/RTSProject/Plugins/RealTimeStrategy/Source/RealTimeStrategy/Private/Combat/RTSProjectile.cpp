@@ -4,7 +4,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 
 
-ARTSProjectile::ARTSProjectile()
+ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 

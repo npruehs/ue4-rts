@@ -11,7 +11,8 @@
 #include "Vision/RTSVisionVolume.h"
 
 
-ARTSVisionInfo::ARTSVisionInfo()
+ARTSVisionInfo::ARTSVisionInfo(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	// Enable replication.
 	SetReplicates(true);

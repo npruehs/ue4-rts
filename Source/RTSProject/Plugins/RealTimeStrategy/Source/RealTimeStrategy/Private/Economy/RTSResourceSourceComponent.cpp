@@ -6,7 +6,8 @@
 #include "RTSContainerComponent.h"
 
 
-URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer)
+URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
 {
 	SetIsReplicated(true);
 

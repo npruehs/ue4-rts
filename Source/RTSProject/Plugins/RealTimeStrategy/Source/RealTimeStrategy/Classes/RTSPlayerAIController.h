@@ -23,7 +23,7 @@ class REALTIMESTRATEGY_API ARTSPlayerAIController : public AAIController
     GENERATED_BODY()
 
 public:
-    ARTSPlayerAIController();
+    ARTSPlayerAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
     /** Checks the build order and returns the class of the next pawn to produce, or the Pawn class if nothing needs to be produced. */

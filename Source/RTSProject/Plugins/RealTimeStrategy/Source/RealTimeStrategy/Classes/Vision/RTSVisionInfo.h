@@ -23,7 +23,7 @@ class REALTIMESTRATEGY_API ARTSVisionInfo : public AInfo
 	GENERATED_BODY()
 
 public:
-    ARTSVisionInfo();
+    ARTSVisionInfo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

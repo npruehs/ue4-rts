@@ -16,7 +16,7 @@
 #include "Production/RTSProductionCostComponent.h"
 
 
-URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& ObjectInitializer)
+URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;

@@ -23,11 +23,9 @@ class REALTIMESTRATEGY_API URTSAttackComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	URTSAttackComponent(const FObjectInitializer& ObjectInitializer);
-
+	URTSAttackComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-
 
 	/** Uses the passed attack on the specified target and starts the cooldown timer. */
 	UFUNCTION(BlueprintCallable)
