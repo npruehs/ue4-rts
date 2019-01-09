@@ -17,11 +17,6 @@
 #include "Vision/RTSVisionVolume.h"
 
 
-URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
-{
-}
-
 void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
 {
 	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)

@@ -8,7 +8,7 @@
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSProductionQueue
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 public:
 	/** Products queued for production. */

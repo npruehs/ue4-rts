@@ -10,7 +10,7 @@
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSControlGroup
 {
-    GENERATED_USTRUCT_BODY()
+    GENERATED_BODY()
 
 public:
     /** Actors of this control group. */

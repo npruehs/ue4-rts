@@ -13,9 +13,11 @@
 UCLASS(Blueprintable)
 class REALTIMESTRATEGY_API ARTSVisionVolume : public AVolume
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 public:
+    ARTSVisionVolume(const FObjectInitializer& ObjectInitializer);
+
     float GetSizePerTile() const;
 	FVector GetWorldSize() const;
 	FIntVector GetTileSize() const;

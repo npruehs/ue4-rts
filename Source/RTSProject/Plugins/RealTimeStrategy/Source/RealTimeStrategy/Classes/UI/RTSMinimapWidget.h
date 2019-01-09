@@ -21,7 +21,7 @@ class ARTSVisionVolume;
 UCLASS(Blueprintable)
 class REALTIMESTRATEGY_API URTSMinimapWidget : public UUserWidget
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
 
 public:
 	/** Sets the vision info to draw on the minimap. */

@@ -11,7 +11,7 @@ class URTSResourceType;
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSGatherData
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 public:
 	/** Type of resources that can be gathered. */

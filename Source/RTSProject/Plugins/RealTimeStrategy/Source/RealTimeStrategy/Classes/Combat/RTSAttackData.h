@@ -11,7 +11,7 @@ class ARTSProjectile;
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSAttackData
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 public:
 	/** Time before this attack can be used again, in seconds. */
