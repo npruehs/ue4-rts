@@ -15,5 +15,5 @@
 UCLASS()
 class REALTIMESTRATEGY_API ARTSCameraBoundsVolume : public AVolume
 {
-    GENERATED_UCLASS_BODY()
+    GENERATED_BODY()
 };

@@ -1,7 +1,7 @@
 #include "RealTimeStrategyPCH.h"
 #include "RTSCharacter.h"
 
-#include "RTSHealthComponent.h"
+#include "Combat/RTSHealthComponent.h"
 
 
 ARTSCharacter::ARTSCharacter()

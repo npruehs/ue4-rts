@@ -6,16 +6,16 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Pawn.h"
 
-#include "RTSBuilderComponent.h"
 #include "RTSCharacterAIController.h"
-#include "RTSConstructionSiteComponent.h"
-#include "RTSPlayerResourcesComponent.h"
-#include "RTSProductionComponent.h"
-#include "RTSProductionCostComponent.h"
-#include "RTSResourceSourceComponent.h"
-#include "RTSResourceDrainComponent.h"
+#include "Construction/RTSBuilderComponent.h"
+#include "Construction/RTSConstructionSiteComponent.h"
+#include "Economy/RTSPlayerResourcesComponent.h"
+#include "Economy/RTSResourceSourceComponent.h"
+#include "Economy/RTSResourceDrainComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Production/RTSProductionComponent.h"
+#include "Production/RTSProductionCostComponent.h"
 
 
 ARTSPlayerAIController::ARTSPlayerAIController()

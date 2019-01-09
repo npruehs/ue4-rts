@@ -4,13 +4,13 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-#include "RTSAttackComponent.h"
-#include "RTSAttackableComponent.h"
-#include "RTSBuilderComponent.h"
 #include "RTSCharacter.h"
 #include "RTSCharacterAIEventComponent.h"
-#include "RTSGathererComponent.h"
 #include "RTSOwnerComponent.h"
+#include "Economy/RTSGathererComponent.h"
+#include "Combat/RTSAttackComponent.h"
+#include "Combat/RTSAttackableComponent.h"
+#include "Construction/RTSBuilderComponent.h"
 
 
 void ARTSCharacterAIController::Possess(APawn* InPawn)

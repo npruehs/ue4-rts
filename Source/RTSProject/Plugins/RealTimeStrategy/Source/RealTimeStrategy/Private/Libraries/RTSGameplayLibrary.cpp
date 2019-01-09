@@ -5,10 +5,10 @@
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 
-#include "RTSConstructionSiteComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSRequirementsComponent.h"
+#include "Construction/RTSConstructionSiteComponent.h"
 
 
 UActorComponent* URTSGameplayLibrary::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)

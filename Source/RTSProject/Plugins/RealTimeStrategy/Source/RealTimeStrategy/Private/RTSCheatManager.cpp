@@ -10,7 +10,7 @@
 #include "RTSPlayerController.h"
 #include "RTSPlayerAIController.h"
 #include "RTSPlayerAdvantageComponent.h"
-#include "RTSPlayerResourcesComponent.h"
+#include "Economy/RTSPlayerResourcesComponent.h"
 
 
 void URTSCheatManager::Boost()

@@ -10,7 +10,6 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSCharacter.h"
-#include "RTSConstructionSiteComponent.h"
 #include "RTSGameState.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAIController.h"
@@ -18,7 +17,8 @@
 #include "RTSPlayerController.h"
 #include "RTSPlayerStart.h"
 #include "RTSTeamInfo.h"
-#include "RTSVisionInfo.h"
+#include "Construction/RTSConstructionSiteComponent.h"
+#include "Vision/RTSVisionInfo.h"
 
 
 ARTSGameMode::ARTSGameMode(const FObjectInitializer& ObjectInitializer)

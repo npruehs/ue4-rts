@@ -1,7 +1,7 @@
 #include "RealTimeStrategyPCH.h"
 #include "RTSPawn.h"
 
-#include "RTSHealthComponent.h"
+#include "Combat/RTSHealthComponent.h"
 
 ARTSPawn::ARTSPawn()
 {
