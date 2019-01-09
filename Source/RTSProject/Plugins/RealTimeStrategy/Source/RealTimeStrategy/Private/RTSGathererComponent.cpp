@@ -1,14 +1,17 @@
 #include "RealTimeStrategyPCH.h"
 #include "RTSGathererComponent.h"
 
+#include "EngineUtils.h"
 #include "GameFramework/Actor.h"
 #include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSOwnerComponent.h"
 #include "RTSPlayerResourcesComponent.h"
 #include "RTSResourceSourceComponent.h"
 #include "RTSResourceDrainComponent.h"
-#include "RTSUtilities.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectInitializer)
@@ -40,7 +43,7 @@ void URTSGathererComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 	// Check range.
 	float GatherRange = GetGatherRange(CurrentResourceSource);
 
-	if (URTSUtilities::GetActorDistance(GetOwner(), CurrentResourceSource, true) > GatherRange)
+	if (URTSCollisionLibrary::GetActorDistance(GetOwner(), CurrentResourceSource, true) > GatherRange)
 	{
 		// Stop gathering.
 		CurrentResourceSource = nullptr;
@@ -116,7 +119,7 @@ AActor* URTSGathererComponent::FindClosestResourceDrain() const
 		}
 	
 		// Check if ready to use (e.g. construction finished).
-		if (!URTSUtilities::IsReadyToUse(ResourceDrain))
+		if (!URTSGameplayLibrary::IsReadyToUse(ResourceDrain))
 		{
 			continue;
 		}

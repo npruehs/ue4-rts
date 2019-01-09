@@ -34,8 +34,9 @@
 #include "RTSResourceSourceComponent.h"
 #include "RTSSelectableComponent.h"
 #include "RTSTeamInfo.h"
-#include "RTSUtilities.h"
 #include "RTSVisionInfo.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 ARTSPlayerController::ARTSPlayerController()
@@ -821,7 +822,7 @@ bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
     TSubclassOf<AActor> ProductClass = ProductionComponent->GetAvailableProducts()[ProductIndex];
 
     // Check costs.
-    URTSProductionCostComponent* ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+    URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
     if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources()))
     {
@@ -832,9 +833,9 @@ bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
     // Check requirements.
     TSubclassOf<AActor> MissingRequirement;
 
-    if (URTSUtilities::GetMissingRequirementFor(this, SelectedActor, ProductClass, MissingRequirement))
+    if (URTSGameplayLibrary::GetMissingRequirementFor(this, SelectedActor, ProductClass, MissingRequirement))
     {
-        URTSNameComponent* NameComponent = URTSUtilities::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+        URTSNameComponent* NameComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
 
         if (NameComponent)
         {
@@ -1032,7 +1033,7 @@ bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed() const
 bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
     // Check resources.
-    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSUtilities::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
+    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
 
     if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts()))
     {
@@ -1045,9 +1046,9 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
     {
         TSubclassOf<AActor> MissingRequirement;
 
-        if (URTSUtilities::GetMissingRequirementFor(this, SelectedActors[0], BuildingClass, MissingRequirement))
+        if (URTSGameplayLibrary::GetMissingRequirementFor(this, SelectedActors[0], BuildingClass, MissingRequirement))
         {
-            URTSNameComponent* NameComponent = URTSUtilities::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+            URTSNameComponent* NameComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
 
             if (NameComponent)
             {
@@ -1105,7 +1106,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
 	UWorld* World = GetWorld();
-    return URTSUtilities::IsSuitableLocationForActor(World, BuildingClass, Location);
+    return URTSCollisionLibrary::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
 void ARTSPlayerController::Surrender()
@@ -1403,7 +1404,7 @@ void ARTSPlayerController::CancelProduction()
 			continue;
 		}
 
-		if (!URTSUtilities::IsReadyToUse(SelectedActor))
+		if (!URTSGameplayLibrary::IsReadyToUse(SelectedActor))
 		{
 			continue;
 		}

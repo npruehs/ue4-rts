@@ -12,7 +12,8 @@
 #include "RTSPlayerController.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerResourcesComponent.h"
-#include "RTSUtilities.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& ObjectInitializer)
@@ -79,7 +80,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 		// Check production costs.
 		auto ProductClass = GetCurrentProduction(QueueIndex);
-		auto ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+		auto ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
 		bool bProductionCostPaid = false;
 
@@ -150,7 +151,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 
 bool URTSProductionComponent::CanAssignProduction(TSubclassOf<AActor> ProductClass) const
 {
-	return URTSUtilities::IsReadyToUse(GetOwner()) && FindQueueForProduct(ProductClass) >= 0;
+	return URTSGameplayLibrary::IsReadyToUse(GetOwner()) && FindQueueForProduct(ProductClass) >= 0;
 }
 
 int32 URTSProductionComponent::FindQueueForProduct(TSubclassOf<AActor> ProductClass) const
@@ -200,7 +201,7 @@ float URTSProductionComponent::GetProductionTime(int32 QueueIndex /*= 0*/) const
 float URTSProductionComponent::GetProductionTimeForProduct(TSubclassOf<AActor> ProductClass) const
 {
 	URTSProductionCostComponent* ProductionCostComponent =
-		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+		URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 	return ProductionCostComponent ? ProductionCostComponent->GetProductionTime() : 0.0f;
 }
 
@@ -266,7 +267,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
     // Check requirements.
     TSubclassOf<AActor> MissingRequirement;
 
-    if (URTSUtilities::GetMissingRequirementFor(this, GetOwner(), ProductClass, MissingRequirement))
+    if (URTSGameplayLibrary::GetMissingRequirementFor(this, GetOwner(), ProductClass, MissingRequirement))
     {
         UE_LOG(LogRTS, Error, TEXT("%s wants to produce %s, but is missing requirement %s."), *GetOwner()->GetName(), *ProductClass->GetName(), *MissingRequirement->GetName());
         return;
@@ -274,7 +275,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 
 	// Check production cost.
 	URTSProductionCostComponent* ProductionCostComponent =
-		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+		URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
 	if (ProductionCostComponent && ProductionCostComponent->GetProductionCostType() == ERTSProductionCostType::COST_PayImmediately)
 	{
@@ -347,16 +348,16 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 
     // Spawn next to production actor.
     float SpawnOffset = 0.0f;
-    SpawnOffset += URTSUtilities::GetActorCollisionSize(GetOwner()) / 2;
-    SpawnOffset += URTSUtilities::GetCollisionSize(ProductClass) / 2;
+    SpawnOffset += URTSCollisionLibrary::GetActorCollisionSize(GetOwner()) / 2;
+    SpawnOffset += URTSCollisionLibrary::GetCollisionSize(ProductClass) / 2;
     SpawnOffset *= 1.05f;
     SpawnLocation.X -= SpawnOffset;
 
     // Calculate location on the ground.
-    SpawnLocation = URTSUtilities::GetGroundLocation(this, SpawnLocation);
+    SpawnLocation = URTSCollisionLibrary::GetGroundLocation(this, SpawnLocation);
 
     // Prevent spawn collision or spawning at wrong side of the world.
-    SpawnLocation.Z += URTSUtilities::GetCollisionHeight(ProductClass) * 1.1f;
+    SpawnLocation.Z += URTSCollisionLibrary::GetCollisionHeight(ProductClass) * 1.1f;
 
 	// Spawn product.
 	AActor* Product = GameMode->SpawnActorForPlayer(
@@ -416,7 +417,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 
 	// Refund resources.
 	URTSProductionCostComponent* ProductionCostComponent =
-		URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+		URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
 	if (ProductionCostComponent)
 	{

@@ -14,7 +14,8 @@
 #include "RTSProductionCostComponent.h"
 #include "RTSResourceSourceComponent.h"
 #include "RTSResourceDrainComponent.h"
-#include "RTSUtilities.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 ARTSPlayerAIController::ARTSPlayerAIController()
@@ -134,14 +135,14 @@ AActor* ARTSPlayerAIController::GetPrimaryResourceSource() const
 
 bool ARTSPlayerAIController::CanPayFor(TSubclassOf<APawn> PawnClass) const
 {
-    URTSProductionCostComponent* ProductionCostComponent = URTSUtilities::FindDefaultComponentByClass<URTSProductionCostComponent>(PawnClass);
+    URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(PawnClass);
 
     if (ProductionCostComponent)
     {
         return PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources());
     }
 
-    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSUtilities::FindDefaultComponentByClass<URTSConstructionSiteComponent>(PawnClass);
+    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(PawnClass);
 
     if (ConstructionSiteComponent)
     {
@@ -154,7 +155,7 @@ bool ARTSPlayerAIController::CanPayFor(TSubclassOf<APawn> PawnClass) const
 bool ARTSPlayerAIController::MeetsAllRequirementsFor(TSubclassOf<APawn> PawnClass) const
 {
     AActor* AnyOwnActor = GetPrimaryResourceDrain();
-    return URTSUtilities::OwnerMeetsAllRequirementsFor(AnyOwnActor, AnyOwnActor, PawnClass);
+    return URTSGameplayLibrary::OwnerMeetsAllRequirementsFor(AnyOwnActor, AnyOwnActor, PawnClass);
 }
 
 bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
@@ -257,7 +258,7 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
         TargetLocation.X += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
         TargetLocation.Y += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
         
-        TargetLocation = URTSUtilities::GetGroundLocation(this, TargetLocation);
+        TargetLocation = URTSCollisionLibrary::GetGroundLocation(this, TargetLocation);
 
         // If there's a primary resource drain, prevent blocking its path.
         AActor* PrimaryResourceSource = GetPrimaryResourceSource();

@@ -8,7 +8,8 @@
 #include "RTSConstructionSiteComponent.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
-#include "RTSUtilities.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -82,7 +83,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
     // Check requirements.
     TSubclassOf<AActor> MissingRequirement;
 
-    if (URTSUtilities::GetMissingRequirementFor(this, GetOwner(), BuildingClass, MissingRequirement))
+    if (URTSGameplayLibrary::GetMissingRequirementFor(this, GetOwner(), BuildingClass, MissingRequirement))
     {
         UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
 
@@ -97,8 +98,8 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
     ToTargetLocation.Z = 0.0f;
     FVector ToTargetLocationNormalized = ToTargetLocation.GetSafeNormal();
     float SafetyDistance = 
-        (URTSUtilities::GetActorCollisionSize(Pawn) / 2 +
-         URTSUtilities::GetCollisionSize(BuildingClass) / 2)
+        (URTSCollisionLibrary::GetActorCollisionSize(Pawn) / 2 +
+         URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2)
         + ConstructionSiteOffset;
 
     FVector SafeBuilderLocation = TargetLocation - ToTargetLocationNormalized * SafetyDistance;
