@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSPlayerAIController.h"
 
 #include "EngineUtils.h"
@@ -7,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 
 #include "RTSCharacterAIController.h"
+#include "RTSLog.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"

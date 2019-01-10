@@ -1,9 +1,10 @@
-#include "RealTimeStrategyPCH.h"
 #include "Economy/RTSResourceSourceComponent.h"
 
+#include "GameFramework/Actor.h"
 #include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSLog.h"
 
 
 URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)

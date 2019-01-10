@@ -1,14 +1,15 @@
-#include "RealTimeStrategyPCH.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 
 #include "GameFramework/Actor.h"
 #include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSLog.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceType.h"
 #include "Construction/RTSBuilderComponent.h"
+
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)

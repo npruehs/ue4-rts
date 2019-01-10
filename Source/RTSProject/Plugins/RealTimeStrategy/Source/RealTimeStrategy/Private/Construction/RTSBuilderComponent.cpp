@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Construction/RTSBuilderComponent.h"
 
 #include "GameFramework/Controller.h"
@@ -7,6 +6,7 @@
 #include "RTSCharacterAIController.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
+#include "RTSLog.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"

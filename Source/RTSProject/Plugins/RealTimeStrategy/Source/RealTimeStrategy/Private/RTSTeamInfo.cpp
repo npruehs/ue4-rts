@@ -1,7 +1,7 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSTeamInfo.h"
 
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 
 #include "RTSGameState.h"
 #include "RTSPlayerState.h"

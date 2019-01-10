@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Launch/Resources/Version.h"

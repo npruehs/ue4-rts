@@ -1,11 +1,12 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
+
+#include "Templates/SubclassOf.h"
+
+#include "Economy/RTSResourceType.h"
 
 #include "RTSGatherData.generated.h"
-
-
-class URTSResourceType;
 
 
 USTRUCT(BlueprintType)
@@ -16,7 +17,7 @@ struct REALTIMESTRATEGY_API FRTSGatherData
 public:
 	/** Type of resources that can be gathered. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
-	TSubclassOf<class URTSResourceType> ResourceType;
+	TSubclassOf<URTSResourceType> ResourceType;
 
 	/** Amount of resources gathered after each cooldown. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")

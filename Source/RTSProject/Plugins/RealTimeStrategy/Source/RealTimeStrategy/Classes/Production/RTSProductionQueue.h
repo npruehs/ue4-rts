@@ -1,6 +1,9 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
+
+#include "GameFramework/Actor.h"
+#include "Templates/SubclassOf.h"
 
 #include "RTSProductionQueue.generated.h"
 

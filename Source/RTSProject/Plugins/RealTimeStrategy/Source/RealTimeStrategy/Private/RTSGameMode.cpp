@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSGameMode.h"
 
 #include "CString.h"
@@ -11,6 +10,7 @@
 
 #include "RTSCharacter.h"
 #include "RTSGameState.h"
+#include "RTSLog.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAIController.h"
 #include "RTSPlayerAdvantageComponent.h"
@@ -55,9 +55,9 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 	AGameModeBase::InitGame(MapName, Options, ErrorMessage);
 
 	// Set up teams.
-    ARTSGameState* GameState = GetGameState<ARTSGameState>();
+    ARTSGameState* RTSGameState = GetGameState<ARTSGameState>();
 
-    if (!IsValid(GameState))
+    if (!IsValid(RTSGameState))
     {
         return;
     }
@@ -72,7 +72,7 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 		// Add team.
 		ARTSTeamInfo* NewTeam = GetWorld()->SpawnActor<ARTSTeamInfo>(TeamClass);
 		NewTeam->SetTeamIndex(TeamIndex);
-        GameState->AddTeam(NewTeam);
+        RTSGameState->AddTeam(NewTeam);
 
 		// Setup vision.
 		ARTSVisionInfo* TeamVision = GetWorld()->SpawnActor<ARTSVisionInfo>();
@@ -139,9 +139,9 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 		return;
 	}
 
-    ARTSGameState* GameState = GetGameState<ARTSGameState>();
+    ARTSGameState* RTSGameState = GetGameState<ARTSGameState>();
 
-    if (!IsValid(GameState))
+    if (!IsValid(RTSGameState))
     {
         return;
     }
@@ -156,13 +156,13 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	}
 
 	// Set team.
-	if (PlayerStart->GetTeamIndex() >= GameState->GetTeams().Num())
+	if (PlayerStart->GetTeamIndex() >= RTSGameState->GetTeams().Num())
 	{
-		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->GetTeamIndex(), GameState->GetTeams().Num());
+		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->GetTeamIndex(), RTSGameState->GetTeams().Num());
 	}
 	else
 	{
-		GameState->GetTeams()[PlayerStart->GetTeamIndex()]->AddToTeam(NewPlayer);
+		RTSGameState->GetTeams()[PlayerStart->GetTeamIndex()]->AddToTeam(NewPlayer);
 	}
 
 	// Build spawn transform.

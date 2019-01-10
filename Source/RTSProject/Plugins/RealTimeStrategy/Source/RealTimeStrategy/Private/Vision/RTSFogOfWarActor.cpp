@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Vision/RTSFogOfWarActor.h"
 
 #include "EngineUtils.h"
@@ -8,6 +7,7 @@
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+#include "RTSLog.h"
 #include "Vision/RTSVisionInfo.h"
 #include "Vision/RTSVisionVolume.h"
 

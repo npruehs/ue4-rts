@@ -1,8 +1,6 @@
-#include "RealTimeStrategyPCH.h"
+#include "RealTimeStrategy.h"
 
 #include "Modules/ModuleManager.h"
-
-#include "RealTimeStrategy.h"
 
 
 void FRealTimeStrategy::StartupModule()
@@ -17,5 +15,3 @@ void FRealTimeStrategy::ShutdownModule()
 }
 
 IMPLEMENT_MODULE(FRealTimeStrategy, RealTimeStrategy)
-
-DEFINE_LOG_CATEGORY(LogRTS);

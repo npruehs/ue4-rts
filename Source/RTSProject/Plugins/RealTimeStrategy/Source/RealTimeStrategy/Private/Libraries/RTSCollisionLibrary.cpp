@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Libraries/RTSCollisionLibrary.h"
 
 #include "Landscape.h"

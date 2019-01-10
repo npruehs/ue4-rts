@@ -1,8 +1,9 @@
-#include "RealTimeStrategyPCH.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 
+#include "RTSLog.h"
 #include "Economy/RTSResourceType.h"
 
 

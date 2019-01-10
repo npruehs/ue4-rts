@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSPlayerAdvantageComponent.h"
 
 URTSPlayerAdvantageComponent::URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)

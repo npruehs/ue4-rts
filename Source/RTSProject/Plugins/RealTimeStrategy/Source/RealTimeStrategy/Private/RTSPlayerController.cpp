@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSPlayerController.h"
 
 #include "EngineUtils.h"
@@ -17,6 +16,7 @@
 #include "RTSCharacter.h"
 #include "RTSCharacterAIController.h"
 #include "RTSGameMode.h"
+#include "RTSLog.h"
 #include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerAdvantageComponent.h"

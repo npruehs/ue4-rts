@@ -1,16 +1,15 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "Templates/SubclassOf.h"
 
 #include "Construction/RTSConstructionState.h"
 #include "Economy/RTSPaymentType.h"
+#include "Economy/RTSResourceType.h"
 
 #include "RTSConstructionSiteComponent.generated.h"
-
-
-class URTSResourceType;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionStartedSignature, float, TotalConstructionTime);

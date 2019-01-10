@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Combat/RTSHealthComponent.h"
 
 #include "Engine/World.h"
@@ -6,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "RTSGameMode.h"
+#include "RTSLog.h"
 
 
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)

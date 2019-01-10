@@ -1,15 +1,14 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "Templates/SubclassOf.h"
 
 #include "Economy/RTSPaymentType.h"
+#include "Economy/RTSResourceType.h"
 
 #include "RTSProductionCostComponent.generated.h"
-
-
-class URTSResourceType;
 
 
 /** Specifies the time and resources required to construct the actor. */

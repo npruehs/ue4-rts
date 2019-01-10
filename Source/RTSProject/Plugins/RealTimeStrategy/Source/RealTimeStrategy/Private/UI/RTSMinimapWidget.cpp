@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "UI/RTSMinimapWidget.h"
 
 #include "EngineUtils.h"
@@ -7,6 +6,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Rendering/DrawElements.h"
 
+#include "RTSLog.h"
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerState.h"

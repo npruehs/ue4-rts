@@ -1,11 +1,13 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
+
+#include "GameFramework/DamageType.h"
+#include "Templates/SubclassOf.h"
+
+#include "Combat/RTSProjectile.h"
 
 #include "RTSAttackData.generated.h"
-
-
-class ARTSProjectile;
 
 
 USTRUCT(BlueprintType)
@@ -24,7 +26,7 @@ public:
 
 	/** Type of the damage caused by this attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
-	TSubclassOf<class UDamageType> DamageType;
+	TSubclassOf<UDamageType> DamageType;
 
 	/** Range of this attack, in cm. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
@@ -32,5 +34,5 @@ public:
 
 	/** Type of the projectile to spawn. If not set, damage will be dealt instantly. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
-	TSubclassOf<class ARTSProjectile> ProjectileClass;
+	TSubclassOf<ARTSProjectile> ProjectileClass;
 };

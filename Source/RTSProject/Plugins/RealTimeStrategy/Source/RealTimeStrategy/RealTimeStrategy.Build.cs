@@ -5,9 +5,9 @@ namespace UnrealBuildTool.Rules
 		public RealTimeStrategy(ReadOnlyTargetRules Target)
             : base(Target)
 		{
-#if UE_4_21_OR_LATER
-            PrivatePCHHeaderFile = "Classes/RealTimeStrategyPCH.h";
-#endif
+            PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+            bEnforceIWYU = true;
+
             PrivateIncludePaths.AddRange(
                 new string[]
                 {

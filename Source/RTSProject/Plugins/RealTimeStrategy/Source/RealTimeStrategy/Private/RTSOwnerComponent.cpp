@@ -1,5 +1,7 @@
-#include "RealTimeStrategyPCH.h"
-#include "RTSPortraitComponent.h"
+#include "RTSOwnerComponent.h"
+
+#include "GameFramework/Controller.h"
+#include "Net/UnrealNetwork.h"
 
 #include "RTSPlayerState.h"
 #include "RTSTeamInfo.h"

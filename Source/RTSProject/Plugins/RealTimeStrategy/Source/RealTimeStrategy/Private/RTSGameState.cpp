@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSGameState.h"
 
 #include "RTSTeamInfo.h"

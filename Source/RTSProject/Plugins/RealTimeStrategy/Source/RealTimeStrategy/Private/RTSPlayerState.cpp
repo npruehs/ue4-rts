@@ -1,6 +1,8 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSPlayerState.h"
 
+#include "Net/UnrealNetwork.h"
+
+#include "RTSLog.h"
 #include "RTSPlayerController.h"
 #include "RTSTeamInfo.h"
 

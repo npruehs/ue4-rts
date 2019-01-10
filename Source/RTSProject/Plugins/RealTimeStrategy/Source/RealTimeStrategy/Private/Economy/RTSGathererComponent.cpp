@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Economy/RTSGathererComponent.h"
 
 #include "EngineUtils.h"
@@ -7,6 +6,7 @@
 
 #include "RTSContainerComponent.h"
 #include "RTSOwnerComponent.h"
+#include "RTSLog.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceSourceComponent.h"
 #include "Economy/RTSResourceDrainComponent.h"

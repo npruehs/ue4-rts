@@ -1,12 +1,18 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
+
 #include "Kismet/BlueprintFunctionLibrary.h"
+
 #include "GameFramework/Actor.h"
+#include "Templates/SubclassOf.h"
+
 #include "RTSCollisionLibrary.generated.h"
+
 
 class UObject;
 class UShapeComponent;
+
 
 /**
 * Utility functions for calculating actor collisions.

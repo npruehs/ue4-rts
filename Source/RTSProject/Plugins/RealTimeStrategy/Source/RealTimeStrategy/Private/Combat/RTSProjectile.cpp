@@ -1,7 +1,8 @@
-#include "RealTimeStrategyPCH.h"
 #include "Combat/RTSProjectile.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+
+#include "RTSLog.h"
 
 
 ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)

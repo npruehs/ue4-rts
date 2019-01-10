@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "RTSPaymentType.generated.h"
 

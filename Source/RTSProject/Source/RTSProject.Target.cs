@@ -9,6 +9,9 @@ public class RTSProjectTarget : TargetRules
 	{
 		Type = TargetType.Game;
 
-		ExtraModuleNames.AddRange( new string[] { "RTSProject" } );
+        bUseUnityBuild = false;
+        bUsePCHFiles = false;
+
+        ExtraModuleNames.AddRange( new string[] { "RTSProject" } );
 	}
 }

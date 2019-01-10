@@ -1,9 +1,9 @@
-#include "RealTimeStrategyPCH.h"
 #include "Combat/RTSAttackComponent.h"
 
 #include "Engine/World.h"
 #include "GameFramework/Pawn.h"
 
+#include "RTSLog.h"
 #include "Combat/RTSProjectile.h"
 
 

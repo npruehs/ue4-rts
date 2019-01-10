@@ -1,7 +1,13 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
+
 #include "Kismet/BlueprintFunctionLibrary.h"
+
+#include "Components/ActorComponent.h"
+#include "GameFramework/Actor.h"
+#include "Templates/SubclassOf.h"
+
 #include "RTSGameplayLibrary.generated.h"
 
 /**

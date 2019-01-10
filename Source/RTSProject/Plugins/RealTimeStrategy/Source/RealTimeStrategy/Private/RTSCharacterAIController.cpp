@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSCharacterAIController.h"
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
@@ -6,6 +5,7 @@
 
 #include "RTSCharacter.h"
 #include "RTSCharacterAIEventComponent.h"
+#include "RTSLog.h"
 #include "RTSOwnerComponent.h"
 #include "Economy/RTSGathererComponent.h"
 #include "Combat/RTSAttackComponent.h"

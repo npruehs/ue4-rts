@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
 
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "GameFramework/PlayerController.h"
+#include "Templates/SubclassOf.h"
 
 #include "RTSControlGroup.h"
 

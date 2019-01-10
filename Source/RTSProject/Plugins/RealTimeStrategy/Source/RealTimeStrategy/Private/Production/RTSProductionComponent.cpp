@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Production/RTSProductionComponent.h"
 
 #include "GameFramework/Actor.h"
@@ -6,8 +5,10 @@
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 #include "RTSGameMode.h"
+#include "RTSLog.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"

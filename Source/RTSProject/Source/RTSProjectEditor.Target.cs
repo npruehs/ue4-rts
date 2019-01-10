@@ -9,6 +9,9 @@ public class RTSProjectEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "RTSProject" } );
+        bUseUnityBuild = false;
+        bUsePCHFiles = false;
+
+        ExtraModuleNames.AddRange( new string[] { "RTSProject" } );
 	}
 }

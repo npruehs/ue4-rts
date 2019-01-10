@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSPlayerStart.h"
 
 int32 ARTSPlayerStart::GetTeamIndex() const

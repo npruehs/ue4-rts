@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Production/RTSProductionCostComponent.h"
 
 #include "Economy/RTSResourceType.h"

@@ -1,7 +1,8 @@
-#include "RealTimeStrategyPCH.h"
 #include "Vision/RTSVisionVolume.h"
 
 #include "Components/BrushComponent.h"
+
+#include "RTSLog.h"
 
 
 ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)

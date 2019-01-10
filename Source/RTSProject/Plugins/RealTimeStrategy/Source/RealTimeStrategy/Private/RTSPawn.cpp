@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSPawn.h"
 
 #include "Combat/RTSHealthComponent.h"

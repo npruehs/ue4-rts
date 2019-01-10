@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "Vision/RTSVisionComponent.h"
 
 

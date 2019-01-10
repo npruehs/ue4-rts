@@ -1,8 +1,9 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "AIController.h"
+#include "Templates/SubclassOf.h"
 
 #include "RTSOrderType.h"
 

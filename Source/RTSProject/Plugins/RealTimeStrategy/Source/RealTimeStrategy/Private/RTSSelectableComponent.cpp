@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSSelectableComponent.h"
 
 #include "WorldCollision.h"
@@ -6,6 +5,8 @@
 #include "Components/DecalComponent.h"
 #include "GameFramework/Actor.h"
 #include "Materials/MaterialInstanceDynamic.h"
+
+#include "RTSLog.h"
 
 
 void URTSSelectableComponent::BeginPlay()

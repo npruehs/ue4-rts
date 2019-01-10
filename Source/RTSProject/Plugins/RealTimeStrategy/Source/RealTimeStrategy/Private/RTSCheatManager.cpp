@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSCheatManager.h"
 
 #include "EngineUtils.h"
@@ -7,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSGameMode.h"
+#include "RTSLog.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerAIController.h"
 #include "RTSPlayerAdvantageComponent.h"

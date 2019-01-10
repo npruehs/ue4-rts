@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 
 struct REALTIMESTRATEGY_API FRTSFloatingCombatTextData

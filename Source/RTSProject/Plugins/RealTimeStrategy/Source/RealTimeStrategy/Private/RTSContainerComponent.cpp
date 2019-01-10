@@ -1,7 +1,8 @@
-#include "RealTimeStrategyPCH.h"
 #include "RTSContainerComponent.h"
 
 #include "GameFramework/Actor.h"
+
+#include "RTSLog.h"
 
 
 URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)

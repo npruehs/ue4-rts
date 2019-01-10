@@ -1,4 +1,3 @@
-#include "RealTimeStrategyPCH.h"
 #include "UI/RTSHUD.h"
 
 #include "EngineUtils.h"

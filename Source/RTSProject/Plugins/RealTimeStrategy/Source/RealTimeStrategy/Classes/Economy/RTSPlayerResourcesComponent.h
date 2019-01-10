@@ -1,13 +1,13 @@
 #pragma once
 
-#include "RealTimeStrategyPCH.h"
+#include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "Templates/SubclassOf.h"
+
+#include "Economy/RTSResourceType.h"
 
 #include "RTSPlayerResourcesComponent.generated.h"
-
-
-class URTSResourceType;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSPlayerResourcesComponentResourcesChangedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, OldResourceAmount, float, NewResourceAmount, bool, bSyncedFromServer);
