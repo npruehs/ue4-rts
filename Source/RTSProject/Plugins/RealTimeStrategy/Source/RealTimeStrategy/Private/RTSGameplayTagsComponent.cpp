@@ -30,9 +30,16 @@ void URTSGameplayTagsComponent::BeginPlay()
     }
 }
 
+void URTSGameplayTagsComponent::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+    TagContainer.AppendTags(CurrentTags);
+}
+
 FGameplayTagContainer URTSGameplayTagsComponent::GetCurrentTags() const
 {
-    return CurrentTags;
+    FGameplayTagContainer GameplayTagContainer;
+    GetOwnedGameplayTags(GameplayTagContainer);
+    return GameplayTagContainer;
 }
 
 void URTSGameplayTagsComponent::AddGameplayTag(const FGameplayTag& NewTag)

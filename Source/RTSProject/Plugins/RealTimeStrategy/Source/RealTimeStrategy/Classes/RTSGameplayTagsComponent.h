@@ -4,6 +4,7 @@
 
 #include "Components/ActorComponent.h"
 
+#include "GameplayTagAssetInterface.h"
 #include "GameplayTagContainer.h"
 
 #include "RTSGameplayTagsComponent.generated.h"
@@ -16,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSGameplayTagsComponentCurrentTag
 * Allows tagging an actor with various properties.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSGameplayTagsComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSGameplayTagsComponent : public UActorComponent, public IGameplayTagAssetInterface
 {
     GENERATED_BODY()
 
@@ -27,9 +28,9 @@ public:
 
     virtual void BeginPlay() override;
 
+    virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
     /** Gets the current set of gameplay tags of the actor. */
-    UFUNCTION(BlueprintPure)
     FGameplayTagContainer GetCurrentTags() const;
 
     /** Adds the specified gameplay tag to the actor. */
