@@ -25,8 +25,8 @@
 #include "RTSTeamInfo.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 #include "Combat/RTSAttackComponent.h"
-#include "Combat/RTSAttackableComponent.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Construction/RTSBuildingCursor.h"
 #include "Construction/RTSConstructionSiteComponent.h"
@@ -401,7 +401,7 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 		return false;
 	}
 
-	if (!Target->FindComponentByClass<URTSAttackableComponent>())
+	if (!URTSGameplayTagLibrary::HasGameplayTag(Target, URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
 	{
 		return false;
 	}

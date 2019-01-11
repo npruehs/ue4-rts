@@ -9,8 +9,8 @@
 #include "RTSOwnerComponent.h"
 #include "Economy/RTSGathererComponent.h"
 #include "Combat/RTSAttackComponent.h"
-#include "Combat/RTSAttackableComponent.h"
 #include "Construction/RTSBuilderComponent.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 void ARTSCharacterAIController::Possess(APawn* InPawn)
@@ -71,9 +71,7 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 		}
 
 		// Check if found attackable actor.
-		auto AttackableComponent = HitResult.Actor->FindComponentByClass<URTSAttackableComponent>();
-
-		if (!AttackableComponent)
+		if (!URTSGameplayTagLibrary::HasGameplayTag(HitResult.Actor.Get(), URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
 		{
 			continue;
 		}
