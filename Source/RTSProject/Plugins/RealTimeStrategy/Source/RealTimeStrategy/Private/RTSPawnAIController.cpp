@@ -1,10 +1,8 @@
-#include "RTSCharacterAIController.h"
+#include "RTSPawnAIController.h"
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-#include "RTSCharacter.h"
-#include "RTSCharacterAIEventComponent.h"
 #include "RTSLog.h"
 #include "RTSOwnerComponent.h"
 #include "Economy/RTSGathererComponent.h"
@@ -13,7 +11,7 @@
 #include "Libraries/RTSGameplayTagLibrary.h"
 
 
-void ARTSCharacterAIController::Possess(APawn* InPawn)
+void ARTSPawnAIController::Possess(APawn* InPawn)
 {
     Super::Possess(InPawn);
 
@@ -22,17 +20,17 @@ void ARTSCharacterAIController::Possess(APawn* InPawn)
     // Make AI use assigned blackboard.
     UBlackboardComponent* BlackboardComponent;
 
-	if (UseBlackboard(CharacterBlackboardAsset, BlackboardComponent))
+	if (UseBlackboard(PawnBlackboardAsset, BlackboardComponent))
 	{
 		// Setup blackboard.
 		IssueStopOrder();
 	}
 
     // Run behavior tree.
-    RunBehaviorTree(CharacterBehaviorTreeAsset);
+    RunBehaviorTree(PawnBehaviorTreeAsset);
 }
 
-void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
+void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 {
 	if (!AttackComponent)
 	{
@@ -84,17 +82,17 @@ void ARTSCharacterAIController::FindTargetInAcquisitionRadius()
 	}
 }
 
-bool ARTSCharacterAIController::HasOrder(ERTSOrderType OrderType) const
+bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
 {
     return Blackboard->GetValueAsEnum(TEXT("OrderType")) == (uint8)OrderType;
 }
 
-bool ARTSCharacterAIController::IsIdle() const
+bool ARTSPawnAIController::IsIdle() const
 {
     return HasOrder(ERTSOrderType::ORDER_None);
 }
 
-void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
+void ARTSPawnAIController::IssueAttackOrder(AActor* Target)
 {
 	if (!VerifyBlackboard())
 	{
@@ -112,7 +110,7 @@ void ARTSCharacterAIController::IssueAttackOrder(AActor* Target)
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
+void ARTSPawnAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	if (!VerifyBlackboard())
 	{
@@ -145,7 +143,7 @@ void ARTSCharacterAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> 
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
+void ARTSPawnAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
 	if (!VerifyBlackboard())
 	{
@@ -163,7 +161,7 @@ void ARTSCharacterAIController::IssueContinueConstructionOrder(AActor* Construct
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueGatherOrder(AActor* ResourceSource)
+void ARTSPawnAIController::IssueGatherOrder(AActor* ResourceSource)
 {
 	if (!VerifyBlackboard())
 	{
@@ -181,7 +179,7 @@ void ARTSCharacterAIController::IssueGatherOrder(AActor* ResourceSource)
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
+void ARTSPawnAIController::IssueMoveOrder(const FVector& Location)
 {
 	if (!VerifyBlackboard())
 	{
@@ -199,7 +197,7 @@ void ARTSCharacterAIController::IssueMoveOrder(const FVector& Location)
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueReturnResourcesOrder()
+void ARTSPawnAIController::IssueReturnResourcesOrder()
 {
 	if (!VerifyBlackboard())
 	{
@@ -231,7 +229,7 @@ void ARTSCharacterAIController::IssueReturnResourcesOrder()
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::IssueStopOrder()
+void ARTSPawnAIController::IssueStopOrder()
 {
 	if (!VerifyBlackboard())
 	{
@@ -249,68 +247,66 @@ void ARTSCharacterAIController::IssueStopOrder()
 	ApplyOrders();
 }
 
-void ARTSCharacterAIController::ApplyOrders()
+void ARTSPawnAIController::ApplyOrders()
 {
+    // Update behavior tree.
 	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	if (BehaviorTreeComponent)
 	{
 		BehaviorTreeComponent->RestartTree();
 	}
 
-    URTSCharacterAIEventComponent* CharacterAIEventComponent = GetPawn()->FindComponentByClass<URTSCharacterAIEventComponent>();
-    if (CharacterAIEventComponent)
-    {
-        uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
-        CharacterAIEventComponent->OnOrderChanged.Broadcast((ERTSOrderType)NewOrder);
-    }
+    // Notify listeners.
+    uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
+    OnOrderChanged.Broadcast((ERTSOrderType)NewOrder);
 }
 
-void ARTSCharacterAIController::ClearBuildingClass()
+void ARTSPawnAIController::ClearBuildingClass()
 {
 	Blackboard->ClearValue(TEXT("BuildingClass"));
 }
 
-void ARTSCharacterAIController::ClearHomeLocation()
+void ARTSPawnAIController::ClearHomeLocation()
 {
 	Blackboard->ClearValue(TEXT("HomeLocation"));
 }
 
-void ARTSCharacterAIController::ClearTargetActor()
+void ARTSPawnAIController::ClearTargetActor()
 {
 	Blackboard->ClearValue(TEXT("TargetActor"));
 }
 
-void ARTSCharacterAIController::ClearTargetLocation()
+void ARTSPawnAIController::ClearTargetLocation()
 {
 	Blackboard->ClearValue(TEXT("TargetLocation"));
 }
 
-void ARTSCharacterAIController::SetBuildingClass(int32 BuildingIndex)
+void ARTSPawnAIController::SetBuildingClass(int32 BuildingIndex)
 {
 	Blackboard->SetValueAsInt(TEXT("BuildingClass"), BuildingIndex);
 }
 
-void ARTSCharacterAIController::SetHomeLocation(const FVector& HomeLocation)
+void ARTSPawnAIController::SetHomeLocation(const FVector& HomeLocation)
 {
 	Blackboard->SetValueAsVector(TEXT("HomeLocation"), HomeLocation);
 }
 
-void ARTSCharacterAIController::SetOrderType(const ERTSOrderType OrderType)
+void ARTSPawnAIController::SetOrderType(const ERTSOrderType OrderType)
 {
 	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderType);
 }
 
-void ARTSCharacterAIController::SetTargetActor(AActor* TargetActor)
+void ARTSPawnAIController::SetTargetActor(AActor* TargetActor)
 {
 	Blackboard->SetValueAsObject(TEXT("TargetActor"), TargetActor);
 }
 
-void ARTSCharacterAIController::SetTargetLocation(const FVector& TargetLocation)
+void ARTSPawnAIController::SetTargetLocation(const FVector& TargetLocation)
 {
 	Blackboard->SetValueAsVector(TEXT("TargetLocation"), TargetLocation);
 }
 
-bool ARTSCharacterAIController::TraceSphere(
+bool ARTSPawnAIController::TraceSphere(
 	const FVector& Location,
 	const float Radius,
 	AActor* ActorToIgnore,
@@ -337,7 +333,7 @@ bool ARTSCharacterAIController::TraceSphere(
 	);
 }
 
-bool ARTSCharacterAIController::VerifyBlackboard()
+bool ARTSPawnAIController::VerifyBlackboard()
 {
 	if (!Blackboard)
 	{

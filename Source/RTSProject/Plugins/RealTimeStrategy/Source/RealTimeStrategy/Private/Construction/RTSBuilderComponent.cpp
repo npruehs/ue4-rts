@@ -3,7 +3,7 @@
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "RTSCharacterAIController.h"
+#include "RTSPawnAIController.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
 #include "RTSLog.h"
@@ -73,7 +73,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
         return;
     }
 
-    auto PawnController = Cast<ARTSCharacterAIController>(Pawn->GetController());
+    auto PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
 
     if (!PawnController)
     {

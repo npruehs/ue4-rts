@@ -3,7 +3,6 @@
 #include "EngineUtils.h"
 #include "Components/CapsuleComponent.h"
 
-#include "RTSCharacter.h"
 #include "RTSPlayerController.h"
 #include "Combat/RTSHealthComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"

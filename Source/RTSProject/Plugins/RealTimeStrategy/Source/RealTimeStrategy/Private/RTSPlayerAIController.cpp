@@ -5,7 +5,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Pawn.h"
 
-#include "RTSCharacterAIController.h"
+#include "RTSPawnAIController.h"
 #include "RTSLog.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
@@ -240,7 +240,7 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
             continue;
         }
 
-        ARTSCharacterAIController* PawnController = Cast<ARTSCharacterAIController>(SomePawn->GetController());
+        ARTSPawnAIController* PawnController = Cast<ARTSPawnAIController>(SomePawn->GetController());
 
         if (!PawnController)
         {

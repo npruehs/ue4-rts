@@ -7,17 +7,20 @@
 
 #include "RTSOrderType.h"
 
-#include "RTSCharacterAIController.generated.h"
+#include "RTSPawnAIController.generated.h"
 
 
 class URTSAttackComponent;
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSPawnAIControllerOrderChangedSignature, ERTSOrderType, NewOrder);
 
 
 /**
 * AI controller that drives RTS unit movement and orders.
 */
 UCLASS()
-class REALTIMESTRATEGY_API ARTSCharacterAIController : public AAIController
+class REALTIMESTRATEGY_API ARTSPawnAIController : public AAIController
 {
     GENERATED_BODY()
 
@@ -62,17 +65,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();
 
+
+    /** Event when the pawn has received a new order. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSPawnAIControllerOrderChangedSignature OnOrderChanged;
+
+
 protected:
 	virtual void Possess(APawn* InPawn) override;
 
 private:
-    /** Behavior tree to use for driving the character AI. */
+    /** Behavior tree to use for driving the pawn AI. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UBehaviorTree* CharacterBehaviorTreeAsset;
+    UBehaviorTree* PawnBehaviorTreeAsset;
 
-    /** Blackboard to use for holding all data relevant to the character AI. */
+    /** Blackboard to use for holding all data relevant to the pawn AI. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UBlackboardData* CharacterBlackboardAsset;
+    UBlackboardData* PawnBlackboardAsset;
 
 	URTSAttackComponent* AttackComponent;
 

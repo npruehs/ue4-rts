@@ -13,8 +13,7 @@
 #include "Sound/SoundCue.h"
 
 #include "RTSCameraBoundsVolume.h"
-#include "RTSCharacter.h"
-#include "RTSCharacterAIController.h"
+#include "RTSPawnAIController.h"
 #include "RTSGameMode.h"
 #include "RTSLog.h"
 #include "RTSNameComponent.h"
@@ -457,7 +456,7 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 
 void ARTSPlayerController::ServerIssueAttackOrder_Implementation(APawn* OrderedPawn, AActor* Target)
 {
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
 
 	if (!PawnController)
 	{
@@ -535,7 +534,7 @@ bool ARTSPlayerController::ServerIssueContinueConstructionOrder_Validate(APawn* 
 
 void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
 
 	if (!PawnController)
 	{
@@ -670,7 +669,7 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 
 void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedPawn, AActor* ResourceSource)
 {
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
 
 	if (!PawnController)
 	{
@@ -693,7 +692,7 @@ bool ARTSPlayerController::ServerIssueGatherOrder_Validate(APawn* OrderedPawn, A
 
 void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(APawn* OrderedPawn, AActor* ConstructionSite)
 {
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
 
 	if (!PawnController)
 	{
@@ -753,7 +752,7 @@ bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 
 void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
 {
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
 
 	if (!PawnController)
 	{
@@ -909,7 +908,7 @@ void ARTSPlayerController::IssueStopOrder()
 
 void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
 {
-	auto PawnController = Cast<ARTSCharacterAIController>(OrderedPawn->GetController());
+	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
 
 	if (!PawnController)
 	{

@@ -8,7 +8,6 @@
 #include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "RTSCharacter.h"
 #include "RTSGameState.h"
 #include "RTSLog.h"
 #include "RTSOwnerComponent.h"

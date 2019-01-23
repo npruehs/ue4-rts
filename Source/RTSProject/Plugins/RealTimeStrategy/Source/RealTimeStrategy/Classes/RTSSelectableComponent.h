@@ -64,7 +64,7 @@ private:
 	/** Whether the unit is currently selected by the local player, or not. */
 	bool bSelected;
 
-    /** Decal used for rendering the selection circle of this character. */
+    /** Decal used for rendering the selection circle of the actor. */
     UPROPERTY()
     UDecalComponent* DecalComponent;
 
