@@ -47,60 +47,9 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 
 ## Usage
 
-### Setting Up The Framewok
-
-Make sure View Plugin Content is enabled in your view options.
-
-1. Create a player controller deriving from RTSPlayerController.
-1. Create a game mode deriving from RTSGameMode using that player controller.
-1. Set the number of teams for your game (e.g. 2). Compile and save.
-1. Use the new game mode in the world settings.
-1. Create a controller deriving from RTSCharacterAIController.
-1. Set the Character Behavior Tree Asset of the new controller to RTSCharacterBehaviorTree.
-1. Set the Character Blackboard Asset of the new controller to RTSCharacterBlackboard.
-1. Set the Game State Class of your game mode to any RTSGameState.
-1. Set the Player State Class of your game mode to any RTSPlayerState.
-
-### Creating Maps
-
-1. Add RTSPlayerStarts to the map.
-1. Set the Team Index for each player start.
-1. Add RTSCameraBoundsVolume to the map.
-1. Add a NavMeshBoundsVolume to the map, and build Navigation. You may press P to review your results in the viewport.
-
-### Setting Up The Camera
-
-#### Creating The Camera
-
-1. Create a RTSPlayerPawn blueprint.
-1. Add a Camera component.
-1. Set the Location of the Camera component as desired (e.g. X = 0, Y = 0, Z = 1500).
-1. Set the Rotation of the Camera component as desired (e.g. X = 0, Y = 285, Z = 0).
-1. Use the RTSPlayerPawn as default pawn in your game mode.
-
-#### Setting Up Camera Movement
-
-1. Bind the axis MoveCameraLeftRight (e.g. to Left and Right keys).
-1. Bind the axis MoveCameraUpDown (e.g. to Up and Down keys).
-1. Bind the axis ZoomCamera (e.g. to the mouse wheel axis).
-1. At your RTSPlayerController, set the CameraSpeed (e.g. to 1000).
-1. At your RTSPlayerController, set the CameraScrollThreshold (e.g. to 20).
-1. At your RTSPlayerController, set CameraZoomSpeed, MinCameraDistance and MaxCameraDistance as desired.
-
 ### Adding Units
 
-1. Create a new RTSCharacter blueprint.
-
-_Note that you may use any class derived from Actor, if you want to. The plugin does not expect any kind of character whatsoever. Right now, RTSCharacter doesn't do much more than showing a nice selection circle, and relaying damage events. You can copy this functionality to any actor you like. Note that, for receiving orders such as Move or Attack, you need to derive from Pawn at least, because orders require AI._
-
-2. Set skeletal mesh, position, rotation, animation, capsule size and max walk speed as usual. (If you're new to the Unreal animation system, we can readily recommend the tutorial at https://docs.unrealengine.com/latest/INT/Programming/Tutorials/FirstPersonShooter/4/index.html)
-1. At the CharacterMovement component, you may set the Max Acceleration property to a high value to avoid stuttering when changing move orders.
-1. Set pawn AI controller class to your RTSCharacterAIController.
-1. Add a SelectableComponent.
-1. Add a PortraitComponent.
-1. Add an OwnerComponent.
-1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
-1. You may want to disable the collision of the Mesh of your character and rely on its capsule instead.
+1. Setup your animations. (If you're new to the Unreal animation system, we can readily recommend the tutorial at https://docs.unrealengine.com/latest/INT/Programming/Tutorials/FirstPersonShooter/4/index.html)
 
 ### Adding Buildings
 
