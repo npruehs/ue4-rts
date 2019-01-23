@@ -353,8 +353,12 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 	}
 
 	// Get target location.
+    TOptional<FVector> TargetLocation;
+
 	for (auto& HitResult : HitResults)
 	{
+        TargetLocation = HitResult.Location;
+
 		if (HitResult.Actor != nullptr)
 		{
 			// Issue attack order.
@@ -383,14 +387,14 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
                 IssueMoveOrder(HitResult.Location);
                 return;
             }
-
-			continue;
 		}
-
-		// Issue move order.
-		IssueMoveOrder(HitResult.Location);
-		return;
 	}
+
+    if (TargetLocation.IsSet())
+    {
+        // Issue move order.
+        IssueMoveOrder(TargetLocation.GetValue());
+    }
 }
 
 bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
