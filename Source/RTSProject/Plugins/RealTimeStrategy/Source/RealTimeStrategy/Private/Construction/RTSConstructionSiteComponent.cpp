@@ -105,7 +105,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 
         if (!Owner)
         {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *Owner->GetName());
+            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
             return;
         }
 
@@ -227,7 +227,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 	RemainingConstructionTime = ConstructionTime;
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_Constructing;
 
-	UE_LOG(LogRTS, Log, TEXT("Construction %s started."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("Construction %s started."), *GetOwner()->GetName());
 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(ConstructionTime);
@@ -261,7 +261,7 @@ void URTSConstructionSiteComponent::CancelConstruction()
 		return;
 	}
 
-	UE_LOG(LogRTS, Log, TEXT("Construction %s canceled."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("Construction %s canceled."), *GetOwner()->GetName());
 
 	// Refund resources.
     auto Owner = GetOwner()->GetOwner();
