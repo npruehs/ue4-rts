@@ -13,6 +13,7 @@ Make sure View Plugin Content is enabled in your view options.
 1. Set the Pawn Behavior Tree Asset of the new controller to BT_RTSPawnBehaviorTree.
 1. Set the Pawn Blackboard Asset of the new controller to BB_RTSPawnBlackboard.
 1. Create a player start deriving from RTSPlayerStart.
+1. Create one or more resource types deriving from RTSResourceType.
 
 ### Camera Setup
 
