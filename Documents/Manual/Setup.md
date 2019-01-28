@@ -33,3 +33,9 @@ Make sure View Plugin Content is enabled in your view options.
 1. At your RTSPlayerController, set the CameraSpeed (e.g. to 1000).
 1. At your RTSPlayerController, set the CameraScrollThreshold (e.g. to 20).
 1. At your RTSPlayerController, set CameraZoomSpeed, MinCameraDistance and MaxCameraDistance as desired.
+
+### Input Setup
+
+At Edit > Project Settings > Engine > Input ...
+
+1. Bind the action Select (e.g. to left mouse button).

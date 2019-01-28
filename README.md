@@ -55,13 +55,8 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 
 #### Enabling Selection
 
-1. Bind the action Select (e.g. to left mouse button).
 1. Bind the action AddSelection (e.g. to Left Shift).
 1. Bind the action ToggleSelection (e.g. to Left Ctrl).
-1. Add SelectableComponents to everything selectable.
-1. At every SelectableComponent, set the Selection Circle Material (e.g. to M_RTSSelectionCircle).
-1. At every SelectableComponent, set the Selected Sound as desired.
-1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController.
 
 #### Showing Selection Frames
 
