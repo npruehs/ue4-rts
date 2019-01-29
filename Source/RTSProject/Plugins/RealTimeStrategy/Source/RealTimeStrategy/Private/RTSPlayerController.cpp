@@ -1717,20 +1717,21 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	{
 		for (auto& HitResult : HitResults)
 		{
+            // Store hovered world position.
+            HoveredWorldPosition = HitResult.Location;
+
+            // Update position of building being placed.
+            if (BuildingCursor)
+            {
+                BuildingCursor->SetActorLocation(HoveredWorldPosition);
+
+                bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
+                BuildingCursor->SetLocationValid(bLocationValid);
+            }
+
 			// Check if hit any actor.
 			if (HitResult.Actor == nullptr || Cast<ALandscape>(HitResult.Actor.Get()) != nullptr)
 			{
-				// Store hovered world position.
-				HoveredWorldPosition = HitResult.Location;
-
-				// Update position of building being placed.
-				if (BuildingCursor)
-				{
-					BuildingCursor->SetActorLocation(HoveredWorldPosition);
-
-					bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
-                    BuildingCursor->SetLocationValid(bLocationValid);
-				}
 				continue;
 			}
 
