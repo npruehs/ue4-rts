@@ -94,6 +94,11 @@ void ARTSHUD::NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width
 	ReceiveDrawSelectionFrame(ScreenX, ScreenY, Width, Height);
 }
 
+void ARTSHUD::NotifyHideSelectionFrame()
+{
+    ReceiveHideSelectionFrame();
+}
+
 FVector2D ARTSHUD::GetActorCenterOnScreen(AActor* Actor) const
 {
 	FVector ProjectedLocation = Project(Actor->GetActorLocation());
@@ -137,6 +142,12 @@ void ARTSHUD::DrawSelectionFrame()
 
 	if (!PlayerController->GetSelectionFrame(SelectionFrame))
 	{
+        if (bWasDrawingSelectionFrame)
+        {
+            NotifyHideSelectionFrame();
+        }
+        
+        bWasDrawingSelectionFrame = false;
 		return;
 	}
 
@@ -146,6 +157,8 @@ void ARTSHUD::DrawSelectionFrame()
 		SelectionFrame.Min.Y,
 		SelectionFrame.Width(),
 		SelectionFrame.Height());
+
+    bWasDrawingSelectionFrame = true;
 }
 
 void ARTSHUD::DrawFloatingCombatTexts()

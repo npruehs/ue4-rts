@@ -70,6 +70,9 @@ public:
 	/** Event for drawing the selection frame because the mouse is being dragged. */
 	virtual void NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
 
+    /** Event for hiding the selection frame because the mouse isn't being dragged. */
+    virtual void NotifyHideSelectionFrame();
+
 	/** Event for drawing the construction progress bar for the specified unit. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawConstructionProgressBar"))
 	void ReceiveDrawConstructionProgressBar(
@@ -127,6 +130,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawSelectionFrame"))
 	void ReceiveDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
 
+    /** Event for hiding the selection frame because the mouse isn't being dragged. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "HideSelectionFrame"))
+    void ReceiveHideSelectionFrame();
 
 	UFUNCTION(BlueprintPure)
 	FVector2D GetActorCenterOnScreen(AActor* Actor) const;
@@ -197,6 +203,10 @@ private:
     /** Whether to automatically adjust the alpha value of the color of floating combat texts depending on their elapsed lifetime. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Floating Combat Texts")
     bool bFadeOutFloatingCombatTexts = true;
+
+
+    /** Whether we've been drawing the selection frame last frame, because the mouse was being dragged. */
+    bool bWasDrawingSelectionFrame;
 
 
 	/** Draws the current selection frame if mouse is being dragged. */
