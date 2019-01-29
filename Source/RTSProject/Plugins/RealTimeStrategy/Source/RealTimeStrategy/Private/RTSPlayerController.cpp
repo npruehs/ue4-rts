@@ -1078,8 +1078,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AActor* DefaultBuilding = BuildingClass->GetDefaultObject<AActor>();
-	UStaticMeshComponent* StaticMeshComponent = DefaultBuilding->FindComponentByClass<UStaticMeshComponent>();
+	UStaticMeshComponent* StaticMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UStaticMeshComponent>(BuildingClass);
 
     if (IsValid(StaticMeshComponent))
     {
@@ -1089,7 +1088,7 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
     }
     else
     {
-        USkeletalMeshComponent* SkeletalMeshComponent = DefaultBuilding->FindComponentByClass<USkeletalMeshComponent>();
+        USkeletalMeshComponent* SkeletalMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<USkeletalMeshComponent>(BuildingClass);
 
         if (IsValid(SkeletalMeshComponent))
         {
