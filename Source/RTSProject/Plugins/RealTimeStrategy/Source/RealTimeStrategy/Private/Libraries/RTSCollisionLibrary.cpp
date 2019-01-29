@@ -4,6 +4,7 @@
 #include "Components/ShapeComponent.h"
 #include "GameFramework/Actor.h"
 
+#include "RTSLog.h"
 #include "Libraries/RTSGameplayLibrary.h"
 
 
@@ -68,9 +69,23 @@ float URTSCollisionLibrary::GetShapeCollisionSize(UShapeComponent* ShapeComponen
 
     FCollisionShape CollisionShape = ShapeComponent->GetCollisionShape();
 
-    return CollisionShape.IsCapsule() ?
-        CollisionShape.Capsule.Radius * 2 :
-        FMath::Max(CollisionShape.Box.HalfExtentX, CollisionShape.Box.HalfExtentY) * 2;
+    if (CollisionShape.IsCapsule())
+    {
+        return CollisionShape.Capsule.Radius * 2;
+    }
+    else if (CollisionShape.IsBox())
+    {
+        return FMath::Max(CollisionShape.Box.HalfExtentX, CollisionShape.Box.HalfExtentY) * 2;
+    }
+    else if (CollisionShape.IsSphere())
+    {
+        return CollisionShape.Sphere.Radius * 2;
+    }
+    else
+    {
+        UE_LOG(LogRTS, Error, TEXT("Unknown collision shape type for %s."), *ShapeComponent->GetOwner()->GetName());
+        return 0.0f;
+    }
 }
 
 float URTSCollisionLibrary::GetShapeCollisionHeight(UShapeComponent* ShapeComponent)
