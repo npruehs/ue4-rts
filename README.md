@@ -58,16 +58,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 1. Bind the action AddSelection (e.g. to Left Shift).
 1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 
-#### Showing Selection Frames
-
-1. Create a new HUD deriving from RTSHUD.
-1. Use the new RTSHUD in your game mode.
-1. In your RTSHUD, implement the DrawSelectionFrame event as desired.
-
-Example: Drawing selection frame as transparent rectangle with borders
-
-![Draw Selection Frame](Documents/Manual/Images/SelectionFrameBlueprint.png)
-
 #### Enabling Control Groups
 
 1. Bind the actions SaveControlGroup0 to SaveControlGroup9 (e.g. to CTRL+0 to CTRL+9).

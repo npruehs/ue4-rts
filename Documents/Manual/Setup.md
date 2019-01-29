@@ -7,8 +7,9 @@ Make sure View Plugin Content is enabled in your view options.
 1. Create a player controller deriving from RTSPlayerController.
 1. Create a player state deriving from RTSPlayerState.
 1. Create a game state deriving from RTSGameState.
+1. Create a HUD deriving from RTSHUD.
 1. Create a game mode deriving from RTSGameMode.
-1. Use your player controller, player state and game state in your game mode.
+1. Use your player controller, player state, game state and HUD in your game mode.
 1. Create an AI controller deriving from RTSPawnAIController.
 1. Set the Pawn Behavior Tree Asset of the new controller to BT_RTSPawnBehaviorTree.
 1. Set the Pawn Blackboard Asset of the new controller to BB_RTSPawnBlackboard.
