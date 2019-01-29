@@ -58,36 +58,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 1. Bind the action AddSelection (e.g. to Left Shift).
 1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 
-#### Enabling Control Groups
-
-1. Bind the actions SaveControlGroup0 to SaveControlGroup9 (e.g. to CTRL+0 to CTRL+9).
-1. Bind the actions LoadControlGroup0 to LoadControlGroup9 (e.g. to 0 to 9).
-
-#### Showing Selection
-
-1. For each character, set the Decal Material of its SelectionCircleDecalComponent.
-
-### Enabling Unit Orders
-
-1. Bind the action IssueOrder (e.g. to the right mouse button). This will enable typical smart orders, such as moving when right-clicking ground, and attacking when right-clicking enemies.
-1. Bind the action IssueStopOrder (e.g. to the S key).
-
-### Setup Up Attacks
-
-1. Add the RTSAttackableComponent and RTSHealthComponent to any actors that can be attacked.
-1. Set the Current Health and Maximum Health properties of the RTSHealthComponent for these actors.
-1. Add the RTSAttackComponent to any actors than can attack.
-1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage, Range, Acquisition Radius and Chase Radius.
-
-_Setting the Damage Type is optional. Remaining Cooldown is handled by the framework and just exposed for scripting purposes._
-
-### Adding Projectiles
-
-1. Create a new RTSProjectile blueprint.
-1. Add a static mesh and any visual effects.
-1. At the ProjectileMovement component, set its Initial Speed (e.g. to 1000).
-1. For all RTSAttackComponents that should use this projectile, reference the new projectile.
-
 ### Setup Victory Conditions
 
 1. Set the Initial Actors for your RTSGameMode. This will spawn initial units for each player at their player start.
