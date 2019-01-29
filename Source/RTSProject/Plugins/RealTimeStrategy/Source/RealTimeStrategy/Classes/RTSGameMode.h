@@ -60,13 +60,13 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     TArray<TSubclassOf<AActor>> InitialActors;
 
-    /** Relative locations of the actors to spawn for each player in the game, relative to their respetive start spot. */
+    /** Relative locations of the actors to spawn for each player in the game, relative to their respective start spot. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<FVector> InitialActorPositions;
+    TArray<FVector> InitialActorLocations;
 
-    /** Optional type of actor that is required for a player to be alive. As soon as no actor of the specified type is alive, the player is defeated. */
+    /** Optional types of actors that are required for a player to be alive. As soon as no actor of the specified type is alive, the player is defeated. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TSubclassOf<AActor> DefeatConditionActor;
+    TArray<TSubclassOf<AActor>> DefeatConditionActorClasses;
 
     /** Class of TeamInfo to spawn. */
     UPROPERTY(EditDefaultsOnly, Category = "Team")

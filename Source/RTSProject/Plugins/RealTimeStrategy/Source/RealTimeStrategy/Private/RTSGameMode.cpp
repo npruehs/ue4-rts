@@ -170,16 +170,16 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	SpawnRotation.Yaw = StartSpot->GetActorRotation().Yaw;
 
 	// Build spawn info.
-	for (int32 i = 0; i < InitialActors.Num(); ++i)
+	for (int32 Index = 0; Index < InitialActors.Num(); ++Index)
 	{
-        TSubclassOf<AActor> ActorClass = InitialActors[i];
+        TSubclassOf<AActor> ActorClass = InitialActors[Index];
 
 		// Spawn actor.
         FVector SpawnLocation = StartSpot->GetActorLocation();
 
-        if (i < InitialActorPositions.Num())
+        if (Index < InitialActorLocations.Num())
         {
-            SpawnLocation += InitialActorPositions[i];
+            SpawnLocation += InitialActorLocations[Index];
         }
         
         FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
@@ -284,7 +284,7 @@ void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
 
 void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 {
-	if (DefeatConditionActor == nullptr)
+	if (DefeatConditionActorClasses.Num() <= 0)
 	{
 		return;
 	}
@@ -304,13 +304,13 @@ void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 	// Check if any required actors are still alive.
 	for (AActor* OwnedActor : ActorOwner->Children)
 	{
-		if (OwnedActor->GetClass() == DefeatConditionActor)
+		if (DefeatConditionActorClasses.Contains(OwnedActor->GetClass()))
 		{
 			return;
 		}
 	}
 
-	UE_LOG(LogRTS, Log, TEXT("Player %s does not control any %s anymore and has been defeated."), *ActorOwner->GetName(), *DefeatConditionActor->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Player %s does not control any required actors anymore and has been defeated."), *ActorOwner->GetName());
 
 	// Notify listeners.
 	NotifyOnPlayerDefeated(ActorOwner);
