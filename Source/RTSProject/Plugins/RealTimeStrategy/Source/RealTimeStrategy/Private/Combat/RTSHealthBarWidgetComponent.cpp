@@ -5,13 +5,6 @@
 #include "Combat/RTSHealthComponent.h"
 
 
-URTSHealthBarWidgetComponent::URTSHealthBarWidgetComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
-{
-    // Set reasonable default values.
-    Space = EWidgetSpace::Screen;
-}
-
 void URTSHealthBarWidgetComponent::BeginPlay()
 {
     Super::BeginPlay();

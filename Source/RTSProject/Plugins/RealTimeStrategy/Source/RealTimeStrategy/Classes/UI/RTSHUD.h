@@ -42,9 +42,6 @@ public:
         float SuggestedTextLeft,
         float SuggestedTextTop);
 
-	/** Event for drawing an effect for the currently hovered actor. */
-	virtual void NotifyDrawHoveredActorEffect(AActor* HoveredActor);
-
 	/** Event for drawing the production progress bar for the specified unit. */
 	virtual void NotifyDrawProductionProgressBar(
 		AActor* Actor,
@@ -86,10 +83,6 @@ public:
         float LifetimePercentage,
         float SuggestedTextLeft,
         float SuggestedTextTop);
-
-	/** Event for drawing an effect for the currently hovered actor. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHoveredActorEffect"))
-	void ReceiveDrawHoveredActorEffect(AActor* HoveredActor);
 
 	/** Event for drawing the production progress bar for the specified unit. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawProductionProgressBar"))
@@ -185,6 +178,10 @@ private:
     /** Whether we've been drawing the selection frame last frame, because the mouse was being dragged. */
     bool bWasDrawingSelectionFrame;
 
+    /** Actor the player has hovering last frame. */
+    UPROPERTY()
+    AActor* OldHoveredActor;
+
 
 	/** Draws the current selection frame if mouse is being dragged. */
 	void DrawSelectionFrame();
@@ -208,7 +205,7 @@ private:
 	void DrawConstructionProgressBar(AActor* Actor);
 
 	/** Draws a custom HUD effect for the currently hovered actor (e.g. player name). */
-	void DrawHoveredActorEffect();
+	void DrawHoveredActorWidget();
 
 	/** Draws all production progress bars. */
 	void DrawProductionProgressBars();

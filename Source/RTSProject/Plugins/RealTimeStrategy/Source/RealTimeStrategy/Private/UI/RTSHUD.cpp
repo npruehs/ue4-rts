@@ -10,6 +10,7 @@
 #include "Production/RTSProductionComponent.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
 #include "UI/RTSFloatingCombatTextData.h"
+#include "UI/RTSHoveredActorWidgetComponent.h"
 
 
 void ARTSHUD::DrawHUD()
@@ -21,7 +22,7 @@ void ARTSHUD::DrawHUD()
 	DrawHealthBars();
 	DrawConstructionProgressBars();
 	DrawProductionProgressBars();
-	DrawHoveredActorEffect();
+	DrawHoveredActorWidget();
 }
 
 void ARTSHUD::NotifyDrawConstructionProgressBar(AActor* Actor, float ConstructionTime, float RemainingConstructionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
@@ -49,11 +50,6 @@ void ARTSHUD::NotifyDrawFloatingCombatText(AActor* Actor, const FString& Text, c
         LifetimePercentage,
         SuggestedTextLeft,
         SuggestedTextTop);
-}
-
-void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
-{
-	ReceiveDrawHoveredActorEffect(HoveredActor);
 }
 
 void ARTSHUD::NotifyDrawProductionProgressBar(AActor* Actor, float ProductionTime, float RemainingProductionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
@@ -250,8 +246,6 @@ void ARTSHUD::DrawHealthBar(AActor* Actor)
 	const float HealthPercentage = HealthComponent->GetCurrentHealth() / HealthComponent->GetMaximumHealth();
 
     // Draw health bar.
-    FVector2D Size = GetActorSizeOnScreen(Actor);
-
     URTSHealthBarWidgetComponent* HealthBarWidgetComponent = Actor->FindComponentByClass<URTSHealthBarWidgetComponent>();
 
     if (!IsValid(HealthBarWidgetComponent))
@@ -259,8 +253,9 @@ void ARTSHUD::DrawHealthBar(AActor* Actor)
         return;
     }
 
-    HealthBarWidgetComponent->UpdateYOffset(Size.Y / 2);
-    HealthBarWidgetComponent->UpdateWidth(Size.X * 2);
+    FVector2D Size = GetActorSizeOnScreen(Actor);
+
+    HealthBarWidgetComponent->UpdatePositionAndSize(Size);
     HealthBarWidgetComponent->SetVisibility(true);
 }
 
@@ -363,7 +358,7 @@ void ARTSHUD::DrawConstructionProgressBar(AActor* Actor)
 		SuggestedProgressBarHeight);
 }
 
-void ARTSHUD::DrawHoveredActorEffect()
+void ARTSHUD::DrawHoveredActorWidget()
 {
 	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
 
@@ -372,15 +367,40 @@ void ARTSHUD::DrawHoveredActorEffect()
 		return;
 	}
 
-	AActor* HoveredActor = PlayerController->GetHoveredActor();
+	AActor* NewHoveredActor = PlayerController->GetHoveredActor();
 
-	if (HoveredActor == nullptr)
+	if (NewHoveredActor == OldHoveredActor)
 	{
 		return;
 	}
 
-	// Draw hovered actor effect.
-	NotifyDrawHoveredActorEffect(HoveredActor);
+    if (IsValid(OldHoveredActor))
+    {
+        URTSHoveredActorWidgetComponent* OldHoveredActorWidgetComponent =
+            OldHoveredActor->FindComponentByClass<URTSHoveredActorWidgetComponent>();
+
+        if (IsValid(OldHoveredActorWidgetComponent))
+        {
+            OldHoveredActorWidgetComponent->SetVisibility(false);
+        }
+    }
+    
+    if (IsValid(NewHoveredActor))
+    {
+        URTSHoveredActorWidgetComponent* NewHoveredActorWidgetComponent =
+            NewHoveredActor->FindComponentByClass<URTSHoveredActorWidgetComponent>();
+
+        if (IsValid(NewHoveredActorWidgetComponent))
+        {
+            FVector2D Size = GetActorSizeOnScreen(NewHoveredActor);
+
+            NewHoveredActorWidgetComponent->UpdatePositionAndSize(Size);
+            NewHoveredActorWidgetComponent->UpdateData(NewHoveredActor);
+            NewHoveredActorWidgetComponent->SetVisibility(true);
+        }
+    }
+
+    OldHoveredActor = NewHoveredActor;
 }
 
 void ARTSHUD::DrawProductionProgressBars()
