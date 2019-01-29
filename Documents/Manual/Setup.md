@@ -50,3 +50,7 @@ At Edit > Project Settings > Engine > Input ...
 
 1. Bind the action IssueOrder (e.g. to the right mouse button). This will enable typical smart orders, such as moving when right-clicking ground, and attacking when right-clicking enemies.
 1. Bind the action IssueStopOrder (e.g. to the S key).
+
+#### Health Bars
+
+1. Bind the action ShowHealthBars (e.g. to the LeftAlt key).

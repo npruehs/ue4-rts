@@ -1,6 +1,6 @@
 ## Creating The User Interface
 
-#### Showing Selection Frames
+#### Selection Frames
 
 In your HUD, implement the DrawSelectionFrame and HideSelectionFrame events as desired.
 
@@ -27,8 +27,30 @@ Example:
 
 ![HUD - Hide Selection Frame](Images/HUDHideSelectionFrame.png)
 
-### Showing Selected Unit Status
+### Selected Unit Status
 
 1. Create a new widget blueprint.
 1. Create the widget where appropriate (e.g. BeginPlay of your player controller) and add it to your viewport.
 1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController and update your UI.
+
+### Health Bars
+
+1. In your HUD, set AlwaysShowHealthBars, ShowHoverHealthBars, ShowSelectionHealthBars and ShowHotkeyHealthBars as desired.
+2. Create a widget for drawing the health bar.
+
+![Health Bar Widget](Images/HealthBarWidget.png)
+
+_You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
+
+3. Create a component deriving from RTSHealthBarWidgetComponent, and set its Widget Class to your health bar widget.
+4. Forward the Update Health Bar event to your health bar widget.
+
+![Component - Update Health Bar Value](Images/UpdateHealthBarValue.png)
+
+5. Forward the Update Y Offset event to your health bar widget.
+
+![Component - Update Health Bar Position](Images/UpdateHealthBarPosition.png)
+
+6. Foward the Update Width event to your health bar widget.
+
+![Component - Update Health Bar Size](Images/UpdateHealthBarPosition.png)

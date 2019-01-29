@@ -60,16 +60,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 
 ### Add HUD
 
-#### Showing Health Bars
-
-1. In your RTSHUD, set AlwaysShowHealthBars, ShowHoverHealthBars, ShowSelectionHealthBars and ShowHotkeyHealthBars as desired.
-1. If you checked ShowHotkeyHealthBars, bind the action ShowHealthBars (e.g. to the LeftAlt key).
-1. In your RTSHUD, implement the DrawHealthBar event as desired.
-
-Example: Drawing health bars as rectangles with borders
-
-![Draw Health Bars](Documents/Manual/Images/HealthBarBlueprint.png)
-
 #### Showing Construction Progress Bars
 
 1. In your RTSHUD, set AlwaysShowConstructionProgressBars, ShowHoverConstructionProgressBars, ShowSelectionConstructionProgressBars and ShowHotkeyConstructionProgressBars as desired.

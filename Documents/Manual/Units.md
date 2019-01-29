@@ -17,14 +17,19 @@ set up its speed properties as usual.
 
 ### Combat
 
+#### Health & Damage
+
 1. Add an RTSAttackableComponent and RTSGameplayTagsComponent to any actors that can be attacked.
 1. Add the Status.Permanent.CanBeAttacked tag to the RTSGameplayTagsComponent.
 1. Set the Maximum Health of the RTSHealthComponent.
+1. Add your RTSHealthBarWidgetComponent.
 
 1. Add the RTSAttackComponent to any actors than can attack.
 1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage, Range, Acquisition Radius and Chase Radius.
 
 _Setting the Damage Type is optional._
+
+#### Projectiles
 
 If you don't specify a projectile, the damage will be applied immediately. In order to setup a projectile for the unit:
 
