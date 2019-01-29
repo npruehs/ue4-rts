@@ -72,14 +72,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 1. If you checked ShowHotkeyProductionProgressBars, bind the action ShowProductionProgressBars (e.g. to the LeftAlt key).
 1. In your RTSHUD, implement the DrawProductionProgressBar event as desired.
 
-#### Showing Hovered Unit Effects
-
-1. In your RTSHUD, implement the DrawHoveredActorEffect event as desired.
-
-Example: Drawing names of unit owners
-
-![Draw Player Name](Documents/Manual/Images/HoveredActorEffectBlueprint.png)
-
 ### Setup Minimap
 
 #### Minimap Background Layer

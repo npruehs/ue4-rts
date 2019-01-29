@@ -27,11 +27,13 @@ Example:
 
 ![HUD - Hide Selection Frame](Images/HUDHideSelectionFrame.png)
 
+
 ### Selected Unit Status
 
 1. Create a new widget blueprint.
 1. Create the widget where appropriate (e.g. BeginPlay of your player controller) and add it to your viewport.
 1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController and update your UI.
+
 
 ### Health Bars
 
@@ -47,10 +49,24 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 
 ![Component - Update Health Bar Value](Images/UpdateHealthBarValue.png)
 
-5. Forward the Update Y Offset event to your health bar widget.
+5. Forward the Update Position And Size event to your health bar widget.
 
-![Component - Update Health Bar Position](Images/UpdateHealthBarPosition.png)
+![Component - Update Health Bar Position And Size](Images/UpdateHealthBarPositionAndSize.png)
 
-6. Foward the Update Width event to your health bar widget.
 
-![Component - Update Health Bar Size](Images/UpdateHealthBarPosition.png)
+### Hovered Actors
+
+2. Create a widget for drawing name plates (or whatever other information you'd like to display for hovered actors).
+
+![Hovered Actor Widget](Images/HoveredActorWidget.png)
+
+_You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
+
+3. Create a component deriving from RTSHoveredActorWidgetComponent, and set its Widget Class to your new widget widget.
+4. Forward the Update Data event to your widget.
+
+![Component - Update Data](Images/UpdateHoveredActorData.png)
+
+5. Forward the Update Position And Size event to your widget.
+
+![Component - Update Widget Position And Size](Images/UpdateHoveredActorPositionAndSize.png)
