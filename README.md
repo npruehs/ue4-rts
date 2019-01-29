@@ -58,11 +58,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 1. Bind the action AddSelection (e.g. to Left Shift).
 1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 
-### Setup Victory Conditions
-
-1. Set the Initial Actors for your RTSGameMode. This will spawn initial units for each player at their player start.
-1. Optionally, set the Defeat Condition Actor type for your RTSGameMode. This will check whether any actors of the specified type exist for a player whenever he or she loses a unit. If no actor of the specified type remains, the player is defeated. Note that it is up to you to define how defeated players should be handled, e.g. whether you've making a 1v1, FFA or team game.
-
 ### Add HUD
 
 #### Showing Health Bars
