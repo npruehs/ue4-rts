@@ -45,17 +45,6 @@ public:
 	/** Event for drawing an effect for the currently hovered actor. */
 	virtual void NotifyDrawHoveredActorEffect(AActor* HoveredActor);
 
-	/** Event for drawing the health bar for the specified actor. */
-	virtual void NotifyDrawHealthBar(
-		AActor* Actor,
-		float CurrentHealth,
-		float MaximumHealth,
-		float HealthPercentage,
-		float SuggestedHealthBarLeft,
-		float SuggestedHealthBarTop,
-		float SuggestedHealthBarWidth,
-		float SuggestedHealthBarHeight);
-
 	/** Event for drawing the production progress bar for the specified unit. */
 	virtual void NotifyDrawProductionProgressBar(
 		AActor* Actor,
@@ -101,18 +90,6 @@ public:
 	/** Event for drawing an effect for the currently hovered actor. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHoveredActorEffect"))
 	void ReceiveDrawHoveredActorEffect(AActor* HoveredActor);
-
-	/** Event for drawing the health bar for the specified actor. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawHealthBar"))
-	void ReceiveDrawHealthBar(
-		AActor* Actor,
-		float CurrentHealth,
-		float MaximumHealth,
-		float HealthPercentage,
-		float SuggestedHealthBarLeft,
-		float SuggestedHealthBarTop,
-		float SuggestedHealthBarWidth,
-		float SuggestedHealthBarHeight);
 
 	/** Event for drawing the production progress bar for the specified unit. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawProductionProgressBar"))
@@ -220,6 +197,9 @@ private:
 
 	/** Draws the health bar of the specified actor. */
 	void DrawHealthBar(AActor* Actor);
+
+    /** Hides the health bar of the specified actor. */
+    void HideHealthBar(AActor* Actor);
 
 	/** Draws all construction progress bars. */
 	void DrawConstructionProgressBars();

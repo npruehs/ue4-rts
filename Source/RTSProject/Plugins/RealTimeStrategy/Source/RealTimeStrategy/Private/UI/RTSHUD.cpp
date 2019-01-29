@@ -5,6 +5,7 @@
 
 #include "RTSPlayerController.h"
 #include "Combat/RTSHealthComponent.h"
+#include "Combat/RTSHealthBarWidgetComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Production/RTSProductionComponent.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
@@ -53,27 +54,6 @@ void ARTSHUD::NotifyDrawFloatingCombatText(AActor* Actor, const FString& Text, c
 void ARTSHUD::NotifyDrawHoveredActorEffect(AActor* HoveredActor)
 {
 	ReceiveDrawHoveredActorEffect(HoveredActor);
-}
-
-void ARTSHUD::NotifyDrawHealthBar(
-	AActor* Actor,
-	float CurrentHealth,
-	float MaximumHealth,
-	float HealthPercentage,
-	float SuggestedHealthBarLeft,
-	float SuggestedHealthBarTop,
-	float SuggestedHealthBarWidth,
-	float SuggestedHealthBarHeight)
-{
-	ReceiveDrawHealthBar(
-		Actor,
-		CurrentHealth,
-		MaximumHealth,
-		HealthPercentage,
-		SuggestedHealthBarLeft,
-		SuggestedHealthBarTop,
-		SuggestedHealthBarWidth,
-		SuggestedHealthBarHeight);
 }
 
 void ARTSHUD::NotifyDrawProductionProgressBar(AActor* Actor, float ProductionTime, float RemainingProductionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
@@ -227,35 +207,29 @@ void ARTSHUD::DrawHealthBars()
 		return;
 	}
 
-	// Check override conditions.
-	if (bAlwaysShowHealthBars || (bShowHotkeyHealthBars && PlayerController->IsHealthBarHotkeyPressed()))
-	{
-		// Draw all health bars.
-		for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
-		{
-			AActor* Actor = *ActorIt;
-			DrawHealthBar(Actor);
-		}
-
-		return;
-	}
-
-	// Draw health bar for hovered actor.
-	if (bShowHoverHealthBars)
-	{
-		AActor* HoveredActor = PlayerController->GetHoveredActor();
-		DrawHealthBar(HoveredActor);
-	}
-
-	// Draw health bars for selected actors.
-	if (bShowSelectionHealthBars)
-	{
-		for (int32 i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
-		{
-			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
-			DrawHealthBar(SelectedActor);
-		}
-	}
+    for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+    {
+        AActor* Actor = *ActorIt;
+       
+        // Check override conditions.
+        if (bAlwaysShowHealthBars || (bShowHotkeyHealthBars && PlayerController->IsHealthBarHotkeyPressed()))
+        {
+            // Draw all health bars.
+            DrawHealthBar(Actor);
+        }
+        else if (bShowHoverHealthBars && Actor == PlayerController->GetHoveredActor())
+        {
+            DrawHealthBar(Actor);
+        }
+        else if (bShowSelectionHealthBars && PlayerController->GetSelectedActors().Contains(Actor))
+        {
+            DrawHealthBar(Actor);
+        }
+        else
+        {
+            HideHealthBar(Actor);
+        }
+    }
 }
 
 void ARTSHUD::DrawHealthBar(AActor* Actor)
@@ -268,31 +242,43 @@ void ARTSHUD::DrawHealthBar(AActor* Actor)
 	// Check health.
 	URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
 
-	if (!HealthComponent)
+	if (!IsValid(HealthComponent))
 	{
 		return;
 	}
 
 	const float HealthPercentage = HealthComponent->GetCurrentHealth() / HealthComponent->GetMaximumHealth();
 
-	// Suggest health bar size.
-	float SuggestedHealthBarLeft;
-	float SuggestedHealthBarTop;
-	float SuggestedHealthBarWidth;
-	float SuggestedHealthBarHeight;
+    // Draw health bar.
+    FVector2D Size = GetActorSizeOnScreen(Actor);
 
-	SuggestUnitBarSize(Actor, SuggestedHealthBarLeft, SuggestedHealthBarTop, SuggestedHealthBarWidth, SuggestedHealthBarHeight);
+    URTSHealthBarWidgetComponent* HealthBarWidgetComponent = Actor->FindComponentByClass<URTSHealthBarWidgetComponent>();
 
-	// Draw health bar.
-	NotifyDrawHealthBar(
-		Actor,
-		HealthComponent->GetCurrentHealth(),
-		HealthComponent->GetMaximumHealth(),
-		HealthPercentage,
-		SuggestedHealthBarLeft,
-		SuggestedHealthBarTop,
-		SuggestedHealthBarWidth,
-		SuggestedHealthBarHeight);
+    if (!IsValid(HealthBarWidgetComponent))
+    {
+        return;
+    }
+
+    HealthBarWidgetComponent->UpdateYOffset(Size.Y / 2);
+    HealthBarWidgetComponent->UpdateWidth(Size.X * 2);
+    HealthBarWidgetComponent->SetVisibility(true);
+}
+
+void ARTSHUD::HideHealthBar(AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return;
+    }
+
+    URTSHealthBarWidgetComponent* HealthBarWidgetComponent = Actor->FindComponentByClass<URTSHealthBarWidgetComponent>();
+
+    if (!IsValid(HealthBarWidgetComponent))
+    {
+        return;
+    }
+
+    HealthBarWidgetComponent->SetVisibility(false);
 }
 
 void ARTSHUD::DrawConstructionProgressBars()
