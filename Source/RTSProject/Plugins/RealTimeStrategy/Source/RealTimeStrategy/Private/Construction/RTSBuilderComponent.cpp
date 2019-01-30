@@ -35,7 +35,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 	{
 		// Assign builder.
 		AssignedConstructionSite = ConstructionSite;
-		ConstructionSiteComponent->GetAssignedBuilders().Add(GetOwner());
+		ConstructionSiteComponent->AssignBuilder(GetOwner());
 
 		// Notify listeners.
 		OnAssignedToConstructionSite.Broadcast(ConstructionSite);
@@ -154,7 +154,7 @@ void URTSBuilderComponent::LeaveConstructionSite()
 
 	// Remove builder.
 	AssignedConstructionSite = nullptr;
-	ConstructionSiteComponent->GetAssignedBuilders().Remove(GetOwner());
+	ConstructionSiteComponent->UnassignBuilder(GetOwner());
 
 	// Notify listeners.
 	OnRemovedFromConstructionSite.Broadcast(ConstructionSite);

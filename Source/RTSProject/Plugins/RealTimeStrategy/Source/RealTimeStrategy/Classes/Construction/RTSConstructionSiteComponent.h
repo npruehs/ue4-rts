@@ -39,6 +39,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual bool CanAssignBuilder(AActor* Builder) const;
 
+    /** Assigns the passed builder to this construction site, contributing to construction progress. */
+    void AssignBuilder(AActor* Builder);
+
+    /** Removes the passed builder from this construction site. */
+    void UnassignBuilder(AActor* Builder);
+
 	/** Gets the current construction progress [0..1]. */
 	UFUNCTION(BlueprintPure)
 	float GetProgressPercentage() const;
