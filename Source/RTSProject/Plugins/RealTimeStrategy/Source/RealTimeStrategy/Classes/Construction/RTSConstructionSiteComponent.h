@@ -13,6 +13,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionStartedSignature, float, TotalConstructionTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionProgressChangedSignature, float, ProgressPercentage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionFinishedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSConstructionSiteComponentConstructionCanceledSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentBuilderConsumedSignature, AActor*, Builder);
@@ -122,6 +123,10 @@ public:
 	/** Event when the construction timer has been started. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionStartedSignature OnConstructionStarted;
+    
+    /** Event when the construction timer has been updated. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSConstructionSiteComponentConstructionProgressChangedSignature OnConstructionProgressChanged;
 
 	/** Event when the construction timer has been expired. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -181,10 +186,13 @@ private:
 	ERTSConstructionState State;
 
     /** Time before the actor is constructed, in seconds. */
-    UPROPERTY(replicated)
+    UPROPERTY(ReplicatedUsing=ReceivedRemainingConstructionTime)
     float RemainingConstructionTime;
 
     /** Builders currently working at this construction site. */
     UPROPERTY()
     TArray<AActor*> AssignedBuilders;
+
+    UFUNCTION()
+    void ReceivedRemainingConstructionTime();
 };

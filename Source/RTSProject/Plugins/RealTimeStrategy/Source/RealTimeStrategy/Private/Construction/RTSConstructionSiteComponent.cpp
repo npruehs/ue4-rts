@@ -164,6 +164,10 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	{
 		FinishConstruction();
 	}
+    else
+    {
+        OnConstructionProgressChanged.Broadcast(GetProgressPercentage());
+    }
 }
 
 bool URTSConstructionSiteComponent::CanAssignBuilder(AActor* Builder) const
@@ -379,4 +383,9 @@ float URTSConstructionSiteComponent::GetRemainingConstructionTime() const
 TArray<AActor*> URTSConstructionSiteComponent::GetAssignedBuilders() const
 {
     return AssignedBuilders;
+}
+
+void URTSConstructionSiteComponent::ReceivedRemainingConstructionTime()
+{
+    OnConstructionProgressChanged.Broadcast(GetProgressPercentage());
 }
