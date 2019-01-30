@@ -70,3 +70,39 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 5. Forward the Update Position And Size event to your widget.
 
 ![Component - Update Widget Position And Size](Images/UpdateHoveredActorPositionAndSize.png)
+
+
+### Building Cursors
+
+1. Create an actor deriving from RTSBuildingCursor (or use the BP_RTSBuildingCursor shipped with the plugin).
+1. In your player controller, set the building cursor reference.
+
+
+### Construction Progress Bars
+
+1. In your HUD, set AlwaysShowConstructionProgressBars, ShowHoverConstructionProgressBars, ShowSelectionConstructionProgressBars and ShowHotkeyConstructionProgressBars as desired.
+2. Create a widget for drawing the construction progress bar.
+
+_See the Health Bars section for an example.
+
+3. Create a component deriving from RTSConstructionProgressBarWidgetComponent, and set its Widget Class to your progress bar widget.
+4. Forward the Update Progress Bar event to your progress bar widget.
+5. Forward the Update Position And Size event to your progress bar widget.
+
+
+### Hovered Actors
+
+2. Create a widget for drawing name plates (or whatever other information you'd like to display for hovered actors).
+
+![Hovered Actor Widget](Images/HoveredActorWidget.png)
+
+_You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
+
+3. Create a component deriving from RTSHoveredActorWidgetComponent, and set its Widget Class to your new widget widget.
+4. Forward the Update Data event to your widget.
+
+![Component - Update Data](Images/UpdateHoveredActorData.png)
+
+5. Forward the Update Position And Size event to your widget.
+
+![Component - Update Widget Position And Size](Images/UpdateHoveredActorPositionAndSize.png)

@@ -13,6 +13,7 @@ set up its speed properties as usual.
 1. Ensure Pawn > Auto Possess AI is set to "Placed in World or Spawned".
 1. You may want to disable the collision of your mesh and rely on its capsule instead.
 1. Add an RTSNameComponent and set its localized name if you want to show it in any kind of ingame UI. 
+1. Add an RTSDescriptionComponent and set its localized text if you want to show it in any kind of ingame UI. 
 1. Add an RTSPortraitComponent and set its portrait if you want to show it in any kind of ingame UI.
 
 ### Combat
@@ -37,3 +38,9 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. Add a static mesh and any visual effects.
 1. At the ProjectileMovement component, set its Initial Speed (e.g. to 1000).
 1. At the RTSAttackComponent, reference the new projectile in your attack.
+
+### Construction
+
+1. Add an RTSBuilderComponent to any actors you want to be able to construct buildings.
+1. Set the Constructible Building Classes for these builders.
+1. Set the Enter Construction Site if you want the builder to be unavailable while building (similar to Orcs in WarCraft).

@@ -60,12 +60,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 
 ### Add HUD
 
-#### Showing Construction Progress Bars
-
-1. In your RTSHUD, set AlwaysShowConstructionProgressBars, ShowHoverConstructionProgressBars, ShowSelectionConstructionProgressBars and ShowHotkeyConstructionProgressBars as desired.
-1. If you checked ShowHotkeyConstructionProgressBars, bind the action ShowConstructionProgressBars (e.g. to the LeftAlt key).
-1. In your RTSHUD, implement the DrawConstructionProgressBar event as desired.
-
 #### Showing Production Progress Bars
 
 1. In your RTSHUD, set AlwaysShowProductionProgressBars, ShowHoverProductionProgressBars, ShowSelectionProductionProgressBars and ShowHotkeyProductionProgressBars as desired.
@@ -107,21 +101,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
     1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
     1. Call SetupVisionInfo for the minimap widget.
 1. In your player controller blueprint (or whichever owns the minimap widget), handle the OnVisionInfoAvailable event and call SetupVisionInfo for the minimap widget. This is required for properly setting up vision info on clients where replication may cause a different initialization order.
-
-### Setup Building Placement
-
-1. Create an RTSBuildingCursor, setting its valid and invalid materials (or use BP_RTSBuildingCursor).
-1. In your player controller, set the building cursor reference.
-1. Bind any input or UI button to the BeginBuildingPlacement function of your RTSPlayerController.
-1. Bind the action ConfirmBuildingPlacement (e.g. to Left Mouse Button).
-1. Bind the action CancelBuildingPlacement (e.g. to Right Mouse Button).
-1. Bind the action CancelConstruction (e.g. to Escape).
-
-### Setup Construction
-
-1. Add the RTSBuilderComponent to any actors you want to be able to construct buildings.
-1. Set the Constructible Building Types for these builders.
-1. Set the Enter Construction Site if you want the builder to be unavailable while building (similar to Orcs in WarCraft).
 
 ### Setup Unit Production
 

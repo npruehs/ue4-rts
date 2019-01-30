@@ -16,6 +16,7 @@ Make sure View Plugin Content is enabled in your view options.
 1. Set the Pawn Blackboard Asset of the new controller to BB_RTSPawnBlackboard.
 1. Create a player start deriving from RTSPlayerStart.
 1. Create one or more resource types deriving from RTSResourceType.
+1. Add the resource types to the PlayerResourcesComponent of your player controller.
 
 ### Camera Setup
 
@@ -54,3 +55,10 @@ At Edit > Project Settings > Engine > Input ...
 #### Health Bars
 
 1. Bind the action ShowHealthBars (e.g. to the LeftAlt key).
+
+#### Construction
+
+1. Bind the action ConfirmBuildingPlacement (e.g. to Left Mouse Button).
+1. Bind the action CancelBuildingPlacement (e.g. to Right Mouse Button).
+1. Bind the action CancelConstruction (e.g. to Escape).
+1. Bind the action ShowConstructionProgressBars (e.g. to the LeftAlt key).

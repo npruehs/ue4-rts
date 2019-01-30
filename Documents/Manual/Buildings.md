@@ -10,3 +10,4 @@
 1. Set the Progress Made Automatically and Progress Made Per Builder factors.
 1. Set the Start Immediately flag unless you want to trigger construction start from script.
 1. Add an RTSContainerComponent if you want builders to enter the building site while building. Its capacity value will be automatically set at runtime to reflect Max Assigned Builders of the construction site.
+1. Add your RTSConstructionProgressBarWidgetComponent.
