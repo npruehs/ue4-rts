@@ -18,18 +18,6 @@ class REALTIMESTRATEGY_API ARTSHUD : public AHUD
 public:
 	virtual void DrawHUD() override;
 
-
-	/** Event for drawing the construction progress bar for the specified unit. */
-	virtual void NotifyDrawConstructionProgressBar(
-		AActor* Actor,
-		float ConstructionTime,
-		float RemainingConstructionTime,
-		float ProgressPercentage,
-		float SuggestedProgressBarLeft,
-		float SuggestedProgressBarTop,
-		float SuggestedProgressBarWidth,
-		float SuggestedProgressBarHeight);
-
     /** Event for drawaing a floating combat text. */
     virtual void NotifyDrawFloatingCombatText(
         AActor* Actor,
@@ -58,18 +46,6 @@ public:
 
     /** Event for hiding the selection frame because the mouse isn't being dragged. */
     virtual void NotifyHideSelectionFrame();
-
-	/** Event for drawing the construction progress bar for the specified unit. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawConstructionProgressBar"))
-	void ReceiveDrawConstructionProgressBar(
-		AActor* Actor,
-		float ConstructionTime,
-		float RemainingConstructionTime,
-		float ProgressPercentage,
-		float SuggestedProgressBarLeft,
-		float SuggestedProgressBarTop,
-		float SuggestedProgressBarWidth,
-		float SuggestedProgressBarHeight);
 
     /** Event for drawaing a floating combat text. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawFloatingCombatText"))
@@ -203,6 +179,9 @@ private:
 
 	/** Draws the construction progress bar of the specified actor. */
 	void DrawConstructionProgressBar(AActor* Actor);
+
+    /** Hides the construction progress bar of the specified actor. */
+    void HideConstructionProgressBar(AActor* Actor);
 
 	/** Draws a custom HUD effect for the currently hovered actor (e.g. player name). */
 	void DrawHoveredActorWidget();

@@ -7,6 +7,7 @@
 #include "Combat/RTSHealthComponent.h"
 #include "Combat/RTSHealthBarWidgetComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
+#include "Construction/RTSConstructionProgressBarWidgetComponent.h"
 #include "Production/RTSProductionComponent.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
 #include "UI/RTSFloatingCombatTextData.h"
@@ -23,19 +24,6 @@ void ARTSHUD::DrawHUD()
 	DrawConstructionProgressBars();
 	DrawProductionProgressBars();
 	DrawHoveredActorWidget();
-}
-
-void ARTSHUD::NotifyDrawConstructionProgressBar(AActor* Actor, float ConstructionTime, float RemainingConstructionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
-{
-	ReceiveDrawConstructionProgressBar(
-		Actor,
-		ConstructionTime,
-		RemainingConstructionTime,
-		ProgressPercentage,
-		SuggestedProgressBarLeft,
-		SuggestedProgressBarTop,
-		SuggestedProgressBarWidth,
-		SuggestedProgressBarHeight);
 }
 
 void ARTSHUD::NotifyDrawFloatingCombatText(AActor* Actor, const FString& Text, const FLinearColor& Color, float Scale, float Lifetime, float RemainingLifetime, float LifetimePercentage, float SuggestedTextLeft, float SuggestedTextTop)
@@ -241,10 +229,12 @@ void ARTSHUD::DrawHealthBars()
         }
         else if (bShowHoverHealthBars && Actor == PlayerController->GetHoveredActor())
         {
+            // Draw health bar for hovered actor.
             DrawHealthBar(Actor);
         }
         else if (bShowSelectionHealthBars && PlayerController->GetSelectedActors().Contains(Actor))
         {
+            // Draw health bars for selected actors.
             DrawHealthBar(Actor);
         }
         else
@@ -304,84 +294,93 @@ void ARTSHUD::HideHealthBar(AActor* Actor)
 
 void ARTSHUD::DrawConstructionProgressBars()
 {
-	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
+    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
 
-	if (!PlayerController)
-	{
-		return;
-	}
+    if (!PlayerController)
+    {
+        return;
+    }
 
-	// Check override conditions.
-	if (bAlwaysShowConstructionProgressBars || (bShowHotkeyConstructionProgressBars && PlayerController->IsConstructionProgressBarHotkeyPressed()))
-	{
-		// Draw all progress bars.
-		for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
-		{
-			AActor* Actor = *ActorIt;
-			DrawConstructionProgressBar(Actor);
-		}
+    for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+    {
+        AActor* Actor = *ActorIt;
 
-		return;
-	}
-
-	// Draw progress bar for hovered actor.
-	if (bShowHoverConstructionProgressBars)
-	{
-		AActor* HoveredActor = PlayerController->GetHoveredActor();
-		DrawConstructionProgressBar(HoveredActor);
-	}
-
-	// Draw progress bars for selected actors.
-	if (bShowSelectionConstructionProgressBars)
-	{
-		for (int32 i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
-		{
-			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
-			DrawConstructionProgressBar(SelectedActor);
-		}
-	}
+        // Check override conditions.
+        if (bAlwaysShowConstructionProgressBars || (bShowHotkeyConstructionProgressBars && PlayerController->IsConstructionProgressBarHotkeyPressed()))
+        {
+            // Draw all progress bars.
+            DrawConstructionProgressBar(Actor);
+        }
+        else if (bShowHoverConstructionProgressBars && Actor == PlayerController->GetHoveredActor())
+        {
+            // Draw progress bar for hovered actor.
+            DrawConstructionProgressBar(Actor);
+        }
+        else if (bShowSelectionConstructionProgressBars && PlayerController->GetSelectedActors().Contains(Actor))
+        {
+            // Draw progress bars for selected actors.
+            DrawConstructionProgressBar(Actor);
+        }
+        else
+        {
+            HideConstructionProgressBar(Actor);
+        }
+    }
 }
 
 void ARTSHUD::DrawConstructionProgressBar(AActor* Actor)
 {
-	if (!IsValid(Actor))
-	{
-		return;
-	}
+    if (!IsValid(Actor))
+    {
+        return;
+    }
 
-	// Check progress.
-	URTSConstructionSiteComponent* ConstructionSiteComponent = Actor->FindComponentByClass<URTSConstructionSiteComponent>();
+    // Check progress.
+    URTSConstructionSiteComponent* ConstructionSiteComponent = Actor->FindComponentByClass<URTSConstructionSiteComponent>();
 
-	if (!ConstructionSiteComponent)
-	{
-		return;
-	}
+    if (!ConstructionSiteComponent)
+    {
+        return;
+    }
 
-	if (!ConstructionSiteComponent->IsConstructing())
-	{
-		return;
-	}
+    if (!ConstructionSiteComponent->IsConstructing())
+    {
+        return;
+    }
 
-	const float ProgressPercentage = ConstructionSiteComponent->GetProgressPercentage();
+    const float ProgressPercentage = ConstructionSiteComponent->GetProgressPercentage();
 
-	// Suggest progress bar size.
-	float SuggestedProgressBarLeft;
-	float SuggestedProgressBarTop;
-	float SuggestedProgressBarWidth;
-	float SuggestedProgressBarHeight;
-	
-	SuggestUnitBarSize(Actor, SuggestedProgressBarLeft, SuggestedProgressBarTop, SuggestedProgressBarWidth, SuggestedProgressBarHeight);
+    // Draw progress bar.
+    URTSConstructionProgressBarWidgetComponent* ConstructionProgressBarWidgetComponent =
+        Actor->FindComponentByClass<URTSConstructionProgressBarWidgetComponent>();
 
-	// Draw progress bar.
-	NotifyDrawConstructionProgressBar(
-		Actor,
-		ConstructionSiteComponent->GetConstructionTime(),
-		ConstructionSiteComponent->GetRemainingConstructionTime(),
-		ProgressPercentage,
-		SuggestedProgressBarLeft,
-		SuggestedProgressBarTop,
-		SuggestedProgressBarWidth,
-		SuggestedProgressBarHeight);
+    if (!IsValid(ConstructionProgressBarWidgetComponent))
+    {
+        return;
+    }
+
+    FVector2D Size = GetActorSizeOnScreen(Actor);
+
+    ConstructionProgressBarWidgetComponent->UpdatePositionAndSize(Size);
+    ConstructionProgressBarWidgetComponent->SetVisibility(true);
+}
+
+void ARTSHUD::HideConstructionProgressBar(AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return;
+    }
+
+    URTSConstructionProgressBarWidgetComponent* ConstructionProgressBarWidgetComponent =
+        Actor->FindComponentByClass<URTSConstructionProgressBarWidgetComponent>();
+
+    if (!IsValid(ConstructionProgressBarWidgetComponent))
+    {
+        return;
+    }
+
+    ConstructionProgressBarWidgetComponent->SetVisibility(false);
 }
 
 void ARTSHUD::DrawHoveredActorWidget()
