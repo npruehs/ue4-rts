@@ -82,4 +82,8 @@ private:
 
     /** Number of AI players to spawn. */
     int32 NumAIPlayers;
+
+    /** Teams of the current match. */
+    UPROPERTY()
+    TArray<ARTSTeamInfo*> Teams;
 };

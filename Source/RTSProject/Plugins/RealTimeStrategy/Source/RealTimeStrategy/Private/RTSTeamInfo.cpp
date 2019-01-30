@@ -86,19 +86,3 @@ void ARTSTeamInfo::SetTeamIndex(uint8 InTeamIndex)
 {
     TeamIndex = InTeamIndex;
 }
-
-void ARTSTeamInfo::ReceivedTeamIndex()
-{
-	if (TeamIndex == 255)
-	{
-		return;
-	}
-
-	ARTSGameState* GameState = GetWorld()->GetGameState<ARTSGameState>();
-	if (GameState == nullptr)
-	{
-		return;
-	}
-    
-    GameState->AddTeam(this);
-}

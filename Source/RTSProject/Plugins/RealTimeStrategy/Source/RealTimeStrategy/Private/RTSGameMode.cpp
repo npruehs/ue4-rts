@@ -54,28 +54,29 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 	AGameModeBase::InitGame(MapName, Options, ErrorMessage);
 
 	// Set up teams.
-    ARTSGameState* RTSGameState = GetGameState<ARTSGameState>();
-
-    if (!IsValid(RTSGameState))
+    if (TeamClass == nullptr)
     {
-        return;
+        TeamClass = ARTSTeamInfo::StaticClass();
     }
-
-	if (TeamClass == nullptr)
-	{
-		TeamClass = ARTSTeamInfo::StaticClass();
-	}
 
 	for (uint8 TeamIndex = 0; TeamIndex < NumTeams; ++TeamIndex)
 	{
 		// Add team.
 		ARTSTeamInfo* NewTeam = GetWorld()->SpawnActor<ARTSTeamInfo>(TeamClass);
 		NewTeam->SetTeamIndex(TeamIndex);
-        RTSGameState->AddTeam(NewTeam);
+
+        if (Teams.Num() <= TeamIndex)
+        {
+            Teams.SetNum(TeamIndex + 1);
+        }
+
+        Teams[TeamIndex] = NewTeam;
 
 		// Setup vision.
 		ARTSVisionInfo* TeamVision = GetWorld()->SpawnActor<ARTSVisionInfo>();
 		TeamVision->SetTeamIndex(TeamIndex);
+
+        UE_LOG(LogRTS, Log, TEXT("Set up team %s (team index %i)."), *NewTeam->GetName(), TeamIndex);
 	}
 }
 
@@ -155,13 +156,13 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	}
 
 	// Set team.
-	if (PlayerStart->GetTeamIndex() >= RTSGameState->GetTeams().Num())
+	if (PlayerStart->GetTeamIndex() >= Teams.Num())
 	{
-		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->GetTeamIndex(), RTSGameState->GetTeams().Num());
+		UE_LOG(LogRTS, Warning, TEXT("Player start team index is %d, but game only has %d teams."), PlayerStart->GetTeamIndex(), Teams.Num());
 	}
 	else
 	{
-		RTSGameState->GetTeams()[PlayerStart->GetTeamIndex()]->AddToTeam(NewPlayer);
+		Teams[PlayerStart->GetTeamIndex()]->AddToTeam(NewPlayer);
 	}
 
 	// Build spawn transform.

@@ -42,13 +42,10 @@ public:
 
 private:
     /** Index of this team. */
-    UPROPERTY(ReplicatedUsing = ReceivedTeamIndex)
+    UPROPERTY(replicated)
     uint8 TeamIndex;
 
 	/** Players on this team. */
     UPROPERTY()
 	TArray<AController*> TeamMembers;
-
-    UFUNCTION()
-    void ReceivedTeamIndex();
 };
