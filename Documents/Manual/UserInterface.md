@@ -78,6 +78,24 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 1. In your player controller, set the building cursor reference.
 
 
+### Production UI
+
+1. Use Get Available Products of a selected production actor to create buttons for your production options (e.g. whenever the player controller raises OnSelectionChanged).
+1. Call IssueProductionOrder of your player controller whenever one of these buttons is clicked.
+
+
+### Production Progress Bars
+
+1. In your HUD, set AlwaysShowProductionProgressBars, ShowHoverProductionProgressBars, ShowSelectionProductionProgressBars and ShowHotkeyProductionProgressBars as desired.
+2. Create a widget for drawing the production progress bar.
+
+_See the Health Bars section for an example.
+
+3. Create a component deriving from RTSProductionProgressBarWidgetComponent, and set its Widget Class to your progress bar widget.
+4. Forward the Update Production Progress Bar event to your progress bar widget.
+5. Forward the Update Position And Size event to your progress bar widget.
+
+
 ### Construction UI
 
 1. Use Get Constructible Building Classes of a selected builder to create buttons for your construction options (e.g. whenever the player controller raises OnSelectionChanged).
@@ -92,7 +110,7 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 _See the Health Bars section for an example.
 
 3. Create a component deriving from RTSConstructionProgressBarWidgetComponent, and set its Widget Class to your progress bar widget.
-4. Forward the Update Progress Bar event to your progress bar widget.
+4. Forward the Update Constrution Progress Bar event to your progress bar widget.
 5. Forward the Update Position And Size event to your progress bar widget.
 
 

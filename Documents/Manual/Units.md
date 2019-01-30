@@ -39,6 +39,14 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. At the ProjectileMovement component, set its Initial Speed (e.g. to 1000).
 1. At the RTSAttackComponent, reference the new projectile in your attack.
 
+### Production
+
+1. Add the RTSProductionCostComponent to everything you want to be produced.
+1. Set the Production Time for these products.
+1. Set the Resources to any resources required for production.
+1. Set the Production Cost Type to to Pay Immediately if all costs should be paid in full when starting production, or to Pay Over Time for continuously paying costs (similar to Command & Conquer).
+1. Set the Refund Factor to the factor to multiply refunded resources with after cancelation.
+
 ### Construction
 
 1. Add an RTSBuilderComponent to any actors you want to be able to construct buildings.

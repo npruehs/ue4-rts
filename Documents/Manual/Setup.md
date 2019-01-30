@@ -56,6 +56,11 @@ At Edit > Project Settings > Engine > Input ...
 
 1. Bind the action ShowHealthBars (e.g. to the LeftAlt key).
 
+### Production
+
+1. Bind the action CancelProduction (e.g. to Escape).
+1. Bind the action ShowProductionProgressBars (e.g. to the LeftAlt key).
+
 #### Construction
 
 1. Bind the action ConfirmBuildingPlacement (e.g. to Left Mouse Button).

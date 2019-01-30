@@ -58,14 +58,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 1. Bind the action AddSelection (e.g. to Left Shift).
 1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 
-### Add HUD
-
-#### Showing Production Progress Bars
-
-1. In your RTSHUD, set AlwaysShowProductionProgressBars, ShowHoverProductionProgressBars, ShowSelectionProductionProgressBars and ShowHotkeyProductionProgressBars as desired.
-1. If you checked ShowHotkeyProductionProgressBars, bind the action ShowProductionProgressBars (e.g. to the LeftAlt key).
-1. In your RTSHUD, implement the DrawProductionProgressBar event as desired.
-
 ### Setup Minimap
 
 #### Minimap Background Layer
@@ -101,22 +93,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
     1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
     1. Call SetupVisionInfo for the minimap widget.
 1. In your player controller blueprint (or whichever owns the minimap widget), handle the OnVisionInfoAvailable event and call SetupVisionInfo for the minimap widget. This is required for properly setting up vision info on clients where replication may cause a different initialization order.
-
-### Setup Unit Production
-
-1. Add the RTSProductionComponent to any actors you want to be able to produce units or research technology.
-1. Add everything you want to produce or research to the Available Products for these factories.
-1. Set the Queue Count, specifying how many products can be produced in parallel.
-1. Set the Capacity Per Queue, specifying how many products can be produced one after another.
-1. Add the RTSProductionCostComponent to everything you want to be produced.
-1. Set the Production Time for these products.
-1. Set the Resources to any resources required for production.
-1. Set the Production Cost Type to to Pay Immediately if all costs should be paid in full when starting production, or to Pay Over Time for continuously paying costs (similar to Command & Conquer).
-1. Set the Refund Factor to the factor to multiply refunded resources with after cancelation.
-1. Bind the action CancelProduction (e.g. to Escape).
-1. In your ingame UI, bind the actions of any of your buttons to call IssueProductionOrder on your player controller.
-
-_Note that, technically, producing units does not differ from researching technology. You can create actor blueprints without physical representation for each technology to research, and add them as products. Then, you can check whether any player owns an actor of that technology for checking a tech tree._
 
 ### Add Resource Gathering
 
