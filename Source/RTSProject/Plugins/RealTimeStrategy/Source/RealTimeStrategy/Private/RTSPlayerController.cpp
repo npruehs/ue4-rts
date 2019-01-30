@@ -777,11 +777,16 @@ bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, con
 	return OrderedPawn->GetOwner() == this;
 }
 
-AActor* ARTSPlayerController::GetSelectedProductionActor() const
+AActor* ARTSPlayerController::GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const
 {
     // Find suitable selected actor.
     for (auto SelectedActor : SelectedActors)
     {
+        if (!IsValid(SelectedActor))
+        {
+            continue;
+        }
+
         // Verify owner.
         if (SelectedActor->GetOwner() != this)
         {
@@ -796,7 +801,7 @@ AActor* ARTSPlayerController::GetSelectedProductionActor() const
             continue;
         }
 
-        if (ProductionComponent->GetAvailableProducts().Num() <= 0)
+        if (!ProductionComponent->GetAvailableProducts().Contains(ProductClass))
         {
             continue;
         }
@@ -807,23 +812,14 @@ AActor* ARTSPlayerController::GetSelectedProductionActor() const
     return nullptr;
 }
 
-bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
+bool ARTSPlayerController::CheckCanIssueProductionOrder(TSubclassOf<AActor> ProductClass)
 {
-    AActor* SelectedActor = GetSelectedProductionActor();
+    AActor* SelectedActor = GetSelectedProductionActorFor(ProductClass);
 
-    if (!SelectedActor)
+    if (!IsValid(SelectedActor))
     {
         return true;
     }
-
-    URTSProductionComponent* ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
-
-    if (ProductIndex >= ProductionComponent->GetAvailableProducts().Num())
-    {
-        return true;
-    }
-
-    TSubclassOf<AActor> ProductClass = ProductionComponent->GetAvailableProducts()[ProductIndex];
 
     // Check costs.
     URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
@@ -858,24 +854,24 @@ bool ARTSPlayerController::CheckCanIssueProductionOrder(int32 ProductIndex)
     return true;
 }
 
-void ARTSPlayerController::IssueProductionOrder(int32 ProductIndex)
+void ARTSPlayerController::IssueProductionOrder(TSubclassOf<AActor> ProductClass)
 {
-    AActor* SelectedActor = GetSelectedProductionActor();
+    AActor* SelectedActor = GetSelectedProductionActorFor(ProductClass);
 
-    if (!SelectedActor)
+    if (!IsValid(SelectedActor))
     {
         return;
     }
 
     // Begin production.
-    ServerStartProduction(SelectedActor, ProductIndex);
+    ServerStartProduction(SelectedActor, ProductClass);
 
     if (IsNetMode(NM_Client))
     {
-        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %i."), *SelectedActor->GetName(), ProductIndex);
+        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %s."), *SelectedActor->GetName(), *ProductClass->GetName());
 
         // Notify listeners.
-        NotifyOnIssuedProductionOrder(SelectedActor, ProductIndex);
+        NotifyOnIssuedProductionOrder(SelectedActor, ProductClass);
     }
 }
 
@@ -1439,26 +1435,19 @@ bool ARTSPlayerController::ServerCancelProduction_Validate(AActor* ProductionAct
 	return ProductionActor->GetOwner() == this;
 }
 
-void ARTSPlayerController::ServerStartProduction_Implementation(AActor* ProductionActor, int32 ProductIndex)
+void ARTSPlayerController::ServerStartProduction_Implementation(AActor* ProductionActor, TSubclassOf<AActor> ProductClass)
 {
 	auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
 
-	if (!ProductionComponent)
+	if (!IsValid(ProductionComponent))
 	{
 		return;
 	}
 
-	if (ProductionComponent->GetAvailableProducts().Num() <= ProductIndex)
-	{
-		return;
-	}
-
-	// Begin production.
-	TSubclassOf<AActor> ProductClass = ProductionComponent->GetAvailableProducts()[ProductIndex];
 	ProductionComponent->StartProduction(ProductClass);
 }
 
-bool ARTSPlayerController::ServerStartProduction_Validate(AActor* ProductionActor, int32 ProductIndex)
+bool ARTSPlayerController::ServerStartProduction_Validate(AActor* ProductionActor, TSubclassOf<AActor> ProductClass)
 {
 	// Verify owner to prevent cheating.
 	return ProductionActor->GetOwner() == this;
@@ -1557,9 +1546,9 @@ void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVe
     ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
 }
 
-void ARTSPlayerController::NotifyOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex)
+void ARTSPlayerController::NotifyOnIssuedProductionOrder(AActor* OrderedActor, TSubclassOf<AActor> ProductClass)
 {
-    ReceiveOnIssuedProductionOrder(OrderedActor, ProductIndex);
+    ReceiveOnIssuedProductionOrder(OrderedActor, ProductClass);
 }
 
 void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)

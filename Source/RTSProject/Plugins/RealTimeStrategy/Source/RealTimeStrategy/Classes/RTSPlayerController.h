@@ -82,15 +82,15 @@ public:
 	bool IssueMoveOrder(const FVector& TargetLocation);
 
     /** Gets a selected actor suitable for production. */
-    AActor* GetSelectedProductionActor() const;
+    AActor* GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const;
 
     /** Checks whether this player can begin producing the product with the specified index (e.g. can pay for it), and shows an error message otherwise. */
     UFUNCTION(BlueprintPure)
-    bool CheckCanIssueProductionOrder(int32 ProductIndex);
+    bool CheckCanIssueProductionOrder(TSubclassOf<AActor> ProductClass);
 
     /** Orders the selected production actor to start producing the product with the specified index. */
     UFUNCTION(BlueprintCallable)
-    void IssueProductionOrder(int32 ProductIndex);
+    void IssueProductionOrder(TSubclassOf<AActor> ProductClass);
 
 	/** Orders all selected units to stop all current actions. */
 	UFUNCTION(BlueprintCallable)
@@ -207,7 +207,7 @@ public:
     virtual void NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
 
     /** Event when an actor has received a production order. */
-    virtual void NotifyOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex);
+    virtual void NotifyOnIssuedProductionOrder(AActor* OrderedActor, TSubclassOf<AActor> ProductClass);
 
 	/** Event when an actor has received a stop order. */
 	virtual void NotifyOnIssuedStopOrder(APawn* OrderedPawn);
@@ -274,7 +274,7 @@ public:
 
     /** Event when an actor has received a production order. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedProductionOrder"))
-    void ReceiveOnIssuedProductionOrder(AActor* OrderedActor, int32 ProductIndex);
+    void ReceiveOnIssuedProductionOrder(AActor* OrderedActor, TSubclassOf<AActor> ProductClass);
 
 	/** Event when an actor has received a stop order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedStopOrder"))
@@ -444,7 +444,7 @@ private:
 
 	/** Start producing the specified product at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerStartProduction(AActor* ProductionActor, int32 ProductIndex);
+	void ServerStartProduction(AActor* ProductionActor, TSubclassOf<AActor> ProductClass);
 
 	/** Cancels the current production at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)
