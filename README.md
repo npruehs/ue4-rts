@@ -94,26 +94,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
     1. Call SetupVisionInfo for the minimap widget.
 1. In your player controller blueprint (or whichever owns the minimap widget), handle the OnVisionInfoAvailable event and call SetupVisionInfo for the minimap widget. This is required for properly setting up vision info on clients where replication may cause a different initialization order.
 
-### Add Resource Gathering
-
-1. Create an RTSResourceType blueprint for each resource in your game.
-1. Add the resource types to your player controller to enable players to keep resources in stock. Listen for the OnResourcesChanged event to update your UI.
-1. Create a unit (see above) and add an RTSResourceSourceComponent for each type of resource node in your game (e.g. gold mine, tree).
-    1. Set the resource type and maximum and current resources of the source.
-    1. Set the gathering factor for increaing the yield of any gatherers (e.g. golden minerals).
-    1. Add an RTSContainerComponent, check Gatherer Must Enter and set the Gatherer Capacity if you want gatherers to enter the resource source (e.g. Refinery in StarCraft).
-1. Create a unit (see above) and add an RTSResourceDrainComponent for each type of building gatherers may return resources to.
-    1. Set the resource types to all resources accepted by the drain.
-1. Create an RTSGathererComponent to any unit that should be able to gather resources.
-    1. Add any resource type the gatherer should be able to gather to Gathered Resources.
-        1. Gathering works similar to attacks, with "damage" and "cooldown". Set Amount Per Gathering to the value to add to the gatherers inventory each time the cooldown is finished.
-        1. Set the Cooldown to the time between two gatherings.
-        1. Set the Capacity to the amount of resources the gatherer can carry before returning to a resource drain.
-        1. Check Needs Return To Drain if the gatherer needs to move to another actor for returning resources (e.g. Age of Empires). Uncheck if they should return all gathered resources immediately when hitting the capacity limit (e.g. Undead in WarCraft).
-        1. Set Range as desired.
-    1. Add all Resource Source Actor Classes the gatherer may gather from (e.g. Undead in Warcraft need Haunted Gold Mine).
-    1. Set the Resource Sweep Radius to the radius in which the gatherer should look for similar resources if their current source is depleted.
-
 ### Setup Fog of War
 
 1. Add the RTSVision component to your units and set their Sight Radius (e.g. 1000).

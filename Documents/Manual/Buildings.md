@@ -2,7 +2,7 @@
 
 ### Construction
 
-1. See Creating Units (except for movement and AI).
+1. See Creating Units (Appearance, Health & Damage, Projectiles).
 1. Add an RTSConstructionSiteComponent and set the ConstructionTime.
 1. Set the Construction Costs to any resources required for construction.
 1. Set the Construction Cost Type to to Pay Immediately if all costs should be paid in full when starting construction, or to Pay Over Time for continuously paying costs (similar to Command & Conquer).
@@ -23,3 +23,8 @@
 1. Add your RTSProductionProgressBarWidgetComponent.
 
 _Note that, technically, producing units does not differ from researching technology. You can create actor blueprints without physical representation for each technology to research, and add them as products. Then, you can check whether any player owns an actor of that technology for checking a tech tree._
+
+### Resource Drain
+
+1. Add an RTSResourceDrainComponent for each type of building gatherers may return resources to.
+1. Set the resource types to all resources accepted by the drain.
