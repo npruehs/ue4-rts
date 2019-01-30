@@ -147,6 +147,10 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 		{
 			FinishProduction(QueueIndex);
 		}
+        else
+        {
+            OnProductionProgressChanged.Broadcast(QueueIndex, GetProgressPercentage(QueueIndex));
+        }
 	}
 }
 
@@ -530,4 +534,12 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 
 	// Notify listeners.
 	OnProductionStarted.Broadcast(ProductClass, QueueIndex, ProductionTime);
+}
+
+void URTSProductionComponent::ReceivedProductionQueues()
+{
+    for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
+    {
+        OnProductionProgressChanged.Broadcast(QueueIndex, GetProgressPercentage(QueueIndex));
+    }
 }

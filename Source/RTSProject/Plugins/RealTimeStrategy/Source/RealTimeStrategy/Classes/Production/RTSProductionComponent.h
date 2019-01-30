@@ -12,6 +12,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductQueuedSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionStartedSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, TotalProductionTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionProgressChangedSignature, int32, QueueIndex, float, ProgressPercentage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionFinishedSignature, AActor*, Product, int32, QueueIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionCanceledSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, ElapsedProductionTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionCostRefundedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
@@ -99,6 +100,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSProductionComponentProductionStartedSignature OnProductionStarted;
 
+    /** Event when the production timer has been updated. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSProductionComponentProductionProgressChangedSignature OnProductionProgressChanged;
+
 	/** Event when the production timer has expired. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSProductionComponentProductionFinishedSignature OnProductionFinished;
@@ -125,9 +130,12 @@ private:
     int32 CapacityPerQueue;
 
     /** Products queued for production. */
-    UPROPERTY(replicated)
+    UPROPERTY(ReplicatedUsing=ReceivedProductionQueues)
     TArray<FRTSProductionQueue> ProductionQueues;
 
 	void DequeueProduct(int32 QueueIndex = 0, int32 ProductIndex = 0);
 	void StartProductionInQueue(int32 QueueIndex = 0);
+
+    UFUNCTION()
+    void ReceivedProductionQueues();
 };
