@@ -30,17 +30,6 @@ public:
         float SuggestedTextLeft,
         float SuggestedTextTop);
 
-	/** Event for drawing the production progress bar for the specified unit. */
-	virtual void NotifyDrawProductionProgressBar(
-		AActor* Actor,
-		float ProductionTime,
-		float RemainingProductionTime,
-		float ProgressPercentage,
-		float SuggestedProgressBarLeft,
-		float SuggestedProgressBarTop,
-		float SuggestedProgressBarWidth,
-		float SuggestedProgressBarHeight);
-
 	/** Event for drawing the selection frame because the mouse is being dragged. */
 	virtual void NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height);
 
@@ -59,18 +48,6 @@ public:
         float LifetimePercentage,
         float SuggestedTextLeft,
         float SuggestedTextTop);
-
-	/** Event for drawing the production progress bar for the specified unit. */
-	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawProductionProgressBar"))
-	void ReceiveDrawProductionProgressBar(
-		AActor* Actor,
-		float ProductionTime,
-		float RemainingProductionTime,
-		float ProgressPercentage,
-		float SuggestedProgressBarLeft,
-		float SuggestedProgressBarTop,
-		float SuggestedProgressBarWidth,
-		float SuggestedProgressBarHeight);
 
 	/** Event for drawing the selection frame because the mouse is being dragged. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "DrawSelectionFrame"))
@@ -192,6 +169,6 @@ private:
 	/** Draws the production progress bar of the specified actor. */
 	void DrawProductionProgressBar(AActor* Actor);
 
-	/** Suggests a position and size for drawing a progress bar widget for the specified unit. */
-	void SuggestUnitBarSize(AActor* Actor, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const;
+    /** Hides the production progress bar of the specified actor. */
+    void HideProductionProgressBar(AActor* Actor);
 };

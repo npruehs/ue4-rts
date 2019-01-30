@@ -9,6 +9,7 @@
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Construction/RTSConstructionProgressBarWidgetComponent.h"
 #include "Production/RTSProductionComponent.h"
+#include "Production/RTSProductionProgressBarWidgetComponent.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
 #include "UI/RTSFloatingCombatTextData.h"
 #include "UI/RTSHoveredActorWidgetComponent.h"
@@ -38,19 +39,6 @@ void ARTSHUD::NotifyDrawFloatingCombatText(AActor* Actor, const FString& Text, c
         LifetimePercentage,
         SuggestedTextLeft,
         SuggestedTextTop);
-}
-
-void ARTSHUD::NotifyDrawProductionProgressBar(AActor* Actor, float ProductionTime, float RemainingProductionTime, float ProgressPercentage, float SuggestedProgressBarLeft, float SuggestedProgressBarTop, float SuggestedProgressBarWidth, float SuggestedProgressBarHeight)
-{
-	ReceiveDrawProductionProgressBar(
-		Actor,
-		ProductionTime,
-		RemainingProductionTime,
-		ProgressPercentage,
-		SuggestedProgressBarLeft,
-		SuggestedProgressBarTop,
-		SuggestedProgressBarWidth,
-		SuggestedProgressBarHeight);
 }
 
 void ARTSHUD::NotifyDrawSelectionFrame(float ScreenX, float ScreenY, float Width, float Height)
@@ -430,94 +418,91 @@ void ARTSHUD::DrawHoveredActorWidget()
 
 void ARTSHUD::DrawProductionProgressBars()
 {
-	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
+    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(PlayerOwner);
 
-	if (!PlayerController)
-	{
-		return;
-	}
+    if (!PlayerController)
+    {
+        return;
+    }
 
-	// Check override conditions.
-	if (bAlwaysShowProductionProgressBars || (bShowHotkeyProductionProgressBars && PlayerController->IsProductionProgressBarHotkeyPressed()))
-	{
-		// Draw all progress bars.
-		for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
-		{
-			AActor* Actor = *ActorIt;
-			DrawProductionProgressBar(Actor);
-		}
+    for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+    {
+        AActor* Actor = *ActorIt;
 
-		return;
-	}
-
-	// Draw progress bar for hovered actor.
-	if (bShowHoverProductionProgressBars)
-	{
-		AActor* HoveredActor = PlayerController->GetHoveredActor();
-		DrawProductionProgressBar(HoveredActor);
-	}
-
-	// Draw progress bars for selected actors.
-	if (bShowSelectionProductionProgressBars)
-	{
-		for (int32 i = 0; i < PlayerController->GetSelectedActors().Num(); ++i)
-		{
-			AActor* SelectedActor = PlayerController->GetSelectedActors()[i];
-			DrawProductionProgressBar(SelectedActor);
-		}
-	}
+        // Check override conditions.
+        if (bAlwaysShowProductionProgressBars || (bShowHotkeyProductionProgressBars && PlayerController->IsProductionProgressBarHotkeyPressed()))
+        {
+            // Draw all progress bars.
+            DrawProductionProgressBar(Actor);
+        }
+        else if (bShowHoverProductionProgressBars && Actor == PlayerController->GetHoveredActor())
+        {
+            // Draw progress bar for hovered actor.
+            DrawProductionProgressBar(Actor);
+        }
+        else if (bShowSelectionProductionProgressBars && PlayerController->GetSelectedActors().Contains(Actor))
+        {
+            // Draw progress bars for selected actors.
+            DrawProductionProgressBar(Actor);
+        }
+        else
+        {
+            HideProductionProgressBar(Actor);
+        }
+    }
 }
 
 void ARTSHUD::DrawProductionProgressBar(AActor* Actor)
 {
-	if (!IsValid(Actor))
-	{
-		return;
-	}
+    if (!IsValid(Actor))
+    {
+        return;
+    }
 
-	// Check progress.
-	URTSProductionComponent* ProductionComponent = Actor->FindComponentByClass<URTSProductionComponent>();
+    // Check progress.
+    URTSProductionComponent* ProductionComponent = Actor->FindComponentByClass<URTSProductionComponent>();
 
-	if (!ProductionComponent)
-	{
-		return;
-	}
+    if (!ProductionComponent)
+    {
+        return;
+    }
 
-	if (!ProductionComponent->IsProducing())
-	{
-		return;
-	}
+    if (!ProductionComponent->IsProducing())
+    {
+        return;
+    }
 
-	const float ProgressPercentage = ProductionComponent->GetProgressPercentage();
+    const float ProgressPercentage = ProductionComponent->GetProgressPercentage();
 
-	// Suggest progress bar size.
-	float SuggestedProgressBarLeft;
-	float SuggestedProgressBarTop;
-	float SuggestedProgressBarWidth;
-	float SuggestedProgressBarHeight;
+    // Draw progress bar.
+    URTSProductionProgressBarWidgetComponent* ProductionProgressBarWidgetComponent =
+        Actor->FindComponentByClass<URTSProductionProgressBarWidgetComponent>();
 
-	SuggestUnitBarSize(Actor, SuggestedProgressBarLeft, SuggestedProgressBarTop, SuggestedProgressBarWidth, SuggestedProgressBarHeight);
+    if (!IsValid(ProductionProgressBarWidgetComponent))
+    {
+        return;
+    }
 
-	// Draw progress bar.
-	NotifyDrawProductionProgressBar(
-		Actor,
-		ProductionComponent->GetProductionTime(),
-		ProductionComponent->GetRemainingProductionTime(),
-		ProgressPercentage,
-		SuggestedProgressBarLeft,
-		SuggestedProgressBarTop,
-		SuggestedProgressBarWidth,
-		SuggestedProgressBarHeight);
+    FVector2D Size = GetActorSizeOnScreen(Actor);
+
+    ProductionProgressBarWidgetComponent->UpdatePositionAndSize(Size);
+    ProductionProgressBarWidgetComponent->SetVisibility(true);
 }
 
-void ARTSHUD::SuggestUnitBarSize(AActor* Actor, float& OutLeft, float& OutTop, float& OutWidth, float& OutHeight) const
+void ARTSHUD::HideProductionProgressBar(AActor* Actor)
 {
-	FVector2D Center = GetActorCenterOnScreen(Actor);
-	FVector2D Size = GetActorSizeOnScreen(Actor);
+    if (!IsValid(Actor))
+    {
+        return;
+    }
 
-	OutWidth = Size.X * 2;
-	OutHeight = 15.0f;
+    URTSProductionProgressBarWidgetComponent* ProductionProgressBarWidgetComponent =
+        Actor->FindComponentByClass<URTSProductionProgressBarWidgetComponent>();
 
-	OutLeft = Center.X - (OutWidth / 2);
-	OutTop = Center.Y - (Size.Y / 2) - (OutHeight * 2);
+    if (!IsValid(ProductionProgressBarWidgetComponent))
+    {
+        return;
+    }
+
+    ProductionProgressBarWidgetComponent->SetVisibility(false);
 }

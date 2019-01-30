@@ -7,9 +7,6 @@
 #include "RTSConstructionProgressBarWidgetComponent.generated.h"
 
 
-class URTSConstructionSiteComponent;
-
-
 /**
 * Adds a construction progress bar widget to the actor.
 */
