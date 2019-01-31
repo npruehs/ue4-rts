@@ -16,6 +16,10 @@
 
 1. Add a movement component (e.g. FloatingPawnMovement or CharacterMovement) and set up its speed properties as usual.
 
+### Vision
+
+1. Add the RTSVision component to your units and set their Sight Radius (e.g. 1000).
+
 ### Combat
 
 #### AI

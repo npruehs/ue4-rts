@@ -62,23 +62,11 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 
 #### Minimap Fog of War Layer
 
-1. Setup fog of war (see below).
-1. Set the FogOfWarMaterial of your RTSMinimapWidget to M_RTSFogOfWarMinimap.
 1. In your player controller blueprint (or whichever owns the minimap widget), when setting up (e.g. in BeginPlay):
     1. Use the blueprint function RTSPlayerController::GetTeamInfo to get the team of the local player.
     1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
     1. Call SetupVisionInfo for the minimap widget.
 1. In your player controller blueprint (or whichever owns the minimap widget), handle the OnVisionInfoAvailable event and call SetupVisionInfo for the minimap widget. This is required for properly setting up vision info on clients where replication may cause a different initialization order.
-
-### Setup Fog of War
-
-1. Add the RTSVision component to your units and set their Sight Radius (e.g. 1000).
-1. Add an RTSVisionVolume to your map, encompassing the whole valid visible map area (e.g. 4096x4096).
-1. Set the Size Per Tile of the vision volume (e.g. 16).
-1. Add a PostProcessVolume to your map, encompassing the whole valid camera area.
-1. Add an RTSFogOfWarActor to your map.
-1. Set the Fog Of War Material of the actor (e.g. to the M_RTSFogOfWar material shipped with the plugin).
-1. Set the Fog Of War Volume reference to the post process volume created before.
 
 ## Bugs & Feature Requests
 
