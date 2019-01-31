@@ -45,29 +45,6 @@ Note that the plugin currently requires a C++ Unreal project, which in turn requ
 1. Start the Unreal Editor.
 1. Enable the plugin in Edit > Plugins > RTS.
 
-## Usage
-
-### Adding Units
-
-1. Setup your animations. (If you're new to the Unreal animation system, we can readily recommend the tutorial at https://docs.unrealengine.com/latest/INT/Programming/Tutorials/FirstPersonShooter/4/index.html)
-
-### Selecting Units
-
-#### Enabling Selection
-
-1. Bind the action AddSelection (e.g. to Left Shift).
-1. Bind the action ToggleSelection (e.g. to Left Ctrl).
-
-### Setup Minimap
-
-#### Minimap Fog of War Layer
-
-1. In your player controller blueprint (or whichever owns the minimap widget), when setting up (e.g. in BeginPlay):
-    1. Use the blueprint function RTSPlayerController::GetTeamInfo to get the team of the local player.
-    1. Use the blueprint function GetVisionInfoForTeam to get vision info for the local player.
-    1. Call SetupVisionInfo for the minimap widget.
-1. In your player controller blueprint (or whichever owns the minimap widget), handle the OnVisionInfoAvailable event and call SetupVisionInfo for the minimap widget. This is required for properly setting up vision info on clients where replication may cause a different initialization order.
-
 ## Bugs & Feature Requests
 
 We are sorry that you've experienced issues or are missing a feature! After verifying that you are using the latest version and having checked whether a [similar issue](https://github.com/npruehs/ue4-rts/issues) has already been reported, feel free to [open a new issue](https://github.com/npruehs/ue4-rts/issues/new). In order to help us resolving your problem as fast as possible, please include the following details in your report:

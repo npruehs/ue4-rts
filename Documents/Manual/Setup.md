@@ -46,6 +46,8 @@ At Edit > Project Settings > Engine > Input ...
 1. Bind the action Select (e.g. to left mouse button).
 1. Bind the actions SaveControlGroup0 to SaveControlGroup9 (e.g. to CTRL+0 to CTRL+9).
 1. Bind the actions LoadControlGroup0 to LoadControlGroup9 (e.g. to 0 to 9).
+1. Bind the action AddSelection (e.g. to Left Shift).
+1. Bind the action ToggleSelection (e.g. to Left Ctrl).
 
 #### Orders
 

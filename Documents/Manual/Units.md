@@ -6,6 +6,7 @@
 1. Add a static or skeletal mesh and setup its location, rotation and scale as usual.
 1. Setup collision (e.g. Capsule Collision) as usual.
 1. You may want to disable the collision of your mesh and rely on its capsule instead.
+1. Setup your animations. (If you're new to the Unreal animation system, we can readily recommend the tutorial at https://docs.unrealengine.com/latest/INT/Programming/Tutorials/FirstPersonShooter/4/index.html)
 1. Add an RTSNameComponent and set its localized name if you want to show it in any kind of ingame UI. 
 1. Add an RTSDescriptionComponent and set its localized text if you want to show it in any kind of ingame UI. 
 1. Add an RTSPortraitComponent and set its portrait if you want to show it in any kind of ingame UI.
