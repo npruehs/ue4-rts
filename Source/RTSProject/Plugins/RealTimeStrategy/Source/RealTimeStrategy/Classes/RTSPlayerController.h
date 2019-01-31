@@ -511,10 +511,6 @@ private:
 	UFUNCTION()
 	void StopToggleSelection();
 	
-	/** Begin placing the first building available to the currently selected builder. */
-	UFUNCTION()
-	void BeginDefaultBuildingPlacement();
-
 	/** Confirms placing the current building at the hovered location. */
 	UFUNCTION()
 	void ConfirmBuildingPlacement();
@@ -526,10 +522,6 @@ private:
 	/** Cancels the construction of the first selected building. */
 	UFUNCTION()
 	void CancelConstruction();
-
-	/** Start producing the first product available to the currently selected production actor. */
-	UFUNCTION()
-	void StartDefaultProduction();
 
 	/** Cancels the current production of the first selected building. */
 	UFUNCTION()

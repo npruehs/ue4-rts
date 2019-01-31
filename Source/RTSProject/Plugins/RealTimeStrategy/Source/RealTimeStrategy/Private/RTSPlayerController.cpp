@@ -122,13 +122,10 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("ShowProductionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingProductionProgressBars);
 	InputComponent->BindAction(TEXT("ShowProductionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingProductionProgressBars);
 
-	InputComponent->BindAction(TEXT("BeginDefaultBuildingPlacement"), IE_Released, this, &ARTSPlayerController::BeginDefaultBuildingPlacement);
 	InputComponent->BindAction(TEXT("ConfirmBuildingPlacement"), IE_Released, this, &ARTSPlayerController::ConfirmBuildingPlacement);
 	InputComponent->BindAction(TEXT("CancelBuildingPlacement"), IE_Released, this, &ARTSPlayerController::CancelBuildingPlacement);
 
 	InputComponent->BindAction(TEXT("CancelConstruction"), IE_Released, this, &ARTSPlayerController::CancelConstruction);
-
-	InputComponent->BindAction(TEXT("StartDefaultProduction"), IE_Released, this, &ARTSPlayerController::StartDefaultProduction);
 	InputComponent->BindAction(TEXT("CancelProduction"), IE_Released, this, &ARTSPlayerController::CancelProduction);
 
 	// Get camera bounds.
@@ -1260,37 +1257,6 @@ void ARTSPlayerController::StopToggleSelection()
 	bToggleSelectionHotkeyPressed = false;
 }
 
-void ARTSPlayerController::BeginDefaultBuildingPlacement()
-{
-	// Find suitable selected builder.
-	for (auto SelectedActor : SelectedActors)
-	{
-		// Verify owner.
-		if (SelectedActor->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Check if builder.
-		auto BuilderComponent = SelectedActor->FindComponentByClass<URTSBuilderComponent>();
-
-		if (!BuilderComponent)
-		{
-			continue;
-		}
-
-		// Check if builder knows about building.
-		if (BuilderComponent->GetConstructibleBuildingClasses().Num() <= 0)
-		{
-			continue;
-		}
-
-		// Begin placement.
-		BeginBuildingPlacement(BuilderComponent->GetConstructibleBuildingClasses()[0]);
-		return;
-	}
-}
-
 void ARTSPlayerController::ConfirmBuildingPlacement()
 {
 	if (!BuildingCursor)
@@ -1379,11 +1345,6 @@ bool ARTSPlayerController::ServerCancelConstruction_Validate(AActor* Constructio
 {
 	// Verify owner to prevent cheating.
 	return ConstructionSite->GetOwner() == this;
-}
-
-void ARTSPlayerController::StartDefaultProduction()
-{
-    IssueProductionOrder(0);
 }
 
 void ARTSPlayerController::CancelProduction()
