@@ -18,9 +18,14 @@ class REALTIMESTRATEGY_API ARTSVisionVolume : public AVolume
 public:
     ARTSVisionVolume(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    float GetSizePerTile() const;
-	FVector GetWorldSize() const;
-	FIntVector GetTileSize() const;
+    /** Gets the width and height of the vision grid imposed on the world. */
+    int32 GetSizeInTiles() const;
+
+    /** Gets the size of the vision volume, in world space. */
+	FVector GetSizeInWorld() const;
+
+    /** Gets the width and height of a single vision grid tile, in cm. */
+    float GetTileSize() const;
     
 	FIntVector WorldToTile(const FVector& WorldPosition) const;
 
@@ -28,10 +33,13 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-    /** Size of a single tile of the vision grid imposed on the world. */
-    UPROPERTY(EditInstanceOnly, Category = "RTS", meta = (ClampMin = 0))
-    float SizePerTile;
+    /** Width and height of the vision grid imposed on the world. */
+    UPROPERTY(EditInstanceOnly, Category = "RTS")
+    int32 SizeInTiles;
 
-	FVector WorldSize;
-	FIntVector TileSize;
+    /** Size of the vision volume, in world space. */
+    FVector SizeInWorld;
+
+    /** Width and height of a single vision grid tile, in cm. */
+    float TileSize;
 };

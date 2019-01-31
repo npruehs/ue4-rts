@@ -9,38 +9,33 @@ ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer /
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.
-	SizePerTile = 16.0f;
+	SizeInTiles = 256;
 }
 
-float ARTSVisionVolume::GetSizePerTile() const
+int32 ARTSVisionVolume::GetSizeInTiles() const
 {
-    return SizePerTile;
+    return SizeInTiles;
 }
 
-FVector ARTSVisionVolume::GetWorldSize() const
+FVector ARTSVisionVolume::GetSizeInWorld() const
 {
-	return WorldSize;
+    return SizeInWorld;
 }
 
-FIntVector ARTSVisionVolume::GetTileSize() const
+float ARTSVisionVolume::GetTileSize() const
 {
-	return TileSize;
+    return TileSize;
 }
 
 FIntVector ARTSVisionVolume::WorldToTile(const FVector& WorldPosition) const
 {
 	// Get relative world position.
-	float RelativeWorldX = WorldPosition.X / WorldSize.X + 0.5f;
-	float RelativeWorldY = WorldPosition.Y / WorldSize.Y + 0.5f;
-
-	//// Rotate to match UI coordinate system.
-	//float temp = RelativeWorldX;
-	//RelativeWorldX = RelativeWorldY;
-	//RelativeWorldY = 1 - temp;
+	float RelativeWorldX = WorldPosition.X / SizeInWorld.X + 0.5f;
+	float RelativeWorldY = WorldPosition.Y / SizeInWorld.Y + 0.5f;
 
 	// Convert to minimap coordinates.
-	int32 TileX = FMath::FloorToInt(RelativeWorldX * TileSize.X);
-	int32 TileY = FMath::FloorToInt(RelativeWorldY * TileSize.Y);
+	int32 TileX = FMath::FloorToInt(RelativeWorldX * SizeInTiles);
+	int32 TileY = FMath::FloorToInt(RelativeWorldY * SizeInTiles);
 
 	return FIntVector(TileX, TileY, 0);
 }
@@ -53,13 +48,8 @@ void ARTSVisionVolume::BeginPlay()
 	UBrushComponent* VisionBrushComponent = GetBrushComponent();
 	FBoxSphereBounds VisionBounds = VisionBrushComponent->CalcBounds(VisionBrushComponent->GetComponentTransform());
 
-	WorldSize = VisionBounds.BoxExtent * 2;
+	SizeInWorld = VisionBounds.BoxExtent * 2;
 
 	// Calculate tile size.
-	TileSize = FIntVector(
-		FMath::FloorToInt(WorldSize.X / SizePerTile),
-		FMath::FloorToInt(WorldSize.Y / SizePerTile),
-		FMath::FloorToInt(WorldSize.Z / SizePerTile));
-
-	UE_LOG(LogRTS, Log, TEXT("Vision tile grid has size %i x %i x %i."), TileSize.X, TileSize.Y, TileSize.Z);
+    TileSize = SizeInWorld.X / SizeInTiles;
 }

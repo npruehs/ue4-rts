@@ -43,8 +43,8 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 	}
 
 	// Reset tiles.
-	FIntVector TileSize = VisionVolume->GetTileSize();
-	Tiles.SetNumZeroed(TileSize.X * TileSize.Y);
+	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
+	Tiles.SetNumZeroed(SizeInTiles * SizeInTiles);
 
 	for (int32 Index = 0; Index < Tiles.Num(); ++Index)
 	{
@@ -53,8 +53,6 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 			Tiles[Index] = ERTSVisionState::VISION_Known;
 		}
 	}
-
-	FIntVector WorldTileSize = VisionVolume->GetTileSize();
 
 	// Apply vision.
 	for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
@@ -91,7 +89,7 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 		// Convert location and sight radius to tile space.
 		FVector ActorLocationWorld = Actor->GetActorLocation();
 		FIntVector ActorLocationTile = VisionVolume->WorldToTile(ActorLocationWorld);
-		int32 ActorSightRadiusTile = FMath::FloorToInt(VisionComponent->GetSightRadius() / VisionVolume->GetSizePerTile());
+		int32 ActorSightRadiusTile = FMath::FloorToInt(VisionComponent->GetSightRadius() / VisionVolume->GetTileSize());
 
 		/*UE_LOG(LogRTS, Log, TEXT("ActorLocationWorld: %s"), *ActorLocationWorld.ToString());
 		UE_LOG(LogRTS, Log, TEXT("ActorLocationTile: %s"), *ActorLocationTile.ToString());
@@ -110,8 +108,8 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 				// Check if within circle.
 				if (TileX >= 0 &&
 					TileY >= 0 &&
-					TileX < WorldTileSize.X &&
-					TileY < WorldTileSize.Y &&
+					TileX < SizeInTiles &&
+					TileY < SizeInTiles &&
 					(RadiusX * RadiusX + RadiusY * RadiusY < ActorSightRadiusTile * ActorSightRadiusTile))
 				{
 					int32 TileIndex = GetTileIndex(TileX, TileY);
@@ -174,8 +172,8 @@ void ARTSVisionInfo::BeginPlay()
 		return;
 	}
 
-	FIntVector TileSize = VisionVolume->GetTileSize();
-	Tiles.SetNumZeroed(TileSize.X * TileSize.Y);
+	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
+	Tiles.SetNumZeroed(SizeInTiles * SizeInTiles);
 }
 
 bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const
@@ -185,16 +183,16 @@ bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const
 		return false;
 	}
 
-	FIntVector TileSize = VisionVolume->GetTileSize();
+	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
 
-	*OutX = Index % TileSize.X;
-	*OutY = Index / TileSize.X;
+	*OutX = Index % SizeInTiles;
+	*OutY = Index / SizeInTiles;
 	return true;
 }
 
 int32 ARTSVisionInfo::GetTileIndex(int X, int Y) const
 {
-	return Y * VisionVolume->GetTileSize().X + X;
+	return Y * VisionVolume->GetSizeInTiles() + X;
 }
 
 void ARTSVisionInfo::NotifyPlayerVisionInfoAvailable()

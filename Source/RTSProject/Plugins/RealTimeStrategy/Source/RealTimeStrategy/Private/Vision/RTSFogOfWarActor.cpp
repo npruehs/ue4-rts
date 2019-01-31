@@ -42,13 +42,13 @@ void ARTSFogOfWarActor::BeginPlay()
 	}
 
 	// Setup fog of war buffer.
-	FIntVector TileSize = VisionVolume->GetTileSize();
-	FVector WorldSize = VisionVolume->GetWorldSize();
+	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
+	FVector SizeInWorld = VisionVolume->GetSizeInWorld();
 
-	FogOfWarTextureBuffer = new uint8[TileSize.X * TileSize.Y * 4];
+	FogOfWarTextureBuffer = new uint8[SizeInTiles * SizeInTiles * 4];
 
 	// Setup fog of war texture.
-	FogOfWarTexture = UTexture2D::CreateTransient(TileSize.X, TileSize.Y);
+	FogOfWarTexture = UTexture2D::CreateTransient(SizeInTiles, SizeInTiles);
 
 #if WITH_EDITORONLY_DATA
 	FogOfWarTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
@@ -58,13 +58,13 @@ void ARTSFogOfWarActor::BeginPlay()
 
 	FogOfWarTexture->UpdateResource();
 
-	FogOfWarUpdateTextureRegion = new FUpdateTextureRegion2D(0, 0, 0, 0, TileSize.X, TileSize.Y);
+	FogOfWarUpdateTextureRegion = new FUpdateTextureRegion2D(0, 0, 0, 0, SizeInTiles, SizeInTiles);
 
 	// Setup fog of war material.
 	FogOfWarMaterialInstance = UMaterialInstanceDynamic::Create(FogOfWarMaterial, nullptr);
 	FogOfWarMaterialInstance->SetTextureParameterValue(FName("VisibilityMask"), FogOfWarTexture);
-	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverWorldSize"), 1.0f / WorldSize.X);
-	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverTileSize"), 1.0f / TileSize.X);
+	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverWorldSize"), 1.0f / SizeInWorld.X);
+	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverTileSize"), 1.0f / SizeInTiles);
 
 	// Setup fog of war post-process volume.
 	FogOfWarVolume->AddOrUpdateBlendable(FogOfWarMaterialInstance);
@@ -80,13 +80,13 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 		return;
 	}
 
-	FIntVector TileSize = VisionVolume->GetTileSize();
+	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
 
-	for (int32 Y = 0; Y < TileSize.Y; ++Y)
+	for (int32 Y = 0; Y < SizeInTiles; ++Y)
 	{
-		for (int32 X = 0; X < TileSize.X; ++X)
+		for (int32 X = 0; X < SizeInTiles; ++X)
 		{
-			const int i = Y * TileSize.X + X;
+			const int i = Y * SizeInTiles + X;
 
 			const int iBlue = i * 4 + 0;
 			const int iGreen = i * 4 + 1;
@@ -119,7 +119,7 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 		}
 	}
 
-	FogOfWarTexture->UpdateTextureRegions(0, 1, FogOfWarUpdateTextureRegion, TileSize.X * 4, (uint32)4, FogOfWarTextureBuffer);
+	FogOfWarTexture->UpdateTextureRegions(0, 1, FogOfWarUpdateTextureRegion, SizeInTiles * 4, (uint32)4, FogOfWarTextureBuffer);
 }
 
 UTexture2D* ARTSFogOfWarActor::GetFogOfWarTexture() const
