@@ -120,6 +120,12 @@ _See the Health Bars section for an example.
 1. Handle the OnResourcesChanged event raised by the PlayerResourcesComponent attached to your player controller to update your UI.
 
 
+### Minimap
+
+1. Add the WBP_RTSMinimapWidget to your UI, with a size matching your minimap volume images (e.g. 256 x 256).
+
+
+
 ### Hovered Actors
 
 2. Create a widget for drawing name plates (or whatever other information you'd like to display for hovered actors).

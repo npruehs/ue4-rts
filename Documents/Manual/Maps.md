@@ -9,3 +9,7 @@
 1. Build navigation. You may press P to review your results in the viewport.
 1. Add your player starts to the map.
 1. Set the Team Index for each player start.
+
+1. Add an RTSMinimapVolume to the very center of your map.
+1. Set its brush size to match the extents of your playable map.
+1. Set the Minimap Image to a nice top-down screenshot of your map.
