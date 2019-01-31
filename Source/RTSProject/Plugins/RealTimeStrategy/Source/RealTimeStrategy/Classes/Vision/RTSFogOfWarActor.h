@@ -41,7 +41,7 @@ private:
     APostProcessVolume* FogOfWarVolume;
 
 	/** Material to instance for rendering the fog of war effect. */
-	UPROPERTY()
+	UPROPERTY(EditInstanceOnly, Category = "RTS")
 	UMaterialInterface* FogOfWarMaterial;
 
 	/** Provides visibility information for how to render the fog of war. */
