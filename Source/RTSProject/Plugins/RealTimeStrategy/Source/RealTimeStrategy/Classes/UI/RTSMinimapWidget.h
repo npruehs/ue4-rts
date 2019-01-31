@@ -61,41 +61,41 @@ protected:
 
 private:
     /** Brush for drawing the background of the current map. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Background")
+    UPROPERTY(EditAnywhere, Category = "RTS|Background")
     FSlateBrush MinimapBackground;
 
     /** Brush for drawing own units on the minimap. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Units")
+    UPROPERTY(EditAnywhere, Category = "RTS|Units")
     FSlateBrush OwnUnitsBrush;
 
     /** Brush for drawing enemy units on the minimap. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Units")
+    UPROPERTY(EditAnywhere, Category = "RTS|Units")
     FSlateBrush EnemyUnitsBrush;
 
     /** Brush for drawing neutral units on the minimap. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Units")
+    UPROPERTY(EditAnywhere, Category = "RTS|Units")
     FSlateBrush NeutralUnitsBrush;
 
     /** Whether to draw the minimap background layer. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Background")
+    UPROPERTY(EditAnywhere, Category = "RTS|Background")
     bool bDrawBackground = true;
 
     /** Whether to draw unit dots on the minimap, with OwnUnitsBrush, EnemyUnitsBrush and NeutralUnitsBrush. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Units")
+    UPROPERTY(EditAnywhere, Category = "RTS|Units")
     bool bDrawUnitsWithTeamColors = true;
 
     /** Whether to draw vision on the minimap, with UnknownAreasBrush, KnownAreasBrush and VisibleAreasBrush. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Vision")
+    UPROPERTY(EditAnywhere, Category = "RTS|Vision")
     bool bDrawVision = true;
 
     /** Whether to show the current camera frustum on the minimap. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera")
+    UPROPERTY(EditAnywhere, Category = "RTS|Camera")
     bool bDrawViewFrustum = true;
 
-
     /** Material to instance for rendering the fog of war effect. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS|Vision")
+    UPROPERTY(EditAnywhere, Category = "RTS|Vision", meta=(AllowPrivateAccess="true"))
     UMaterialInterface* FogOfWarMaterial;
+
 
     /** Provides visibility information. */
     UPROPERTY()
