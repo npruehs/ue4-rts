@@ -17,31 +17,6 @@
 #include "Vision/RTSVisionVolume.h"
 
 
-void URTSMinimapWidget::SetupVisionInfo(ARTSVisionInfo* InVisionInfo)
-{
-	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
-	{
-		VisionVolume = *It;
-		break;
-	}
-
-	if (!VisionVolume)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("No RTSVisionVolume found, won't draw vision on minimap."));
-		return;
-	}
-
-	VisionInfo = InVisionInfo;
-
-	if (!VisionInfo)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("No vision info found, won't draw vision on minimap."));
-		return;
-	}
-
-	UE_LOG(LogRTS, Log, TEXT("Drawing vision for team %i on minimap."), VisionInfo->GetTeamIndex());
-}
-
 void URTSMinimapWidget::NotifyOnDrawUnit(
 	FPaintContext& Context,
 	AActor* Actor,

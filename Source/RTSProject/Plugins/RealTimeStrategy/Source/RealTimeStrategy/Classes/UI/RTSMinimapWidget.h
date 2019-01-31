@@ -24,10 +24,6 @@ class REALTIMESTRATEGY_API URTSMinimapWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	/** Sets the vision info to draw on the minimap. */
-	UFUNCTION(BlueprintCallable)
-	void SetupVisionInfo(ARTSVisionInfo* VisionInfo);
-
     /** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
     virtual void NotifyOnDrawUnit(
         FPaintContext& Context,
