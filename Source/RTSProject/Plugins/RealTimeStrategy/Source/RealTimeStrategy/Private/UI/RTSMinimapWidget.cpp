@@ -65,10 +65,14 @@ void URTSMinimapWidget::NativeConstruct()
 
 	if (MinimapVolume)
 	{
+        // Set size.
 		UBrushComponent* MinimapBrushComponent = MinimapVolume->GetBrushComponent();
 		FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->GetComponentTransform());
 
 		MinimapWorldSize = MinimapBounds.BoxExtent * 2;
+
+        // Set background image.
+        MinimapBackground.SetResourceObject(MinimapVolume->GetMinimapImage());
 	}
 	else
 	{
