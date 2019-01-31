@@ -1,13 +1,13 @@
 #include "UI/RTSHUD.h"
 
 #include "EngineUtils.h"
-#include "Components/ShapeComponent.h"
 
 #include "RTSPlayerController.h"
 #include "Combat/RTSHealthComponent.h"
 #include "Combat/RTSHealthBarWidgetComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Construction/RTSConstructionProgressBarWidgetComponent.h"
+#include "Libraries/RTSCollisionLibrary.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionProgressBarWidgetComponent.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
@@ -60,45 +60,13 @@ FVector2D ARTSHUD::GetActorCenterOnScreen(AActor* Actor) const
 FVector2D ARTSHUD::GetActorSizeOnScreen(AActor* Actor) const
 {
 	// Get actor position projected on HUD.
-    UShapeComponent* ShapeComponent = Actor->FindComponentByClass<UShapeComponent>();
+    float ActorHeight = URTSCollisionLibrary::GetActorCollisionHeight(Actor);
+    float ActorWidth = URTSCollisionLibrary::GetActorCollisionSize(Actor);
 
-	if (!ShapeComponent)
-	{
-        return FVector2D::ZeroVector;
-	}
-
-    FCollisionShape CollisionShape = ShapeComponent->GetCollisionShape();
-
-    FVector ActorTopPosition;
-    FVector ActorBottomPosition;
-    FVector ActorLeftPosition;
-    FVector ActorRightPosition;
-
-    if (CollisionShape.IsCapsule())
-    {
-        ActorTopPosition = Project(Actor->GetActorLocation() + (Actor->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
-        ActorBottomPosition = Project(Actor->GetActorLocation() - (Actor->GetActorForwardVector() * CollisionShape.Capsule.HalfHeight));
-        ActorLeftPosition = Project(Actor->GetActorLocation() - (Actor->GetActorRightVector() * CollisionShape.Capsule.Radius));
-        ActorRightPosition = Project(Actor->GetActorLocation() + (Actor->GetActorRightVector() * CollisionShape.Capsule.Radius));
-    }
-    else if (CollisionShape.IsBox())
-    {
-        ActorTopPosition = Project(Actor->GetActorLocation() + (Actor->GetActorForwardVector() * CollisionShape.Box.HalfExtentX));
-        ActorBottomPosition = Project(Actor->GetActorLocation() - (Actor->GetActorForwardVector() * CollisionShape.Box.HalfExtentX));
-        ActorLeftPosition = Project(Actor->GetActorLocation() - (Actor->GetActorRightVector() * CollisionShape.Box.HalfExtentY));
-        ActorRightPosition = Project(Actor->GetActorLocation() + (Actor->GetActorRightVector() * CollisionShape.Box.HalfExtentY));
-    }
-    else if (CollisionShape.IsSphere())
-    {
-        ActorTopPosition = Project(Actor->GetActorLocation() + (Actor->GetActorForwardVector() * CollisionShape.Sphere.Radius));
-        ActorBottomPosition = Project(Actor->GetActorLocation() - (Actor->GetActorForwardVector() * CollisionShape.Sphere.Radius));
-        ActorLeftPosition = Project(Actor->GetActorLocation() - (Actor->GetActorRightVector() * CollisionShape.Sphere.Radius));
-        ActorRightPosition = Project(Actor->GetActorLocation() + (Actor->GetActorRightVector() * CollisionShape.Sphere.Radius));
-    }
-    else
-    {
-        return FVector2D::ZeroVector;
-    }
+    FVector ActorTopPosition = Project(Actor->GetActorLocation() + (Actor->GetActorForwardVector() * ActorHeight));
+    FVector ActorBottomPosition = Project(Actor->GetActorLocation() - (Actor->GetActorForwardVector() * ActorHeight));
+    FVector ActorLeftPosition = Project(Actor->GetActorLocation() - (Actor->GetActorRightVector() * ActorWidth));
+    FVector ActorRightPosition = Project(Actor->GetActorLocation() + (Actor->GetActorRightVector() * ActorWidth));
 
     float Width = FVector(ActorRightPosition - ActorLeftPosition).Size();
     float Height = FVector(ActorTopPosition - ActorBottomPosition).Size();

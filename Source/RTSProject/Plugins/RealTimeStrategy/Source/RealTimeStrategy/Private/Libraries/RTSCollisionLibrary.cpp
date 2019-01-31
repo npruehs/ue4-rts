@@ -69,13 +69,13 @@ float URTSCollisionLibrary::GetShapeCollisionSize(UShapeComponent* ShapeComponen
 
     FCollisionShape CollisionShape = ShapeComponent->GetCollisionShape();
 
-    if (CollisionShape.IsCapsule())
-    {
-        return CollisionShape.Capsule.Radius * 2;
-    }
-    else if (CollisionShape.IsBox())
+    if (CollisionShape.IsBox())
     {
         return FMath::Max(CollisionShape.Box.HalfExtentX, CollisionShape.Box.HalfExtentY) * 2;
+    }
+    else if (CollisionShape.IsCapsule())
+    {
+        return CollisionShape.Capsule.Radius * 2;
     }
     else if (CollisionShape.IsSphere())
     {
@@ -97,9 +97,23 @@ float URTSCollisionLibrary::GetShapeCollisionHeight(UShapeComponent* ShapeCompon
 
     FCollisionShape CollisionShape = ShapeComponent->GetCollisionShape();
 
-    return CollisionShape.IsCapsule() ?
-        CollisionShape.Capsule.HalfHeight * 2 :
-        CollisionShape.Box.HalfExtentZ * 2;
+    if (CollisionShape.IsBox())
+    {
+        return CollisionShape.Box.HalfExtentZ * 2;
+    }
+    else if (CollisionShape.IsCapsule())
+    {
+        return CollisionShape.Capsule.HalfHeight * 2;
+    }
+    else if (CollisionShape.IsSphere())
+    {
+        return CollisionShape.Sphere.Radius * 2;
+    }
+    else
+    {
+        UE_LOG(LogRTS, Error, TEXT("Unknown collision shape type for %s."), *ShapeComponent->GetOwner()->GetName());
+        return 0.0f;
+    }
 }
 
 FVector URTSCollisionLibrary::GetGroundLocation(UObject* WorldContextObject, FVector Location)

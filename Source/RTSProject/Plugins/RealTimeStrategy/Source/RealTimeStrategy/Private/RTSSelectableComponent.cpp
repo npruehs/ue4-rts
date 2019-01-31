@@ -1,9 +1,9 @@
 #include "RTSSelectableComponent.h"
 
 #include "WorldCollision.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/Actor.h"
+#include "Libraries/RTSCollisionLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 #include "RTSLog.h"
@@ -20,39 +20,31 @@ void URTSSelectableComponent::BeginPlay()
         return;
     }
 
-    UCapsuleComponent* CapsuleComponent = Owner->FindComponentByClass<UCapsuleComponent>();
+    // Calculate decal size.
+    float DecalHeight = URTSCollisionLibrary::GetActorCollisionHeight(Owner);
+    float DecalRadius = URTSCollisionLibrary::GetActorCollisionSize(Owner);
 
-    if (IsValid(CapsuleComponent))
+    // Create selection circle decal.
+    DecalComponent = NewObject<UDecalComponent>(Owner, TEXT("SelectionCircleDecal"));
+
+    if (!DecalComponent)
     {
-        // Create selection circle decal.
-        DecalComponent = NewObject<UDecalComponent>(Owner, TEXT("SelectionCircleDecal"));
-
-        if (DecalComponent)
-        {
-            DecalComponent->RegisterComponent();
-            DecalComponent->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-
-            // Set decal size.
-            FCollisionShape CollisionShape = CapsuleComponent->GetCollisionShape();
-            float DecalHeight = CollisionShape.Capsule.HalfHeight * 2;
-            float DecalRadius = CollisionShape.Capsule.Radius;
-
-            DecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
-
-            // Rotate decal to face ground.
-            DecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
-
-            // Setup decal material.
-            SelectionCircleMaterialInstance = UMaterialInstanceDynamic::Create(SelectionCircleMaterial, this);
-            DecalComponent->SetDecalMaterial(SelectionCircleMaterialInstance);
-
-            DecalComponent->SetHiddenInGame(true);
-        }
+        return;
     }
-    else
-    {
-        UE_LOG(LogRTS, Warning, TEXT("%s has no UCapsuleComponent and won't show selection circles."), *Owner->GetName());
-    }
+
+    // Set decal size.
+    DecalComponent->RegisterComponent();
+    DecalComponent->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+    DecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
+
+    // Rotate decal to face ground.
+    DecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
+
+    // Setup decal material.
+    SelectionCircleMaterialInstance = UMaterialInstanceDynamic::Create(SelectionCircleMaterial, this);
+    DecalComponent->SetDecalMaterial(SelectionCircleMaterialInstance);
+
+    DecalComponent->SetHiddenInGame(true);
 }
 
 void URTSSelectableComponent::SelectActor()
