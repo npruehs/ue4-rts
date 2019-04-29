@@ -18,7 +18,6 @@ void URTSPlayerResourcesComponent::GetLifetimeReplicatedProps(TArray<FLifetimePr
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(URTSPlayerResourcesComponent, ResourceAmounts);
-    DOREPLIFETIME(URTSPlayerResourcesComponent, ResourceTypes);
 }
 
 void URTSPlayerResourcesComponent::BeginPlay()
