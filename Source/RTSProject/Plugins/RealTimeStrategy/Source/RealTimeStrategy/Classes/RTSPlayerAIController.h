@@ -54,7 +54,7 @@ public:
     bool StartProduction(TSubclassOf<APawn> PawnClass);
 
 protected:
-    virtual void Possess(APawn* InPawn) override;
+    virtual void OnPossess(APawn* InPawn) override;
 
 
 private:

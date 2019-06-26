@@ -281,9 +281,9 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
     return false;
 }
 
-void ARTSPlayerAIController::Possess(APawn* InPawn)
+void ARTSPlayerAIController::OnPossess(APawn* InPawn)
 {
-    Super::Possess(InPawn);
+    Super::OnPossess(InPawn);
 
     // Make AI use assigned blackboard.
     UBlackboardComponent* BlackboardComponent;

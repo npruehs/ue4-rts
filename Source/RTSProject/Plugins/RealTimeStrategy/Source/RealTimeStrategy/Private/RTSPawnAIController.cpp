@@ -11,9 +11,9 @@
 #include "Libraries/RTSGameplayTagLibrary.h"
 
 
-void ARTSPawnAIController::Possess(APawn* InPawn)
+void ARTSPawnAIController::OnPossess(APawn* InPawn)
 {
-    Super::Possess(InPawn);
+    Super::OnPossess(InPawn);
 
 	AttackComponent = InPawn->FindComponentByClass<URTSAttackComponent>();
 

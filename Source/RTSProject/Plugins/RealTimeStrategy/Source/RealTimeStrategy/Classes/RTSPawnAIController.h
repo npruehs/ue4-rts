@@ -72,7 +72,7 @@ public:
 
 
 protected:
-	virtual void Possess(APawn* InPawn) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 private:
     /** Behavior tree to use for driving the pawn AI. */
