@@ -10,7 +10,7 @@
 URTSOwnerComponent::URTSOwnerComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 }
 
 void URTSOwnerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -202,7 +202,7 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 ARTSPlayerAIController* ARTSGameMode::StartAIPlayer()
 {
     FActorSpawnParameters SpawnInfo;
-    SpawnInfo.Instigator = Instigator;
+    SpawnInfo.Instigator = GetInstigator();
     SpawnInfo.ObjectFlags |= RF_Transient;	// We never want to save player controllers into a map
     SpawnInfo.bDeferConstruction = true;
     ARTSPlayerAIController* NewAI = GetWorld()->SpawnActor<ARTSPlayerAIController>(PlayerAIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
@@ -270,7 +270,7 @@ void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
 
         if (Pawn)
         {
-            Pawn->bCanBeDamaged = !PlayerAdvantageComponent->IsGodModeEnabled();
+            Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
         }
     }
 

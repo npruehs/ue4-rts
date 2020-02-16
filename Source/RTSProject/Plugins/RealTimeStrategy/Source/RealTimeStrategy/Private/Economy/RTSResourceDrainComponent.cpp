@@ -10,7 +10,7 @@
 URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
-    SetIsReplicated(true);
+    SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
 	GathererCapacity = 1;

@@ -63,7 +63,7 @@ void URTSCheatManager::God()
             continue;
         }
 
-        Pawn->bCanBeDamaged = !PlayerAdvantageComponent->IsGodModeEnabled();
+        Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
     }
 }
 

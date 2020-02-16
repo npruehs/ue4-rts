@@ -19,7 +19,7 @@ URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectIni
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
 	ResourceSweepRadius = 1000.0f;

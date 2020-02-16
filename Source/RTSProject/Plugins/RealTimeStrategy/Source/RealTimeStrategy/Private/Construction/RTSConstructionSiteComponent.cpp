@@ -16,7 +16,7 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 
 	State = ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted;
 
