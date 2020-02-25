@@ -8,7 +8,7 @@
 URTSGameplayTagsComponent::URTSGameplayTagsComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
-    SetIsReplicated(true);
+    SetIsReplicatedByDefault(true);
 }
 
 void URTSGameplayTagsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

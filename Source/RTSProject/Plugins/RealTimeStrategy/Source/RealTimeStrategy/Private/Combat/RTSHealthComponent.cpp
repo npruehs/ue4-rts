@@ -11,7 +11,7 @@
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
 	CurrentHealth = 100.0f;

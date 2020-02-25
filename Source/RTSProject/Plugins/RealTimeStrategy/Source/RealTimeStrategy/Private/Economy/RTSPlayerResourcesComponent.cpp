@@ -10,7 +10,7 @@
 URTSPlayerResourcesComponent::URTSPlayerResourcesComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
-    SetIsReplicated(true);
+    SetIsReplicatedByDefault(true);
 }
 
 void URTSPlayerResourcesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

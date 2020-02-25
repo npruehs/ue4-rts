@@ -1652,7 +1652,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
     if (IsValid(PlayerPawnCamera))
     {
-        FVector CameraLocation = PlayerPawnCamera->RelativeLocation;
+        FVector CameraLocation = PlayerPawnCamera->GetRelativeLocation();
         CameraLocation.Z += CameraZoomSpeed * CameraZoomAxisValue * DeltaTime;
         CameraLocation.Z = FMath::Clamp(CameraLocation.Z, MinCameraDistance, MaxCameraDistance);
         PlayerPawnCamera->SetRelativeLocation(CameraLocation);
@@ -1699,5 +1699,5 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->bHidden; });
+	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
 }

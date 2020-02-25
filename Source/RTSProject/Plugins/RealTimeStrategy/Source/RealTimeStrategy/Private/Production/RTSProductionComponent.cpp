@@ -22,7 +22,7 @@ URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& Objec
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	SetIsReplicated(true);
+	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
 	CapacityPerQueue = 5;
