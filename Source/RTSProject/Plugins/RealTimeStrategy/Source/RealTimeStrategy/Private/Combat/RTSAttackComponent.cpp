@@ -126,3 +126,13 @@ float URTSAttackComponent::GetRemainingCooldown() const
 {
     return RemainingCooldown;
 }
+
+void URTSAttackComponent::SetTarget(AActor* Target)
+{
+	CurrentTarget = Target;
+}
+
+AActor* URTSAttackComponent::GetTarget() const
+{
+	return CurrentTarget;
+}

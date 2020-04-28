@@ -99,6 +99,12 @@ void ARTSPawnAIController::IssueAttackOrder(AActor* Target)
 		return;
 	}
 
+	// Attack order already issued for this target
+	if (Target == AttackComponent->GetTarget())
+	{
+		return;
+	}
+
 	// Update blackboard.
 	SetOrderType(ERTSOrderType::ORDER_Attack);
 	ClearBuildingClass();
@@ -274,6 +280,7 @@ void ARTSPawnAIController::ClearHomeLocation()
 void ARTSPawnAIController::ClearTargetActor()
 {
 	Blackboard->ClearValue(TEXT("TargetActor"));
+	AttackComponent->SetTarget(nullptr);
 }
 
 void ARTSPawnAIController::ClearTargetLocation()
@@ -299,6 +306,7 @@ void ARTSPawnAIController::SetOrderType(const ERTSOrderType OrderType)
 void ARTSPawnAIController::SetTargetActor(AActor* TargetActor)
 {
 	Blackboard->SetValueAsObject(TEXT("TargetActor"), TargetActor);
+	AttackComponent->SetTarget(TargetActor);
 }
 
 void ARTSPawnAIController::SetTargetLocation(const FVector& TargetLocation)

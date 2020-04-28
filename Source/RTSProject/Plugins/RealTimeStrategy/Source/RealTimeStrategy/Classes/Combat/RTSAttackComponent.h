@@ -47,6 +47,14 @@ public:
     UFUNCTION(BlueprintPure)
     float GetRemainingCooldown() const;
 
+    /** Set current target of issued attack order. */
+    UFUNCTION(BlueprintCallable)
+    void SetTarget(AActor* Target);
+
+    /** Get current target of issued attack order. Null if target is dead or attack order has been cancelled. */
+    UFUNCTION(BlueprintCallable)
+    AActor* GetTarget() const;
+
 
 	/** Event when the attack cooldown has expired. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -71,4 +79,7 @@ private:
 
     /** Time before the next attack can be used, in seconds. This is shared between attacks.*/
     float RemainingCooldown;
+
+    /** Current target of issued attack order by PawnAIController. */
+    AActor* CurrentTarget;
 };
