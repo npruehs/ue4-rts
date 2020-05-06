@@ -57,7 +57,7 @@ bool URTSGameplayLibrary::IsAIUnit(AActor* Actor)
         return false;
     }
 
-    return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->bIsABot;
+    return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->IsABot();
 }
 
 bool URTSGameplayLibrary::IsReadyToUse(AActor* Actor)
