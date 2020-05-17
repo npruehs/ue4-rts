@@ -41,6 +41,10 @@ Make sure View Plugin Content is enabled in your view options.
 
 At Edit > Project Settings > Engine > Input ...
 
+### Gameplay Tags
+
+At Edit > Project Settings > Project > Gameplay Tags, add DT_RTSGameplayTags to the Gameplay Tag Table List.
+
 #### Selection
 
 1. Bind the action Select (e.g. to left mouse button).
