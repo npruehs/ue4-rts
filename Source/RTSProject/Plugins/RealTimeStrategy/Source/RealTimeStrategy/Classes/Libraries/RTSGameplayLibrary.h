@@ -44,4 +44,7 @@ public:
 
     /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
     static bool GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement);
+
+private:
+    static bool IsOwnerABot(class URTSOwnerComponent* OwnerComponent);
 };

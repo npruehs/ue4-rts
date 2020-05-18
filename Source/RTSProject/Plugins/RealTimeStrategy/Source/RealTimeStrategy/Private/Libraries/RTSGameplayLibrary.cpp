@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
+#include "Runtime/Launch/Resources/Version.h"
 
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
@@ -57,7 +58,8 @@ bool URTSGameplayLibrary::IsAIUnit(AActor* Actor)
         return false;
     }
 
-    return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->IsABot();
+    return IsOwnerABot(OwnerComponent);
+
 }
 
 bool URTSGameplayLibrary::IsReadyToUse(AActor* Actor)
@@ -123,4 +125,13 @@ bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, 
 
     OutMissingRequirement = RequiredActors[0];
     return true;
+}
+
+bool URTSGameplayLibrary::IsOwnerABot(URTSOwnerComponent* OwnerComponent)
+{
+	#if ENGINE_MINOR_VERSION < 25
+		return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->bIsABot;
+	#else
+		return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->IsABot();
+	#endif
 }
