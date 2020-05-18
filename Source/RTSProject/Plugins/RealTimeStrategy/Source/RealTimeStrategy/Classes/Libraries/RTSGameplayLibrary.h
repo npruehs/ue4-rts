@@ -46,5 +46,6 @@ public:
     static bool GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement);
 
 private:
+	/** Helper function - check if owner is a bot */
     static bool IsOwnerABot(class URTSOwnerComponent* OwnerComponent);
 };
