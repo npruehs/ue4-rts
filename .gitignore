@@ -67,3 +67,5 @@ Source/RTSProject/Plugins/RealTimeStrategy/Intermediate/
 Source/RTSProject/Saved/
 Source/RTSProject/Plugins/RealTimeStrategyTests/Binaries/
 Source/RTSProject/Plugins/RealTimeStrategyTests/Intermediate/
+Source/RTSProject/Plugins/DaedalicTestAutomationPlugin/Binaries/
+Source/RTSProject/Plugins/DaedalicTestAutomationPlugin/Intermediate/
