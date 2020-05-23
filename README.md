@@ -65,14 +65,14 @@ Make sure View Plugin Content is enabled in your view options.
 
 1. Add RTSPlayerStarts to the map.
 1. Set the Team Index for each player start.
-1. Add RTSCameraBoundsVolume to the map.
-1. Add a NavMeshBoundsVolume to the map, and build Navigation. You may press P to review your results in the viewport.
+1. Add RTSCameraBoundsVolume to the map, and make sure it extends to the edge of your map.
+1. Add a NavMeshBoundsVolume to the map, and make sure it extends to the edge of your map. Build Navigation. You may press P to review your results in the viewport.
 
 ### Setting Up The Camera
 
 #### Creating The Camera
 
-1. Create a RTSPlayerPawn blueprint.
+1. Create a new Pawn blueprint called RTSPlayerPawn.
 1. Add a Camera component.
 1. Set the Location of the Camera component as desired (e.g. X = 0, Y = 0, Z = 1500).
 1. Set the Rotation of the Camera component as desired (e.g. X = 0, Y = 285, Z = 0).
