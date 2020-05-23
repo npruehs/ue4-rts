@@ -1,6 +1,5 @@
 #include "RTSGameMode.h"
 
-#include "CString.h"
 #include "EngineUtils.h"
 #include "Engine/World.h"
 #include "GameFramework/Controller.h"
