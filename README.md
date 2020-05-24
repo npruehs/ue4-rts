@@ -2,7 +2,7 @@
 
 # Real-Time Strategy Plugin for Unreal Engine 4
 
-Open-Source Real-Time Strategy Plugin for Unreal Engine 4 developed by the original creators of [Hostile Worlds](http://www.indiedb.com/games/hostile-worlds/) for Unreal Engine 3.
+Open source Real-Time Strategy Plugin for Unreal Engine 4 developed by the original creators of [Hostile Worlds](http://www.indiedb.com/games/hostile-worlds/) for Unreal Engine 3.
 
 We really love the spirit of Unreal 4 moving to open-source, and we'd love to give something back.
 
@@ -31,19 +31,40 @@ All of this is already completely working in multiplayer as well, and has been f
 
 We're going to add all of this to the Unreal Marketplace for free as well soon (tm).
 
-For a quick look, just open RTSSampleGame/Maps/RTSGameSampleMap.umap in the editor and hit Play. We recommend taking a closer look at that map as reference for your own ones as well.
+For a quick look, just open `Source/RTSProject/RTSProject.uproject`,  load `Maps/SKM-DarkSpace.umap` in the editor and hit Play. We recommend taking a closer look at that map as reference for your own ones as well.
 
-## Adding The Plugin
 
-Note that the plugin currently requires a C++ Unreal project, which in turn requires a working compiler.
+## Setup
 
-1. Clone the repository.
-1. Close the Unreal Editor.
-1. Copy the RTSPlugin folder to Plugins folder next to your .uproject file.
+### Prerequisites
+
+Real-Time Strategy Plugin for Unreal Engine 4 currently supports the following Unreal Engine Versions:
+
+* 4.23
+* 4.24
+* 4.25
+
+### Adding The Plugin (Blueprint Project)
+
+1. Close your Unreal Editor.
+1. [Download](https://github.com/npruehs/ue4-rts/releases) the latest release.
+1. Copy the `RealTimeStrategy` folder to `Plugins` folder next to your `.uproject` file (create if necessary).
+1. Start the Unreal Editor.
+
+### Adding The Plugin (C++ Project)
+
+1. Close your Unreal Editor.
+1. [Clone](https://github.com/npruehs/ue4-rts) the repository or [download](https://github.com/npruehs/ue4-rts/releases) a release.
+1. Copy the `RealTimeStrategy` folder to `Plugins` folder next to your `.uproject` file (create if necessary).
 1. Right-click your .uproject file and select Re-generate Visual Studio project files.
 1. Build the resulting solution in Visual Studio.
 1. Start the Unreal Editor.
-1. Enable the plugin in Edit > Plugins > RTS.
+
+
+## Getting Started
+
+Take a look at the [official manual](Documents/Manual/Manual.md) to get started right away!
+
 
 ## Bugs & Feature Requests
 
@@ -56,34 +77,25 @@ We are sorry that you've experienced issues or are missing a feature! After veri
 After being able to reproduce the issue, we'll look into fixing it immediately.
 
 
+## Development Cycle
+
+We know that using this plugin in production requires you to be completely sure about stability and compatibility. Thus, new releases are created using [Semantic Versioning](http://semver.org/). In short:
+
+* Version numbers are specified as MAJOR.MINOR.PATCH.
+* MAJOR version increases indicate incompatible API changes.
+* MINOR version increases indicate added functionality in a backwards compatible manner.
+* PATCH version increases indicate backwards compatible bug fixes.
+
+You'll always find all available releases and their respective release notes at:
+
+https://github.com/npruehs/ue4-rts/releases
+
+
 ## Contributing
 
-You'd like to help make this plugin even more awesome? Seems like today's our lucky day! In order to maintain stability of the tool and its code base, please adhere to the following steps, and we'll be pleased to include your additions in our next release.
-
-Note that this plugin is distributed under the [MIT License](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE). So will be your code.
-
-### Step 1: Choose what to do
-
-If you've got no idea how to help, head over to our [issue tracker](https://github.com/npruehs/ue4-rts/issues) and see what you'd like to do most. You can basically pick anything you want to, as long as it's not already assigned to anyone.
-
-If you know exactly what you're missing, [open a new issue](https://github.com/npruehs/ue4-rts/issues/new) to begin a short discussion about your idea and how it fits the project. If we all agree, you're good to go!
-
-### Step 2: Fork the project and check out the code
-
-Real-Time Strategy Plugin for Unreal Engine 4 is developed using the [GitFlow branching model](http://nvie.com/posts/a-successful-git-branching-model/). In order to contribute, you should check out the latest develop branch, and create a new feature or hotfix branch to be merged back.
-
-### Step 3: Implement your feature or bugfix
-
-Real-Time Strategy Plugin for Unreal Engine 4 is based on [Unreal Engine 4.16.1](https://www.unrealengine.com/).
-
-### Step 4: Open a pull request
-
-Finally, [open a pull request](https://help.github.com/articles/creating-a-pull-request/) so we can review your changes together, and finally integrate it into the next release.
+You want to contribute to  Real-Time Strategy Plugin for Unreal Engine 4? Great! Take a look at [Contributing](CONTRIBUTING.md) to get started right away!
 
 
 ## License
 
-Real-Time Strategy Plugin for Unreal Engine 4 is dual-licensed:
-
-* everything beneath Source\RTS\Content\StarterContent is governed by the [Unreal® Engine End User License Agreement](https://www.unrealengine.com/eula) 
-* everything else is released under the [MIT License](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE)
+Real-Time Strategy Plugin for Unreal Engine 4 is released under the [MIT License](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE).
