@@ -52,6 +52,6 @@ private:
     float MaximumHealth;
 
     /** Current health of the actor. */
-    UPROPERTY(replicated)
+    UPROPERTY(Replicated)
     float CurrentHealth;
 };

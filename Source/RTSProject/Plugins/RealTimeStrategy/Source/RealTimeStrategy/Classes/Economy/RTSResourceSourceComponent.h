@@ -93,6 +93,6 @@ private:
     int32 GathererCapacity;
 
     /** Current resources available at the actor. */
-    UPROPERTY(replicated)
+    UPROPERTY(Replicated)
     float CurrentResources;
 };

@@ -100,11 +100,11 @@ private:
     float ResourceSweepRadius;
 
     /** Amount of resources the actor is carrying. */
-    UPROPERTY(replicated)
+    UPROPERTY(Replicated)
     float CarriedResourceAmount;
 
     /** Type of resource the actor is carrying. */
-    UPROPERTY(replicated)
+    UPROPERTY(Replicated)
     TSubclassOf<class URTSResourceType> CarriedResourceType;
 
     /** Resource source the actor is currently gathering from .*/

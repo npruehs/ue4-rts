@@ -61,6 +61,6 @@ private:
     uint8 InitialOwnerPlayerIndex;
 
 	/** Player owning this actor. */
-	UPROPERTY(replicated)
+	UPROPERTY(Replicated)
 	ARTSPlayerState* PlayerOwner;
 };

@@ -42,7 +42,7 @@ public:
 
 private:
     /** Index of this team. */
-    UPROPERTY(replicated)
+    UPROPERTY(Replicated)
     uint8 TeamIndex;
 
 	/** Players on this team. */
