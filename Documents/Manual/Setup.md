@@ -34,9 +34,9 @@ Make sure _View Plugin Content_ is enabled in your view options.
 1. Bind the axis `MoveCameraLeftRight` (e.g. to Left and Right keys).
 1. Bind the axis `MoveCameraUpDown` (e.g. to Up and Down keys).
 1. Bind the axis `ZoomCamera` (e.g. to the mouse wheel axis).
-1. At your `RTSPlayerController`, set the _CameraSpeed_ (e.g. to 1000).
-1. At your `RTSPlayerController`, set the _CameraScrollThreshold_ (e.g. to 20).
-1. At your `RTSPlayerController`, set _CameraZoomSpeed_, _MinCameraDistance_ and _MaxCameraDistance_ as desired.
+1. At your `RTSPlayerController`, set the _Camera Speed_ (e.g. to 1000).
+1. At your `RTSPlayerController`, set the _Camera Scroll Threshold_ (e.g. to 20).
+1. At your `RTSPlayerController`, set _Camera Zoom Speed_, _Min Camera Distance_ and _Max Camera Distance_ as desired.
 
 
 ### Input Setup

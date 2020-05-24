@@ -29,7 +29,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void LoadActor(AActor* Actor);
 
-	/** Remvoes the specified actor from this container. */
+	/** Removes the specified actor from this container. */
 	UFUNCTION(BlueprintCallable)
 	virtual void UnloadActor(AActor* Actor);
 

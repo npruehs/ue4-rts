@@ -128,7 +128,7 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "RTS")
     FRTSConstructionSiteComponentConstructionProgressChangedSignature OnConstructionProgressChanged;
 
-	/** Event when the construction timer has been expired. */
+	/** Event when the construction timer has expired. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionFinishedSignature OnConstructionFinished;
 
