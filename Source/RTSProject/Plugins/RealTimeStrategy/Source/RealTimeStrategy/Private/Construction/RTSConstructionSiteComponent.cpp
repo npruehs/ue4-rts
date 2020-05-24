@@ -96,7 +96,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
         (DeltaTime * ProgressMadeAutomatically * SpeedBoostFactor) +
         (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num() * SpeedBoostFactor);
 
-    UE_LOG(LogRTS, Log, TEXT("DeltaTime: %f, ProgressMadeAutomatically: %f, ProgressMadePerBuilder: %f, SpeedBoostFactor: %f, AssignedBuilders: %i,"), DeltaTime, ProgressMadeAutomatically, ProgressMadePerBuilder,
+    UE_LOG(LogRTS, Verbose, TEXT("DeltaTime: %f, ProgressMadeAutomatically: %f, ProgressMadePerBuilder: %f, SpeedBoostFactor: %f, AssignedBuilders: %i,"), DeltaTime, ProgressMadeAutomatically, ProgressMadePerBuilder,
         SpeedBoostFactor, AssignedBuilders.Num());
 
 	// Check construction costs.

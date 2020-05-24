@@ -95,7 +95,7 @@ float URTSPlayerResourcesComponent::AddResources(TSubclassOf<URTSResourceType> R
     float NewResourceAmount = OldResourceAmount + ResourceAmount;
     ResourceAmounts[ResourceIndex] = NewResourceAmount;
 
-    UE_LOG(LogRTS, Log, TEXT("Player %s stock of %s has changed to %f."),
+    UE_LOG(LogRTS, Verbose, TEXT("Player %s stock of %s has changed to %f."),
         *GetOwner()->GetName(),
         *ResourceType->GetName(),
         NewResourceAmount);
