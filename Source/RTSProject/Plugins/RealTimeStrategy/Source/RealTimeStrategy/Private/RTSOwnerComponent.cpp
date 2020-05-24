@@ -11,6 +11,8 @@ URTSOwnerComponent::URTSOwnerComponent(const FObjectInitializer& ObjectInitializ
     : Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
+
+    InitialOwnerPlayerIndex = ARTSPlayerState::PLAYER_INDEX_NONE;
 }
 
 void URTSOwnerComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -78,4 +80,9 @@ bool URTSOwnerComponent::IsSameTeamAsController(AController* C) const
 	ARTSPlayerState* OtherPlayer = Cast<ARTSPlayerState>(C->PlayerState);
 
 	return MyOwner && MyOwner->IsSameTeamAs(OtherPlayer);
+}
+
+uint8 URTSOwnerComponent::GetInitialOwnerPlayerIndex()
+{
+    return InitialOwnerPlayerIndex;
 }

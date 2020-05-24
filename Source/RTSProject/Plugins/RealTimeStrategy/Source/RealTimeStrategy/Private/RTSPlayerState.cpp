@@ -7,16 +7,36 @@
 #include "RTSTeamInfo.h"
 
 
+const uint8 ARTSPlayerState::PLAYER_INDEX_NONE = 255;
+
+
+ARTSPlayerState::ARTSPlayerState(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
+{
+    PlayerIndex = PLAYER_INDEX_NONE;
+}
+
 void ARTSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+    DOREPLIFETIME(ARTSPlayerState, PlayerIndex);
     DOREPLIFETIME(ARTSPlayerState, Team);
+}
+
+uint8 ARTSPlayerState::GetPlayerIndex() const
+{
+    return PlayerIndex;
 }
 
 ARTSTeamInfo* ARTSPlayerState::GetTeam() const
 {
     return Team;
+}
+
+void ARTSPlayerState::SetPlayerIndex(uint8 InPlayerIndex)
+{
+    PlayerIndex = InPlayerIndex;
 }
 
 void ARTSPlayerState::SetTeam(ARTSTeamInfo* InTeam)

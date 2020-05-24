@@ -14,6 +14,7 @@
 #include "RTSPlayerAdvantageComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerStart.h"
+#include "RTSPlayerState.h"
 #include "RTSTeamInfo.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Vision/RTSVisionInfo.h"
@@ -196,6 +197,28 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
             }
         }
 	}
+
+    // Transfer ownership of pre-placed units.
+    ARTSPlayerState* PlayerState = Cast<ARTSPlayerState>(NewPlayer->PlayerState);
+
+    if (IsValid(PlayerState))
+    {
+        uint8 PlayerIndex = GetAvailablePlayerIndex();
+        PlayerState->SetPlayerIndex(PlayerIndex);
+
+        for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+        {
+            AActor* Actor = *ActorItr;
+
+            // Check owner.
+            URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+            if (IsValid(OwnerComponent) && OwnerComponent->GetInitialOwnerPlayerIndex() == PlayerIndex)
+            {
+                TransferOwnership(Actor, NewPlayer);
+            }
+        }
+    }
 }
 
 ARTSPlayerAIController* ARTSGameMode::StartAIPlayer()
@@ -319,4 +342,36 @@ void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 void ARTSGameMode::NotifyOnPlayerDefeated(AController* Player)
 {
 	ReceiveOnPlayerDefeated(Player);
+}
+
+uint8 ARTSGameMode::GetAvailablePlayerIndex()
+{
+    UWorld* World = GetWorld();
+
+    if (!IsValid(World))
+    {
+        return ARTSPlayerState::PLAYER_INDEX_NONE;
+    }
+
+    uint8 PlayerIndex = 0;
+    bool bPlayerIndexInUse = false;
+
+    do
+    {
+        bPlayerIndexInUse = false;
+
+        for (TActorIterator<ARTSPlayerState> PlayerIt(World); PlayerIt; ++PlayerIt)
+        {
+            ARTSPlayerState* PlayerState = *PlayerIt;
+
+            if (PlayerState->GetPlayerIndex() == PlayerIndex)
+            {
+                bPlayerIndexInUse = true;
+                ++PlayerIndex;
+                break;
+            }
+        }
+    } while (bPlayerIndexInUse && PlayerIndex < ARTSPlayerState::PLAYER_INDEX_NONE);
+
+    return PlayerIndex;
 }

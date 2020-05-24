@@ -86,4 +86,7 @@ private:
     /** Teams of the current match. */
     UPROPERTY()
     TArray<ARTSTeamInfo*> Teams;
+
+    /** Gets the first player index that isn't assigned to any player. */
+    uint8 GetAvailablePlayerIndex();
 };

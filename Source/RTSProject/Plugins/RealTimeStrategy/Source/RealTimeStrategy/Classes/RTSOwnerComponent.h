@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSameTeamAsController(AController* C) const;
 
+    /** Gets the index of the player that should initially own the actor. */
+    uint8 GetInitialOwnerPlayerIndex();
+
 
 	/** Event when the actor is owned by a different player. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -53,6 +56,10 @@ public:
 
 
 private:
+    /** Index of the player that should initially own the actor. */
+    UPROPERTY(EditInstanceOnly, Category = "RTS")
+    uint8 InitialOwnerPlayerIndex;
+
 	/** Player owning this actor. */
 	UPROPERTY(replicated)
 	ARTSPlayerState* PlayerOwner;
