@@ -182,7 +182,7 @@ private:
     bool bStartImmediately;
 
 	/** Whether the construction timer is currently being ticked, or not. */
-    UPROPERTY(replicated)
+    UPROPERTY(EditInstanceOnly, Replicated, Category = "RTS")
 	ERTSConstructionState State;
 
     /** Time before the actor is constructed, in seconds. */
