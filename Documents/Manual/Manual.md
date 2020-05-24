@@ -9,3 +9,4 @@
 1. [Buildings](Buildings.md)
 1. [Resources](Resources.md)
 1. [User Interface](UserInterface.md)
+1. [Scripting](Scripting.md)
