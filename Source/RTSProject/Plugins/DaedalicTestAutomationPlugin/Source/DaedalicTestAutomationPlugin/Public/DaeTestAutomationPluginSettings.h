@@ -20,7 +20,9 @@ public:
 
     UDaeTestAutomationPluginSettings();
 
+#if WITH_EDITOR
     virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
     /** Event when the path to look for test maps in has changed. */
     FDaeTestAutomationPluginSettingsTestMapPathChangedSignature OnTestMapPathChanged;

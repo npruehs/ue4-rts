@@ -5,6 +5,7 @@ UDaeTestAutomationPluginSettings::UDaeTestAutomationPluginSettings()
 {
 }
 
+#if WITH_EDITOR
 void UDaeTestAutomationPluginSettings::PostEditChangeProperty(
     struct FPropertyChangedEvent& PropertyChangedEvent)
 {
@@ -13,3 +14,4 @@ void UDaeTestAutomationPluginSettings::PostEditChangeProperty(
         OnTestMapPathChanged.Broadcast(TestMapPath);
     }
 }
+#endif
