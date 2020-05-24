@@ -12,6 +12,7 @@
 1. Add an RTSPortraitComponent and set its portrait if you want to show it in any kind of ingame UI.
 1. Add an RTSSelectableComponent, and set its selection circle material (e.g. to M_RTSSelectionCircle) and selection sound.
 1. Add an RTSOwnerComponent.
+1. Add your RTSHoveredActorWidgetComponent (see [User Interface](UserInterface.md)).
 
 ### Movement
 
@@ -33,7 +34,7 @@
 1. Add an RTSAttackableComponent and RTSGameplayTagsComponent to any actors that can be attacked.
 1. Add the Status.Permanent.CanBeAttacked tag to the RTSGameplayTagsComponent.
 1. Set the Maximum Health of the RTSHealthComponent.
-1. Add your RTSHealthBarWidgetComponent.
+1. Add your RTSHealthBarWidgetComponent (see [User Interface](UserInterface.md)).
 
 1. Add the RTSAttackComponent to any actors than can attack.
 1. Add an attack to the RTSAttackComponent of these actors, setting its Cooldown, Damage, Range, Acquisition Radius and Chase Radius.

@@ -123,22 +123,5 @@ _See the Health Bars section for an example.
 ### Minimap
 
 1. Add the WBP_RTSMinimapWidget to your UI, with a size matching your minimap volume images (e.g. 256 x 256).
-
-
-
-### Hovered Actors
-
-2. Create a widget for drawing name plates (or whatever other information you'd like to display for hovered actors).
-
-![Hovered Actor Widget](Images/HoveredActorWidget.png)
-
-_You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
-
-3. Create a component deriving from RTSHoveredActorWidgetComponent, and set its Widget Class to your new widget widget.
-4. Forward the Update Data event to your widget.
-
-![Component - Update Data](Images/UpdateHoveredActorData.png)
-
-5. Forward the Update Position And Size event to your widget.
-
-![Component - Update Widget Position And Size](Images/UpdateHoveredActorPositionAndSize.png)
+1. Set the Draw Background, Draw Units With Team Colors, Draw Vision and Draw View Frustum flags as desired.
+1. If you checked Draw Units With Team Colors, set the OwnUnitsBrush, EnemyUnitsBrush and NeutralUnitsBrush as desired.

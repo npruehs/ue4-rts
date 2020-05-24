@@ -35,3 +35,9 @@
 1. Add an RTSFogOfWarActor to your map.
 1. Set the Fog Of War Volume reference to the post process volume created before.
 1. Set the Fog Of War Material of the actor (e.g. to the M_RTSFogOfWar material shipped with the plugin).
+
+### Pre-Placed Units
+
+1. Add any actors that should initially on the battlefield.
+1. For each of these actors, at the RTSOwnerComponent, set the Initial Owner Player Index to specify which player should own them.
+1. When pre-placing buildings, at the RTSConstructionSiteComponent, set their State to Finished if they should be ready from the beginning.
