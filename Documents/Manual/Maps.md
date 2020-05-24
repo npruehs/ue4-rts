@@ -10,7 +10,7 @@
 1. Add an `RTSCameraBoundsVolume` to the map.
 1. Use the _Brush Settings_ to adjust the camera bounds as desired.
 
-## Navigation
+### Navigation
 
 1. Add a `NavMeshBoundsVolume` to the map.
 1. Use the _Brush Settings_ to adjust have the nav mesh bounds encompass your whole level.

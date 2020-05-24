@@ -1,6 +1,6 @@
 ## Creating The User Interface
 
-#### Selection Frames
+### Selection Frames
 
 In your HUD, implement the `DrawSelectionFrame` and `HideSelectionFrame` events as desired.
 

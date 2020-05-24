@@ -14,13 +14,16 @@
 1. Add an `RTSOwnerComponent`.
 1. Add your `RTSHoveredActorWidgetComponent` (see [User Interface](UserInterface.md)).
 
+
 ### Movement
 
 1. Add a movement component (e.g. `FloatingPawnMovement` or `CharacterMovement`) and set up its speed properties as usual.
 
+
 ### Vision
 
 1. Add the `RTSVision` component to your units and set their _Sight Radius_ (e.g. 1000).
+
 
 ### Combat
 
@@ -50,6 +53,7 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. At the `ProjectileMovement` component, set its _Initial Speed_ (e.g. to 1000).
 1. At the `RTSAttackComponent`, reference the new projectile in your attack.
 
+
 ### Production
 
 1. Add the `RTSProductionCostComponent` to everything you want to be produced.
@@ -58,11 +62,13 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. Set the _Production Cost Type_ to to _Pay Immediately_ if all costs should be paid in full when starting production, or to _Pay Over Time_ for continuously paying costs (similar to Command & Conquer).
 1. Set the _Refund Factor_ to the factor to multiply refunded resources with after cancelation.
 
+
 ### Construction
 
 1. Add an `RTSBuilderComponent` to any actors you want to be able to construct buildings.
 1. Set the _Constructible Building Classes_ for these builders.
 1. Check _Enter Construction Site_ if you want the builder to be unavailable while building (similar to Orcs in WarCraft).
+
 
 ### Gathering
 
