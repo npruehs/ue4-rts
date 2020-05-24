@@ -2,7 +2,8 @@
 
 ### Appearance
 
-1. Create a new `RTSPawn` or `RTSCharacter` blueprint.
+1. Create a new pawn or character blueprint.
+1. Check the Replicates flag.
 1. Add a static or skeletal mesh and setup its location, rotation and scale as usual.
 1. Setup collision (e.g. Capsule Collision) as usual.
 1. You may want to disable the collision of your mesh and rely on its capsule instead.

@@ -25,45 +25,18 @@ void URTSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(URTSHealthComponent, CurrentHealth);
 }
 
-float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void URTSHealthComponent::BeginPlay()
 {
-	float OldHealth = CurrentHealth;
-	CurrentHealth -= Damage;
-	float NewHealth = CurrentHealth;
+    Super::BeginPlay();
 
-	UE_LOG(LogRTS, Log, TEXT("Actor %s has taken %f damage from %s, reducing health to %f."),
-		*GetOwner()->GetName(),
-		Damage,
-		*DamageCauser->GetName(),
-		CurrentHealth);
+    AActor* Owner = GetOwner();
 
-	// Notify listeners.
-	OnHealthChanged.Broadcast(GetOwner(), OldHealth, NewHealth, DamageCauser);
+    if (!IsValid(Owner))
+    {
+        return;
+    }
 
-	// Check if we've just died.
-	if (CurrentHealth <= 0)
-	{
-		UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *GetOwner()->GetName());
-
-		// Get owner before destruction.
-		AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());
-
-        // Notify listeners.
-        OnKilled.Broadcast(GetOwner(), OwningPlayer, DamageCauser);
-
-		// Destroy this actor.
-		GetOwner()->Destroy();
-
-		// Notify game mode.
-		ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-
-		if (GameMode != nullptr)
-		{
-			GameMode->NotifyOnActorKilled(GetOwner(), OwningPlayer);
-		}
-	}
-
-	return Damage;
+    Owner->OnTakeAnyDamage.AddDynamic(this, &URTSHealthComponent::OnTakeAnyDamage);
 }
 
 float URTSHealthComponent::GetMaximumHealth() const
@@ -74,4 +47,43 @@ float URTSHealthComponent::GetMaximumHealth() const
 float URTSHealthComponent::GetCurrentHealth() const
 {
     return CurrentHealth;
+}
+
+void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+    float OldHealth = CurrentHealth;
+    CurrentHealth -= Damage;
+    float NewHealth = CurrentHealth;
+
+    UE_LOG(LogRTS, Log, TEXT("Actor %s has taken %f damage from %s, reducing health to %f."),
+        *GetOwner()->GetName(),
+        Damage,
+        *DamageCauser->GetName(),
+        CurrentHealth);
+
+    // Notify listeners.
+    OnHealthChanged.Broadcast(GetOwner(), OldHealth, NewHealth, DamageCauser);
+
+    // Check if we've just died.
+    if (CurrentHealth <= 0)
+    {
+        UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *GetOwner()->GetName());
+
+        // Get owner before destruction.
+        AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());
+
+        // Notify listeners.
+        OnKilled.Broadcast(GetOwner(), OwningPlayer, DamageCauser);
+
+        // Destroy this actor.
+        GetOwner()->Destroy();
+
+        // Notify game mode.
+        ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+        if (GameMode != nullptr)
+        {
+            GameMode->NotifyOnActorKilled(GetOwner(), OwningPlayer);
+        }
+    }
 }

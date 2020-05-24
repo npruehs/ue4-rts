@@ -24,9 +24,7 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-
-	/** Apply damage to this actor. */
-	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+    virtual void BeginPlay() override;
 
 
     /** Gets the maximum health of the actor. */
@@ -54,4 +52,7 @@ private:
     /** Current health of the actor. */
     UPROPERTY(Replicated)
     float CurrentHealth;
+
+    UFUNCTION()
+    void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };
