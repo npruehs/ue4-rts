@@ -20,6 +20,9 @@ class REALTIMESTRATEGY_API ARTSVisionVolume : public AVolume
 public:
     ARTSVisionVolume(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+    /** Prepares this actor for gameplay. */
+    void Initialize();
+
     /** Gets the width and height of the vision grid imposed on the world. */
     int32 GetSizeInTiles() const;
 
@@ -33,9 +36,6 @@ public:
     ERTSVisionState GetMinimumVisionState() const;
 
 	FIntVector WorldToTile(const FVector& WorldPosition) const;
-
-protected:
-	virtual void BeginPlay() override;
 
 private:
     /** Width and height of the vision grid imposed on the world. */

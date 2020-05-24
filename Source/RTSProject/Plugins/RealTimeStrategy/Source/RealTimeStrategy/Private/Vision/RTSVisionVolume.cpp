@@ -12,6 +12,20 @@ ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer /
 	SizeInTiles = 256;
 }
 
+void ARTSVisionVolume::Initialize()
+{
+    // Get vision world size.
+    UBrushComponent* VisionBrushComponent = GetBrushComponent();
+    FBoxSphereBounds VisionBounds = VisionBrushComponent->CalcBounds(VisionBrushComponent->GetComponentTransform());
+
+    SizeInWorld = VisionBounds.BoxExtent * 2;
+
+    // Calculate tile size.
+    TileSize = SizeInWorld.X / SizeInTiles;
+
+    UE_LOG(LogRTS, Log, TEXT("%s has %i tiles of world size %f."), *GetName(), SizeInTiles, TileSize);
+}
+
 int32 ARTSVisionVolume::GetSizeInTiles() const
 {
     return SizeInTiles;
@@ -43,18 +57,4 @@ FIntVector ARTSVisionVolume::WorldToTile(const FVector& WorldPosition) const
 	int32 TileY = FMath::FloorToInt(RelativeWorldY * SizeInTiles);
 
 	return FIntVector(TileX, TileY, 0);
-}
-
-void ARTSVisionVolume::BeginPlay()
-{
-    Super::BeginPlay();
-
-	// Get vision world size.
-	UBrushComponent* VisionBrushComponent = GetBrushComponent();
-	FBoxSphereBounds VisionBounds = VisionBrushComponent->CalcBounds(VisionBrushComponent->GetComponentTransform());
-
-	SizeInWorld = VisionBounds.BoxExtent * 2;
-
-	// Calculate tile size.
-    TileSize = SizeInWorld.X / SizeInTiles;
 }

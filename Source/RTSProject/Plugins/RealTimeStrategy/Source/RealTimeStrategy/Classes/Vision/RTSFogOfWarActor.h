@@ -26,7 +26,9 @@ class REALTIMESTRATEGY_API ARTSFogOfWarActor : public AActor
 public:
 	ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void BeginPlay() override;
+    /** Prepares this actor for gameplay. */
+    void Initialize(ARTSVisionVolume* InVisionVolume);
+
 	void Tick(float DeltaTime) override;
 
     /** Gets the texture containing visibility information. */

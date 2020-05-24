@@ -33,6 +33,27 @@ void ARTSVisionInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
     DOREPLIFETIME_CONDITION(ARTSVisionInfo, TeamIndex, COND_InitialOnly);
 }
 
+void ARTSVisionInfo::Initialize(ARTSVisionVolume* InVisionVolume)
+{
+    VisionVolume = InVisionVolume;
+
+    if (!VisionVolume)
+    {
+        UE_LOG(LogRTS, Warning, TEXT("No vision volume found, won't update vision."));
+        return;
+    }
+
+    int32 SizeInTiles = VisionVolume->GetSizeInTiles();
+    Tiles.SetNumZeroed(SizeInTiles * SizeInTiles);
+
+    for (int32 Index = 0; Index < Tiles.Num(); ++Index)
+    {
+        Tiles[Index] = VisionVolume->GetMinimumVisionState();
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Set up %s with %s."), *GetName(), *VisionVolume->GetName());
+}
+
 void ARTSVisionInfo::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -157,31 +178,6 @@ ARTSVisionInfo* ARTSVisionInfo::GetVisionInfoForTeam(UObject* WorldContextObject
 	}
 
 	return nullptr;
-}
-
-void ARTSVisionInfo::BeginPlay()
-{
-    Super::BeginPlay();
-
-	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
-	{
-		VisionVolume = *It;
-		break;
-	}
-
-	if (!VisionVolume)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("No vision volume found, won't update vision."));
-		return;
-	}
-
-	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
-	Tiles.SetNumZeroed(SizeInTiles * SizeInTiles);
-
-    for (int32 Index = 0; Index < Tiles.Num(); ++Index)
-    {
-        Tiles[Index] = VisionVolume->GetMinimumVisionState();
-    }
 }
 
 bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const

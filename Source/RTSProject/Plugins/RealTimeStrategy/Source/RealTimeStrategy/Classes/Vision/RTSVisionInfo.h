@@ -27,6 +27,9 @@ public:
 
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+    /** Prepares this actor for gameplay. */
+    void Initialize(ARTSVisionVolume* InVisionVolume);
+
 	virtual void Tick(float DeltaSeconds) override;
 
     /** Gets the index of the team this actor keeps track of the vision for. */
@@ -41,9 +44,6 @@ public:
 	/** Gets vision information for the specified team. */
 	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"))
 	static ARTSVisionInfo* GetVisionInfoForTeam(UObject* WorldContextObject, uint8 InTeamIndex);
-
-protected:
-	virtual void BeginPlay() override;
 
 private:
     /** Index of the team this actor keeps track of the vision for. */

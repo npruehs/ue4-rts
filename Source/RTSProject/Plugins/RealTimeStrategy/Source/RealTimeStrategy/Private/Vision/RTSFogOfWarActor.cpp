@@ -18,56 +18,52 @@ ARTSFogOfWarActor::ARTSFogOfWarActor(const FObjectInitializer& ObjectInitializer
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ARTSFogOfWarActor::BeginPlay()
+void ARTSFogOfWarActor::Initialize(ARTSVisionVolume* InVisionVolume)
 {
-	Super::BeginPlay();
+    // Get vision size.
+    VisionVolume = InVisionVolume;
 
-	// Get vision size.
-	for (TActorIterator<ARTSVisionVolume> It(GetWorld()); It; ++It)
-	{
-		VisionVolume = *It;
-		break;
-	}
+    if (!VisionVolume)
+    {
+        UE_LOG(LogRTS, Warning, TEXT("No vision volume found, won't update fog of war."));
+        return;
+    }
 
-	if (!VisionVolume)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("No vision volume found, won't update vision."));
-		return;
-	}
+    if (!FogOfWarVolume)
+    {
+        UE_LOG(LogRTS, Warning, TEXT("No fog of war volume found, won't render fog of war."));
+        return;
+    }
 
-	if (!FogOfWarVolume)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("No fog of war volume found, won't render vision."));
-		return;
-	}
+    // Setup fog of war buffer.
+    int32 SizeInTiles = VisionVolume->GetSizeInTiles();
+    FVector SizeInWorld = VisionVolume->GetSizeInWorld();
 
-	// Setup fog of war buffer.
-	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
-	FVector SizeInWorld = VisionVolume->GetSizeInWorld();
+    FogOfWarTextureBuffer = new uint8[SizeInTiles * SizeInTiles * 4];
 
-	FogOfWarTextureBuffer = new uint8[SizeInTiles * SizeInTiles * 4];
-
-	// Setup fog of war texture.
-	FogOfWarTexture = UTexture2D::CreateTransient(SizeInTiles, SizeInTiles);
+    // Setup fog of war texture.
+    FogOfWarTexture = UTexture2D::CreateTransient(SizeInTiles, SizeInTiles);
 
 #if WITH_EDITORONLY_DATA
-	FogOfWarTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+    FogOfWarTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
 #endif
 
-	FogOfWarTexture->AddToRoot();
+    FogOfWarTexture->AddToRoot();
 
-	FogOfWarTexture->UpdateResource();
+    FogOfWarTexture->UpdateResource();
 
-	FogOfWarUpdateTextureRegion = new FUpdateTextureRegion2D(0, 0, 0, 0, SizeInTiles, SizeInTiles);
+    FogOfWarUpdateTextureRegion = new FUpdateTextureRegion2D(0, 0, 0, 0, SizeInTiles, SizeInTiles);
 
-	// Setup fog of war material.
-	FogOfWarMaterialInstance = UMaterialInstanceDynamic::Create(FogOfWarMaterial, nullptr);
-	FogOfWarMaterialInstance->SetTextureParameterValue(FName("VisibilityMask"), FogOfWarTexture);
-	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverWorldSize"), 1.0f / SizeInWorld.X);
-	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverTileSize"), 1.0f / SizeInTiles);
+    // Setup fog of war material.
+    FogOfWarMaterialInstance = UMaterialInstanceDynamic::Create(FogOfWarMaterial, nullptr);
+    FogOfWarMaterialInstance->SetTextureParameterValue(FName("VisibilityMask"), FogOfWarTexture);
+    FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverWorldSize"), 1.0f / SizeInWorld.X);
+    FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverTileSize"), 1.0f / SizeInTiles);
 
-	// Setup fog of war post-process volume.
-	FogOfWarVolume->AddOrUpdateBlendable(FogOfWarMaterialInstance);
+    // Setup fog of war post-process volume.
+    FogOfWarVolume->AddOrUpdateBlendable(FogOfWarMaterialInstance);
+
+    UE_LOG(LogRTS, Log, TEXT("Set up %s with %s."), *GetName(), *VisionVolume->GetName());
 }
 
 void ARTSFogOfWarActor::Tick(float DeltaTime)
@@ -75,7 +71,7 @@ void ARTSFogOfWarActor::Tick(float DeltaTime)
 	AActor::Tick(DeltaTime);
 
 	// Update texture.
-	if (!VisionInfo)
+	if (!VisionVolume || !FogOfWarVolume || !VisionInfo)
 	{
 		return;
 	}

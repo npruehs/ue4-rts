@@ -14,4 +14,7 @@ UCLASS()
 class REALTIMESTRATEGY_API ARTSGameState : public AGameStateBase
 {
 	GENERATED_BODY()
+
+public:
+    virtual void HandleBeginPlay() override;
 };
