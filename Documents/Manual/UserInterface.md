@@ -15,15 +15,15 @@ Example:
 
 ![UI - Show Selection Frame](Images/UIShowSelectionFrame.png)
 
-3. In the user interface, provide a function for hiding the selection frame.
+4. In the user interface, provide a function for hiding the selection frame.
 
 ![UI - Hide Selection Frame](Images/UIHideSelectionFrame.png)
 
-4. In your HUD, forward the `DrawSelectionFrame` event to your UI.
+5. In your HUD, forward the `DrawSelectionFrame` event to your UI.
 
 ![HUD - Show Selection Frame](Images/HUDDrawSelectionFrame.png)
 
-5. In the HUD, forward the `HideSelectionFrame` event to your UI.
+6. In the HUD, forward the `HideSelectionFrame` event to your UI.
 
 ![HUD - Hide Selection Frame](Images/HUDHideSelectionFrame.png)
 
@@ -56,18 +56,18 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 
 ### Hovered Actors
 
-2. Create a widget for drawing name plates (or whatever other information you'd like to display for hovered actors).
+1. Create a widget for drawing name plates (or whatever other information you'd like to display for hovered actors).
 
 ![Hovered Actor Widget](Images/HoveredActorWidget.png)
 
 _You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
 
-3. Create a component deriving from `RTSHoveredActorWidgetComponent`, and set its Widget Class to your new widget widget.
-4. Forward the `UpdateData` event to your widget.
+2. Create a component deriving from `RTSHoveredActorWidgetComponent`, and set its Widget Class to your new widget widget.
+3. Forward the `UpdateData` event to your widget.
 
 ![Component - Update Data](Images/UpdateHoveredActorData.png)
 
-5. Forward the `UpdatePositionAndSize` event to your widget.
+4. Forward the `UpdatePositionAndSize` event to your widget.
 
 ![Component - Update Widget Position And Size](Images/UpdateHoveredActorPositionAndSize.png)
 
