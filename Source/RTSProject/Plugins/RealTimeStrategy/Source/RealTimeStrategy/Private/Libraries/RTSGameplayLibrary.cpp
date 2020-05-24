@@ -87,6 +87,11 @@ bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, 
         return false;
     }
 
+    if (DesiredProduct == nullptr)
+    {
+        return false;
+    }
+
     // Check owner.
     URTSOwnerComponent* OwnerComponent = OwnedActor->FindComponentByClass<URTSOwnerComponent>();
 

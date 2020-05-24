@@ -80,6 +80,12 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
         return;
     }
 
+    if (BuildingClass == nullptr)
+    {
+        UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build, but no building class was specified."), *GetOwner()->GetName());
+        return;
+    }
+
     // Check requirements.
     TSubclassOf<AActor> MissingRequirement;
 
