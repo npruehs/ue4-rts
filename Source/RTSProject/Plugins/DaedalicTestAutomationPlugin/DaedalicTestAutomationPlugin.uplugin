@@ -23,7 +23,7 @@
     },
     {
       "Name": "DaedalicTestAutomationPluginEditor",
-      "Type": "DeveloperTool",
+      "Type": "Editor",
       "LoadingPhase": "PreDefault"
     }
   ],
