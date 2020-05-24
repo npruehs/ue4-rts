@@ -159,6 +159,11 @@ void ARTSVisionInfo::SetTeamIndex(uint8 NewTeamIndex)
 
 ERTSVisionState ARTSVisionInfo::GetVision(int32 X, int32 Y) const
 {
+    if (!VisionVolume)
+    {
+        return ERTSVisionState::VISION_Unknown;
+    }
+
 	int32 TileIndex = GetTileIndex(X, Y);
 	return Tiles[TileIndex];
 }
