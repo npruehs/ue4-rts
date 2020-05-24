@@ -2,7 +2,7 @@
 
 #### Selection Frames
 
-In your HUD, implement the DrawSelectionFrame and HideSelectionFrame events as desired.
+In your HUD, implement the `DrawSelectionFrame` and `HideSelectionFrame` events as desired.
 
 Example:
 
@@ -19,11 +19,11 @@ Example:
 
 ![UI - Hide Selection Frame](Images/UIHideSelectionFrame.png)
 
-4. In your HUD, forward the DrawSelectionFrame event to your UI.
+4. In your HUD, forward the `DrawSelectionFrame` event to your UI.
 
 ![HUD - Show Selection Frame](Images/HUDDrawSelectionFrame.png)
 
-5. In the HUD, forward the HideSelectionFrame event to your UI.
+5. In the HUD, forward the `HideSelectionFrame` event to your UI.
 
 ![HUD - Hide Selection Frame](Images/HUDHideSelectionFrame.png)
 
@@ -31,25 +31,25 @@ Example:
 ### Selected Unit Status
 
 1. Create a new widget blueprint.
-1. Create the widget where appropriate (e.g. BeginPlay of your player controller) and add it to your viewport.
-1. Listen to the OnSelectionChanged event broadcasted by the RTSPlayerController and update your UI.
+1. Create the widget where appropriate (e.g. `BeginPlay` of your player controller) and add it to your viewport.
+1. Listen to the `OnSelectionChanged` event broadcasted by the `RTSPlayerController` and update your UI.
 
 
 ### Health Bars
 
-1. In your HUD, set AlwaysShowHealthBars, ShowHoverHealthBars, ShowSelectionHealthBars and ShowHotkeyHealthBars as desired.
+1. In your HUD, set _Always Show Health Bars, Show Hover Health Bars, Show Selection Health Bars_ and _Show Hotkey Health Bars_ as desired.
 2. Create a widget for drawing the health bar.
 
 ![Health Bar Widget](Images/HealthBarWidget.png)
 
 _You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
 
-3. Create a component deriving from RTSHealthBarWidgetComponent, and set its Widget Class to your health bar widget.
-4. Forward the Update Health Bar event to your health bar widget.
+3. Create a component deriving from `RTSHealthBarWidgetComponent`, and set its _Widget Class_ to your health bar widget.
+4. Forward the `UpdateHealthBar` event to your health bar widget.
 
 ![Component - Update Health Bar Value](Images/UpdateHealthBarValue.png)
 
-5. Forward the Update Position And Size event to your health bar widget.
+5. Forward the `UpdatePositionAndSize` event to your health bar widget.
 
 ![Component - Update Health Bar Position And Size](Images/UpdateHealthBarPositionAndSize.png)
 
@@ -62,66 +62,66 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 
 _You might want to make sure that the visibility of the widget is set to Hit Test Invisible. Otherwise, it will block mouse input from your player._
 
-3. Create a component deriving from RTSHoveredActorWidgetComponent, and set its Widget Class to your new widget widget.
-4. Forward the Update Data event to your widget.
+3. Create a component deriving from `RTSHoveredActorWidgetComponent`, and set its Widget Class to your new widget widget.
+4. Forward the `UpdateData` event to your widget.
 
 ![Component - Update Data](Images/UpdateHoveredActorData.png)
 
-5. Forward the Update Position And Size event to your widget.
+5. Forward the `UpdatePositionAndSize` event to your widget.
 
 ![Component - Update Widget Position And Size](Images/UpdateHoveredActorPositionAndSize.png)
 
 
 ### Building Cursors
 
-1. Create an actor deriving from RTSBuildingCursor (or use the BP_RTSBuildingCursor shipped with the plugin).
+1. Create an actor deriving from `RTSBuildingCursor` (or use the `BP_RTSBuildingCursor` shipped with the plugin).
 1. In your player controller, set the building cursor reference.
 
 
 ### Production UI
 
-1. Use Get Available Products of a selected production actor to create buttons for your production options (e.g. whenever the player controller raises OnSelectionChanged).
-1. Call IssueProductionOrder of your player controller whenever one of these buttons is clicked.
+1. Use `GetAvailableProducts` of a selected production actor to create buttons for your production options (e.g. whenever the player controller raises OnSelectionChanged).
+1. Call `IssueProductionOrder` of your player controller whenever one of these buttons is clicked.
 
 
 ### Production Progress Bars
 
-1. In your HUD, set AlwaysShowProductionProgressBars, ShowHoverProductionProgressBars, ShowSelectionProductionProgressBars and ShowHotkeyProductionProgressBars as desired.
+1. In your HUD, set _Always Show Production Progress Bars, Show Hover Production Progress Bars, Show Selection Production Progress Bars_ and _Show Hotkey Production Progress Bars_ as desired.
 2. Create a widget for drawing the production progress bar.
 
-_See the Health Bars section for an example.
+_See the [Health Bars](#health-bars) section for an example._
 
-3. Create a component deriving from RTSProductionProgressBarWidgetComponent, and set its Widget Class to your progress bar widget.
-4. Forward the Update Production Progress Bar event to your progress bar widget.
-5. Forward the Update Position And Size event to your progress bar widget.
+3. Create a component deriving from `RTSProductionProgressBarWidgetComponent`, and set its _Widget Class_ to your progress bar widget.
+4. Forward the `UpdateProductionProgressBar` event to your progress bar widget.
+5. Forward the `UpdatePositionAndSize` event to your progress bar widget.
 
 
 ### Construction UI
 
-1. Use Get Constructible Building Classes of a selected builder to create buttons for your construction options (e.g. whenever the player controller raises OnSelectionChanged).
-1. Call BeginBuildingPlacement of your player controller whenever one of these buttons is clicked.
+1. Use `GetConstructibleBuildingClasses` of a selected builder to create buttons for your construction options (e.g. whenever the player controller raises `OnSelectionChanged`).
+1. Call `BeginBuildingPlacement` of your player controller whenever one of these buttons is clicked.
 
 
 ### Construction Progress Bars
 
-1. In your HUD, set AlwaysShowConstructionProgressBars, ShowHoverConstructionProgressBars, ShowSelectionConstructionProgressBars and ShowHotkeyConstructionProgressBars as desired.
+1. In your HUD, set _Always Show Construction Progress Bars, Show Hover Construction Progress Bars, Show Selection Construction Progress Bars_ and _Show Hotkey Construction Progress Bars_ as desired.
 2. Create a widget for drawing the construction progress bar.
 
-_See the Health Bars section for an example.
+_See the [Health Bars](#health-bars) section for an example._
 
-3. Create a component deriving from RTSConstructionProgressBarWidgetComponent, and set its Widget Class to your progress bar widget.
-4. Forward the Update Constrution Progress Bar event to your progress bar widget.
-5. Forward the Update Position And Size event to your progress bar widget.
+3. Create a component deriving from `RTSConstructionProgressBarWidgetComponent`, and set its _Widget Class_ to your progress bar widget.
+4. Forward the `UpdateConstrutionProgressBar` event to your progress bar widget.
+5. Forward the `UpdatePositionAndSize` event to your progress bar widget.
 
 
 ### Resources UI
 
 1. Create a widget for showing your current resources.
-1. Handle the OnResourcesChanged event raised by the PlayerResourcesComponent attached to your player controller to update your UI.
+1. Handle the `OnResourcesChanged` event raised by the `PlayerResourcesComponent` attached to your player controller to update your UI.
 
 
 ### Minimap
 
-1. Add the WBP_RTSMinimapWidget to your UI, with a size matching your minimap volume images (e.g. 256 x 256).
-1. Set the Draw Background, Draw Units With Team Colors, Draw Vision and Draw View Frustum flags as desired.
-1. If you checked Draw Units With Team Colors, set the OwnUnitsBrush, EnemyUnitsBrush and NeutralUnitsBrush as desired.
+1. Add the `WBP_RTSMinimapWidget` to your UI, with a size matching your minimap volume images (e.g. 256 x 256).
+1. Set the _Draw Background, Draw Units With Team Colors, Draw Vision_ and _Draw View Frustum_ flags as desired.
+1. If you checked _Draw Units With Team Colors_, set the _Own Units Brush, Enemy Units Brush_ and _Neutral Units Brush_ as desired.
