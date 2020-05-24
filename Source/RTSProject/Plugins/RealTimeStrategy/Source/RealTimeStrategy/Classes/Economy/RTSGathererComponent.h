@@ -14,8 +14,8 @@ class AActor;
 class URTSResourceType;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesGatheredSignature, AActor*, ResourceSource, const FRTSGatherData&, GatherData, float, GatheredAmount);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSGathererComponentResourcesReturnedSignature, AActor*, ResourceDrain, TSubclassOf<class URTSResourceType>, ResourceType, float, ReturnedAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSGathererComponentResourcesGatheredSignature, AActor*, Gatherer, AActor*, ResourceSource, const FRTSGatherData&, GatherData, float, GatheredAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSGathererComponentResourcesReturnedSignature, AActor*, Gatherer, AActor*, ResourceDrain, TSubclassOf<class URTSResourceType>, ResourceType, float, ReturnedAmount);
 
 
 /**

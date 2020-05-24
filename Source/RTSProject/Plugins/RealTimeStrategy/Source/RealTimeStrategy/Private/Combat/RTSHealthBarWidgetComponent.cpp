@@ -26,7 +26,7 @@ void URTSHealthBarWidgetComponent::BeginPlay()
     HealthComponent->OnHealthChanged.AddDynamic(this, &URTSHealthBarWidgetComponent::OnHealthChanged);
 }
 
-void URTSHealthBarWidgetComponent::OnHealthChanged(float OldHealth, float NewHealth, AActor* DamageCauser)
+void URTSHealthBarWidgetComponent::OnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser)
 {
     UpdateHealthBar(HealthComponent->GetCurrentHealth() / HealthComponent->GetMaximumHealth());
 }

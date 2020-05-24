@@ -36,7 +36,7 @@ void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 			UE_LOG(LogRTS, Log, TEXT("Actor %s attack is ready again."), *GetOwner()->GetName());
 
 			// Notify listeners.
-			OnCooldownReady.Broadcast();
+			OnCooldownReady.Broadcast(GetOwner());
 		}
 	}
 }
@@ -104,7 +104,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 	RemainingCooldown = Attack.Cooldown;
 
 	// Notify listeners.
-	OnAttackUsed.Broadcast(Attack, Target, SpawnedProjectile);
+	OnAttackUsed.Broadcast(Owner, Attack, Target, SpawnedProjectile);
 }
 
 float URTSAttackComponent::GetAcquisitionRadius() const

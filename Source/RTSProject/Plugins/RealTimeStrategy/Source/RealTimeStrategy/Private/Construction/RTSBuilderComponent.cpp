@@ -38,7 +38,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		ConstructionSiteComponent->AssignBuilder(GetOwner());
 
 		// Notify listeners.
-		OnAssignedToConstructionSite.Broadcast(ConstructionSite);
+		OnAssignedToConstructionSite.Broadcast(GetOwner(), ConstructionSite);
 
 		UE_LOG(LogRTS, Log, TEXT("Builder %s assigned to construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
 
@@ -50,7 +50,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 			if (ContainerComponent)
 			{
 				ContainerComponent->LoadActor(GetOwner());
-				OnConstructionSiteEntered.Broadcast(ConstructionSite);
+				OnConstructionSiteEntered.Broadcast(GetOwner(), ConstructionSite);
 			}
 		}
 	}
@@ -125,7 +125,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 	}
 
 	// Notify listeners.
-	OnConstructionStarted.Broadcast(Building);
+	OnConstructionStarted.Broadcast(Pawn, Building);
 
 	UE_LOG(LogRTS, Log, TEXT("Builder %s has created construction site %s."), *GetOwner()->GetName(), *Building->GetName());
 
@@ -163,7 +163,7 @@ void URTSBuilderComponent::LeaveConstructionSite()
 	ConstructionSiteComponent->UnassignBuilder(GetOwner());
 
 	// Notify listeners.
-	OnRemovedFromConstructionSite.Broadcast(ConstructionSite);
+	OnRemovedFromConstructionSite.Broadcast(GetOwner(), ConstructionSite);
 
 	UE_LOG(LogRTS, Log, TEXT("Builder %s has been unassigned from construction site %s."), *GetOwner()->GetName(), *ConstructionSite->GetName());
 
@@ -175,7 +175,7 @@ void URTSBuilderComponent::LeaveConstructionSite()
 		if (ContainerComponent)
 		{
 			ContainerComponent->UnloadActor(GetOwner());
-			OnConstructionSiteLeft.Broadcast(ConstructionSite);
+			OnConstructionSiteLeft.Broadcast(GetOwner(), ConstructionSite);
 		}
 	}
 }

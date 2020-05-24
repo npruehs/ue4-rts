@@ -12,7 +12,7 @@ class AController;
 class ARTSPlayerState;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSOwnerComponentOwnerChangedSignature, AController*, NewOwner);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSOwnerComponentOwnerChangedSignature, AActor*, Actor, AController*, NewOwner);
 
 
 /**

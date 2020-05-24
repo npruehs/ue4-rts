@@ -12,8 +12,8 @@ class UMaterialInstanceDynamic;
 class USoundCue;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSSelectableComponentSelectedSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSSelectableComponentDeselectedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentSelectedSignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentDeselectedSignature, AActor*, Actor);
 
 
 /**

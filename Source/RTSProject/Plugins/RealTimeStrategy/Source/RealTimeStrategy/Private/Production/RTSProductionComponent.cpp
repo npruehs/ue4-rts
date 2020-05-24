@@ -149,7 +149,7 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 		}
         else
         {
-            OnProductionProgressChanged.Broadcast(QueueIndex, GetProgressPercentage(QueueIndex));
+            OnProductionProgressChanged.Broadcast(OwningActor, QueueIndex, GetProgressPercentage(QueueIndex));
         }
 	}
 }
@@ -319,7 +319,7 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 	UE_LOG(LogRTS, Log, TEXT("%s queued %s for production in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
 
 	// Notify listeners.
-	OnProductQueued.Broadcast(ProductClass, QueueIndex);
+	OnProductQueued.Broadcast(GetOwner(), ProductClass, QueueIndex);
 
 	if (Queue.Num() == 1)
 	{
@@ -378,7 +378,7 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 	UE_LOG(LogRTS, Log, TEXT("%s finished producing %s in queue %i."), *GetOwner()->GetName(), *Product->GetName(), QueueIndex);
 
 	// Notify listeners.
-	OnProductionFinished.Broadcast(Product, QueueIndex);
+	OnProductionFinished.Broadcast(GetOwner(), Product, QueueIndex);
 
 	// Remove product from queue.
 	DequeueProduct(QueueIndex);
@@ -415,7 +415,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 		ElapsedProductionTime);
 
 	// Notify listeners.
-	OnProductionCanceled.Broadcast(ProductClass, QueueIndex, ElapsedProductionTime);
+	OnProductionCanceled.Broadcast(GetOwner(), ProductClass, QueueIndex, ElapsedProductionTime);
 
 	// Remove product from queue.
 	DequeueProduct(QueueIndex, ProductIndex);
@@ -464,7 +464,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 			UE_LOG(LogRTS, Log, TEXT("%f %s of production costs refunded."), ResourceAmount, *ResourceType->GetName());
 
 			// Notify listeners.
-			OnProductionCostRefunded.Broadcast(ResourceType, ResourceAmount);
+			OnProductionCostRefunded.Broadcast(GetOwner(), ResourceType, ResourceAmount);
 		}
 	}
 }
@@ -533,13 +533,13 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 	UE_LOG(LogRTS, Log, TEXT("%s started producing %s in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
 
 	// Notify listeners.
-	OnProductionStarted.Broadcast(ProductClass, QueueIndex, ProductionTime);
+	OnProductionStarted.Broadcast(GetOwner(), ProductClass, QueueIndex, ProductionTime);
 }
 
 void URTSProductionComponent::ReceivedProductionQueues()
 {
     for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
     {
-        OnProductionProgressChanged.Broadcast(QueueIndex, GetProgressPercentage(QueueIndex));
+        OnProductionProgressChanged.Broadcast(GetOwner(), QueueIndex, GetProgressPercentage(QueueIndex));
     }
 }

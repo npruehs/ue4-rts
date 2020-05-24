@@ -44,7 +44,7 @@ void URTSOwnerComponent::SetPlayerOwner(AController* Controller)
 	if (PlayerOwner != PreviousOwner)
 	{
 		// Notify listeners.
-		OnOwnerChanged.Broadcast(Controller);
+		OnOwnerChanged.Broadcast(GetOwner(), Controller);
 	}
 }
 

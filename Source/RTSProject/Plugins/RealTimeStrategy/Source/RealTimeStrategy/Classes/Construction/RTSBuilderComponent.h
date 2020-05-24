@@ -8,11 +8,11 @@
 #include "RTSBuilderComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentAssignedToConstructionSiteSignature, AActor*, ConstructionSite);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentRemovedFromConstructionSiteSignature, AActor*, ConstructionSite);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionSiteEnteredSignature, AActor*, ConstructionSite);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionSiteLeftSignature, AActor*, ConstructionSite);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSBuilderComponentConstructionStartedSignature, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentAssignedToConstructionSiteSignature, AActor*, Builder, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentRemovedFromConstructionSiteSignature, AActor*, Builder, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentConstructionSiteEnteredSignature, AActor*, Builder, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentConstructionSiteLeftSignature, AActor*, Builder, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentConstructionStartedSignature, AActor*, Builder, AActor*, ConstructionSite);
 
 
 /**

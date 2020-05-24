@@ -62,7 +62,7 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 		CurrentResources);
 
 	// Notify listeners.
-	OnResourcesChanged.Broadcast(OldResources, NewResources);
+	OnResourcesChanged.Broadcast(GetOwner(), OldResources, NewResources);
 
 	// Check if we're depleted.
 	if (CurrentResources <= 0)
@@ -70,7 +70,7 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 		UE_LOG(LogRTS, Log, TEXT("Actor %s has been depleted."), *GetOwner()->GetName());
 
         // Notify listeners.
-        OnDepleted.Broadcast();
+        OnDepleted.Broadcast(GetOwner());
 
 		// Destroy this actor.
 		GetOwner()->Destroy();

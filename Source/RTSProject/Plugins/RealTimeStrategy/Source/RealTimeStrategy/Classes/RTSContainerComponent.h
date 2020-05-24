@@ -7,8 +7,8 @@
 #include "RTSContainerComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSContainerComponentActorEnteredSignature, AActor*, Actor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSContainerComponentActorLeftSignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainerComponentActorEnteredSignature, AActor*, Container, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainerComponentActorLeftSignature, AActor*, Container, AActor*, Actor);
 
 
 /** Can hold one or more actors. */

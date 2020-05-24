@@ -38,7 +38,7 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 		CurrentHealth);
 
 	// Notify listeners.
-	OnHealthChanged.Broadcast(OldHealth, NewHealth, DamageCauser);
+	OnHealthChanged.Broadcast(GetOwner(), OldHealth, NewHealth, DamageCauser);
 
 	// Check if we've just died.
 	if (CurrentHealth <= 0)
@@ -49,7 +49,7 @@ float URTSHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& D
 		AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());
 
         // Notify listeners.
-        OnKilled.Broadcast(OwningPlayer, DamageCauser);
+        OnKilled.Broadcast(GetOwner(), OwningPlayer, DamageCauser);
 
 		// Destroy this actor.
 		GetOwner()->Destroy();

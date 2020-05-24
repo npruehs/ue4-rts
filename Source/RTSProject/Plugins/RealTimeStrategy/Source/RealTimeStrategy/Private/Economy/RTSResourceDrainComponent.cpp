@@ -68,5 +68,5 @@ void URTSResourceDrainComponent::NotifyOnResourcesReturned_Implementation(AActor
         *ResourceType->GetName(),
         *GetOwner()->GetName());
 
-    OnResourcesReturned.Broadcast(Gatherer, ResourceType, ResourceAmount);
+    OnResourcesReturned.Broadcast(GetOwner(), Gatherer, ResourceType, ResourceAmount);
 }

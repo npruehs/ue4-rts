@@ -63,7 +63,7 @@ void URTSSelectableComponent::SelectActor()
     }
 
 	// Notify listeners.
-	OnSelected.Broadcast();
+	OnSelected.Broadcast(GetOwner());
 }
 
 void URTSSelectableComponent::DeselectActor()
@@ -82,7 +82,7 @@ void URTSSelectableComponent::DeselectActor()
     }
 
 	// Notify listeners.
-	OnDeselected.Broadcast();
+	OnDeselected.Broadcast(GetOwner());
 }
 
 bool URTSSelectableComponent::IsSelected() const

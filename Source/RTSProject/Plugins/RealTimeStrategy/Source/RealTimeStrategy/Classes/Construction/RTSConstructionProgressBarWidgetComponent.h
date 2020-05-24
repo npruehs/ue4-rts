@@ -25,5 +25,5 @@ public:
 
 private:
     UFUNCTION()
-    void OnConstructionProgressChanged(float ProgressPercentage);
+    void OnConstructionProgressChanged(AActor* Actor, float ProgressPercentage);
 };

@@ -303,7 +303,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 		*ResourceSource->GetName());
 
 	// Notify listeners.
-	OnResourcesGathered.Broadcast(ResourceSource, GatherData, GatheredResourceAmount);
+	OnResourcesGathered.Broadcast(GetOwner(), ResourceSource, GatherData, GatheredResourceAmount);
 
 	if (GatherData.bNeedsReturnToDrain)
 	{
@@ -340,7 +340,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
                             *CarriedResourceType->GetName());
 
                         // Notify listeners.
-                        OnResourcesReturned.Broadcast(nullptr, CarriedResourceType, ReturnedResources);
+                        OnResourcesReturned.Broadcast(GetOwner(), nullptr, CarriedResourceType, ReturnedResources);
                     }
                 }
 			}
@@ -376,7 +376,7 @@ float URTSGathererComponent::ReturnResources(AActor* ResourceDrain)
 		*ResourceDrain->GetName());
 
 	// Notify listeners.
-	OnResourcesReturned.Broadcast(ResourceDrain, CarriedResourceType, ReturnedResources);
+	OnResourcesReturned.Broadcast(GetOwner(), ResourceDrain, CarriedResourceType, ReturnedResources);
 	return ReturnedResources;
 }
 

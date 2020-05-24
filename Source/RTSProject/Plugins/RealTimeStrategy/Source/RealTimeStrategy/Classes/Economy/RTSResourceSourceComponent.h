@@ -9,8 +9,8 @@
 #include "RTSResourceSourceComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSResourceSourceComponentResourcesChangedSignature, float, OldResources, float, NewResources);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSResourceSourceComponentDepletedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSResourceSourceComponentResourcesChangedSignature, AActor*, ResourceSource, float, OldResources, float, NewResources);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSResourceSourceComponentDepletedSignature, AActor*, ResourceSource);
 
 
 /**

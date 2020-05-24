@@ -7,8 +7,8 @@
 #include "RTSHealthComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSHealthComponentHealthChangedSignature, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSHealthComponentKilledSignature, AController*, PreviousOwner, AActor*, DamageCauser);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSHealthComponentHealthChangedSignature, AActor*, Actor, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSHealthComponentKilledSignature, AActor*, Actor, AController*, PreviousOwner, AActor*, DamageCauser);
 
 
 /**

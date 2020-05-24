@@ -37,7 +37,7 @@ void URTSContainerComponent::LoadActor(AActor* Actor)
 	Actor->SetActorEnableCollision(false);
 
 	// Notify listeners.
-	OnActorEntered.Broadcast(Actor);
+	OnActorEntered.Broadcast(GetOwner(), Actor);
 
 	UE_LOG(LogRTS, Log, TEXT("Actor %s has entered %s."), *Actor->GetName(), *GetOwner()->GetName());
 }
@@ -57,7 +57,7 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
 	Actor->SetActorEnableCollision(true);
 
 	// Notify listeners.
-	OnActorLeft.Broadcast(Actor);
+	OnActorLeft.Broadcast(GetOwner(), Actor);
 
 	UE_LOG(LogRTS, Log, TEXT("Actor %s has left %s."), *Actor->GetName(), *GetOwner()->GetName());
 }

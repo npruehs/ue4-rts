@@ -166,7 +166,7 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	}
     else
     {
-        OnConstructionProgressChanged.Broadcast(GetProgressPercentage());
+        OnConstructionProgressChanged.Broadcast(GetOwner(), GetProgressPercentage());
     }
 }
 
@@ -247,7 +247,7 @@ void URTSConstructionSiteComponent::StartConstruction()
 	UE_LOG(LogRTS, Log, TEXT("Construction %s started."), *GetOwner()->GetName());
 
 	// Notify listeners.
-	OnConstructionStarted.Broadcast(ConstructionTime);
+	OnConstructionStarted.Broadcast(GetOwner(), ConstructionTime);
 }
 
 void URTSConstructionSiteComponent::FinishConstruction()
@@ -263,12 +263,12 @@ void URTSConstructionSiteComponent::FinishConstruction()
 		for (AActor* Builder : AssignedBuilders)
 		{
 			Builder->Destroy();
-			OnBuilderConsumed.Broadcast(Builder);
+			OnBuilderConsumed.Broadcast(GetOwner(), Builder);
 		}
 	}
 
 	// Notify listeners.
-	OnConstructionFinished.Broadcast();
+	OnConstructionFinished.Broadcast(GetOwner());
 }
 
 void URTSConstructionSiteComponent::CancelConstruction()
@@ -313,7 +313,7 @@ void URTSConstructionSiteComponent::CancelConstruction()
                 UE_LOG(LogRTS, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
 
                 // Notify listeners.
-                OnConstructionCostRefunded.Broadcast(ResourceType, ResourceAmount);
+                OnConstructionCostRefunded.Broadcast(GetOwner(), ResourceType, ResourceAmount);
             }
         }
     }
@@ -322,7 +322,7 @@ void URTSConstructionSiteComponent::CancelConstruction()
 	GetOwner()->Destroy();
 
 	// Notify listeners.
-	OnConstructionCanceled.Broadcast();
+	OnConstructionCanceled.Broadcast(GetOwner());
 }
 
 ERTSPaymentType URTSConstructionSiteComponent::GetConstructionCostType() const
@@ -387,5 +387,5 @@ TArray<AActor*> URTSConstructionSiteComponent::GetAssignedBuilders() const
 
 void URTSConstructionSiteComponent::ReceivedRemainingConstructionTime()
 {
-    OnConstructionProgressChanged.Broadcast(GetProgressPercentage());
+    OnConstructionProgressChanged.Broadcast(GetOwner(), GetProgressPercentage());
 }

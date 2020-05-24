@@ -27,7 +27,7 @@ void URTSConstructionProgressBarWidgetComponent::BeginPlay()
         &URTSConstructionProgressBarWidgetComponent::OnConstructionProgressChanged);
 }
 
-void URTSConstructionProgressBarWidgetComponent::OnConstructionProgressChanged(float ProgressPercentage)
+void URTSConstructionProgressBarWidgetComponent::OnConstructionProgressChanged(AActor* Actor, float ProgressPercentage)
 {
     UpdateConstructionProgressBar(ProgressPercentage);
 }

@@ -10,7 +10,7 @@
 #include "RTSResourceDrainComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSResourceDrainComponentResourcesReturnedSignature, AActor*, Gatherer, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSResourceDrainComponentResourcesReturnedSignature, AActor*, ResourceDrain, AActor*, Gatherer, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
 
 /**

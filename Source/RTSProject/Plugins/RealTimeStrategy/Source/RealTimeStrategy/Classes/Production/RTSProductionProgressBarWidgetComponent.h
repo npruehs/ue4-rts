@@ -25,5 +25,5 @@ public:
 
 private:
     UFUNCTION()
-    void OnProductionProgressChanged(int32 QueueIndex, float ProgressPercentage);
+    void OnProductionProgressChanged(AActor* Actor, int32 QueueIndex, float ProgressPercentage);
 };

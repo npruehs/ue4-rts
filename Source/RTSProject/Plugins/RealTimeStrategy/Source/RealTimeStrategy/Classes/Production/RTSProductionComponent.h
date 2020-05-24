@@ -10,12 +10,12 @@
 #include "RTSProductionComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductQueuedSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionStartedSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, TotalProductionTime);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionProgressChangedSignature, int32, QueueIndex, float, ProgressPercentage);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionFinishedSignature, AActor*, Product, int32, QueueIndex);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionCanceledSignature, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, ElapsedProductionTime);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentProductionCostRefundedSignature, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductQueuedSignature, AActor*, Actor, TSubclassOf<AActor>, ProductClass, int32, QueueIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSProductionComponentProductionStartedSignature, AActor*, Actor, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, TotalProductionTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionProgressChangedSignature, AActor*, Actor, int32, QueueIndex, float, ProgressPercentage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionFinishedSignature, AActor*, Actor, AActor*, Product, int32, QueueIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSProductionComponentProductionCanceledSignature, AActor*, Actor, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, ElapsedProductionTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionCostRefundedSignature, AActor*, Actor, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
 
 /** Allows producing actors over time. */

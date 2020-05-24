@@ -258,7 +258,7 @@ void ARTSPawnAIController::ApplyOrders()
 
     // Notify listeners.
     uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
-    OnOrderChanged.Broadcast((ERTSOrderType)NewOrder);
+    OnOrderChanged.Broadcast(GetOwner(), (ERTSOrderType)NewOrder);
 }
 
 void ARTSPawnAIController::ClearBuildingClass()

@@ -13,7 +13,7 @@
 class URTSAttackComponent;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSPawnAIControllerOrderChangedSignature, ERTSOrderType, NewOrder);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSPawnAIControllerOrderChangedSignature, AActor*, Actor, ERTSOrderType, NewOrder);
 
 
 /**

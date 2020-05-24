@@ -9,8 +9,8 @@
 #include "RTSAttackComponent.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSAttackComponentCooldownReadySignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSAttackComponentAttackedUsedSignature, const FRTSAttackData&, Attack, AActor*, Target, ARTSProjectile*, Projectile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSAttackComponentCooldownReadySignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSAttackComponentAttackedUsedSignature, AActor*, Actor, const FRTSAttackData&, Attack, AActor*, Target, ARTSProjectile*, Projectile);
 
 
 /**

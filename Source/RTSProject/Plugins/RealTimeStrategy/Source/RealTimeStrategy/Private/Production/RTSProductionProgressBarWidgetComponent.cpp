@@ -26,7 +26,7 @@ void URTSProductionProgressBarWidgetComponent::BeginPlay()
         &URTSProductionProgressBarWidgetComponent::OnProductionProgressChanged);
 }
 
-void URTSProductionProgressBarWidgetComponent::OnProductionProgressChanged(int32 QueueIndex, float ProgressPercentage)
+void URTSProductionProgressBarWidgetComponent::OnProductionProgressChanged(AActor* Actor, int32 QueueIndex, float ProgressPercentage)
 {
     UpdateProductionProgressBar(QueueIndex, ProgressPercentage);
 }

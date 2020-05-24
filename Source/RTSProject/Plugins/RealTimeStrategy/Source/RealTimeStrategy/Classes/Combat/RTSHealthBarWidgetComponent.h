@@ -31,5 +31,5 @@ private:
     URTSHealthComponent* HealthComponent;
 
     UFUNCTION()
-    void OnHealthChanged(float OldHealth, float NewHealth, AActor* DamageCauser);
+    void OnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser);
 };
