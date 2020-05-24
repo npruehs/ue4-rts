@@ -4,6 +4,8 @@
 
 #include "GameFramework/Volume.h"
 
+#include "Vision/RTSVisionState.h"
+
 #include "RTSVisionVolume.generated.h"
 
 
@@ -27,6 +29,9 @@ public:
     /** Gets the width and height of a single vision grid tile, in cm. */
     float GetTileSize() const;
     
+    /** Gets the minimum vision state of the world. */
+    ERTSVisionState GetMinimumVisionState() const;
+
 	FIntVector WorldToTile(const FVector& WorldPosition) const;
 
 protected:
@@ -36,6 +41,10 @@ private:
     /** Width and height of the vision grid imposed on the world. */
     UPROPERTY(EditInstanceOnly, Category = "RTS")
     int32 SizeInTiles;
+
+    /** Minimum vision state of the world. Change this for removing the black part of fog of war, or disabling it entirely. */
+    UPROPERTY(EditInstanceOnly, Category = "RTS")
+    ERTSVisionState MinimumVisionState;
 
     /** Size of the vision volume, in world space. */
     FVector SizeInWorld;

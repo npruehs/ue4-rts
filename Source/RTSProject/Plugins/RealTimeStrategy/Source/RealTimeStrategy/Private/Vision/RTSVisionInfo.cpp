@@ -46,11 +46,14 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
 	Tiles.SetNumZeroed(SizeInTiles * SizeInTiles);
 
+    const ERTSVisionState VisionAfterVisible =
+        FMath::Max(ERTSVisionState::VISION_Known, VisionVolume->GetMinimumVisionState());
+
 	for (int32 Index = 0; Index < Tiles.Num(); ++Index)
 	{
 		if (Tiles[Index] == ERTSVisionState::VISION_Visible)
 		{
-			Tiles[Index] = ERTSVisionState::VISION_Known;
+			Tiles[Index] = VisionAfterVisible;
 		}
 	}
 
@@ -174,6 +177,11 @@ void ARTSVisionInfo::BeginPlay()
 
 	int32 SizeInTiles = VisionVolume->GetSizeInTiles();
 	Tiles.SetNumZeroed(SizeInTiles * SizeInTiles);
+
+    for (int32 Index = 0; Index < Tiles.Num(); ++Index)
+    {
+        Tiles[Index] = VisionVolume->GetMinimumVisionState();
+    }
 }
 
 bool ARTSVisionInfo::GetTileCoordinates(int Index, int* OutX, int* OutY) const

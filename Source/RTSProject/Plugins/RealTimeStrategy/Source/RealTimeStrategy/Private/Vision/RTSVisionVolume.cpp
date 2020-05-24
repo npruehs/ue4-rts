@@ -27,6 +27,11 @@ float ARTSVisionVolume::GetTileSize() const
     return TileSize;
 }
 
+ERTSVisionState ARTSVisionVolume::GetMinimumVisionState() const
+{
+    return MinimumVisionState;
+}
+
 FIntVector ARTSVisionVolume::WorldToTile(const FVector& WorldPosition) const
 {
 	// Get relative world position.
