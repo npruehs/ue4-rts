@@ -14,7 +14,7 @@ void ARTSGameState::HandleBeginPlay()
 
     // Setup vision.
     ARTSFogOfWarActor* FogOfWarActor = nullptr;
-    ARTSVisionInfo* VisionInfo = nullptr;
+    TArray<ARTSVisionInfo*> VisionInfos;
     ARTSVisionVolume* VisionVolume = nullptr;
 
     for (TActorIterator<AActor> It(GetWorld()); It; ++It)
@@ -27,13 +27,14 @@ void ARTSGameState::HandleBeginPlay()
             {
                 FogOfWarActor = Cast<ARTSFogOfWarActor>(Actor);
             }
+            else if (Actor->IsA(ARTSVisionInfo::StaticClass()))
+            {
+                ARTSVisionInfo* VisionInfo = Cast<ARTSVisionInfo>(Actor);
+                VisionInfos.Add(VisionInfo);
+            }
             else if (Actor->IsA(ARTSVisionVolume::StaticClass()))
             {
                 VisionVolume = Cast<ARTSVisionVolume>(Actor);
-            }
-            else if (Actor->IsA(ARTSVisionInfo::StaticClass()))
-            {
-                VisionInfo = Cast<ARTSVisionInfo>(Actor);
             }
         }
     }
@@ -43,7 +44,7 @@ void ARTSGameState::HandleBeginPlay()
         VisionVolume->Initialize();
     }
 
-    if (IsValid(VisionInfo))
+    for (ARTSVisionInfo* VisionInfo : VisionInfos)
     {
         VisionInfo->Initialize(VisionVolume);
     }
