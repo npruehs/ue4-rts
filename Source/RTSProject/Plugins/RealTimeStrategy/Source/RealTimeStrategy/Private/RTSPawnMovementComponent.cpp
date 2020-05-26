@@ -12,7 +12,7 @@ void URTSPawnMovementComponent::UpdateComponentVelocity()
 {
     Super::UpdateComponentVelocity();
 
-    if (!Velocity.IsNearlyZero())
+    if (bUpdateRotation && !Velocity.IsNearlyZero())
     {
         MoveUpdatedComponent(FVector::ZeroVector, Velocity.Rotation(), false);
     }
