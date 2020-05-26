@@ -125,3 +125,19 @@ _See the [Health Bars](#health-bars) section for an example._
 1. Add the `WBP_RTSMinimapWidget` to your UI, with a size matching your minimap volume images (e.g. 256 x 256).
 1. Set the _Draw Background, Draw Units With Team Colors, Draw Vision_ and _Draw View Frustum_ flags as desired.
 1. If you checked _Draw Units With Team Colors_, set the _Own Units Brush, Enemy Units Brush_ and _Neutral Units Brush_ as desired.
+
+
+### Floating Combat Texts
+
+1. In your HUD, enable _Show Floating Combat Texts_.
+2. Set _Floating Combat Text Speed_ and _Fade Out Floating Combat Texts_ as desired.
+3. Add a `RTSFloatingCombatTextComponent` to any actor that should be able to display texts above them.
+4. Create an actor component for adding the actual floating combat texts.
+
+![Floating Combat Text Component - BeginPlay](Images/FloatingCombatTextComponentBeginPlay.png)
+![Floating Combat Text Component - OnResourcesReturned](Images/FloatingCombatTextComponentOnResourcesReturned.png)
+
+5. Add your actor component to all actors that should be able to add floating combat texts.
+6. In your HUD, handle the `DrawFloatingCombatText` event.
+
+![HUD - Draw Floating Combat Text](Images/HUDDrawFloatingCombatText.png)

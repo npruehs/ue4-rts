@@ -3,7 +3,7 @@
 ### Appearance
 
 1. Create a new pawn or character blueprint.
-1. Check the Replicates flag.
+1. Check the _Replicates_ flag.
 1. Add a static or skeletal mesh and setup its location, rotation and scale as usual.
 1. Setup collision (e.g. Capsule Collision) as usual.
 1. You may want to disable the collision of your mesh and rely on its capsule instead.
@@ -18,7 +18,7 @@
 
 ### Movement
 
-1. Add a movement component (e.g. `FloatingPawnMovement` or `CharacterMovement`) and set up its speed properties as usual.
+1. Add a movement component (e.g. `FloatingPawnMovement` or `CharacterMovement`) and set up its speed properties as usual. The plugin also ships with a `RTSPawnMovementComponent` that basically just adds rotation updates to the built-in `FloatingPawnMovement`.
 
 
 ### Vision
@@ -55,13 +55,14 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. At the `RTSAttackComponent`, reference the new projectile in your attack.
 
 
-### Production
+### Production Costs
 
 1. Add the `RTSProductionCostComponent` to everything you want to be produced.
 1. Set the _Production Time_ for these products.
 1. Set the _Resources_ to any resources required for production.
 1. Set the _Production Cost Type_ to to _Pay Immediately_ if all costs should be paid in full when starting production, or to _Pay Over Time_ for continuously paying costs (similar to Command & Conquer).
 1. Set the _Refund Factor_ to the factor to multiply refunded resources with after cancelation.
+1. Add the `RTSRequirementsComponent` if the actor should have any requirements, and set the _Required Actors_.
 
 
 ### Construction
