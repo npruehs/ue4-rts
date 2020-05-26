@@ -17,6 +17,9 @@ class REALTIMESTRATEGY_API URTSCheatManager : public UCheatManager
     GENERATED_BODY()
 
 public:
+    URTSCheatManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+
     /** Increases construction and production speed. */
     UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
     virtual void Boost();

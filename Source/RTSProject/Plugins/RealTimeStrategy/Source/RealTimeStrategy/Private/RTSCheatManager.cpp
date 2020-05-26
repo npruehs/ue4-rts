@@ -13,6 +13,13 @@
 #include "Economy/RTSPlayerResourcesComponent.h"
 
 
+URTSCheatManager::URTSCheatManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+{
+    // Set reasonable default values.
+    ResourceAmount = 1000.0f;
+    SpeedBoostFactor = 10.0f;
+}
+
 void URTSCheatManager::Boost()
 {
     APlayerController* Player = GetOuterAPlayerController();
