@@ -24,6 +24,7 @@ ARTSGameMode::ARTSGameMode(const FObjectInitializer& ObjectInitializer /*= FObje
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.
+    TeamClass = ARTSTeamInfo::StaticClass();
 	NumTeams = 2;
 }
 
