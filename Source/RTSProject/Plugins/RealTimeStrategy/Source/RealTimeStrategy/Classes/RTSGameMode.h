@@ -81,6 +81,7 @@ private:
     TSubclassOf<ARTSPlayerAIController> PlayerAIControllerClass;
 
     /** Number of AI players to spawn. */
+    UPROPERTY(EditDefaultsOnly, Category = AI)
     int32 NumAIPlayers;
 
     /** Teams of the current match. */

@@ -34,7 +34,11 @@ void ARTSGameMode::BeginPlay()
 
     // Parse options.
     FString NumAIPlayersString = UGameplayStatics::ParseOption(OptionsString, TEXT("NumAIPlayers"));
-    NumAIPlayers = FCString::Atoi(*NumAIPlayersString);
+
+    if (!NumAIPlayersString.IsEmpty())
+    {
+        NumAIPlayers = FCString::Atoi(*NumAIPlayersString);
+    }
 
     UE_LOG(LogRTS, Log, TEXT("NumAIPlayers = %i"), NumAIPlayers);
 
