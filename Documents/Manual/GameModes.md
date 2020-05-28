@@ -1,5 +1,8 @@
 ## Game Modes
 
+Clearly, even for real-time strategy games, you may want to define multiple game modes (such as classic Skirmish or story-based campaigns). Thus, we won't restrict you too much here, but just want to provide a few basic things that you might find useful.
+
+
 ### Initialization
 
 1. Set the _Initial Actors_ and their locations for your game mode. This will spawn initial units for each player at their player start as soon as the game starts.

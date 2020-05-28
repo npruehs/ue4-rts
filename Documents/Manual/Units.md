@@ -1,18 +1,20 @@
 ## Creating Units
 
+As mentioned before, most features of the plugin are implemented by the means of components to add to your actors. Thus, for adding new units (or buildings), you'll usually create a pawn or character, and add various components, depending on the capabitilies you want the unit to have. This approach enables you to combine features just as you like, for instance having buildings that can attack or units that resources can be returned to.
+
+
 ### Appearance
 
 1. Create a new pawn or character blueprint.
 1. Check the _Replicates_ flag.
 1. Add a static or skeletal mesh and setup its location, rotation and scale as usual.
-1. Setup collision (e.g. Capsule Collision) as usual.
-1. You may want to disable the collision of your mesh and rely on its capsule instead.
+1. Setup collision (e.g. Capsule Collision) as usual. You may want to disable the collision of your mesh and rely on its capsule instead.
 1. Setup your animations. (If you're new to the Unreal animation system, we can readily recommend the tutorial at https://docs.unrealengine.com/latest/INT/Programming/Tutorials/FirstPersonShooter/4/index.html)
 1. Add an `RTSNameComponent` and set its localized name if you want to show it in any kind of ingame UI. 
 1. Add an `RTSDescriptionComponent` and set its localized text if you want to show it in any kind of ingame UI. 
 1. Add an `RTSPortraitComponent` and set its portrait if you want to show it in any kind of ingame UI.
 1. Add an `RTSSelectableComponent`, and set its selection circle material (e.g. to `M_RTSSelectionCircle`) and selection sound.
-1. Add an `RTSOwnerComponent`.
+1. Add an `RTSOwnerComponent`. This will be used to store (and replicate) the owner of the unit for all players (e.g. for showing team colors).
 1. Add your `RTSHoveredActorWidgetComponent` (see [User Interface](UserInterface.md)).
 
 
@@ -29,6 +31,8 @@
 ### Combat
 
 #### AI
+
+As mentioned before, units are not directly possessed by player controllers in the plugin. Instead, every unit is possessed by an AIController that will carry out orders issued by the players.
 
 1. Set the pawn AI controller class to your `RTSPawnAIController`.
 1. Ensure _Pawn > Auto Possess AI_ is set to _Placed in World or Spawned_.

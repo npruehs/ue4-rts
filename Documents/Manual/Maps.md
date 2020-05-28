@@ -1,5 +1,8 @@
 ## Creating Maps
 
+For the plugin, you'll design and create your maps the same way you're used to when using Unreal Engine, for the most part. This section serves as a short checklist for you, and highlights some setup that is supposed to make it easier for you to get started. Some steps are mandatory for some features of the plugin to work, however, such as vision.
+
+
 ### Game Mode & Geometry
 
 1. Use your game mode in the world settings.
@@ -18,7 +21,7 @@
 
 ### Player Starts
 
-1. Add your player starts to the map.
+1. Add `RTSPlayerStart`s to the map.
 1. Set the _Team Index_ for each player start.
 
 ### Minimap

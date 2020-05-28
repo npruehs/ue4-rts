@@ -26,6 +26,8 @@ Note that we're still in heavy development. Some things are already in place, su
 * Unit Production/Tech Research
 * Resource Gathering
 * Fog of War
+* AI Players
+* Cheats
 
 All of this is already completely working in multiplayer as well, and has been fully exposed to scripting, enabling you to update UI and play animations and sounds.
 
@@ -40,7 +42,6 @@ For a quick look, just open `Source/RTSProject/RTSProject.uproject`,  load `Maps
 
 Real-Time Strategy Plugin for Unreal Engine 4 currently supports the following Unreal Engine Versions:
 
-* 4.23
 * 4.24
 * 4.25
 

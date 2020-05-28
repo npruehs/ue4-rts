@@ -1,5 +1,8 @@
 ## Creating Buildings
 
+From the perspective of the plugin, buildings are just units with a few additional components. There's no special class for buildings; their setup has just been moved to this manual section because that many people would explicitly look for that. In fact, you can mix and match the setup outlined in this section with all of the other sections. This allows you to create truly deep gameplay, such as units that serve as resource sources, or produce other units.
+
+
 ### Construction
 
 1. See [Creating Units](Units.md) (Appearance, Health & Damage, Projectiles).

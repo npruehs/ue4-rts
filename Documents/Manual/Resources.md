@@ -1,5 +1,7 @@
 ## Creating Resource Sources
 
+In case you missed that step earlier, make your to set up your resource types as explained in [Setup](Setup.md). Then, create resource sources as follows:
+
 1. See [Creating Units](Units.md) (Appearance only; can be a standard actor).
 1. Add an `RTSResourceSourceComponent`.
 1. Set the resource type and maximum and current resources of the source.

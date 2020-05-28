@@ -1,8 +1,16 @@
 ## Setup
 
-Make sure _View Plugin Content_ is enabled in your view options.
-
 ### Game Framework Setup
+
+_Real-Time Strategy Plugin for Unreal Engine 4_ extends the [game framework](https://docs.unrealengine.com/en-US/Gameplay/Framework/index.html) provided by Unreal Engine with features that are common in real-time strategy games.
+
+For this, we embrace the principle of _composition over inheritance_: Most features are implemented by the means of components to add to your actors, to allow for the most flexibility on your side when building your game, especially when it comes to combining the plugin with other third-party software.
+
+Some things have been carefully added to the existing game framework however, as designed by Epic, and require a few steps to set up.
+
+The plugin also ships with a few assets that are designed to get you started, e.g. with unit AI, but feel free to modify or replace them as you see fit.
+
+Make sure _View Plugin Content_ is enabled in your view options.
 
 1. Create a player controller deriving from `RTSPlayerController`.
 1. Create a player state deriving from `RTSPlayerState`.
@@ -19,6 +27,8 @@ Make sure _View Plugin Content_ is enabled in your view options.
 
 
 ### Camera Setup
+
+Usually, players control a single [pawn](https://docs.unrealengine.com/en-US/Gameplay/Framework/Pawn/index.html) in Unreal Engine. However, in the case of real-time strategy games, players control many units from a camera perspective far out. Thus, the plugin works best when using a simple pawn with a normal camera whose location reflects what the player wants to see right now. Individual units are not directly possessed by the player controllers (or AI controllers), but just "owned" by them.
 
 #### Creating The Camera
 
@@ -39,6 +49,8 @@ Make sure _View Plugin Content_ is enabled in your view options.
 
 
 ### Input Setup
+
+Many default [input](https://docs.unrealengine.com/en-US/Gameplay/Input/index.html) actions for real-time strategy games are already provided by the plugin. Given that you use an RTSPlayerController in your game mode, you can bind the following actions which should speak for themselves. Clearly, all of these bindings are optional.
 
 At _Edit > Project Settings > Engine > Input_ ...
 
@@ -73,5 +85,7 @@ At _Edit > Project Settings > Engine > Input_ ...
 
 
 ### Gameplay Tags
+
+The plugin makes use of [gameplay tags](https://docs.unrealengine.com/en-US/Gameplay/Tags/index.html) for enabling condition-based gameplay (such as whether a unit can be attacked or not). 
 
 At _Edit > Project Settings > Project > Gameplay Tags_, add `DT_RTSGameplayTags` to the _Gameplay Tag Table List_.

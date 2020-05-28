@@ -1,5 +1,8 @@
 ## Creating The User Interface
 
+Usually, you'll want to create a very individual user interface for your own game. However, some things are very common to real-time strategy games, such as health bars or minimaps, and we want to provide you a small head start at least, mostly by the means of events you can implement. As always, feel free to create your own UI widgets as you see fit - you should be able to apply them easily with the plugin.
+
+
 ### Selection Frames
 
 In your HUD, implement the `DrawSelectionFrame` and `HideSelectionFrame` events as desired.

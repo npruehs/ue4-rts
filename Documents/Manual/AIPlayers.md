@@ -1,5 +1,7 @@
 ## AI Players
 
+The plugin provides basic support for AI players as well. Currently, this doesn't go beyond fulfilling basic build orders, so you'll probably want to extend that, e.g. by determining when to attack other players, and where. At least, this should get you started:
+
 1. Create an AI controller deriving from `RTSPlayerAIController`.
 1. Set the _Player Behavior Tree Asset_ of your new player AI controller to `BT_RTSPlayerBehaviorTree` (or create your own one).
 1. Set the _Player Blackboard Asset_ of your new player AI controller to `BB_RTSPlayerBlackboard` (or create your own one).

@@ -1,5 +1,8 @@
 ## Cheats
 
+The plugin comes with a small set of built-in cheats you can use. Feel free to create your own cheat manager and add additional cheats.
+
+
 1. Create a cheat manager deriving from `RTSCheatManager`.
 1. Set the _Resource Types_ of your cheat manager.
 1. At your `RTSPlayerController`, set the _Cheat Manager_ to your cheat manager.
