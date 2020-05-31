@@ -13,5 +13,7 @@ public class RTSProjectTarget : TargetRules
         bUsePCHFiles = false;
 
         ExtraModuleNames.AddRange( new string[] { "RTSProject" } );
-	}
+
+        DefaultBuildSettings = BuildSettingsVersion.V2;
+    }
 }
