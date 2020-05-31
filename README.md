@@ -33,7 +33,7 @@ All of this is already completely working in multiplayer as well, and has been f
 
 We're going to add all of this to the Unreal Marketplace for free as well soon (tm).
 
-For a quick look, just open `Source/RTSProject/RTSProject.uproject`,  load `Maps/SKM-DarkSpace.umap` in the editor and hit Play. We recommend taking a closer look at that map as reference for your own ones as well.
+For a quick look, just open `Source/RTSProject/RTSProject.uproject`,  load `Maps/SKM-DarkSpace.umap` in the editor and hit Play. We recommend taking a closer look at that map (and the rest of the example project) as reference for your own one as well.
 
 
 ## Setup
