@@ -87,3 +87,9 @@ If you don't specify a projectile, the damage will be applied immediately. In or
     1. Set _Range_ as desired.
 1. Add all _Resource Source Actor Classes_ the gatherer may gather from (e.g. Undead in Warcraft need Haunted Gold Mine).
 1. Set the _Resource Sweep Radius_ to the radius in which the gatherer should look for similar resources if their current source is depleted.
+
+
+### Bounties
+
+1. Add an `RTSBountyComponent` to any actors you want to grant bounties to killing players.
+1. Set the _Bounty_ for these actors.

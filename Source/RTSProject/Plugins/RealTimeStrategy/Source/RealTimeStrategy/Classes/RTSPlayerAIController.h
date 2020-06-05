@@ -53,6 +53,9 @@ public:
     UFUNCTION(BlueprintCallable)
     bool StartProduction(TSubclassOf<APawn> PawnClass);
 
+    /** Whether killing an actor owned by this player yields a reward for the attacking player. */
+    bool GivesBounty() const;
+
 protected:
     virtual void OnPossess(APawn* InPawn) override;
 
@@ -77,6 +80,10 @@ private:
     /** Type of the primary resource for the AI to gather (e.g. used for placing resource drains). */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     TSubclassOf<URTSResourceType> PrimaryResourceType;
+
+    /** Whether killing an actor owned by this player yields a reward for the attacking player. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bGivesBounty;
 
     /** Stores the resources available for this player. */
     UPROPERTY(VisibleAnywhere, Category = "RTS")
