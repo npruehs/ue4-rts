@@ -93,6 +93,8 @@ bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
     {
         UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
 
+        NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
+
         // Player is missing a required actor. Stop.
         PawnController->IssueStopOrder();
         return false;
@@ -121,6 +123,7 @@ bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
 	if (!Building)
 	{
+        NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
 		return false;
 	}
 
@@ -200,4 +203,9 @@ float URTSBuilderComponent::GetConstructionSiteOffset() const
 AActor* URTSBuilderComponent::GetAssignedConstructionSite() const
 {
     return AssignedConstructionSite;
+}
+
+void URTSBuilderComponent::NotifyOnConstructionFailed(AActor* Builder, TSubclassOf<AActor> BuildingClass, const FVector& Location)
+{
+    OnConstructionFailed.Broadcast(Builder, BuildingClass, Location);
 }
