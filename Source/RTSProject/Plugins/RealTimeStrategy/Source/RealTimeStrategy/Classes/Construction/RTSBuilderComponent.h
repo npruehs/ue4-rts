@@ -30,11 +30,11 @@ public:
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
-	virtual void BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
+	virtual bool BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
-	void BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation);
+	bool BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation);
 
 	/** Removes the builder from its assigned construction site. */
 	UFUNCTION(BlueprintCallable)

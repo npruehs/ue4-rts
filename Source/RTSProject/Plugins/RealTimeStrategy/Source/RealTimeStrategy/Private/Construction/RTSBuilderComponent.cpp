@@ -56,34 +56,34 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 	}
 }
 
-void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
+bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	// Get game, pawn and controller.
 	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
 	if (!GameMode)
 	{
-		return;
+		return false;
 	}
 
     auto Pawn = Cast<APawn>(GetOwner());
 
     if (!Pawn)
     {
-        return;
+        return false;
     }
 
     auto PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
 
     if (!PawnController)
     {
-        return;
+        return false;
     }
 
     if (BuildingClass == nullptr)
     {
         UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build, but no building class was specified."), *GetOwner()->GetName());
-        return;
+        return false;
     }
 
     // Check requirements.
@@ -95,7 +95,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
         // Player is missing a required actor. Stop.
         PawnController->IssueStopOrder();
-        return;
+        return false;
     }
 
     // Move builder away in order to avoid collision.
@@ -121,7 +121,7 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
 	if (!Building)
 	{
-		return;
+		return false;
 	}
 
 	// Notify listeners.
@@ -131,16 +131,18 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
 	// Issue construction order.
 	PawnController->IssueContinueConstructionOrder(Building);
+
+    return true;
 }
 
-void URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)
+bool URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)
 {
 	if (BuildingIndex < 0 || BuildingIndex >= ConstructibleBuildingClasses.Num())
 	{
-		return;
+		return false;
 	}
 
-	BeginConstruction(ConstructibleBuildingClasses[BuildingIndex], TargetLocation);
+	return BeginConstruction(ConstructibleBuildingClasses[BuildingIndex], TargetLocation);
 }
 
 void URTSBuilderComponent::LeaveConstructionSite()
