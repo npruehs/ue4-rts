@@ -14,7 +14,6 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
-	CurrentHealth = 100.0f;
 	MaximumHealth = 100.0f;
 }
 
@@ -29,6 +28,10 @@ void URTSHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
+    // Set initial health.
+    CurrentHealth = MaximumHealth;
+
+    // Register for events.
     AActor* Owner = GetOwner();
 
     if (!IsValid(Owner))
