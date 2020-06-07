@@ -45,7 +45,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 {
 	AActor* Owner = GetOwner();
 	APawn* OwnerPawn = Cast<APawn>(Owner);
-	AController* OwnerController = OwnerPawn ? OwnerPawn->GetController() : nullptr;
+	AController* OwnerController = Cast<AController>(Owner->GetOwner());
 
 	if (!IsValid(Target))
 	{
