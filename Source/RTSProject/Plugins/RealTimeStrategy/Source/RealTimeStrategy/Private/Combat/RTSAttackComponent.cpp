@@ -1,9 +1,11 @@
 #include "Combat/RTSAttackComponent.h"
 
 #include "Engine/World.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
 
 #include "RTSLog.h"
+#include "RTSPlayerAdvantageComponent.h"
 #include "Combat/RTSProjectile.h"
 
 
@@ -58,10 +60,23 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 		return;
 	}
 
+    // Calculate damage.
+    const FRTSAttackData& Attack = Attacks[0];
+
+    float Damage = Attack.Damage;
+
+    if (IsValid(OwnerController))
+    {
+        URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwnerController->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+        if (IsValid(PlayerAdvantageComponent))
+        {
+            Damage *= PlayerAdvantageComponent->GetOutgoingDamageFactor();
+        }
+    }
+
 	// Use attack.
 	UE_LOG(LogRTS, Log, TEXT("Actor %s attacks %s."), *Owner->GetName(), *Target->GetName());
-
-	const FRTSAttackData& Attack = Attacks[0];
 
 	ARTSProjectile* SpawnedProjectile = nullptr;
 
@@ -88,7 +103,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 			// Aim at target.
 			SpawnedProjectile->FireAt(
 				Target,
-				Attack.Damage,
+				Damage,
 				Attack.DamageType,
 				OwnerController,
 				Owner);
@@ -97,7 +112,7 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 	else
 	{
 		// Deal damage immediately.
-		Target->TakeDamage(Attack.Damage, FDamageEvent(Attack.DamageType), OwnerController, Owner);
+		Target->TakeDamage(Damage, FDamageEvent(Attack.DamageType), OwnerController, Owner);
 	}
 
 	// Start cooldown timer.

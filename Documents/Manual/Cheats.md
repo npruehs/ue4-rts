@@ -13,6 +13,9 @@ This will unlock the following built-in cheats to use in your console:
 | Cheat | Description |
 | --- | --- |
 | Boost | Increases construction and production speed. |
+| Damage | Increase damage of all own units. |
 | God | Invulnerability cheat. |
+| NoFog | Toggles fog of war on/off. |
 | Money | Adds resources. |
 | Victory | Defeat all other players. |
+| Weak | Decreases damage of all own units. |

@@ -24,6 +24,8 @@ ARTSVisionInfo::ARTSVisionInfo(const FObjectInitializer& ObjectInitializer /*= F
 	TeamIndex = 255;
 
 	PrimaryActorTick.bCanEverTick = true;
+
+    bRevealed = false;
 }
 
 void ARTSVisionInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -146,6 +148,16 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 	}
 }
 
+bool ARTSVisionInfo::IsRevealed() const
+{
+    return bRevealed;
+}
+
+void ARTSVisionInfo::SetRevealed(bool bInRevealed)
+{
+    bRevealed = bInRevealed;
+}
+
 uint8 ARTSVisionInfo::GetTeamIndex() const
 {
     return TeamIndex;
@@ -162,6 +174,11 @@ ERTSVisionState ARTSVisionInfo::GetVision(int32 X, int32 Y) const
     if (!VisionVolume)
     {
         return ERTSVisionState::VISION_Unknown;
+    }
+
+    if (bRevealed)
+    {
+        return ERTSVisionState::VISION_Visible;
     }
 
 	int32 TileIndex = GetTileIndex(X, Y);
