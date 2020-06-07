@@ -61,7 +61,12 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 	}
 
     // Calculate damage.
-    const FRTSAttackData& Attack = Attacks[0];
+    if (!Attacks.IsValidIndex(AttackIndex))
+    {
+        return;
+    }
+
+    const FRTSAttackData& Attack = Attacks[AttackIndex];
 
     float Damage = Attack.Damage;
 
