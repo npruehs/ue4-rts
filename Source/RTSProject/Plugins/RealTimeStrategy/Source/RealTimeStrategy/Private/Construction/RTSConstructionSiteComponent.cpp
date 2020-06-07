@@ -369,6 +369,10 @@ bool URTSConstructionSiteComponent::DoesStartImmediately() const
 {
     return bStartImmediately;
 }
+bool URTSConstructionSiteComponent::ShouldPreviewAttackRange() const
+{
+    return bPreviewAttackRange;
+}
 
 ERTSConstructionState URTSConstructionSiteComponent::GetState() const
 {

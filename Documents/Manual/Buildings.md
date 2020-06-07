@@ -31,3 +31,7 @@ _Note that, technically, producing units does not differ from researching techno
 
 1. Add an `RTSResourceDrainComponent` for each type of building gatherers may return resources to.
 1. Set the resource types to all resources accepted by the drain.
+
+### Defense
+
+1. If your building has an `RTSAttackComponent`, check _Preview Attack Range_ if you want the attack range of your building to be previewed while placing the building.

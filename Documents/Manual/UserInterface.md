@@ -81,6 +81,12 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 1. In your player controller, set the building cursor reference.
 
 
+### Range Indicators
+
+1. Create an actor deriving from `RTSRangeIndicator` (or use the `BP_RTSRangeIndicator` shipped with the plugin).
+1. At your building cursor, set the range indicator reference.
+
+
 ### Production UI
 
 1. Use `GetAvailableProducts` of a selected production actor to create buttons for your production options (e.g. whenever the player controller raises OnSelectionChanged).

@@ -1067,9 +1067,45 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
-	// Spawn dummy building.
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    // Check if we should preview attack range.
+    URTSConstructionSiteComponent* ConstructionSiteComponent =
+        URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
+
+    bool bPreviewAttackRange = false;
+    float AttackRange = 0.0f;
+
+    if (IsValid(ConstructionSiteComponent))
+    {
+        // Preview attack range.
+        bPreviewAttackRange = ConstructionSiteComponent->ShouldPreviewAttackRange();
+
+        if (bPreviewAttackRange)
+        {
+            URTSAttackComponent* AttackComponent =
+                URTSGameplayLibrary::FindDefaultComponentByClass<URTSAttackComponent>(BuildingClass);
+
+            if (IsValid(AttackComponent))
+            {
+                for (const FRTSAttackData& Attack : AttackComponent->GetAttacks())
+                {
+                    if (Attack.Range > AttackRange)
+                    {
+                        AttackRange = Attack.Range;
+                    }
+                }
+
+                AttackRange += URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2.0f;
+            }
+            else
+            {
+                bPreviewAttackRange = false;
+            }
+        }
+    }
+
+    // Spawn preview building.
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	UStaticMeshComponent* StaticMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UStaticMeshComponent>(BuildingClass);
 
@@ -1077,7 +1113,6 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
     {
         BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
         BuildingCursor->SetStaticMesh(StaticMeshComponent->GetStaticMesh(), StaticMeshComponent->GetRelativeTransform());
-        BuildingCursor->SetLocationValid(false);
     }
     else
     {
@@ -1087,10 +1122,20 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
         {
             BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
             BuildingCursor->SetSkeletalMesh(SkeletalMeshComponent->SkeletalMesh, SkeletalMeshComponent->GetRelativeTransform());
-            BuildingCursor->SetLocationValid(false);
         }
     }
-	
+    
+    if (IsValid(BuildingCursor))
+    {
+        BuildingCursor->SetLocationValid(false);
+
+        // Show attack range.
+        if (bPreviewAttackRange && AttackRange > 0.0f)
+        {
+            BuildingCursor->SetRange(AttackRange);
+        }
+    }
+
 	BuildingBeingPlacedClass = BuildingClass;
 
 	UE_LOG(LogRTS, Log, TEXT("Beginning placement of building %s."), *BuildingClass->GetName());

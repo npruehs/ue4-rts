@@ -107,6 +107,9 @@ public:
     UFUNCTION(BlueprintPure)
     bool DoesStartImmediately() const;
 
+    /** Whether the attack range of the building should be previewed while selecting a construction location. */
+    bool ShouldPreviewAttackRange() const;
+
     /** Whether the construction timer is currently being ticked, or not. */
     UFUNCTION(BlueprintPure)
     ERTSConstructionState GetState() const;
@@ -118,7 +121,6 @@ public:
     /** Gets the builders currently working at this construction site. */
     UFUNCTION(BlueprintPure)
     TArray<AActor*> GetAssignedBuilders() const;
-
 
 	/** Event when the construction timer has been started. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -180,6 +182,10 @@ private:
     /** Whether to start construction immediately after spawn, or not. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     bool bStartImmediately;
+
+    /** Whether the attack range of the building should be previewed while selecting a construction location. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bPreviewAttackRange;
 
 	/** Whether the construction timer is currently being ticked, or not. */
     UPROPERTY(EditInstanceOnly, Replicated, Category = "RTS")
