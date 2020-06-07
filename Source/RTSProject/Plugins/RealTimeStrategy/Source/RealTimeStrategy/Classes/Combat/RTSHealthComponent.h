@@ -7,6 +7,9 @@
 #include "RTSHealthComponent.generated.h"
 
 
+class AActor;
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSHealthComponentHealthChangedSignature, AActor*, Actor, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSHealthComponentKilledSignature, AActor*, Actor, AController*, PreviousOwner, AActor*, DamageCauser);
 
@@ -34,6 +37,9 @@ public:
     /** Gets the current health of the actor. */
     UFUNCTION(BlueprintPure)
     float GetCurrentHealth() const;
+
+    /** Sets the current health of the actor directly. */
+    void SetCurrentHealth(float NewHealth, AActor* DamageCauser);
 
 
 	/** Event when the current health of the actor has changed. */

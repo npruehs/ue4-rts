@@ -52,17 +52,10 @@ float URTSHealthComponent::GetCurrentHealth() const
     return CurrentHealth;
 }
 
-void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser)
 {
     float OldHealth = CurrentHealth;
-    CurrentHealth -= Damage;
-    float NewHealth = CurrentHealth;
-
-    UE_LOG(LogRTS, Log, TEXT("Actor %s has taken %f damage from %s, reducing health to %f."),
-        *GetOwner()->GetName(),
-        Damage,
-        *DamageCauser->GetName(),
-        CurrentHealth);
+    CurrentHealth = NewHealth;
 
     // Notify listeners.
     OnHealthChanged.Broadcast(GetOwner(), OldHealth, NewHealth, DamageCauser);
@@ -89,4 +82,9 @@ void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, co
             GameMode->NotifyOnActorKilled(GetOwner(), OwningPlayer);
         }
     }
+}
+
+void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+    SetCurrentHealth(CurrentHealth - Damage, DamageCauser);
 }

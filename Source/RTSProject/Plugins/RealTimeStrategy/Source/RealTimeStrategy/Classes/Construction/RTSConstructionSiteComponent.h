@@ -175,6 +175,10 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     float ProgressMadePerBuilder;
 
+    /** Health percentage to set when starting construction. Health will increase will construction progress. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    float InitialHealthPercentage;
+
     /** Resources to refund when canceling construction. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     float RefundFactor;

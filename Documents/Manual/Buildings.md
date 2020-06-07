@@ -13,6 +13,7 @@ From the perspective of the plugin, buildings are just units with a few addition
 1. Set the _Consumes Builders_ flag if builders working at the construction site should be destroyed when finished (similar to Zerg in StarCraft).
 1. Set _Max Assigned Builders_ if you want to require a builder to work at the construction site to make progress, and/or to allow multi-building (similar to Age of Empires).
 1. Set the _Progress Made Automatically_ and _Progress Made Per Builder_ factors.
+1. Set _Initial Health Percentage_ to a value between 0 and 1 to specify how much health the construction site should start with.
 1. Set the _Start Immediately_ flag unless you want to trigger construction start from script.
 1. Add an `RTSContainerComponent` if you want builders to enter the building site while building. Its capacity value will be automatically set at runtime to reflect _Max Assigned Builders_ of the construction site.
 1. Add your `RTSConstructionProgressBarWidgetComponent` (see [User Interface](UserInterface.md)).
