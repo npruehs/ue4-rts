@@ -10,6 +10,7 @@
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -47,7 +48,8 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 			// Enter construction site.
 			auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
-			if (ContainerComponent)
+			if (ContainerComponent && 
+                URTSGameplayTagLibrary::HasGameplayTag(ConstructionSite, URTSGameplayTagLibrary::Container_ConstructionSite()))
 			{
 				ContainerComponent->LoadActor(GetOwner());
 				OnConstructionSiteEntered.Broadcast(GetOwner(), ConstructionSite);

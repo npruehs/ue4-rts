@@ -4,7 +4,9 @@
 #include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSGameplayTagsComponent.h"
 #include "RTSLog.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -36,6 +38,13 @@ void URTSResourceSourceComponent::BeginPlay()
 	if (ContainerComponent)
 	{
 		ContainerComponent->SetCapacity(GathererCapacity);
+
+        URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
+
+        if (IsValid(GameplayTagsComponent))
+        {
+            GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ResourceSource());
+        }
 	}
 }
 

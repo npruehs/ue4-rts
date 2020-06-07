@@ -4,12 +4,14 @@
 #include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSGameplayTagsComponent.h"
 #include "RTSLog.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "Combat/RTSHealthComponent.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceType.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -51,6 +53,13 @@ void URTSConstructionSiteComponent::BeginPlay()
 	if (ContainerComponent)
 	{
 		ContainerComponent->SetCapacity(MaxAssignedBuilders);
+
+        URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
+
+        if (IsValid(GameplayTagsComponent))
+        {
+            GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ConstructionSite());
+        }
 	}
 }
 

@@ -21,6 +21,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "RTS")
     static bool HasGameplayTag(const AActor* Actor, const FGameplayTag& Tag);
 
+    /** Actor can contain builders. */
+    static const FGameplayTag& Container_ConstructionSite();
+
+    /** Actor can contain gatherers. */
+    static const FGameplayTag& Container_ResourceSource();
+
     /** Actor can be attacked by other actors. */
     static const FGameplayTag& Status_Permanent_CanBeAttacked();
 };
