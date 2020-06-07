@@ -21,6 +21,10 @@ public:
 	URTSContainerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
+    /** Gets whether the specified actor is inside this container. */
+    UFUNCTION(BlueprintPure)
+    bool ContainsActor(const AActor* Actor) const;
+
 	/** Whether the specified actor can enter this container. */
 	UFUNCTION(BlueprintPure)
 	virtual bool CanLoadActor(AActor* Actor) const;

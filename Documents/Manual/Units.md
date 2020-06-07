@@ -73,7 +73,7 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 
 1. Add an `RTSBuilderComponent` to any actors you want to be able to construct buildings.
 1. Set the _Constructible Building Classes_ for these builders.
-1. Check _Enter Construction Site_ if you want the builder to be unavailable while building (similar to Orcs in WarCraft).
+1. Check _Enter Construction Site_ if you want the builder to be unavailable while building (similar to Orcs in WarCraft). In that case, add a `RTSContainableComponent` as well.
 
 
 ### Gathering

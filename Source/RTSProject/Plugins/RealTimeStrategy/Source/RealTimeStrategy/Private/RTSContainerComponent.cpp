@@ -2,6 +2,7 @@
 
 #include "GameFramework/Actor.h"
 
+#include "RTSContainableComponent.h"
 #include "RTSLog.h"
 
 
@@ -10,6 +11,11 @@ URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectI
 {
 	// Set reasonable default values.
 	Capacity = 1;
+}
+
+bool URTSContainerComponent::ContainsActor(const AActor* Actor) const
+{
+    return ContainedActors.Contains(Actor);
 }
 
 bool URTSContainerComponent::CanLoadActor(AActor* Actor) const
@@ -32,6 +38,13 @@ void URTSContainerComponent::LoadActor(AActor* Actor)
 	// Add to container.
 	ContainedActors.Add(Actor);
 
+    URTSContainableComponent* ContainableComponent = Actor->FindComponentByClass<URTSContainableComponent>();
+
+    if (IsValid(ContainableComponent))
+    {
+        ContainableComponent->SetContainer(GetOwner());
+    }
+
 	// Hide actor.
 	Actor->SetActorHiddenInGame(true);
 	Actor->SetActorEnableCollision(false);
@@ -51,6 +64,13 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
 
 	// Remove from container.
 	ContainedActors.Remove(Actor);
+
+    URTSContainableComponent* ContainableComponent = Actor->FindComponentByClass<URTSContainableComponent>();
+
+    if (IsValid(ContainableComponent))
+    {
+        ContainableComponent->SetContainer(nullptr);
+    }
 
 	// Show actor.
 	Actor->SetActorHiddenInGame(false);
