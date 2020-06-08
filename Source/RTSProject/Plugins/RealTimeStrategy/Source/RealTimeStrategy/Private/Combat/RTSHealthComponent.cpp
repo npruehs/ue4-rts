@@ -52,6 +52,8 @@ void URTSHealthComponent::BeginPlay()
         Owner->GetWorldTimerManager().SetTimer(
             HealthRegenerationTimer, this, &URTSHealthComponent::OnHealthRegenerationTimerElapsed, 1.0f, true);
     }
+
+    LastTimeDamageTaken = 0.0f;
 }
 
 float URTSHealthComponent::GetMaximumHealth() const
@@ -73,6 +75,11 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
     AActor* Owner = GetOwner();
 
     OnHealthChanged.Broadcast(Owner, OldHealth, NewHealth, DamageCauser);
+
+    if (GetWorld() && OldHealth > NewHealth)
+    {
+        LastTimeDamageTaken = GetWorld()->GetRealTimeSeconds();
+    }
 
     // Check if we've just died.
     if (CurrentHealth <= 0)
@@ -110,6 +117,11 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
 void URTSHealthComponent::KillActor(AActor* DamageCauser /*= nullptr*/)
 {
     SetCurrentHealth(0.0f, DamageCauser);
+}
+
+float URTSHealthComponent::GetLastTimeDamageTaken() const
+{
+    return LastTimeDamageTaken;
 }
 
 void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)

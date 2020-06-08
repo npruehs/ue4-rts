@@ -46,6 +46,9 @@ public:
     /** Kills the actor immediately. */
     void KillActor(AActor* DamageCauser = nullptr);
 
+    /** Gets the last time the actor has taken damage. */
+    float GetLastTimeDamageTaken() const;
+
 
 	/** Event when the current health of the actor has changed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -75,6 +78,9 @@ private:
     /** Current health of the actor. */
     UPROPERTY(Replicated)
     float CurrentHealth;
+
+    /** Last time the actor has taken damage. */
+    float LastTimeDamageTaken;
 
     /** Timer for ticking health regeneration. */
     FTimerHandle HealthRegenerationTimer;

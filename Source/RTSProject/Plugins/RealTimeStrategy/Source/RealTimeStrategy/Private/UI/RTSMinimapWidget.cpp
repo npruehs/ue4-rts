@@ -10,12 +10,20 @@
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerState.h"
+#include "Combat/RTSHealthComponent.h"
 #include "UI/RTSMinimapVolume.h"
 #include "Vision/RTSFogOfWarActor.h"
 #include "Vision/RTSVisionInfo.h"
 #include "Vision/RTSVisionState.h"
 #include "Vision/RTSVisionVolume.h"
 
+
+URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
+{
+    // Set reasonable default values.
+    DamagedUnitBlinkTimeSeconds = 3.0f;
+}
 
 void URTSMinimapWidget::NotifyOnDrawUnit(
 	FPaintContext& Context,
@@ -215,7 +223,28 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 		{
 			if (OwnerComponent->GetPlayerOwner() == Player->PlayerState)
 			{
-				DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+                // Check if the unit has been taking damage lately.
+                URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
+                float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
+
+                if (!IsValid(HealthComponent) ||
+                    HealthComponent->GetLastTimeDamageTaken() <= 0.0f ||
+                    HealthComponent->GetLastTimeDamageTaken() + DamagedUnitBlinkTimeSeconds < RealTimeSeconds)
+                {
+                    DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+                }
+                else
+                {
+                    // Have unit blink while taking damage.
+                    if (RealTimeSeconds - FMath::FloorToFloat(RealTimeSeconds) <= 0.5)
+                    {
+                        DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+                    }
+                    else
+                    {
+                        DrawBoxWithBrush(InContext, ActorLocationMinimap, DamagedUnitsBlinkBrush);
+                    }
+                }
 			}
 			else if (OwnerComponent->GetPlayerOwner() != nullptr && !OwnerComponent->IsSameTeamAsController(Player))
 			{

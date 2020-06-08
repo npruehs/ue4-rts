@@ -24,6 +24,8 @@ class REALTIMESTRATEGY_API URTSMinimapWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+    URTSMinimapWidget(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
     /** Event for custom drawing of units on the minimap (e.g. for drawing hero portraits for hero units). */
     virtual void NotifyOnDrawUnit(
         FPaintContext& Context,
@@ -72,6 +74,10 @@ private:
     UPROPERTY(EditAnywhere, Category = "RTS|Units")
     FSlateBrush NeutralUnitsBrush;
 
+    /** Brush for drawing blinking damaged units on the minimap. */
+    UPROPERTY(EditAnywhere, Category = "RTS|Units")
+    FSlateBrush DamagedUnitsBlinkBrush;
+
     /** Whether to draw the minimap background layer. */
     UPROPERTY(EditAnywhere, Category = "RTS|Background")
     bool bDrawBackground = true;
@@ -87,6 +93,10 @@ private:
     /** Whether to show the current camera frustum on the minimap. */
     UPROPERTY(EditAnywhere, Category = "RTS|Camera")
     bool bDrawViewFrustum = true;
+
+    /** How long to have a unit change its color on the minimap after it has taken damage. */
+    UPROPERTY(EditAnywhere, Category = "RTS|Units")
+    float DamagedUnitBlinkTimeSeconds;
 
     /** Material to instance for rendering the fog of war effect. */
     UPROPERTY(EditAnywhere, Category = "RTS|Vision", meta=(AllowPrivateAccess="true"))
