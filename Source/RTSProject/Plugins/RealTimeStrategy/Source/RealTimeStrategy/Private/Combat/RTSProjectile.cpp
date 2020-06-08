@@ -78,13 +78,16 @@ void ARTSProjectile::Tick(float DeltaSeconds)
 
     if (IsValid(Target))
     {
-        UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
+        if (HasAuthority())
+        {
+            UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
 
-        // Deal damage.
-        Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
+            // Deal damage.
+            Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
 
-        // Notify listeners.
-        NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+            // Notify listeners.
+            NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+        }
     }
 
     // Destroy projectile.
@@ -138,4 +141,7 @@ void ARTSProjectile::MulticastFireAt_Implementation(AActor* ProjectileTarget, fl
         static const float G = 9.8067f;
         LaunchAngle = 0.5f * FMath::Asin(G * InitialDistance / (ProjectileMovement->InitialSpeed * ProjectileMovement->InitialSpeed));
     }
+
+    // Clients will take it from here.
+    TearOff();
 }
