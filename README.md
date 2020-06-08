@@ -58,6 +58,7 @@ Real-Time Strategy Plugin for Unreal Engine 4 currently supports the following U
 1. [Clone](https://github.com/npruehs/ue4-rts) the repository or [download](https://github.com/npruehs/ue4-rts/releases) a release.
 1. Copy the `RealTimeStrategy` folder to `Plugins` folder next to your `.uproject` file (create if necessary).
 1. Right-click your .uproject file and select Re-generate Visual Studio project files.
+1. If you want to create C++ subclasses of the plugin classes, add `"RealTimeStrategy"` to the `PublicDependencyModuleNames` of the `Build.cs` file of your project. Note that you might need to add other dependencies as well, depending on the respective class you want to extend. Take a look at `RealTimeStrategy.Build.cs` of the plugin for a full list of referenced engine modules.
 1. Build the resulting solution in Visual Studio.
 1. Start the Unreal Editor.
 
