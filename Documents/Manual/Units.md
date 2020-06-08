@@ -42,6 +42,7 @@ As mentioned before, units are not directly possessed by player controllers in t
 1. Add an `RTSAttackableComponent` and `RTSGameplayTagsComponent` to any actors that can be attacked.
 1. Add the `Status.Permanent.CanBeAttacked` tag to the `RTSGameplayTagsComponent`.
 1. Set the _Maximum Health_ of the `RTSHealthComponent`.
+1. In case your actor should regenerate health, check _Regenerate Health_ and set the _Health Regeneration Rate_.
 1. If you want to play animations or visual effects when the actor dies, set _Actor Death Type_ to _Stop Gameplay_. In that case, you're responsible of destroying the actor yourself as soon as all of your visual clues have finished playing.
 1. Add your `RTSHealthBarWidgetComponent` (see [User Interface](UserInterface.md)).
 

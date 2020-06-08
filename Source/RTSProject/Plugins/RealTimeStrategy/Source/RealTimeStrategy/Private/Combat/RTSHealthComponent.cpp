@@ -1,6 +1,8 @@
 #include "Combat/RTSHealthComponent.h"
 
+#include "TimerManager.h"
 #include "Engine/World.h"
+#include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -16,6 +18,7 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 
 	// Set reasonable default values.
 	MaximumHealth = 100.0f;
+    bRegenerateHealth = false;
     ActorDeathType = ERTSActorDeathType::DEATH_Destroy;
 }
 
@@ -42,6 +45,13 @@ void URTSHealthComponent::BeginPlay()
     }
 
     Owner->OnTakeAnyDamage.AddDynamic(this, &URTSHealthComponent::OnTakeAnyDamage);
+
+    if (bRegenerateHealth && Owner->HasAuthority())
+    {
+        // Set up health regeneration timer.
+        Owner->GetWorldTimerManager().SetTimer(
+            HealthRegenerationTimer, this, &URTSHealthComponent::OnHealthRegenerationTimerElapsed, 1.0f, true);
+    }
 }
 
 float URTSHealthComponent::GetMaximumHealth() const
@@ -100,4 +110,15 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
 void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
     SetCurrentHealth(CurrentHealth - Damage, DamageCauser);
+}
+
+void URTSHealthComponent::OnHealthRegenerationTimerElapsed()
+{
+    if (CurrentHealth >= MaximumHealth)
+    {
+        return;
+    }
+
+    float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenerationRate, 0.0f, MaximumHealth);
+    SetCurrentHealth(NewHealth, GetOwner());
 }

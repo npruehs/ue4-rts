@@ -57,6 +57,14 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
     float MaximumHealth;
 
+    /** Whether the actor is allowed to periodically regenerate health. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bRegenerateHealth;
+
+    /** Health restored for the actor, per second. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0, EditCondition = "bRegenerateHealth"))
+    float HealthRegenerationRate;
+
     /** How to handle depleted health. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     ERTSActorDeathType ActorDeathType;
@@ -65,6 +73,12 @@ private:
     UPROPERTY(Replicated)
     float CurrentHealth;
 
+    /** Timer for ticking health regeneration. */
+    FTimerHandle HealthRegenerationTimer;
+
     UFUNCTION()
     void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+    UFUNCTION()
+    void OnHealthRegenerationTimerElapsed();
 };
