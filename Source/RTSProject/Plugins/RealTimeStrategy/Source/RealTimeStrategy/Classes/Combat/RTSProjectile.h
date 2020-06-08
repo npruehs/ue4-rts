@@ -53,6 +53,14 @@ public:
 		AActor* ProjectileDamageCauser);
 
 private:
+    /** Whether the projectile should follow a ballistic trajectory on its way. Should not be used with homing projectiles. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bBallisticTrajectory;
+
+    /** How much to exaggerate the ballistic trajectory. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (EditCondition = bBallisticTrajectory))
+    float BallisticTrajectoryFactor;
+
     bool bFired;
 
     UPROPERTY()
@@ -69,6 +77,25 @@ private:
 
     float TimeToImpact;
 
+    /** How far away the projectile started flying towards its target. */
+    float InitialDistance;
+
+    /** How far above the ground the projectile started flying towards its target. */
+    float InitialHeight;
+
+    /** How far above the ground the target was when the projectile started flying towards it. */
+    float TargetHeight;
+
+    /** Angle at which the projectile has been launched if following a ballistic trajectory. */
+    float LaunchAngle;
+
 	UPROPERTY(VisibleAnywhere, Category = "RTS")
 	UProjectileMovementComponent* ProjectileMovement;
+
+    UFUNCTION(NetMulticast, Reliable)
+    void MulticastFireAt(AActor* ProjectileTarget,
+            float ProjectileDamage,
+            TSubclassOf<class UDamageType> ProjectileDamageType,
+            AController* ProjectileEventInstigator,
+            AActor* ProjectileDamageCauser);
 };
