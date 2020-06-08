@@ -107,6 +107,11 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
     }
 }
 
+void URTSHealthComponent::KillActor(AActor* DamageCauser /*= nullptr*/)
+{
+    SetCurrentHealth(0.0f, DamageCauser);
+}
+
 void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
     SetCurrentHealth(CurrentHealth - Damage, DamageCauser);

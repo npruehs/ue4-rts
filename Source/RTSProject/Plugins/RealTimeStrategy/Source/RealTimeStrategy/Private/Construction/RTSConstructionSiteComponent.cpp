@@ -355,7 +355,16 @@ void URTSConstructionSiteComponent::CancelConstruction()
     }
 
 	// Destroy construction site.
-	GetOwner()->Destroy();
+    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+
+    if (IsValid(HealthComponent))
+    {
+        HealthComponent->KillActor(GetOwner());
+    }
+    else
+    {
+        GetOwner()->Destroy();
+    }
 
 	// Notify listeners.
 	OnConstructionCanceled.Broadcast(GetOwner());

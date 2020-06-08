@@ -43,6 +43,9 @@ public:
     /** Sets the current health of the actor directly. */
     void SetCurrentHealth(float NewHealth, AActor* DamageCauser);
 
+    /** Kills the actor immediately. */
+    void KillActor(AActor* DamageCauser = nullptr);
+
 
 	/** Event when the current health of the actor has changed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
