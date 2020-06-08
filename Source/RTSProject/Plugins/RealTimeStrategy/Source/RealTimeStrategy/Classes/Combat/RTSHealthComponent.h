@@ -4,6 +4,8 @@
 
 #include "Components/ActorComponent.h"
 
+#include "Combat/RTSActorDeathType.h"
+
 #include "RTSHealthComponent.generated.h"
 
 
@@ -54,6 +56,10 @@ private:
     /** Maximum health of the actor. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
     float MaximumHealth;
+
+    /** How to handle depleted health. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    ERTSActorDeathType ActorDeathType;
 
     /** Current health of the actor. */
     UPROPERTY(Replicated)

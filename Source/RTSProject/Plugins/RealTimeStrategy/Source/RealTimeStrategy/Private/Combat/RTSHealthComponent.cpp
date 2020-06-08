@@ -6,6 +6,7 @@
 
 #include "RTSGameMode.h"
 #include "RTSLog.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -15,6 +16,7 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 
 	// Set reasonable default values.
 	MaximumHealth = 100.0f;
+    ActorDeathType = ERTSActorDeathType::DEATH_Destroy;
 }
 
 void URTSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,28 +60,39 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
     CurrentHealth = NewHealth;
 
     // Notify listeners.
-    OnHealthChanged.Broadcast(GetOwner(), OldHealth, NewHealth, DamageCauser);
+    AActor* Owner = GetOwner();
+
+    OnHealthChanged.Broadcast(Owner, OldHealth, NewHealth, DamageCauser);
 
     // Check if we've just died.
     if (CurrentHealth <= 0)
     {
-        UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *GetOwner()->GetName());
+        UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *Owner->GetName());
 
         // Get owner before destruction.
-        AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());
+        AController* OwningPlayer = Cast<AController>(Owner->GetOwner());
 
         // Notify listeners.
-        OnKilled.Broadcast(GetOwner(), OwningPlayer, DamageCauser);
+        OnKilled.Broadcast(Owner, OwningPlayer, DamageCauser);
 
-        // Destroy this actor.
-        GetOwner()->Destroy();
+        // Stop or destroy actor.
+        switch (ActorDeathType)
+        {
+        case ERTSActorDeathType::DEATH_StopGameplay:
+            URTSGameplayLibrary::StopGameplayFor(Owner);
+            break;
+
+        case ERTSActorDeathType::DEATH_Destroy:
+            Owner->Destroy();
+            break;
+        }
 
         // Notify game mode.
         ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
         if (GameMode != nullptr)
         {
-            GameMode->NotifyOnActorKilled(GetOwner(), OwningPlayer);
+            GameMode->NotifyOnActorKilled(Owner, OwningPlayer);
         }
     }
 }

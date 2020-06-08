@@ -3,12 +3,16 @@
 #include "EngineUtils.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerState.h"
 #include "RTSRequirementsComponent.h"
+#include "RTSSelectableComponent.h"
+#include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
+#include "Economy/RTSGathererComponent.h"
 
 
 UActorComponent* URTSGameplayLibrary::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)
@@ -78,6 +82,28 @@ bool URTSGameplayLibrary::OwnerMeetsAllRequirementsFor(UObject* WorldContextObje
 {
     TSubclassOf<AActor> MissingRequirement;
     return !GetMissingRequirementFor(WorldContextObject, OwnedActor, DesiredProduct, MissingRequirement);
+}
+
+void URTSGameplayLibrary::StopGameplayFor(AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return;
+    }
+
+    Actor->SetActorEnableCollision(false);
+
+    UCharacterMovementComponent* CharacterMovement = Actor->FindComponentByClass<UCharacterMovementComponent>();
+
+    if (CharacterMovement != nullptr)
+    {
+        CharacterMovement->SetMovementMode(MOVE_None);
+    }
+
+    DestroyComponentByClass<URTSSelectableComponent>(Actor);
+    DestroyComponentByClass<URTSAttackComponent>(Actor);
+    DestroyComponentByClass<URTSGathererComponent>(Actor);
+    DestroyComponentByClass<URTSConstructionSiteComponent>(Actor);
 }
 
 bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement)
