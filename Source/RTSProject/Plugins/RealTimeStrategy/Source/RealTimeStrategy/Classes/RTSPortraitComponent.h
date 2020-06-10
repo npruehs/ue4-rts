@@ -23,6 +23,9 @@ public:
     UFUNCTION(BlueprintPure)
     UTexture2D* GetPortrait() const;
 
+	UFUNCTION(BlueprintCallable)
+    void SetPortrait(UTexture2D* NewPortrait);
+
 private:
 	/** Portrait of the actor. Can be shown in the UI. */
 	UPROPERTY(EditDefaultsOnly, Category = "RTS")

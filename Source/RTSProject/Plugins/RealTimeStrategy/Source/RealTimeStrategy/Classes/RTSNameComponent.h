@@ -18,7 +18,10 @@ class REALTIMESTRATEGY_API URTSNameComponent : public UActorComponent
 public:
     /** Gets the name of the actor. */
     UFUNCTION(BlueprintPure)
-    FText GetName() const;
+    FText GetNameRTS() const;
+
+    UFUNCTION(BlueprintCallable)
+    void SetName(const FText& NewName);
 
 private:
     /** Name of the actor. */

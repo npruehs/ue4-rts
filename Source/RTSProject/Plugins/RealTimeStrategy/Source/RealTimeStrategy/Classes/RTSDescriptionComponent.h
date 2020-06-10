@@ -20,6 +20,9 @@ public:
     UFUNCTION(BlueprintPure)
     FText GetDescription() const;
 
+    UFUNCTION(BlueprintCallable)
+    void SetDescription(const FText& NewDescription);
+
 private:
     /** Description of the actor. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
