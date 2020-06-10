@@ -1,6 +1,6 @@
 #include "RTSNameComponent.h"
 
-FText URTSNameComponent::GetNameRTS() const
+FText URTSNameComponent::GetName() const
 {
     return Name;
 }
