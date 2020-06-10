@@ -36,3 +36,8 @@ _Note that, technically, producing units does not differ from researching techno
 ### Defense
 
 1. If your building has an `RTSAttackComponent`, check _Preview Attack Range_ if you want the attack range of your building to be previewed while placing the building.
+
+### Projectile Impacts
+
+1. While your building is under attack, you might want to prevent every single projectile hitting the exact same location. You can add a `RTSProjectileTargetComponent` to your actor, and specify the _Target Sockets_ to have projectile fly towards. These sockets have to be added to your static mesh using the built-in Unreal socket manager.
+2. If your building has multiple mesh components, add a _component tag_ to the desired mesh component and specify the same tag at your `RTSProjectileTargetComponent`.

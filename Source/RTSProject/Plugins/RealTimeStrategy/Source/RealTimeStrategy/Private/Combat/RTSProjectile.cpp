@@ -6,6 +6,7 @@
 
 #include "RTSLog.h"
 #include "RTSOwnerComponent.h"
+#include "Combat/RTSProjectileTargetComponent.h"
 
 
 ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -174,15 +175,26 @@ void ARTSProjectile::MulticastFireAt_Implementation(AActor* ProjectileTarget, fl
     EventInstigator = ProjectileEventInstigator;
     DamageCauser = ProjectileDamageCauser;
 
-    TargetLocation = Target->GetActorLocation();
+    // Find target location.
+    URTSProjectileTargetComponent* ProjectileTargetComponent =
+        Target->FindComponentByClass<URTSProjectileTargetComponent>();
+
+    if (IsValid(ProjectileTargetComponent))
+    {
+        TargetLocation = ProjectileTargetComponent->GetRandomProjectileTargetLocation();
+    }
+    else
+    {
+        TargetLocation = Target->GetActorLocation();
+    }
 
     // Set direction.
-    FVector Direction = Target->GetActorLocation() - GetActorLocation();
+    FVector Direction = TargetLocation - GetActorLocation();
     FVector DirectionNormalized = Direction.GetSafeNormal(0.01f);
 
     InitialDistance = Direction.Size();
     InitialHeight = GetActorLocation().Z;
-    TargetHeight = Target->GetActorLocation().Z;
+    TargetHeight = TargetLocation.Z;
 
     ProjectileMovement->Velocity = DirectionNormalized * ProjectileMovement->InitialSpeed;
 
