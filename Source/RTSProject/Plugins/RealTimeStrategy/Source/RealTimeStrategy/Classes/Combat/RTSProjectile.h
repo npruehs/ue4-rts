@@ -61,10 +61,28 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (EditCondition = bBallisticTrajectory))
     float BallisticTrajectoryFactor;
 
+    /** Whether this projectile causes an area of effect when hitting its target location. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bApplyAreaOfEffect;
+
+    /** Radius around impact location in which targets take damage. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (EditCondition = bApplyAreaOfEffect, ClampMin = 0))
+    float AreaOfEffect;
+
+    /** Object types to query when finding area of effect targets near the impact location. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (EditCondition = bApplyAreaOfEffect))
+    TArray<TEnumAsByte<EObjectTypeQuery>> AreaOfEffectTargetObjectTypeFilter;
+    
+    /** Actor class to filter by when finding area of effect targets near the impact location. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (EditCondition = bApplyAreaOfEffect))
+    TSubclassOf<AActor> AreaOfEffectTargetClassFilter;
+
     bool bFired;
 
     UPROPERTY()
 	AActor* Target;
+
+    FVector TargetLocation;
 
 	float Damage;
 	TSubclassOf<class UDamageType> DamageType;
@@ -98,4 +116,7 @@ private:
             TSubclassOf<class UDamageType> ProjectileDamageType,
             AController* ProjectileEventInstigator,
             AActor* ProjectileDamageCauser);
+
+    void HitTargetActor(AActor* Actor);
+    void HitTargetLocation();
 };

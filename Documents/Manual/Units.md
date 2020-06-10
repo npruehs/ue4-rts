@@ -59,6 +59,7 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. Add a static mesh and any visual effects.
 1. At the `ProjectileMovement` component, set its _Initial Speed_ (e.g. to 1000).
 1. If you want your projectile to use a ballistic trajectory, check _Ballistic Trajectory_ at the projectile and set the _Ballistic Trajectory Factor_ as you like.
+1. For dealing area of effect damage, check _Apply Area Of Effect_ and set your area of effect radius and collision filters.
 1. At the `RTSAttackComponent`, reference the new projectile in your attack.
 
 

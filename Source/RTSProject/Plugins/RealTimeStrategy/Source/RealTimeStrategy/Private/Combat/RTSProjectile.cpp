@@ -1,8 +1,11 @@
 #include "Combat/RTSProjectile.h"
 
+#include "GameFramework/Pawn.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #include "RTSLog.h"
+#include "RTSOwnerComponent.h"
 
 
 ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -23,6 +26,11 @@ ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= F
 
     // Set reasonable default values.
     BallisticTrajectoryFactor = 600.0f;
+
+    AreaOfEffect = 1000.0f;
+    AreaOfEffectTargetObjectTypeFilter.Add(EObjectTypeQuery::ObjectTypeQuery2); // WorldDynamic
+    AreaOfEffectTargetObjectTypeFilter.Add(EObjectTypeQuery::ObjectTypeQuery3); // Pawn
+    AreaOfEffectTargetClassFilter = APawn::StaticClass();
 }
 
 void ARTSProjectile::FireAt(
@@ -76,19 +84,20 @@ void ARTSProjectile::Tick(float DeltaSeconds)
         return;
 	}
 
-    if (IsValid(Target))
+    if (HasAuthority())
     {
-        if (HasAuthority())
+        if (!bApplyAreaOfEffect)
         {
-            UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Target->GetName(), Damage);
-
-            // Deal damage.
-            Target->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
-
-            // Notify listeners.
-            NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+            HitTargetActor(Target);
+        }
+        else
+        {
+            HitTargetLocation();
         }
     }
+
+    // Notify listeners.
+    NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
 
     // Destroy projectile.
     Destroy();
@@ -104,6 +113,57 @@ void ARTSProjectile::NotifyOnProjectileDetonated(
 	ReceiveOnProjectileDetonated(ProjectileTarget, ProjectileDamage, ProjectileDamageType, ProjectileEventInstigator, ProjectileDamageCauser);
 }
 
+void ARTSProjectile::HitTargetActor(AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return;
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Actor->GetName(), Damage);
+
+    // Deal damage.
+    Actor->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
+}
+
+void ARTSProjectile::HitTargetLocation()
+{
+    // Overlap actors in target area.
+    TArray<AActor*> OverlapedActors;
+    TArray<AActor*> ActorsToIgnore;
+
+    UKismetSystemLibrary::CapsuleOverlapActors(this, FVector(TargetLocation.X, TargetLocation.Y, 0.0f),
+        AreaOfEffect, 10000.0f,
+        AreaOfEffectTargetObjectTypeFilter, AreaOfEffectTargetClassFilter,
+        ActorsToIgnore, OverlapedActors);
+
+    // Collect valid targets (e.g. by owner).
+    for (AActor* OverlapedActor : OverlapedActors)
+    {
+        if (!IsValid(OverlapedActor))
+        {
+            continue;
+        }
+
+        // Note that we always apply the effects to the real projectile target.
+        // This is necessary for forced attacks to friendly units.
+        if (OverlapedActor == Target)
+        {
+            HitTargetActor(OverlapedActor);
+            continue;
+        }
+
+        // Check owner.
+        URTSOwnerComponent* OwnerComponent = OverlapedActor->FindComponentByClass<URTSOwnerComponent>();
+
+        if (IsValid(OwnerComponent) && !OwnerComponent->IsSameTeamAsActor(DamageCauser))
+        {
+            HitTargetActor(OverlapedActor);
+            continue;
+        }
+    }
+}
+
 void ARTSProjectile::MulticastFireAt_Implementation(AActor* ProjectileTarget, float ProjectileDamage,
     TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator,
     AActor* ProjectileDamageCauser)
@@ -113,6 +173,8 @@ void ARTSProjectile::MulticastFireAt_Implementation(AActor* ProjectileTarget, fl
     DamageType = ProjectileDamageType;
     EventInstigator = ProjectileEventInstigator;
     DamageCauser = ProjectileDamageCauser;
+
+    TargetLocation = Target->GetActorLocation();
 
     // Set direction.
     FVector Direction = Target->GetActorLocation() - GetActorLocation();
