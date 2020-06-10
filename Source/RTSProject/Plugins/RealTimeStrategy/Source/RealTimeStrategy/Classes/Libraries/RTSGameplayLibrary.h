@@ -55,7 +55,7 @@ public:
 
     /** Checks whether the specified actor is ready to use (e.g. finished construction). */
     UFUNCTION(BlueprintPure, Category = "RTS")
-    static bool IsReadyToUse(AActor* Actor);
+    static bool IsReadyToUse(const AActor* Actor);
 
     /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
     UFUNCTION(BlueprintPure, Category = "RTS", meta = (WorldContext = "WorldContextObject"))

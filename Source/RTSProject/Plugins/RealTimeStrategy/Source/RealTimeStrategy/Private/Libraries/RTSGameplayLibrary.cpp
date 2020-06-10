@@ -66,7 +66,7 @@ bool URTSGameplayLibrary::IsAIUnit(AActor* Actor)
 
 }
 
-bool URTSGameplayLibrary::IsReadyToUse(AActor* Actor)
+bool URTSGameplayLibrary::IsReadyToUse(const AActor* Actor)
 {
     if (!Actor)
     {

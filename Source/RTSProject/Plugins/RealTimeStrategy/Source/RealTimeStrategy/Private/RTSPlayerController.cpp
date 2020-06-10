@@ -939,6 +939,39 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 		}
 	}
 
+    // Sort by priority and lifetime.
+    Actors.Sort([=](const AActor& Lhs, const AActor& Rhs) {
+        const URTSSelectableComponent* FirstSelectableComponent = Lhs.FindComponentByClass<URTSSelectableComponent>();
+        const URTSSelectableComponent* SecondSelectableComponent = Rhs.FindComponentByClass<URTSSelectableComponent>();
+
+        if (!IsValid(FirstSelectableComponent) || !IsValid(SecondSelectableComponent))
+        {
+            return true;
+        }
+
+        if (FirstSelectableComponent->GetSelectionPriority() > SecondSelectableComponent->GetSelectionPriority())
+        {
+            return true;
+        }
+
+        if (FirstSelectableComponent->GetSelectionPriority() < SecondSelectableComponent->GetSelectionPriority())
+        {
+            return false;
+        }
+
+        if (URTSGameplayLibrary::IsReadyToUse(&Lhs) && !URTSGameplayLibrary::IsReadyToUse(&Rhs))
+        {
+            return true;
+        }
+
+        if (!URTSGameplayLibrary::IsReadyToUse(&Lhs) && URTSGameplayLibrary::IsReadyToUse(&Rhs))
+        {
+            return false;
+        }
+
+        return Lhs.CreationTime < Rhs.CreationTime;
+    });
+
 	// Apply new selection.
 	SelectedActors = Actors;
 

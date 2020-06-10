@@ -40,6 +40,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
+    /** Gets the sort index for selected units. */
+    UFUNCTION(BlueprintPure)
+    int32 GetSelectionPriority() const;
+
     /** Gets the sound to play when the actor is selected. */
     USoundCue* GetSelectedSound() const;
 
@@ -53,6 +57,10 @@ public:
 
 
 private:
+    /** Sort index for selected units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    int32 SelectionPriority;
+
     /** Material for rendering the selection circle of the actor. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     UMaterialInterface* SelectionCircleMaterial;

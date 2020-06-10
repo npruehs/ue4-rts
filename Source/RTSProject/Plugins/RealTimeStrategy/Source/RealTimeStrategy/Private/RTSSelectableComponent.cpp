@@ -90,6 +90,11 @@ bool URTSSelectableComponent::IsSelected() const
 	return bSelected;
 }
 
+int32 URTSSelectableComponent::GetSelectionPriority() const
+{
+    return SelectionPriority;
+}
+
 USoundCue* URTSSelectableComponent::GetSelectedSound() const
 {
     return SelectedSound;
