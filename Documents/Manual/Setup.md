@@ -22,7 +22,7 @@ Make sure _View Plugin Content_ is enabled in your view options.
 1. Set the _Pawn Behavior Tree Asset_ of the new pawn AI controller to `BT_RTSPawnBehaviorTree`.
 1. Set the _Pawn Blackboard Asset_ of the new pawn AI controller to `BB_RTSPawnBlackboard`.
 1. Create a player start deriving from `RTSPlayerStart`.
-1. Create one or more resource types deriving from `RTSResourceType`.
+1. Create one or more resource types deriving from `RTSResourceType`, setting their names and icons to use in your UI.
 1. Add the resource types to the `PlayerResourcesComponent` of your player controller.
 
 
