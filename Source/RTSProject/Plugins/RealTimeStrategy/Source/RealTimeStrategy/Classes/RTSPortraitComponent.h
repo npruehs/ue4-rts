@@ -23,6 +23,7 @@ public:
     UFUNCTION(BlueprintPure)
     UTexture2D* GetPortrait() const;
 
+	/** Sets the portrait of the actor. */
 	UFUNCTION(BlueprintCallable)
     void SetPortrait(UTexture2D* NewPortrait);
 

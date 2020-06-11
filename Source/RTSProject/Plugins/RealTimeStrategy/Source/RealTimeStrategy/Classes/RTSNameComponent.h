@@ -20,6 +20,7 @@ public:
     UFUNCTION(BlueprintPure)
     FText GetName() const;
 
+    /** Sets the name of the actor. */
     UFUNCTION(BlueprintCallable)
     void SetName(const FText& NewName);
 

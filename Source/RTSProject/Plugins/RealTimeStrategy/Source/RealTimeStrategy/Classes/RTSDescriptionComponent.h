@@ -20,6 +20,7 @@ public:
     UFUNCTION(BlueprintPure)
     FText GetDescription() const;
 
+    /** Sets the description of the actor. */
     UFUNCTION(BlueprintCallable)
     void SetDescription(const FText& NewDescription);
 
