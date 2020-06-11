@@ -14,6 +14,7 @@ As mentioned before, most features of the plugin are implemented by the means of
 1. Add an `RTSDescriptionComponent` and set its localized text if you want to show it in any kind of ingame UI. 
 1. Add an `RTSPortraitComponent` and set its portrait if you want to show it in any kind of ingame UI.
 1. Add an `RTSSelectableComponent`, and set its selection circle material (e.g. to `M_RTSSelectionCircle`) and selection sound.
+1. If the selection order of your actors matters (e.g. for grouping in your UI), set the _Selection Priority_ as well.
 1. Add an `RTSOwnerComponent`. This will be used to store (and replicate) the owner of the unit for all players (e.g. for showing team colors).
 1. Add your `RTSHoveredActorWidgetComponent` (see [User Interface](UserInterface.md)).
 
