@@ -1737,6 +1737,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
     }
 
 	// Get hovered actors.
+    AActor* OldHoveredActor = HoveredActor;
 	HoveredActor = nullptr;
 
 	TArray<FHitResult> HitResults;
@@ -1778,4 +1779,28 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
 	// Verify selection.
 	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+
+    // Notify listeners.
+    if (OldHoveredActor != HoveredActor)
+    {
+        if (IsValid(OldHoveredActor))
+        {
+            auto OldHoveredSelectableComponent = OldHoveredActor->FindComponentByClass<URTSSelectableComponent>();
+
+            if (OldHoveredSelectableComponent)
+            {
+                OldHoveredSelectableComponent->UnhoverActor();
+            }
+        }
+
+        if (IsValid(HoveredActor))
+        {
+            auto HoveredSelectableComponent = HoveredActor->FindComponentByClass<URTSSelectableComponent>();
+
+            if (HoveredSelectableComponent)
+            {
+                HoveredSelectableComponent->HoverActor();
+            }
+        }
+    }
 }

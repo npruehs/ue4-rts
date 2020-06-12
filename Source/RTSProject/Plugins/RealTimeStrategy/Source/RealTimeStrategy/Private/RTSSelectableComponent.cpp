@@ -90,6 +90,37 @@ bool URTSSelectableComponent::IsSelected() const
 	return bSelected;
 }
 
+void URTSSelectableComponent::HoverActor()
+{
+    if (bHovered)
+    {
+        return;
+    }
+
+    bHovered = true;
+
+    // Notify listeners.
+    OnHovered.Broadcast(GetOwner());
+}
+
+void URTSSelectableComponent::UnhoverActor()
+{
+    if (!bHovered)
+    {
+        return;
+    }
+
+    bHovered = false;
+
+    // Notify listeners.
+    OnUnhovered.Broadcast(GetOwner());
+}
+
+bool URTSSelectableComponent::IsHovered() const
+{
+    return bHovered;
+}
+
 int32 URTSSelectableComponent::GetSelectionPriority() const
 {
     return SelectionPriority;

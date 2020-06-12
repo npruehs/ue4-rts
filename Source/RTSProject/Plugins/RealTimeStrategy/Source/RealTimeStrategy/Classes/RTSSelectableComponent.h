@@ -14,6 +14,8 @@ class USoundCue;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentSelectedSignature, AActor*, Actor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentDeselectedSignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentHoveredSignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentUnhoveredSignature, AActor*, Actor);
 
 
 /**
@@ -40,6 +42,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
+    /** Hovers the unit for the local player. */
+    void HoverActor();
+
+    /** Unhovers the unit for the local player. */
+    void UnhoverActor();
+
+    /** Checks whether the unit is currently hovered by the local player, or not. */
+    UFUNCTION(BlueprintPure)
+    bool IsHovered() const;
+
     /** Gets the sort index for selected units. */
     UFUNCTION(BlueprintPure)
     int32 GetSelectionPriority() const;
@@ -54,6 +66,14 @@ public:
 	/** Event when the actor has been selected. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSSelectableComponentSelectedSignature OnSelected;
+
+    /** Event when the actor has been hovered. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSSelectableComponentHoveredSignature OnHovered;
+
+    /** Event when the actor has been unhovered. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSSelectableComponentUnhoveredSignature OnUnhovered;
 
 
 private:
@@ -71,6 +91,9 @@ private:
 
 	/** Whether the unit is currently selected by the local player, or not. */
 	bool bSelected;
+
+    /** Whether the unit is currently hovered by the local player, or not. */
+    bool bHovered;
 
     /** Decal used for rendering the selection circle of the actor. */
     UPROPERTY()
