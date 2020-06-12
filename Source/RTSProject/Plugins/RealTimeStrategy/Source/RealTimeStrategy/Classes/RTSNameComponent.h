@@ -20,6 +20,10 @@ public:
     UFUNCTION(BlueprintPure)
     FText GetName() const;
 
+    /** Sets the name of the actor. */
+    UFUNCTION(BlueprintCallable)
+    void SetName(const FText& NewName);
+
 private:
     /** Name of the actor. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
