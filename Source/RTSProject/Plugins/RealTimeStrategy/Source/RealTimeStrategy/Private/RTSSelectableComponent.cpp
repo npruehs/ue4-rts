@@ -47,6 +47,16 @@ void URTSSelectableComponent::BeginPlay()
     DecalComponent->SetHiddenInGame(true);
 }
 
+void URTSSelectableComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
+{
+    Super::DestroyComponent(bPromoteChildren);
+
+    if (IsValid(DecalComponent))
+    {
+        DecalComponent->DestroyComponent();
+    }
+}
+
 void URTSSelectableComponent::SelectActor()
 {
 	if (bSelected)

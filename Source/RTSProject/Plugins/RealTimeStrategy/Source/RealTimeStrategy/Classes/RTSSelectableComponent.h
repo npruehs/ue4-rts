@@ -28,6 +28,7 @@ class REALTIMESTRATEGY_API URTSSelectableComponent : public UActorComponent
 
 public:
     virtual void BeginPlay() override;
+    virtual void DestroyComponent(bool bPromoteChildren = false) override;
 
 
 	/** Selects the unit for the local player. */
