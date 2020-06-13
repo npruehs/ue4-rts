@@ -99,3 +99,8 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 
 1. Add an `RTSBountyComponent` to any actors you want to grant bounties to killing players.
 1. Set the _Bounty_ for these actors.
+
+
+### Multiplayer
+
+1. If you're working on an online game, check _Always Relevant_ for your actor.
