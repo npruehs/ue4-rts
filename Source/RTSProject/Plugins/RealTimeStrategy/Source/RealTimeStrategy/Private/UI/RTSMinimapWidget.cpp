@@ -213,6 +213,17 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 	for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 	{
 		AActor* Actor = *ActorIt;
+
+        if (!IsValid(Actor))
+        {
+            continue;
+        }
+
+        if (Actor->IsHidden())
+        {
+            continue;
+        }
+
 		URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
 
 		FVector ActorLocationWorld = Actor->GetActorLocation();
