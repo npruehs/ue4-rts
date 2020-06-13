@@ -5,6 +5,7 @@
 #include "RTSContainableComponent.h"
 #include "RTSLog.h"
 #include "Combat/RTSHealthComponent.h"
+#include "Vision/RTSVisibleComponent.h"
 
 
 URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -68,7 +69,17 @@ void URTSContainerComponent::LoadActor(AActor* Actor)
     }
 
 	// Hide actor.
-	Actor->SetActorHiddenInGame(true);
+    URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
+
+    if (!IsValid(VisibleComponent))
+    {
+        UE_LOG(LogRTS, Warning, TEXT("%s has a RTSContainerComponent, but no RTSVisibleComponent. "
+            "Actor visibility will be handled by container component itself. "
+            "Add an RTSVisibleComponent and URTSContainableComponent to ensure visibility can be determined by multiple reasons (e.g. containers and fog of war)."),
+            *Actor->GetName());
+        Actor->SetActorHiddenInGame(true);
+    }
+	
 	Actor->SetActorEnableCollision(false);
 
 	// Notify listeners.
@@ -95,7 +106,13 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
     }
 
 	// Show actor.
-	Actor->SetActorHiddenInGame(false);
+    URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
+
+    if (!IsValid(VisibleComponent))
+    {
+        Actor->SetActorHiddenInGame(false);
+    }
+
 	Actor->SetActorEnableCollision(true);
 
 	// Notify listeners.

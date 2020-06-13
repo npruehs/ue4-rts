@@ -27,6 +27,9 @@ public:
     /** Actor can contain gatherers. */
     static const FGameplayTag& Container_ResourceSource();
 
+    /** Actor is hidden because of being in a container. */
+    static const FGameplayTag& HideReason_Container();
+
     /** Actor can be attacked by other actors. */
     static const FGameplayTag& Status_Permanent_CanBeAttacked();
 };

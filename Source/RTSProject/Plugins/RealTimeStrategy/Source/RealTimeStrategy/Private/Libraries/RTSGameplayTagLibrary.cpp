@@ -28,6 +28,12 @@ const FGameplayTag& URTSGameplayTagLibrary::Container_ResourceSource()
     return Tag;
 }
 
+const FGameplayTag& URTSGameplayTagLibrary::HideReason_Container()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("HideReason.Container")));
+    return Tag;
+}
+
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()
 {
     static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeAttacked")));

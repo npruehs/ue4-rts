@@ -9,12 +9,14 @@
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
+#include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 
 #include "RTSCameraBoundsVolume.h"
 #include "RTSPawnAIController.h"
 #include "RTSGameMode.h"
+#include "RTSGameState.h"
 #include "RTSLog.h"
 #include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
@@ -36,6 +38,7 @@
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
 #include "Vision/RTSVisionInfo.h"
+#include "Vision/RTSVisionManager.h"
 
 
 ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -1621,12 +1624,17 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 	}
 
 	// Setup fog of war.
-	for (TActorIterator<ARTSFogOfWarActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
-	{
-		ARTSFogOfWarActor* FogOfWarActor = *ActorIt;
-		FogOfWarActor->SetupVisionInfo(VisionInfo);
-		break;
-	}
+    ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
+
+    if (IsValid(GameState))
+    {
+        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+
+        if (IsValid(VisionManager))
+        {
+            VisionManager->SetLocalVisionInfo(VisionInfo);
+        }
+    }
 
 	// Allow others to setup vision.
 	ReceiveOnVisionInfoAvailable(VisionInfo);
