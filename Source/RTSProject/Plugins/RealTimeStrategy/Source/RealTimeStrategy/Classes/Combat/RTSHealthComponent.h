@@ -76,7 +76,7 @@ private:
     ERTSActorDeathType ActorDeathType;
 
     /** Current health of the actor. */
-    UPROPERTY(Replicated)
+    UPROPERTY(ReplicatedUsing=ReceivedCurrentHealth)
     float CurrentHealth;
 
     /** Last time the actor has taken damage. */
@@ -90,4 +90,7 @@ private:
 
     UFUNCTION()
     void OnHealthRegenerationTimerElapsed();
+
+    UFUNCTION()
+    void ReceivedCurrentHealth(float OldHealth);
 };

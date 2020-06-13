@@ -139,3 +139,8 @@ void URTSHealthComponent::OnHealthRegenerationTimerElapsed()
     float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenerationRate, 0.0f, MaximumHealth);
     SetCurrentHealth(NewHealth, GetOwner());
 }
+
+void URTSHealthComponent::ReceivedCurrentHealth(float OldHealth)
+{
+    OnHealthChanged.Broadcast(GetOwner(), OldHealth, CurrentHealth, nullptr);
+}
