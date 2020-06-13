@@ -76,6 +76,11 @@ bool URTSOwnerComponent::IsSameTeamAsActor(AActor* Other) const
 
 bool URTSOwnerComponent::IsSameTeamAsController(AController* C) const
 {
+    if (!IsValid(C))
+    {
+        return false;
+    }
+
 	ARTSPlayerState* MyOwner = GetPlayerOwner();
 	ARTSPlayerState* OtherPlayer = Cast<ARTSPlayerState>(C->PlayerState);
 
