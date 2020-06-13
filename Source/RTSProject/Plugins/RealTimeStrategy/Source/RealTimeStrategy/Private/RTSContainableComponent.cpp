@@ -11,7 +11,7 @@
 URTSContainableComponent::URTSContainableComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
-    SetIsReplicated(true);
+    SetIsReplicatedByDefault(true);
 }
 
 void URTSContainableComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
