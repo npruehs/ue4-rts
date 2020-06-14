@@ -281,6 +281,11 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
     return false;
 }
 
+bool ARTSPlayerAIController::GivesBounty() const
+{
+    return bGivesBounty;
+}
+
 void ARTSPlayerAIController::OnPossess(APawn* InPawn)
 {
     Super::OnPossess(InPawn);

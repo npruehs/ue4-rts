@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "UObject/TextProperty.h"
 
 #include "RTSNameComponent.generated.h"
 
@@ -19,6 +20,10 @@ public:
     /** Gets the name of the actor. */
     UFUNCTION(BlueprintPure)
     FText GetName() const;
+
+    /** Sets the name of the actor. */
+    UFUNCTION(BlueprintCallable)
+    void SetName(const FText& NewName);
 
 private:
     /** Name of the actor. */

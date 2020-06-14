@@ -24,6 +24,8 @@ ARTSVisionInfo::ARTSVisionInfo(const FObjectInitializer& ObjectInitializer /*= F
 	TeamIndex = 255;
 
 	PrimaryActorTick.bCanEverTick = true;
+
+    bRevealed = false;
 }
 
 void ARTSVisionInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -52,6 +54,9 @@ void ARTSVisionInfo::Initialize(ARTSVisionVolume* InVisionVolume)
     }
 
     UE_LOG(LogRTS, Log, TEXT("Set up %s with %s."), *GetName(), *VisionVolume->GetName());
+
+    // Players might already have their team info, before we had been initialized. Give them another chance now.
+    NotifyPlayerVisionInfoAvailable();
 }
 
 void ARTSVisionInfo::Tick(float DeltaSeconds)
@@ -112,7 +117,7 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 
 		// Convert location and sight radius to tile space.
 		FVector ActorLocationWorld = Actor->GetActorLocation();
-		FIntVector ActorLocationTile = VisionVolume->WorldToTile(ActorLocationWorld);
+		VisionComponent->ActorLocationTile = VisionVolume->WorldToTile(ActorLocationWorld);
 		int32 ActorSightRadiusTile = FMath::FloorToInt(VisionComponent->GetSightRadius() / VisionVolume->GetTileSize());
 
 		/*UE_LOG(LogRTS, Log, TEXT("ActorLocationWorld: %s"), *ActorLocationWorld.ToString());
@@ -126,8 +131,8 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 		{
 			for (int32 RadiusX = -ActorSightRadiusTile; RadiusX <= ActorSightRadiusTile; RadiusX++)
 			{
-				int32 TileX = ActorLocationTile.X + RadiusX;
-				int32 TileY = ActorLocationTile.Y + RadiusY;
+				int32 TileX = VisionComponent->ActorLocationTile.X + RadiusX;
+				int32 TileY = VisionComponent->ActorLocationTile.Y + RadiusY;
 
 				// Check if within circle.
 				if (TileX >= 0 &&
@@ -146,6 +151,16 @@ void ARTSVisionInfo::Tick(float DeltaSeconds)
 	}
 }
 
+bool ARTSVisionInfo::IsRevealed() const
+{
+    return bRevealed;
+}
+
+void ARTSVisionInfo::SetRevealed(bool bInRevealed)
+{
+    bRevealed = bInRevealed;
+}
+
 uint8 ARTSVisionInfo::GetTeamIndex() const
 {
     return TeamIndex;
@@ -162,6 +177,11 @@ ERTSVisionState ARTSVisionInfo::GetVision(int32 X, int32 Y) const
     if (!VisionVolume)
     {
         return ERTSVisionState::VISION_Unknown;
+    }
+
+    if (bRevealed)
+    {
+        return ERTSVisionState::VISION_Visible;
     }
 
 	int32 TileIndex = GetTileIndex(X, Y);

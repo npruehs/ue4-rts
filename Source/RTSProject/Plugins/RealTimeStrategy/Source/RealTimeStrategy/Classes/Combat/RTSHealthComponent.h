@@ -4,7 +4,12 @@
 
 #include "Components/ActorComponent.h"
 
+#include "Combat/RTSActorDeathType.h"
+
 #include "RTSHealthComponent.generated.h"
+
+
+class AActor;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSHealthComponentHealthChangedSignature, AActor*, Actor, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
@@ -35,6 +40,15 @@ public:
     UFUNCTION(BlueprintPure)
     float GetCurrentHealth() const;
 
+    /** Sets the current health of the actor directly. */
+    void SetCurrentHealth(float NewHealth, AActor* DamageCauser);
+
+    /** Kills the actor immediately. */
+    void KillActor(AActor* DamageCauser = nullptr);
+
+    /** Gets the last time the actor has taken damage. */
+    float GetLastTimeDamageTaken() const;
+
 
 	/** Event when the current health of the actor has changed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -49,10 +63,34 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
     float MaximumHealth;
 
+    /** Whether the actor is allowed to periodically regenerate health. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    bool bRegenerateHealth;
+
+    /** Health restored for the actor, per second. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0, EditCondition = "bRegenerateHealth"))
+    float HealthRegenerationRate;
+
+    /** How to handle depleted health. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    ERTSActorDeathType ActorDeathType;
+
     /** Current health of the actor. */
-    UPROPERTY(Replicated)
+    UPROPERTY(ReplicatedUsing=ReceivedCurrentHealth)
     float CurrentHealth;
+
+    /** Last time the actor has taken damage. */
+    float LastTimeDamageTaken;
+
+    /** Timer for ticking health regeneration. */
+    FTimerHandle HealthRegenerationTimer;
 
     UFUNCTION()
     void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+    UFUNCTION()
+    void OnHealthRegenerationTimerElapsed();
+
+    UFUNCTION()
+    void ReceivedCurrentHealth(float OldHealth);
 };

@@ -13,6 +13,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentRemovedFromCons
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentConstructionSiteEnteredSignature, AActor*, Builder, AActor*, ConstructionSite);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentConstructionSiteLeftSignature, AActor*, Builder, AActor*, ConstructionSite);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSBuilderComponentConstructionStartedSignature, AActor*, Builder, AActor*, ConstructionSite);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSBuilderComponentConstructionFailedSignature, AActor*, Builder, TSubclassOf<AActor>,
+    BuildingClass, const FVector&, Location);
 
 
 /**
@@ -30,11 +32,11 @@ public:
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
-	virtual void BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
+	virtual bool BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
 
 	/** Spawns a building of the specified type at the target location and assigns the builder. */
 	UFUNCTION(BlueprintCallable)
-	void BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation);
+	bool BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation);
 
 	/** Removes the builder from its assigned construction site. */
 	UFUNCTION(BlueprintCallable)
@@ -57,6 +59,9 @@ public:
     UFUNCTION(BlueprintPure)
     AActor* GetAssignedConstructionSite() const;
 
+    /** Event when the builder failed to create a new construction site. */
+    virtual void NotifyOnConstructionFailed(AActor* Builder, TSubclassOf<AActor> BuildingClass, const FVector& Location);
+
 
 	/** Event when the builder has been assigned to a construction site. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -76,8 +81,11 @@ public:
 
 	/** Event when the builder has created a new construction site. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
-	FRTSBuilderComponentConstructionSiteEnteredSignature OnConstructionStarted;
+	FRTSBuilderComponentConstructionStartedSignature OnConstructionStarted;
 
+    /** Event when the builder failed to create a new construction site. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSBuilderComponentConstructionFailedSignature OnConstructionFailed;
 
 private:
     /** Types of buildings the builder can construct. */

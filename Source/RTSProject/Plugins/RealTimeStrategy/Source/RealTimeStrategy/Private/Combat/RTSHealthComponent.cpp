@@ -1,11 +1,14 @@
 #include "Combat/RTSHealthComponent.h"
 
+#include "TimerManager.h"
 #include "Engine/World.h"
+#include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 #include "RTSGameMode.h"
 #include "RTSLog.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -14,8 +17,9 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
-	CurrentHealth = 100.0f;
 	MaximumHealth = 100.0f;
+    bRegenerateHealth = false;
+    ActorDeathType = ERTSActorDeathType::DEATH_Destroy;
 }
 
 void URTSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -29,6 +33,10 @@ void URTSHealthComponent::BeginPlay()
 {
     Super::BeginPlay();
 
+    // Set initial health.
+    CurrentHealth = MaximumHealth;
+
+    // Register for events.
     AActor* Owner = GetOwner();
 
     if (!IsValid(Owner))
@@ -37,6 +45,15 @@ void URTSHealthComponent::BeginPlay()
     }
 
     Owner->OnTakeAnyDamage.AddDynamic(this, &URTSHealthComponent::OnTakeAnyDamage);
+
+    if (bRegenerateHealth && Owner->HasAuthority())
+    {
+        // Set up health regeneration timer.
+        Owner->GetWorldTimerManager().SetTimer(
+            HealthRegenerationTimer, this, &URTSHealthComponent::OnHealthRegenerationTimerElapsed, 1.0f, true);
+    }
+
+    LastTimeDamageTaken = 0.0f;
 }
 
 float URTSHealthComponent::GetMaximumHealth() const
@@ -49,41 +66,81 @@ float URTSHealthComponent::GetCurrentHealth() const
     return CurrentHealth;
 }
 
-void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser)
 {
     float OldHealth = CurrentHealth;
-    CurrentHealth -= Damage;
-    float NewHealth = CurrentHealth;
-
-    UE_LOG(LogRTS, Log, TEXT("Actor %s has taken %f damage from %s, reducing health to %f."),
-        *GetOwner()->GetName(),
-        Damage,
-        *DamageCauser->GetName(),
-        CurrentHealth);
+    CurrentHealth = NewHealth;
 
     // Notify listeners.
-    OnHealthChanged.Broadcast(GetOwner(), OldHealth, NewHealth, DamageCauser);
+    AActor* Owner = GetOwner();
+
+    OnHealthChanged.Broadcast(Owner, OldHealth, NewHealth, DamageCauser);
+
+    if (GetWorld() && OldHealth > NewHealth)
+    {
+        LastTimeDamageTaken = GetWorld()->GetRealTimeSeconds();
+    }
 
     // Check if we've just died.
     if (CurrentHealth <= 0)
     {
-        UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *GetOwner()->GetName());
+        UE_LOG(LogRTS, Log, TEXT("Actor %s has been killed."), *Owner->GetName());
 
         // Get owner before destruction.
-        AController* OwningPlayer = Cast<AController>(GetOwner()->GetOwner());
+        AController* OwningPlayer = Cast<AController>(Owner->GetOwner());
 
         // Notify listeners.
-        OnKilled.Broadcast(GetOwner(), OwningPlayer, DamageCauser);
+        OnKilled.Broadcast(Owner, OwningPlayer, DamageCauser);
 
-        // Destroy this actor.
-        GetOwner()->Destroy();
+        // Stop or destroy actor.
+        switch (ActorDeathType)
+        {
+        case ERTSActorDeathType::DEATH_StopGameplay:
+            URTSGameplayLibrary::StopGameplayFor(Owner);
+            break;
+
+        case ERTSActorDeathType::DEATH_Destroy:
+            Owner->Destroy();
+            break;
+        }
 
         // Notify game mode.
         ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
         if (GameMode != nullptr)
         {
-            GameMode->NotifyOnActorKilled(GetOwner(), OwningPlayer);
+            GameMode->NotifyOnActorKilled(Owner, OwningPlayer);
         }
     }
+}
+
+void URTSHealthComponent::KillActor(AActor* DamageCauser /*= nullptr*/)
+{
+    SetCurrentHealth(0.0f, DamageCauser);
+}
+
+float URTSHealthComponent::GetLastTimeDamageTaken() const
+{
+    return LastTimeDamageTaken;
+}
+
+void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+    SetCurrentHealth(CurrentHealth - Damage, DamageCauser);
+}
+
+void URTSHealthComponent::OnHealthRegenerationTimerElapsed()
+{
+    if (CurrentHealth >= MaximumHealth)
+    {
+        return;
+    }
+
+    float NewHealth = FMath::Clamp(CurrentHealth + HealthRegenerationRate, 0.0f, MaximumHealth);
+    SetCurrentHealth(NewHealth, GetOwner());
+}
+
+void URTSHealthComponent::ReceivedCurrentHealth(float OldHealth)
+{
+    OnHealthChanged.Broadcast(GetOwner(), OldHealth, CurrentHealth, nullptr);
 }

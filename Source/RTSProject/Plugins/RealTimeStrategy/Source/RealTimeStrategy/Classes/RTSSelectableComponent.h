@@ -14,6 +14,8 @@ class USoundCue;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentSelectedSignature, AActor*, Actor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentDeselectedSignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentHoveredSignature, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentUnhoveredSignature, AActor*, Actor);
 
 
 /**
@@ -26,6 +28,7 @@ class REALTIMESTRATEGY_API URTSSelectableComponent : public UActorComponent
 
 public:
     virtual void BeginPlay() override;
+    virtual void DestroyComponent(bool bPromoteChildren = false) override;
 
 
 	/** Selects the unit for the local player. */
@@ -40,6 +43,20 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSelected() const;
 
+    /** Hovers the unit for the local player. */
+    void HoverActor();
+
+    /** Unhovers the unit for the local player. */
+    void UnhoverActor();
+
+    /** Checks whether the unit is currently hovered by the local player, or not. */
+    UFUNCTION(BlueprintPure)
+    bool IsHovered() const;
+
+    /** Gets the sort index for selected units. */
+    UFUNCTION(BlueprintPure)
+    int32 GetSelectionPriority() const;
+
     /** Gets the sound to play when the actor is selected. */
     USoundCue* GetSelectedSound() const;
 
@@ -51,8 +68,20 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSSelectableComponentSelectedSignature OnSelected;
 
+    /** Event when the actor has been hovered. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSSelectableComponentHoveredSignature OnHovered;
+
+    /** Event when the actor has been unhovered. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSSelectableComponentUnhoveredSignature OnUnhovered;
+
 
 private:
+    /** Sort index for selected units. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    int32 SelectionPriority;
+
     /** Material for rendering the selection circle of the actor. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     UMaterialInterface* SelectionCircleMaterial;
@@ -63,6 +92,9 @@ private:
 
 	/** Whether the unit is currently selected by the local player, or not. */
 	bool bSelected;
+
+    /** Whether the unit is currently hovered by the local player, or not. */
+    bool bHovered;
 
     /** Decal used for rendering the selection circle of the actor. */
     UPROPERTY()

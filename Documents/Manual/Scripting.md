@@ -5,6 +5,14 @@ Occasionally, you want to create additional gameplay (especially when creating a
 Feel free to explore the plugin yourself by looking at what other functions and events each component provides, and open an issue if you're missing something.
 
 
+### RTSBountyComponent
+#### Events
+
+| Event | Description |
+| --- | --- |
+| ![On Bounty Collected](Images/OnBountyCollected.png) | Event when the bounty was collected. |
+
+
 ### RTSContainerComponent
 #### Functions
 

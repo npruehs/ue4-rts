@@ -14,6 +14,8 @@ As mentioned before, most features of the plugin are implemented by the means of
 1. Add an `RTSDescriptionComponent` and set its localized text if you want to show it in any kind of ingame UI. 
 1. Add an `RTSPortraitComponent` and set its portrait if you want to show it in any kind of ingame UI.
 1. Add an `RTSSelectableComponent`, and set its selection circle material (e.g. to `M_RTSSelectionCircle`) and selection sound.
+1. If the selection order of your actors matters (e.g. for grouping in your UI), set the _Selection Priority_ as well.
+1. In case you got special visual effects for highlighting hovered actors, you can listen for the `OnHovered` and `OnUnhovered` events of the component.
 1. Add an `RTSOwnerComponent`. This will be used to store (and replicate) the owner of the unit for all players (e.g. for showing team colors).
 1. Add your `RTSHoveredActorWidgetComponent` (see [User Interface](UserInterface.md)).
 
@@ -26,7 +28,7 @@ As mentioned before, most features of the plugin are implemented by the means of
 ### Vision
 
 1. Add the `RTSVision` component to your units and set their _Sight Radius_ (e.g. 1000).
-
+1. Add a `RTSVisible`component to your actor. That component will manage vibility of that actor, in case multiple effects want to show/hide it (e.g. fog of war, containers).
 
 ### Combat
 
@@ -42,6 +44,8 @@ As mentioned before, units are not directly possessed by player controllers in t
 1. Add an `RTSAttackableComponent` and `RTSGameplayTagsComponent` to any actors that can be attacked.
 1. Add the `Status.Permanent.CanBeAttacked` tag to the `RTSGameplayTagsComponent`.
 1. Set the _Maximum Health_ of the `RTSHealthComponent`.
+1. In case your actor should regenerate health, check _Regenerate Health_ and set the _Health Regeneration Rate_.
+1. If you want to play animations or visual effects when the actor dies, set _Actor Death Type_ to _Stop Gameplay_. In that case, you're responsible of destroying the actor yourself as soon as all of your visual clues have finished playing.
 1. Add your `RTSHealthBarWidgetComponent` (see [User Interface](UserInterface.md)).
 
 1. Add the `RTSAttackComponent` to any actors than can attack.
@@ -56,6 +60,8 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. Create an actor deriving from `RTSProjectile`.
 1. Add a static mesh and any visual effects.
 1. At the `ProjectileMovement` component, set its _Initial Speed_ (e.g. to 1000).
+1. If you want your projectile to use a ballistic trajectory, check _Ballistic Trajectory_ at the projectile and set the _Ballistic Trajectory Factor_ as you like.
+1. For dealing area of effect damage, check _Apply Area Of Effect_ and set your area of effect radius and collision filters.
 1. At the `RTSAttackComponent`, reference the new projectile in your attack.
 
 
@@ -73,7 +79,7 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 
 1. Add an `RTSBuilderComponent` to any actors you want to be able to construct buildings.
 1. Set the _Constructible Building Classes_ for these builders.
-1. Check _Enter Construction Site_ if you want the builder to be unavailable while building (similar to Orcs in WarCraft).
+1. Check _Enter Construction Site_ if you want the builder to be unavailable while building (similar to Orcs in WarCraft). In that case, add a `RTSContainableComponent` as well.
 
 
 ### Gathering
@@ -87,3 +93,14 @@ If you don't specify a projectile, the damage will be applied immediately. In or
     1. Set _Range_ as desired.
 1. Add all _Resource Source Actor Classes_ the gatherer may gather from (e.g. Undead in Warcraft need Haunted Gold Mine).
 1. Set the _Resource Sweep Radius_ to the radius in which the gatherer should look for similar resources if their current source is depleted.
+
+
+### Bounties
+
+1. Add an `RTSBountyComponent` to any actors you want to grant bounties to killing players.
+1. Set the _Bounty_ for these actors.
+
+
+### Multiplayer
+
+1. If you're working on an online game, check _Always Relevant_ for your actor.

@@ -20,6 +20,12 @@ class REALTIMESTRATEGY_API URTSContainerComponent : public UActorComponent
 public:
 	URTSContainerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+    virtual void BeginPlay() override;
+
+
+    /** Gets whether the specified actor is inside this container. */
+    UFUNCTION(BlueprintPure)
+    bool ContainsActor(const AActor* Actor) const;
 
 	/** Whether the specified actor can enter this container. */
 	UFUNCTION(BlueprintPure)
@@ -32,6 +38,9 @@ public:
 	/** Removes the specified actor from this container. */
 	UFUNCTION(BlueprintCallable)
 	virtual void UnloadActor(AActor* Actor);
+
+    /** Removes all actors from this container. */
+    void UnloadAll();
 
 
     /** Gets how many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
@@ -62,4 +71,7 @@ private:
     /** Actors currently held by this container. */
     UPROPERTY()
     TArray<AActor*> ContainedActors;
+
+    UFUNCTION()
+    void OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser);
 };

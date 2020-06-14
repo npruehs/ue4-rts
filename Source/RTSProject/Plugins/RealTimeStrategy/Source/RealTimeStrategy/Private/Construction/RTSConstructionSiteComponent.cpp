@@ -4,11 +4,14 @@
 #include "Net/UnrealNetwork.h"
 
 #include "RTSContainerComponent.h"
+#include "RTSGameplayTagsComponent.h"
 #include "RTSLog.h"
 #include "RTSPlayerAdvantageComponent.h"
+#include "Combat/RTSHealthComponent.h"
+#include "Construction/RTSBuilderComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceType.h"
-#include "Construction/RTSBuilderComponent.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -27,6 +30,7 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 	MaxAssignedBuilders = 1;
 	ProgressMadeAutomatically = 0.0f;
 	ProgressMadePerBuilder = 1.0f;
+    InitialHealthPercentage = 0.1f;
 	RefundFactor = 0.5f;
 	bStartImmediately = true;
 }
@@ -49,6 +53,13 @@ void URTSConstructionSiteComponent::BeginPlay()
 	if (ContainerComponent)
 	{
 		ContainerComponent->SetCapacity(MaxAssignedBuilders);
+
+        URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
+
+        if (IsValid(GameplayTagsComponent))
+        {
+            GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ConstructionSite());
+        }
 	}
 }
 
@@ -159,6 +170,19 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	// Update construction progress.
 	RemainingConstructionTime -= ConstructionProgress;
 
+    // Update health.
+    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+
+    if (IsValid(HealthComponent))
+    {
+        float CurrentHealth = HealthComponent->GetCurrentHealth();
+        float MaximumHealth = HealthComponent->GetMaximumHealth();
+
+        float HealthIncrement = MaximumHealth * (1 - InitialHealthPercentage) * ConstructionProgress / ConstructionTime;
+
+        HealthComponent->SetCurrentHealth(CurrentHealth + HealthIncrement, nullptr);
+    }
+
 	// Check if finished.
 	if (RemainingConstructionTime <= 0)
 	{
@@ -246,6 +270,18 @@ void URTSConstructionSiteComponent::StartConstruction()
 
 	UE_LOG(LogRTS, Log, TEXT("Construction %s started."), *GetOwner()->GetName());
 
+    // Set initial health.
+    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+
+    if (IsValid(HealthComponent))
+    {
+        float MaximumHealth = HealthComponent->GetMaximumHealth();
+        float InitialHealth = MaximumHealth * InitialHealthPercentage;
+
+        HealthComponent->SetCurrentHealth(InitialHealth, nullptr);
+
+    }
+
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(GetOwner(), ConstructionTime);
 }
@@ -319,7 +355,16 @@ void URTSConstructionSiteComponent::CancelConstruction()
     }
 
 	// Destroy construction site.
-	GetOwner()->Destroy();
+    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+
+    if (IsValid(HealthComponent))
+    {
+        HealthComponent->KillActor(GetOwner());
+    }
+    else
+    {
+        GetOwner()->Destroy();
+    }
 
 	// Notify listeners.
 	OnConstructionCanceled.Broadcast(GetOwner());
@@ -368,6 +413,10 @@ float URTSConstructionSiteComponent::GetRefundFactor() const
 bool URTSConstructionSiteComponent::DoesStartImmediately() const
 {
     return bStartImmediately;
+}
+bool URTSConstructionSiteComponent::ShouldPreviewAttackRange() const
+{
+    return bPreviewAttackRange;
 }
 
 ERTSConstructionState URTSConstructionSiteComponent::GetState() const

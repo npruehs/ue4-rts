@@ -81,6 +81,12 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 1. In your player controller, set the building cursor reference.
 
 
+### Range Indicators
+
+1. Create an actor deriving from `RTSRangeIndicator` (or use the `BP_RTSRangeIndicator` shipped with the plugin).
+1. At your building cursor, set the range indicator reference.
+
+
 ### Production UI
 
 1. Use `GetAvailableProducts` of a selected production actor to create buttons for your production options (e.g. whenever the player controller raises OnSelectionChanged).
@@ -128,7 +134,7 @@ _See the [Health Bars](#health-bars) section for an example._
 1. Add the `WBP_RTSMinimapWidget` to your UI, with a size matching your minimap volume images (e.g. 256 x 256).
 1. Set the _Draw Background, Draw Units With Team Colors, Draw Vision_ and _Draw View Frustum_ flags as desired.
 1. If you checked _Draw Units With Team Colors_, set the _Own Units Brush, Enemy Units Brush_ and _Neutral Units Brush_ as desired.
-
+1. If you want damaged units to blink on the minimap, set _Damaged Units Blink Brush_ and _Damaged Unit Blink Time Seconds_ as desired.
 
 ### Floating Combat Texts
 

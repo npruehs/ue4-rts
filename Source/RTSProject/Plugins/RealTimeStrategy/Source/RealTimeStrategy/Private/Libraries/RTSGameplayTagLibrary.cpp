@@ -16,6 +16,24 @@ bool URTSGameplayTagLibrary::HasGameplayTag(const AActor* Actor, const FGameplay
     return IsValid(GameplayTagsComponent) ? GameplayTagsComponent->GetCurrentTags().HasTag(Tag) : false;
 }
 
+const FGameplayTag& URTSGameplayTagLibrary::Container_ConstructionSite()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Container.ConstructionSite")));
+    return Tag;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::Container_ResourceSource()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Container.ResourceSource")));
+    return Tag;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::HideReason_Container()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("HideReason.Container")));
+    return Tag;
+}
+
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()
 {
     static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeAttacked")));

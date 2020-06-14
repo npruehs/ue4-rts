@@ -24,11 +24,17 @@ public:
     /** Gets the factor to multiply all construction and production speed with. */
     float GetSpeedBoostFactor() const;
 
+    /** Gets the factor to multiply all damage dealt by actors owned by the player with. */
+    float GetOutgoingDamageFactor() const;
+
     /** Sets whether units controlled by the player are invulnerable, or not. */
     void SetGodModeEnabled(bool bInGodModeEnabled);
 
     /** Sets the factor to multiply all construction and production speed with. */
     void SetSpeedBoostFactor(float InSpeedBoostFactor);
+
+    /** Sets the factor to multiply all damage dealt by actors owned by the player with. */
+    void SetOutgoingDamageFactor(float InOutgoingDamageFactor);
 
 private:
     /** Whether units controlled by the player are invulnerable, or not. */
@@ -38,4 +44,8 @@ private:
     /** Factor to multiply all construction and production speed with. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Advantage")
     float SpeedBoostFactor;
+
+    /** Factor to multiply all damage dealt by actors owned by the player with. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Advantage")
+    float OutgoingDamageFactor;
 };

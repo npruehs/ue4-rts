@@ -1,56 +1,21 @@
 #include "RTSGameState.h"
 
-#include "EngineUtils.h"
-#include "GameFramework/Actor.h"
+#include "Engine/World.h"
 
-#include "Vision/RTSFogOfWarActor.h"
-#include "Vision/RTSVisionInfo.h"
-#include "Vision/RTSVisionVolume.h"
+#include "Vision/RTSVisionManager.h"
 
-void ARTSGameState::HandleBeginPlay()
+
+void ARTSGameState::BeginPlay()
 {
     // Make sure all actors have begun play.
-    Super::HandleBeginPlay();
+    Super::BeginPlay();
 
     // Setup vision.
-    ARTSFogOfWarActor* FogOfWarActor = nullptr;
-    TArray<ARTSVisionInfo*> VisionInfos;
-    ARTSVisionVolume* VisionVolume = nullptr;
+    VisionManager = GetWorld()->SpawnActor<ARTSVisionManager>();
+    VisionManager->Initialize();
+}
 
-    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
-    {
-        AActor* Actor = *It;
-
-        if (IsValid(Actor))
-        {
-            if (Actor->IsA(ARTSFogOfWarActor::StaticClass()))
-            {
-                FogOfWarActor = Cast<ARTSFogOfWarActor>(Actor);
-            }
-            else if (Actor->IsA(ARTSVisionInfo::StaticClass()))
-            {
-                ARTSVisionInfo* VisionInfo = Cast<ARTSVisionInfo>(Actor);
-                VisionInfos.Add(VisionInfo);
-            }
-            else if (Actor->IsA(ARTSVisionVolume::StaticClass()))
-            {
-                VisionVolume = Cast<ARTSVisionVolume>(Actor);
-            }
-        }
-    }
-
-    if (IsValid(VisionVolume))
-    {
-        VisionVolume->Initialize();
-    }
-
-    for (ARTSVisionInfo* VisionInfo : VisionInfos)
-    {
-        VisionInfo->Initialize(VisionVolume);
-    }
-
-    if (IsValid(FogOfWarActor))
-    {
-        FogOfWarActor->Initialize(VisionVolume);
-    }
+ARTSVisionManager* ARTSGameState::GetVisionManager() const
+{
+    return VisionManager;
 }

@@ -11,11 +11,13 @@
 #include "RTSPlayerAIController.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
+#include "Vision/RTSVisionInfo.h"
 
 
 URTSCheatManager::URTSCheatManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 {
     // Set reasonable default values.
+    OutgoingDamageFactor = 1000.0f;
     ResourceAmount = 1000.0f;
     SpeedBoostFactor = 10.0f;
 }
@@ -38,6 +40,35 @@ void URTSCheatManager::Boost()
 
     PlayerAdvantageComponent->SetSpeedBoostFactor(PlayerAdvantageComponent->GetSpeedBoostFactor() * SpeedBoostFactor);
     UE_LOG(LogRTS, Log, TEXT("Cheat: Set speed boost factor to %f."), PlayerAdvantageComponent->GetSpeedBoostFactor());
+}
+
+void URTSCheatManager::Damage()
+{
+    APlayerController* Player = GetOuterAPlayerController();
+
+    if (!Player)
+    {
+        return;
+    }
+
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+    if (!PlayerAdvantageComponent)
+    {
+        return;
+    }
+
+    if (PlayerAdvantageComponent->GetOutgoingDamageFactor() > 1.0f)
+    {
+        PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f);
+    }
+
+    else
+    {
+        PlayerAdvantageComponent->SetOutgoingDamageFactor(OutgoingDamageFactor);
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Cheat: Set outgoing damage factor to %f."), PlayerAdvantageComponent->GetOutgoingDamageFactor());
 }
 
 void URTSCheatManager::God()
@@ -97,6 +128,17 @@ void URTSCheatManager::Money()
     }
 }
 
+void URTSCheatManager::NoFog()
+{
+    for (TActorIterator<ARTSVisionInfo> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+    {
+        ARTSVisionInfo* VisionInfo = *ActorItr;
+        VisionInfo->SetRevealed(!VisionInfo->IsRevealed());
+
+        UE_LOG(LogRTS, Log, TEXT("Cheat: Set vision to %s."), VisionInfo->IsRevealed() ? TEXT("revealed") : TEXT("not revealed"));
+    }
+}
+
 void URTSCheatManager::Victory()
 {
     APlayerController* Player = GetOuterAPlayerController();
@@ -130,4 +172,33 @@ void URTSCheatManager::Victory()
 
         GameMode->NotifyOnPlayerDefeated(Controller);
     }
+}
+
+void URTSCheatManager::Weak()
+{
+    APlayerController* Player = GetOuterAPlayerController();
+
+    if (!Player)
+    {
+        return;
+    }
+
+    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+    if (!PlayerAdvantageComponent)
+    {
+        return;
+    }
+
+    if (PlayerAdvantageComponent->GetOutgoingDamageFactor() < 1.0f)
+    {
+        PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f);
+    }
+
+    else
+    {
+        PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f / OutgoingDamageFactor);
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Cheat: Set outgoing damage factor to %f."), PlayerAdvantageComponent->GetOutgoingDamageFactor());
 }

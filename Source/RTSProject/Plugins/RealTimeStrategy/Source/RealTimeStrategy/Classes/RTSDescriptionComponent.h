@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "UObject/TextProperty.h"
 
 #include "RTSDescriptionComponent.generated.h"
 
@@ -19,6 +20,10 @@ public:
     /** Gets the description of the actor. */
     UFUNCTION(BlueprintPure)
     FText GetDescription() const;
+
+    /** Sets the description of the actor. */
+    UFUNCTION(BlueprintCallable)
+    void SetDescription(const FText& NewDescription);
 
 private:
     /** Description of the actor. */

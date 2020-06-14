@@ -47,6 +47,16 @@ void URTSSelectableComponent::BeginPlay()
     DecalComponent->SetHiddenInGame(true);
 }
 
+void URTSSelectableComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
+{
+    Super::DestroyComponent(bPromoteChildren);
+
+    if (IsValid(DecalComponent))
+    {
+        DecalComponent->DestroyComponent();
+    }
+}
+
 void URTSSelectableComponent::SelectActor()
 {
 	if (bSelected)
@@ -88,6 +98,42 @@ void URTSSelectableComponent::DeselectActor()
 bool URTSSelectableComponent::IsSelected() const
 {
 	return bSelected;
+}
+
+void URTSSelectableComponent::HoverActor()
+{
+    if (bHovered)
+    {
+        return;
+    }
+
+    bHovered = true;
+
+    // Notify listeners.
+    OnHovered.Broadcast(GetOwner());
+}
+
+void URTSSelectableComponent::UnhoverActor()
+{
+    if (!bHovered)
+    {
+        return;
+    }
+
+    bHovered = false;
+
+    // Notify listeners.
+    OnUnhovered.Broadcast(GetOwner());
+}
+
+bool URTSSelectableComponent::IsHovered() const
+{
+    return bHovered;
+}
+
+int32 URTSSelectableComponent::GetSelectionPriority() const
+{
+    return SelectionPriority;
 }
 
 USoundCue* URTSSelectableComponent::GetSelectedSound() const

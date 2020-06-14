@@ -12,6 +12,7 @@
 #include "Economy/RTSResourceDrainComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -251,7 +252,8 @@ void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 		// Enter resource source.
 		auto ContainerComponent = ResourceSource->FindComponentByClass<URTSContainerComponent>();
 
-		if (ContainerComponent)
+		if (ContainerComponent &&
+            URTSGameplayTagLibrary::HasGameplayTag(ResourceSource, URTSGameplayTagLibrary::Container_ResourceSource()))
 		{
 			ContainerComponent->LoadActor(GetOwner());
 		}

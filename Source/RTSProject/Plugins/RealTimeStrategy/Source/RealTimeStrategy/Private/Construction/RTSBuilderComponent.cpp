@@ -10,6 +10,7 @@
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -47,7 +48,8 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 			// Enter construction site.
 			auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
-			if (ContainerComponent)
+			if (ContainerComponent && 
+                URTSGameplayTagLibrary::HasGameplayTag(ConstructionSite, URTSGameplayTagLibrary::Container_ConstructionSite()))
 			{
 				ContainerComponent->LoadActor(GetOwner());
 				OnConstructionSiteEntered.Broadcast(GetOwner(), ConstructionSite);
@@ -56,34 +58,34 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 	}
 }
 
-void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
+bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
 	// Get game, pawn and controller.
 	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
 	if (!GameMode)
 	{
-		return;
+		return false;
 	}
 
     auto Pawn = Cast<APawn>(GetOwner());
 
     if (!Pawn)
     {
-        return;
+        return false;
     }
 
     auto PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
 
     if (!PawnController)
     {
-        return;
+        return false;
     }
 
     if (BuildingClass == nullptr)
     {
         UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build, but no building class was specified."), *GetOwner()->GetName());
-        return;
+        return false;
     }
 
     // Check requirements.
@@ -93,9 +95,11 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
     {
         UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
 
+        NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
+
         // Player is missing a required actor. Stop.
         PawnController->IssueStopOrder();
-        return;
+        return false;
     }
 
     // Move builder away in order to avoid collision.
@@ -121,7 +125,8 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
 	if (!Building)
 	{
-		return;
+        NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
+		return false;
 	}
 
 	// Notify listeners.
@@ -131,16 +136,18 @@ void URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
 	// Issue construction order.
 	PawnController->IssueContinueConstructionOrder(Building);
+
+    return true;
 }
 
-void URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)
+bool URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)
 {
 	if (BuildingIndex < 0 || BuildingIndex >= ConstructibleBuildingClasses.Num())
 	{
-		return;
+		return false;
 	}
 
-	BeginConstruction(ConstructibleBuildingClasses[BuildingIndex], TargetLocation);
+	return BeginConstruction(ConstructibleBuildingClasses[BuildingIndex], TargetLocation);
 }
 
 void URTSBuilderComponent::LeaveConstructionSite()
@@ -198,4 +205,9 @@ float URTSBuilderComponent::GetConstructionSiteOffset() const
 AActor* URTSBuilderComponent::GetAssignedConstructionSite() const
 {
     return AssignedConstructionSite;
+}
+
+void URTSBuilderComponent::NotifyOnConstructionFailed(AActor* Builder, TSubclassOf<AActor> BuildingClass, const FVector& Location)
+{
+    OnConstructionFailed.Broadcast(Builder, BuildingClass, Location);
 }

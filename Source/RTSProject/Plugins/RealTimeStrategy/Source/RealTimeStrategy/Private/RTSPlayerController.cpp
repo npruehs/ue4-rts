@@ -9,12 +9,14 @@
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
+#include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 
 #include "RTSCameraBoundsVolume.h"
 #include "RTSPawnAIController.h"
 #include "RTSGameMode.h"
+#include "RTSGameState.h"
 #include "RTSLog.h"
 #include "RTSNameComponent.h"
 #include "RTSOwnerComponent.h"
@@ -36,6 +38,7 @@
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
 #include "Vision/RTSVisionInfo.h"
+#include "Vision/RTSVisionManager.h"
 
 
 ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -939,6 +942,39 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 		}
 	}
 
+    // Sort by priority and lifetime.
+    Actors.Sort([=](const AActor& Lhs, const AActor& Rhs) {
+        const URTSSelectableComponent* FirstSelectableComponent = Lhs.FindComponentByClass<URTSSelectableComponent>();
+        const URTSSelectableComponent* SecondSelectableComponent = Rhs.FindComponentByClass<URTSSelectableComponent>();
+
+        if (!IsValid(FirstSelectableComponent) || !IsValid(SecondSelectableComponent))
+        {
+            return true;
+        }
+
+        if (FirstSelectableComponent->GetSelectionPriority() > SecondSelectableComponent->GetSelectionPriority())
+        {
+            return true;
+        }
+
+        if (FirstSelectableComponent->GetSelectionPriority() < SecondSelectableComponent->GetSelectionPriority())
+        {
+            return false;
+        }
+
+        if (URTSGameplayLibrary::IsReadyToUse(&Lhs) && !URTSGameplayLibrary::IsReadyToUse(&Rhs))
+        {
+            return true;
+        }
+
+        if (!URTSGameplayLibrary::IsReadyToUse(&Lhs) && URTSGameplayLibrary::IsReadyToUse(&Rhs))
+        {
+            return false;
+        }
+
+        return Lhs.CreationTime < Rhs.CreationTime;
+    });
+
 	// Apply new selection.
 	SelectedActors = Actors;
 
@@ -1067,9 +1103,45 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
-	// Spawn dummy building.
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    // Check if we should preview attack range.
+    URTSConstructionSiteComponent* ConstructionSiteComponent =
+        URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
+
+    bool bPreviewAttackRange = false;
+    float AttackRange = 0.0f;
+
+    if (IsValid(ConstructionSiteComponent))
+    {
+        // Preview attack range.
+        bPreviewAttackRange = ConstructionSiteComponent->ShouldPreviewAttackRange();
+
+        if (bPreviewAttackRange)
+        {
+            URTSAttackComponent* AttackComponent =
+                URTSGameplayLibrary::FindDefaultComponentByClass<URTSAttackComponent>(BuildingClass);
+
+            if (IsValid(AttackComponent))
+            {
+                for (const FRTSAttackData& Attack : AttackComponent->GetAttacks())
+                {
+                    if (Attack.Range > AttackRange)
+                    {
+                        AttackRange = Attack.Range;
+                    }
+                }
+
+                AttackRange += URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2.0f;
+            }
+            else
+            {
+                bPreviewAttackRange = false;
+            }
+        }
+    }
+
+    // Spawn preview building.
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	UStaticMeshComponent* StaticMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UStaticMeshComponent>(BuildingClass);
 
@@ -1077,7 +1149,6 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
     {
         BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
         BuildingCursor->SetStaticMesh(StaticMeshComponent->GetStaticMesh(), StaticMeshComponent->GetRelativeTransform());
-        BuildingCursor->SetLocationValid(false);
     }
     else
     {
@@ -1087,10 +1158,20 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
         {
             BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
             BuildingCursor->SetSkeletalMesh(SkeletalMeshComponent->SkeletalMesh, SkeletalMeshComponent->GetRelativeTransform());
-            BuildingCursor->SetLocationValid(false);
         }
     }
-	
+    
+    if (IsValid(BuildingCursor))
+    {
+        BuildingCursor->SetLocationValid(false);
+
+        // Show attack range.
+        if (bPreviewAttackRange && AttackRange > 0.0f)
+        {
+            BuildingCursor->SetRange(AttackRange);
+        }
+    }
+
 	BuildingBeingPlacedClass = BuildingClass;
 
 	UE_LOG(LogRTS, Log, TEXT("Beginning placement of building %s."), *BuildingClass->GetName());
@@ -1543,12 +1624,17 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 	}
 
 	// Setup fog of war.
-	for (TActorIterator<ARTSFogOfWarActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
-	{
-		ARTSFogOfWarActor* FogOfWarActor = *ActorIt;
-		FogOfWarActor->SetupVisionInfo(VisionInfo);
-		break;
-	}
+    ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
+
+    if (IsValid(GameState))
+    {
+        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+
+        if (IsValid(VisionManager))
+        {
+            VisionManager->SetLocalVisionInfo(VisionInfo);
+        }
+    }
 
 	// Allow others to setup vision.
 	ReceiveOnVisionInfoAvailable(VisionInfo);
@@ -1659,6 +1745,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
     }
 
 	// Get hovered actors.
+    AActor* OldHoveredActor = HoveredActor;
 	HoveredActor = nullptr;
 
 	TArray<FHitResult> HitResults;
@@ -1700,4 +1787,28 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 
 	// Verify selection.
 	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+
+    // Notify listeners.
+    if (OldHoveredActor != HoveredActor)
+    {
+        if (IsValid(OldHoveredActor))
+        {
+            auto OldHoveredSelectableComponent = OldHoveredActor->FindComponentByClass<URTSSelectableComponent>();
+
+            if (OldHoveredSelectableComponent)
+            {
+                OldHoveredSelectableComponent->UnhoverActor();
+            }
+        }
+
+        if (IsValid(HoveredActor))
+        {
+            auto HoveredSelectableComponent = HoveredActor->FindComponentByClass<URTSSelectableComponent>();
+
+            if (HoveredSelectableComponent)
+            {
+                HoveredSelectableComponent->HoverActor();
+            }
+        }
+    }
 }

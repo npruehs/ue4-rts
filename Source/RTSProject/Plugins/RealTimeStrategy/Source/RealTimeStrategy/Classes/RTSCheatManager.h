@@ -24,6 +24,10 @@ public:
     UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
     virtual void Boost();
 
+    /** Increase damage of all own units. */
+    UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
+    virtual void Damage();
+
     /** Invulnerability cheat. */
     virtual void God() override;
 
@@ -31,11 +35,23 @@ public:
     UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
     virtual void Money();
 
+    /** Toggles fog of war on/off. */
+    UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
+    virtual void NoFog();
+
     /** Defeat all other players. */
     UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
     virtual void Victory();
 
+    /** Decreases damage of all own units. */
+    UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
+    virtual void Weak();
+
 private:
+    /** Factor to multiply all damage dealt by actors owned by the player with. */
+    UPROPERTY(EditDefaultsOnly, Category = "Cheat Manager")
+    float OutgoingDamageFactor;
+
     /** Amount of resources to grant with the Money cheat. */
     UPROPERTY(EditDefaultsOnly, Category = "Cheat Manager")
     float ResourceAmount;

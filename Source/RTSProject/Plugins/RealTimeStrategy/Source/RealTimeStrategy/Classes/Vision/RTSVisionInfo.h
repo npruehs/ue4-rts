@@ -32,6 +32,12 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+    /** Whether the whole map is currently being considered revealed (e.g. cheat, cinematic mode.) */
+    bool IsRevealed() const;
+
+    /** Sets whether the whole map is currently being considered revealed (e.g. cheat, cinematic mode.) */
+    void SetRevealed(bool bInRevealed);
+
     /** Gets the index of the team this actor keeps track of the vision for. */
     uint8 GetTeamIndex() const;
 
@@ -46,6 +52,9 @@ public:
 	static ARTSVisionInfo* GetVisionInfoForTeam(UObject* WorldContextObject, uint8 InTeamIndex);
 
 private:
+    /** Whether the whole map is currently being considered revealed (e.g. cheat, cinematic mode.) */
+    bool bRevealed;
+
     /** Index of the team this actor keeps track of the vision for. */
     UPROPERTY(ReplicatedUsing = ReceivedTeamIndex)
     uint8 TeamIndex;
