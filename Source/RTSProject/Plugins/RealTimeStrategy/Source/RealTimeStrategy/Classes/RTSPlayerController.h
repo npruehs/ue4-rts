@@ -100,6 +100,34 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SelectActors(TArray<AActor*> Actors);
 
+    /** Gets the currently selected subgroup of selected actors. */
+    UFUNCTION(BlueprintPure)
+    TSubclassOf<AActor> GetSelectedSubgroup() const;
+
+    /** Gets any member of the currently selected subgroup of selected actors. */
+    UFUNCTION(BlueprintPure)
+    AActor* GetSelectedSubgroupActor();
+
+    /** Gets all members of the currently selected subgroup of selected actors. */
+    UFUNCTION(BlueprintPure)
+    void GetSelectedSubgroupActors(TArray<AActor*>& OutActors) const;
+
+    /** Selects the first subgroup of selected actors. */
+    UFUNCTION(BlueprintCallable)
+    void SelectFirstSubgroup();
+
+    /** Selects the next subgroup of selected actors, wrapping around. */
+    UFUNCTION(BlueprintCallable)
+    void SelectNextSubgroup();
+
+    /** Selects the previous subgroup of selected actors, wrapping around. */
+    UFUNCTION(BlueprintCallable)
+    void SelectPreviousSubgroup();
+
+    /** Selects the specified subgroup of selected actors. */
+    UFUNCTION(Category = RTS, BlueprintCallable)
+    void SelectSubgroup(TSubclassOf<AActor> NewSubgroup);
+
 	/** Saves the current selection to the specified control group. */
 	UFUNCTION(BlueprintCallable)
 	void SaveControlGroup(int32 Index);
@@ -215,6 +243,9 @@ public:
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
 
+    /** Event when the a new subgroup of actors has been selected. */
+    virtual void NotifyOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup);
+
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
 
@@ -283,6 +314,10 @@ public:
 	/** Event when the player has clicked a spot on the minimap. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
+    /** Event when the a new subgroup of actors has been selected. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectedSubgroupChanged"))
+    void ReceiveOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup);
 
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
@@ -363,6 +398,9 @@ private:
     UPROPERTY()
     TArray<AActor*> SelectedActors;
 
+    /** Type of actors whose subgroup is currently selected. */
+    TSubclassOf<AActor> SelectedSubgroup;
+
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingBeingPlacedClass;
 
@@ -413,6 +451,12 @@ private:
 
 	/** Automatically issues the most reasonable order for the specified targets. */
 	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
+
+    /** Gets any member of the currently selected subgroup of selected actors. */
+    bool GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex);
+
+    /** Selects the next or previous subgroup. */
+    void SelectNextSubgroupInDirection(int32 Sign);
 
 	/** Cancels constructing the specified actor, destroying the construction site. */
 	UFUNCTION(Reliable, Server, WithValidation)

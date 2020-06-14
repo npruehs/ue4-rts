@@ -89,6 +89,9 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Pressed, this, &ARTSPlayerController::StartToggleSelection);
 	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Released, this, &ARTSPlayerController::StopToggleSelection);
 
+    InputComponent->BindAction(TEXT("SelectNextSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectNextSubgroup);
+    InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
+
 	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueOrder);
 	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 
@@ -394,6 +397,87 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
     {
         // Issue move order.
         IssueMoveOrder(TargetLocation.GetValue());
+    }
+}
+
+bool ARTSPlayerController::GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex)
+{
+    *OutSelectedSubgroupActor = nullptr;
+    *OutSelectedSubgroupActorIndex = -1;
+
+    if (SelectedActors.Num() <= 0)
+    {
+        return false;
+    }
+
+    for (int32 Index = 0; Index < SelectedActors.Num(); ++Index)
+    {
+        AActor* SelectedActor = SelectedActors[Index];
+
+        if (!IsValid(SelectedActors[Index]))
+        {
+            continue;
+        }
+
+        if (SelectedActor->GetClass() == GetSelectedSubgroup())
+        {
+            *OutSelectedSubgroupActor = SelectedActor;
+            *OutSelectedSubgroupActorIndex = Index;
+            return true;
+        }
+    }
+
+    // Selected subgroup invalid.
+    return false;
+}
+
+void ARTSPlayerController::SelectNextSubgroupInDirection(int32 Sign)
+{
+    // Find first actor in selected subgroup.
+    AActor* OldSelectedSubgroupActor = nullptr;
+    int32 OldSelectedSubgroupActorIndex = 0;
+
+    if (!GetSelectedSubgroupActorAndIndex(&OldSelectedSubgroupActor, &OldSelectedSubgroupActorIndex))
+    {
+        SelectFirstSubgroup();
+        return;
+    }
+
+    // Iterate all other selected actors, wrapping around.
+    AActor* NewSelectedSubgroupActor = nullptr;
+    int NewSelectedSubgroupActorIndex = OldSelectedSubgroupActorIndex + Sign;
+
+    while (SelectedActors.IsValidIndex(NewSelectedSubgroupActorIndex))
+    {
+        if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
+        {
+            NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
+            break;
+        }
+
+        NewSelectedSubgroupActorIndex += Sign;
+    }
+
+    if (!IsValid(NewSelectedSubgroupActor))
+    {
+        NewSelectedSubgroupActorIndex = Sign >= 0 ? 0 : SelectedActors.Num() - 1;
+
+        while (NewSelectedSubgroupActorIndex != OldSelectedSubgroupActorIndex)
+        {
+            if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
+            {
+                NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
+                break;
+            }
+
+            NewSelectedSubgroupActorIndex += Sign;
+        }
+    }
+
+    // Select new subgroup.
+    if (IsValid(NewSelectedSubgroupActor))
+    {
+        SelectSubgroup(NewSelectedSubgroupActor->GetClass());
     }
 }
 
@@ -995,8 +1079,84 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 		}
 	}
 
+    // Initially, select first subgroup.
+    SelectFirstSubgroup();
+
 	// Notify listeners.
 	NotifyOnSelectionChanged(SelectedActors);
+}
+
+TSubclassOf<AActor> ARTSPlayerController::GetSelectedSubgroup() const
+{
+    return SelectedSubgroup;
+}
+
+AActor* ARTSPlayerController::GetSelectedSubgroupActor()
+{
+    AActor* SelectedSubgroupActor;
+    int32 SelectedSubgroupActorIndex;
+    return GetSelectedSubgroupActorAndIndex(&SelectedSubgroupActor, &SelectedSubgroupActorIndex) ? SelectedSubgroupActor
+        : nullptr;
+}
+
+void ARTSPlayerController::GetSelectedSubgroupActors(TArray<AActor*>& OutActors) const
+{
+    for (AActor* Actor : SelectedActors)
+    {
+        if (!IsValid(Actor))
+        {
+            continue;
+        }
+
+        if (Actor->GetClass() == SelectedSubgroup)
+        {
+            OutActors.Add(Actor);
+        }
+    }
+}
+
+void ARTSPlayerController::SelectFirstSubgroup()
+{
+    if (SelectedActors.Num() > 0)
+    {
+        SelectSubgroup(SelectedActors[0]->GetClass());
+    }
+    else
+    {
+        SelectSubgroup(nullptr);
+    }
+}
+
+void ARTSPlayerController::SelectNextSubgroup()
+{
+    SelectNextSubgroupInDirection(+1);
+}
+
+void ARTSPlayerController::SelectPreviousSubgroup()
+{
+    SelectNextSubgroupInDirection(-1);
+}
+
+void ARTSPlayerController::SelectSubgroup(TSubclassOf<AActor> NewSubgroup)
+{
+    if (SelectedSubgroup == NewSubgroup)
+    {
+        return;
+    }
+
+    SelectedSubgroup = NewSubgroup;
+
+    if (NewSubgroup == nullptr)
+    {
+        UE_LOG(LogRTS, Verbose, TEXT("Cleared selected subgroup."));
+    }
+    else
+    {
+        UE_LOG(LogRTS, Verbose, TEXT("Selected subgroup %s."), *NewSubgroup->GetName());
+    }
+
+    // Notify listeners.
+    NotifyOnSelectedSubgroupChanged(NewSubgroup);
 }
 
 void ARTSPlayerController::SaveControlGroup(int32 Index)
@@ -1672,6 +1832,11 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
 }
 
+void ARTSPlayerController::NotifyOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup)
+{
+    ReceiveOnSelectedSubgroupChanged(Subgroup);
+}
+
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
     Super::PlayerTick(DeltaTime);
@@ -1786,7 +1951,19 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+	int32 DeselectedActors = SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+
+    if (DeselectedActors > 0)
+    {
+        // Notify listeners.
+        NotifyOnSelectionChanged(SelectedActors);
+
+        // Verify subgroup.
+        if (SelectedActors.Num() > 0 && !IsValid(GetSelectedSubgroupActor()))
+        {
+            SelectFirstSubgroup();
+        }
+    }
 
     // Notify listeners.
     if (OldHoveredActor != HoveredActor)

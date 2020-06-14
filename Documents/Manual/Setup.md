@@ -61,6 +61,8 @@ At _Edit > Project Settings > Engine > Input_ ...
 1. Bind the actions `LoadControlGroup0` to `LoadControlGroup9` (e.g. to 0 to 9).
 1. Bind the action `AddSelection` (e.g. to Left Shift).
 1. Bind the action `ToggleSelection` (e.g. to Left Ctrl).
+1. Bind the action `SelectNextSubgroup` (e.g. to Tab).
+1. Bind the action `SelectPreviousSubgroup` (e.g. Shift + Tab).
 
 #### Orders
 
