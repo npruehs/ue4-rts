@@ -65,6 +65,11 @@ At _Edit > Project Settings > Engine > Input_ ...
 1. Bind the action `SelectNextSubgroup` (e.g. to Tab).
 1. Bind the action `SelectPreviousSubgroup` (e.g. Shift + Tab).
 
+#### Camera
+
+1. Bind the actions `SaveCameraLocation0` to `SaveCameraLocation4` (e.g. to CTRL+F5 to CTRL+F9).
+1. Bind the actions `LoadCameraLocation0` to `LoadCameraLocation9` (e.g. to F5 to F9).
+
 #### Orders
 
 1. Bind the action `IssueOrder` (e.g. to the right mouse button). This will enable typical smart orders, such as moving when right-clicking ground, and attacking when right-clicking enemies.

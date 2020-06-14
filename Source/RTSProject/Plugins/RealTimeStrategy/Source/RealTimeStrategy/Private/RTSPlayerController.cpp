@@ -124,6 +124,18 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAxis(TEXT("MoveCameraUpDown"), this, &ARTSPlayerController::MoveCameraUpDown);
     InputComponent->BindAxis(TEXT("ZoomCamera"), this, &ARTSPlayerController::ZoomCamera);
 
+    InputComponent->BindAction(TEXT("SaveCameraLocation0"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<0>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation1"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<1>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation2"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<2>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation3"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<3>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation4"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<4>);
+
+    InputComponent->BindAction(TEXT("LoadCameraLocation0"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<0>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation1"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<1>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation2"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<2>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation3"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<3>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation4"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<4>);
+
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
@@ -149,8 +161,9 @@ void ARTSPlayerController::SetupInputComponent()
 		UE_LOG(LogRTS, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
 	}
 
-	// Setup control groups.
+	// Setup control groups and camera locations.
 	ControlGroups.SetNum(10);
+    CameraLocations.SetNum(5);
 }
 
 void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -1326,6 +1339,46 @@ void ARTSPlayerController::FocusCameraOnActors(TArray<AActor*> Actors)
 
     FVector2D Location = Locations / NumActors;
     FocusCameraOnLocation(Location);
+}
+
+void ARTSPlayerController::SaveCameraLocation(int32 Index)
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return;
+    }
+
+    if (!CameraLocations.IsValidIndex(Index))
+    {
+        return;
+    }
+
+    // Save camera location.
+    CameraLocations[Index] = PlayerPawn->GetActorLocation();
+
+    UE_LOG(LogRTS, Log, TEXT("Saved camera location to index %d."), Index);
+}
+
+void ARTSPlayerController::LoadCameraLocation(int32 Index)
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return;
+    }
+
+    if (!CameraLocations.IsValidIndex(Index))
+    {
+        return;
+    }
+
+    // Restore camera.
+    PlayerPawn->SetActorLocation(CameraLocations[Index]);
+
+    UE_LOG(LogRTS, Log, TEXT("Loaded camera location with index %d."), Index);
 }
 
 bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed() const

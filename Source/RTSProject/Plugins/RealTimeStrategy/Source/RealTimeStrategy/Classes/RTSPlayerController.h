@@ -173,6 +173,28 @@ public:
     UFUNCTION(BlueprintCallable)
     void FocusCameraOnActors(TArray<AActor*> Actors);
 
+    /** Saves the current camera location to the specified index. */
+    UFUNCTION(BlueprintCallable)
+    void SaveCameraLocation(int32 Index);
+
+    /** Saves the current camera location to the specified index. */
+    template <int32 Index>
+    void SaveCameraLocationWithIndex()
+    {
+        SaveCameraLocation(Index);
+    }
+
+    /** Restores the camera location with the specified index. */
+    UFUNCTION(BlueprintCallable)
+    void LoadCameraLocation(int32 Index);
+
+    /** Restores the camera location with the specified index. */
+    template <int32 Index>
+    void LoadCameraLocationWithIndex()
+    {
+        LoadCameraLocation(Index);
+    }
+
 	/** Whether the hotkey for showing all construction progress bars is currently pressed, or not. */
 	UFUNCTION(BlueprintPure)
 	bool IsConstructionProgressBarHotkeyPressed() const;
@@ -429,6 +451,9 @@ private:
 
     /** Last time a group was selected. */
     float LastSelectionTime;
+
+    /** Saved camera locations of this player. */
+    TArray<FVector> CameraLocations;
 
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingBeingPlacedClass;
