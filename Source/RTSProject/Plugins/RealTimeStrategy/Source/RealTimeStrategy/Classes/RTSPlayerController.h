@@ -35,6 +35,8 @@ public:
     
     virtual void PlayerTick(float DeltaTime) override;
 
+    virtual void InitPlayerState() override;
+    virtual void OnRep_PlayerState() override;
 
 	/** Gets the actor currently hovered by this player. */
 	UFUNCTION(BlueprintPure)
@@ -315,6 +317,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
 
+    /** Event when the player state has been set up or replicated for this player. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnPlayerStateAvailable"))
+    void ReceiveOnPlayerStateAvailable(ARTSPlayerState* NewPlayerState);
+
     /** Event when the a new subgroup of actors has been selected. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectedSubgroupChanged"))
     void ReceiveOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup);
@@ -336,6 +342,9 @@ protected:
     virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+    /** Player state has been created or replicated and is now available. */
+    virtual void OnPlayerStateAvailable(ARTSPlayerState* NewPlayerState);
 
 private:
     /** Movement speed of the camera when moved with keys or mouse, in cm/sec. */

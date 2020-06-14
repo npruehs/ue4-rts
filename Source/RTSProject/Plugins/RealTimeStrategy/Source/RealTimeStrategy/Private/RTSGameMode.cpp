@@ -299,15 +299,7 @@ void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
         {
             Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
         }
-    }
-
-    // Notify listeners.
-    ARTSPlayerController* NewPlayerOwner = Cast<ARTSPlayerController>(NewOwner);
-    
-    if (NewPlayerOwner != nullptr)
-    {
-        NewPlayerOwner->NotifyOnActorOwnerChanged(Actor);
-    }    
+    }   
 }
 
 void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)

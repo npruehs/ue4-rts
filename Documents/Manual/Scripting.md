@@ -65,6 +65,14 @@ Feel free to explore the plugin yourself by looking at what other functions and 
 | ![On Order Changed](Images/OnOrderChanged.png) | Event when the pawn has received a new order. |
 
 
+### RTSPlayerController
+#### Events
+
+| Event | Description |
+| --- | --- |
+| ![On Player State Available](Images/OnPlayerStateAvailable.png) | Event when the player state has been set up or replicated for this player. |
+
+
 ### RTSPlayerResourcesComponent
 #### Functions
 
@@ -77,6 +85,14 @@ Feel free to explore the plugin yourself by looking at what other functions and 
 | Event | Description |
 | --- | --- |
 | ![On Resources Changed](Images/OnResourcesChanged.png) | Event when the current resource stock amount for the player has changed. |
+
+
+### RTSPlayerController
+#### Functions
+
+| Node | Description |
+| --- | --- |
+| ![Get Own Actors](Images/GetOwnActors.png) | Gets the list of actors currently owned by this player. |
 
 
 ### RTSProductionComponent

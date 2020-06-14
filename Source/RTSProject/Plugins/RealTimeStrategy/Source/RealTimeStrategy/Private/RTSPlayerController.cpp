@@ -155,6 +155,20 @@ void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
+void ARTSPlayerController::OnPlayerStateAvailable(ARTSPlayerState* NewPlayerState)
+{
+    // Discover own actors.
+    ARTSPlayerState* RTSPlayerState = GetPlayerState();
+
+    if (IsValid(RTSPlayerState))
+    {
+        RTSPlayerState->DiscoverOwnActors();
+    }
+
+    // Notify listeners.
+    ReceiveOnPlayerStateAvailable(RTSPlayerState);
+}
+
 AActor* ARTSPlayerController::GetHoveredActor() const
 {
 	return HoveredActor;
@@ -1988,4 +2002,34 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
             }
         }
     }
+}
+
+void ARTSPlayerController::InitPlayerState()
+{
+    Super::InitPlayerState();
+
+    if (!IsValid(PlayerState))
+    {
+        return;
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Player %s set up player state %s (%s)."), *GetName(), *PlayerState->GetName(),
+        *PlayerState->GetPlayerName());
+
+    OnPlayerStateAvailable(GetPlayerState());
+}
+
+void ARTSPlayerController::OnRep_PlayerState()
+{
+    Super::OnRep_PlayerState();
+
+    if (!IsValid(PlayerState))
+    {
+        return;
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Player %s received player state %s (%s)."), *GetName(), *PlayerState->GetName(),
+        *PlayerState->GetPlayerName());
+
+    OnPlayerStateAvailable(GetPlayerState());
 }
