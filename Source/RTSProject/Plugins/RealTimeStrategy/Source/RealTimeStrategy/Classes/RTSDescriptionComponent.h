@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "UObject/TextProperty.h"
 
 #include "RTSDescriptionComponent.generated.h"
 
