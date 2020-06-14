@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "Landscape.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BrushComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -55,6 +56,8 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
 	MaxCameraDistance = 2500.0f;
 
 	CameraScrollThreshold = 20.0f;
+
+    DoubleGroupSelectionTime = 0.2f;
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -1027,8 +1030,50 @@ bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
 	return OrderedPawn->GetOwner() == this;
 }
 
-void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
+void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode)
 {
+    // Check for double-selection.
+    UWorld* World = GetWorld();
+
+    if (!World)
+    {
+        return;
+    }
+
+    const float CurrentSelectionTime = World->GetRealTimeSeconds();
+    const float SelectionTimeDelta = CurrentSelectionTime - LastSelectionTime;
+    LastSelectionTime = CurrentSelectionTime;
+
+    if (CameraFocusMode == ERTSSelectionCameraFocusMode::SELECTIONFOCUS_FocusOnDoubleSelection &&
+        DoubleGroupSelectionTime > 0.0f && SelectionTimeDelta < DoubleGroupSelectionTime)
+    {
+        // Compare groups.
+        if (Actors.Num() == SelectedActors.Num())
+        {
+            bool bSameSelection = true;
+
+            for (AActor* Actor : Actors)
+            {
+                if (!SelectedActors.Contains(Actor))
+                {
+                    bSameSelection = false;
+                    break;
+                }
+            }
+
+            if (bSameSelection)
+            {
+                // Focus selected actors instead.
+                if (SelectedActors.Num() > 0)
+                {
+                    FocusCameraOnActor(SelectedActors[0]);
+                }
+
+                return;
+            }
+        }
+    }
+
 	// Clear selection.
 	for (AActor* SelectedActor : SelectedActors)
 	{
@@ -1206,7 +1251,7 @@ void ARTSPlayerController::LoadControlGroup(int32 Index)
 		return;
 	}
 
-	SelectActors(ControlGroups[Index].Actors);
+	SelectActors(ControlGroups[Index].Actors, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_FocusOnDoubleSelection);
 
 	UE_LOG(LogRTS, Log, TEXT("Loaded selection from control group %d."), Index);
 }
@@ -1221,6 +1266,67 @@ void ARTSPlayerController::LoadControlGroup6() { LoadControlGroup(6); }
 void ARTSPlayerController::LoadControlGroup7() { LoadControlGroup(7); }
 void ARTSPlayerController::LoadControlGroup8() { LoadControlGroup(8); }
 void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
+
+void ARTSPlayerController::FocusCameraOnLocation(FVector2D NewCameraLocation)
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return;
+    }
+
+    // Calculate where to put the camera, considering its angle, to center on the specified location.
+    FVector FinalCameraLocation = FVector(NewCameraLocation.X - GetCameraDistance(), NewCameraLocation.Y, 0.0f);
+
+    // Enforce camera bounds.
+    if (IsValid(CameraBoundsVolume) && !CameraBoundsVolume->EncompassesPoint(FinalCameraLocation))
+    {
+        UBrushComponent* CameraBoundsBrushComponent = CameraBoundsVolume->GetBrushComponent();
+        FTransform CameraBoundsBrushTransform = CameraBoundsBrushComponent->GetComponentTransform();
+        FBoxSphereBounds Bounds = CameraBoundsBrushComponent->CalcBounds(CameraBoundsBrushTransform);
+
+        FinalCameraLocation.X = FMath::Clamp(FinalCameraLocation.X, Bounds.GetBox().Min.X, Bounds.GetBox().Max.X);
+        FinalCameraLocation.Y = FMath::Clamp(FinalCameraLocation.Y, Bounds.GetBox().Min.Y, Bounds.GetBox().Max.Y);
+    }
+
+    // Keep camera height.
+    FinalCameraLocation.Z = PlayerPawn->GetActorLocation().Z;
+
+    // Update camera location.
+    PlayerPawn->SetActorLocation(FinalCameraLocation);
+}
+
+void ARTSPlayerController::FocusCameraOnActor(AActor* Actor)
+{
+    TArray<AActor*> Actors;
+    Actors.Add(Actor);
+    FocusCameraOnActors(Actors);
+}
+
+void ARTSPlayerController::FocusCameraOnActors(TArray<AActor*> Actors)
+{
+    // Get center of group.
+    FVector2D Locations = FVector2D::ZeroVector;
+    int32 NumActors = 0;
+
+    for (auto Actor : Actors)
+    {
+        if (!IsValid(Actor))
+        {
+            continue;
+        }
+
+        FVector ActorLocation = Actor->GetActorLocation();
+        Locations.X += ActorLocation.X;
+        Locations.Y += ActorLocation.Y;
+
+        ++NumActors;
+    }
+
+    FVector2D Location = Locations / NumActors;
+    FocusCameraOnLocation(Location);
+}
 
 bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed() const
 {
@@ -1457,7 +1563,7 @@ void ARTSPlayerController::FinishSelectActors()
 		}
     }
 
-	SelectActors(ActorsToSelect);
+	SelectActors(ActorsToSelect, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_DoNothing);
 
 	bCreatingSelectionFrame = false;
 }
@@ -1702,6 +1808,35 @@ void ARTSPlayerController::ZoomCamera(float Value)
     CameraZoomAxisValue = Value;
 }
 
+float ARTSPlayerController::GetCameraDistance() const
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return 0.0f;
+    }
+
+    UCameraComponent* Camera = PlayerPawn->FindComponentByClass<UCameraComponent>();
+
+    if (!IsValid(Camera))
+    {
+        return 0.0f;
+    }
+
+    // Get camera angle.
+    float CameraAngle = Camera->GetRelativeRotation().Pitch;
+
+    if (CameraAngle < 0.0f)
+    {
+        CameraAngle += 90.0f;
+    }
+
+    // Get camera distance using trigonometry.
+    // We are assuming that the terrain is flat, centered at the origin, and the camera has no roll or yaw.
+    return Camera->GetRelativeLocation().Z * FMath::Tan(FMath::DegreesToRadians(CameraAngle));
+}
+
 void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
 {
 	ReceiveOnActorOwnerChanged(Actor);
@@ -1816,7 +1951,7 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 
 void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition)
 {
-	APawn* PlayerPawn = GetPawn();
+	APawn* PlayerPawn = GetPawnOrSpectator();
 
 	if (!PlayerPawn)
 	{
@@ -1861,7 +1996,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
         SelectionSoundCooldownRemaining -= DeltaTime;
     }
 
-    APawn* PlayerPawn = GetPawn();
+    APawn* PlayerPawn = GetPawnOrSpectator();
 
     if (!PlayerPawn)
     {

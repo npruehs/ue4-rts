@@ -46,6 +46,7 @@ Usually, players control a single [pawn](https://docs.unrealengine.com/en-US/Gam
 1. At your `RTSPlayerController`, set the _Camera Speed_ (e.g. to 1000).
 1. At your `RTSPlayerController`, set the _Camera Scroll Threshold_ (e.g. to 20).
 1. At your `RTSPlayerController`, set _Camera Zoom Speed_, _Min Camera Distance_ and _Max Camera Distance_ as desired.
+1. At your `RTSPlayerController`, set _Double Group Selection Time_ to the number of seconds the player has for rapidly selecting the same control group to center the camera on it.
 
 
 ### Input Setup

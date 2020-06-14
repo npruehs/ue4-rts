@@ -6,6 +6,7 @@
 #include "Templates/SubclassOf.h"
 
 #include "RTSControlGroup.h"
+#include "RTSSelectionCameraFocusMode.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -100,7 +101,7 @@ public:
 
 	/** Selects the specified actors. */
 	UFUNCTION(BlueprintCallable)
-	void SelectActors(TArray<AActor*> Actors);
+	void SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode);
 
     /** Gets the currently selected subgroup of selected actors. */
     UFUNCTION(BlueprintPure)
@@ -159,6 +160,18 @@ public:
 	UFUNCTION(BlueprintCallable) void LoadControlGroup7();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup8();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup9();
+
+    /** Makes the camera focus the specified world location. */
+    UFUNCTION(BlueprintCallable)
+    void FocusCameraOnLocation(FVector2D NewCameraLocation);
+
+    /** Makes the camera focus the specified actor. */
+    UFUNCTION(BlueprintCallable)
+    void FocusCameraOnActor(AActor* Actor);
+
+    /** Makes the camera focus the specified actors. */
+    UFUNCTION(BlueprintCallable)
+    void FocusCameraOnActors(TArray<AActor*> Actors);
 
 	/** Whether the hotkey for showing all construction progress bars is currently pressed, or not. */
 	UFUNCTION(BlueprintPure)
@@ -367,6 +380,10 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
     int32 CameraScrollThreshold;
 
+    /** Time between two group selections to be considered a double-selection (e.g. for centering the camera on that group). */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Input", meta = (ClampMin = 0))
+    float DoubleGroupSelectionTime;
+
     /** Preview to use for placing buildings. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction")
     TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
@@ -409,6 +426,9 @@ private:
 
     /** Type of actors whose subgroup is currently selected. */
     TSubclassOf<AActor> SelectedSubgroup;
+
+    /** Last time a group was selected. */
+    float LastSelectionTime;
 
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingBeingPlacedClass;
@@ -515,6 +535,9 @@ private:
 
     /** Applies zoom input to camera movement. */
     void ZoomCamera(float Value);
+
+    /** Gets the distance from the player camera to an object, on the ground, in cm. */
+    float GetCameraDistance() const;
 
     /** Remembers the current mouse position for multi-selection, finished by FinishSelectActors. */
     UFUNCTION()
