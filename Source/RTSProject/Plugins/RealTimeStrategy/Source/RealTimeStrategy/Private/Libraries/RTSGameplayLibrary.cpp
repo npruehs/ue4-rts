@@ -3,7 +3,9 @@
 #include "EngineUtils.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
+#include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 #include "RTSOwnerComponent.h"
@@ -156,6 +158,37 @@ bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, 
 
     OutMissingRequirement = RequiredActors[0];
     return true;
+}
+
+bool URTSGameplayLibrary::IsOwnedByLocalPlayer(AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return false;
+    }
+
+    URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+    if (!IsValid(OwnerComponent))
+    {
+        return false;
+    }
+
+    UWorld* World = Actor->GetWorld();
+    
+    if (!IsValid(World))
+    {
+        return false;
+    }
+    
+    APlayerController* PlayerController = World->GetFirstPlayerController();
+
+    if (!IsValid(PlayerController))
+    {
+        return false;
+    }
+
+    return OwnerComponent->GetPlayerOwner() == PlayerController->GetPlayerState<ARTSPlayerState>();
 }
 
 bool URTSGameplayLibrary::IsOwnerABot(URTSOwnerComponent* OwnerComponent)

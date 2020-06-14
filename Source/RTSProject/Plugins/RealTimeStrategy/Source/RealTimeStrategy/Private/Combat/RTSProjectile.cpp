@@ -2,7 +2,9 @@
 
 #include "GameFramework/Pawn.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSLog.h"
 #include "RTSOwnerComponent.h"
@@ -99,6 +101,12 @@ void ARTSProjectile::Tick(float DeltaSeconds)
 
     // Notify listeners.
     NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+
+    // Play sound.
+    if (IsValid(ImpactSound))
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), GetActorRotation());
+    }
 
     // Destroy projectile.
     Destroy();
@@ -214,6 +222,12 @@ void ARTSProjectile::MulticastFireAt_Implementation(AActor* ProjectileTarget, fl
         // Calculate angle of reach.
         static const float G = 9.8067f;
         LaunchAngle = 0.5f * FMath::Asin(G * InitialDistance / (ProjectileMovement->InitialSpeed * ProjectileMovement->InitialSpeed));
+    }
+
+    // Play sound.
+    if (IsValid(FiredSound))
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, FiredSound, GetActorLocation(), GetActorRotation());
     }
 
     // Clients will take it from here.

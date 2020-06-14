@@ -1143,7 +1143,9 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCam
 			SelectableComponent->SelectActor();
 
             // Play selection sound.
-            if (SelectionSoundCooldownRemaining <= 0.0f && IsValid(SelectableComponent->GetSelectedSound()))
+            if (SelectionSoundCooldownRemaining <= 0.0f &&
+                URTSGameplayLibrary::IsOwnedByLocalPlayer(SelectedActor) &&
+                IsValid(SelectableComponent->GetSelectedSound()))
             {
                 UGameplayStatics::PlaySound2D(this, SelectableComponent->GetSelectedSound());
                 SelectionSoundCooldownRemaining = SelectableComponent->GetSelectedSound()->GetDuration();

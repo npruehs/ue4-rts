@@ -46,12 +46,14 @@ As mentioned before, units are not directly possessed by player controllers in t
 1. Set the _Maximum Health_ of the `RTSHealthComponent`.
 1. In case your actor should regenerate health, check _Regenerate Health_ and set the _Health Regeneration Rate_.
 1. If you want to play animations or visual effects when the actor dies, set _Actor Death Type_ to _Stop Gameplay_. In that case, you're responsible of destroying the actor yourself as soon as all of your visual clues have finished playing.
+1. Set the _Death Sound_ to the sound cue to play when the actor is killed.
 1. Add your `RTSHealthBarWidgetComponent` (see [User Interface](UserInterface.md)).
-
 1. Add the `RTSAttackComponent` to any actors than can attack.
 1. Add an attack to the `RTSAttackComponent` of these actors, setting its _Cooldown, Damage, Range, Acquisition Radius_ and _Chase Radius_.
 
 _Setting the Damage Type is optional._
+
+
 
 #### Projectiles
 
@@ -62,6 +64,7 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. At the `ProjectileMovement` component, set its _Initial Speed_ (e.g. to 1000).
 1. If you want your projectile to use a ballistic trajectory, check _Ballistic Trajectory_ at the projectile and set the _Ballistic Trajectory Factor_ as you like.
 1. For dealing area of effect damage, check _Apply Area Of Effect_ and set your area of effect radius and collision filters.
+1. Set the _Fired Sound_ and _Impact Sound_ to the sound cues to play when the projectile is fired and detonated, respectively.
 1. At the `RTSAttackComponent`, reference the new projectile in your attack.
 
 
@@ -72,6 +75,7 @@ If you don't specify a projectile, the damage will be applied immediately. In or
 1. Set the _Resources_ to any resources required for production.
 1. Set the _Production Cost Type_ to to _Pay Immediately_ if all costs should be paid in full when starting production, or to _Pay Over Time_ for continuously paying costs (similar to Command & Conquer).
 1. Set the _Refund Factor_ to the factor to multiply refunded resources with after cancelation.
+1. Set the _Finished Sound_ to the sound cue to play when the actor spaws after being produced.
 1. Add the `RTSRequirementsComponent` if the actor should have any requirements, and set the _Required Actors_.
 
 

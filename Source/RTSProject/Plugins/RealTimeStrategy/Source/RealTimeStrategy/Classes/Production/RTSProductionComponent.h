@@ -92,6 +92,10 @@ public:
     int32 GetCapacityPerQueue() const;
 
 
+    /** Event when the production timer has expired. */
+    virtual void NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex);
+
+
 	/** Event when a product has been queued for production. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSProductionComponentProductQueuedSignature OnProductQueued;
@@ -133,9 +137,16 @@ private:
     UPROPERTY(ReplicatedUsing=ReceivedProductionQueues)
     TArray<FRTSProductionQueue> ProductionQueues;
 
+    /** Product that the actor finished most recently. */
+    UPROPERTY(ReplicatedUsing=ReceivedMostRecentProduct)
+    AActor* MostRecentProduct;
+
 	void DequeueProduct(int32 QueueIndex = 0, int32 ProductIndex = 0);
 	void StartProductionInQueue(int32 QueueIndex = 0);
 
     UFUNCTION()
     void ReceivedProductionQueues();
+
+    UFUNCTION()
+    void ReceivedMostRecentProduct();
 };

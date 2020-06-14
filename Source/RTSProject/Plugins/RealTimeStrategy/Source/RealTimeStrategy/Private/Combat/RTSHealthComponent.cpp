@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSGameMode.h"
 #include "RTSLog.h"
@@ -74,7 +75,7 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
     // Notify listeners.
     AActor* Owner = GetOwner();
 
-    OnHealthChanged.Broadcast(Owner, OldHealth, NewHealth, DamageCauser);
+    NotifyOnHealthChanged(Owner, OldHealth, NewHealth, DamageCauser);
 
     if (GetWorld() && OldHealth > NewHealth)
     {
@@ -124,6 +125,19 @@ float URTSHealthComponent::GetLastTimeDamageTaken() const
     return LastTimeDamageTaken;
 }
 
+void URTSHealthComponent::NotifyOnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser)
+{
+    // Notify listeners.
+    OnHealthChanged.Broadcast(Actor, OldHealth, NewHealth, DamageCauser);
+
+    // Play sound.
+    if (NewHealth <= 0.0f && IsValid(DeathSound))
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, DeathSound,
+            Actor->GetActorLocation(), Actor->GetActorRotation());
+    }
+}
+
 void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
     SetCurrentHealth(CurrentHealth - Damage, DamageCauser);
@@ -142,5 +156,5 @@ void URTSHealthComponent::OnHealthRegenerationTimerElapsed()
 
 void URTSHealthComponent::ReceivedCurrentHealth(float OldHealth)
 {
-    OnHealthChanged.Broadcast(GetOwner(), OldHealth, CurrentHealth, nullptr);
+    NotifyOnHealthChanged(GetOwner(), OldHealth, CurrentHealth, nullptr);
 }

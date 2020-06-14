@@ -9,6 +9,7 @@
 
 
 class UProjectileMovementComponent;
+class USoundCue;
 
 
 /**
@@ -76,6 +77,14 @@ private:
     /** Actor class to filter by when finding area of effect targets near the impact location. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (EditCondition = bApplyAreaOfEffect))
     TSubclassOf<AActor> AreaOfEffectTargetClassFilter;
+
+    /** Sound to play when the projectile is fired. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* FiredSound;
+
+    /** Sound to play on projectile impact. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* ImpactSound;
 
     bool bFired;
 

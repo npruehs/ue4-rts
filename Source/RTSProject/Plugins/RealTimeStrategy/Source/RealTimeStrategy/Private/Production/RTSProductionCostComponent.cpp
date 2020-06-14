@@ -31,3 +31,8 @@ float URTSProductionCostComponent::GetRefundFactor() const
 {
     return RefundFactor;
 }
+
+USoundCue* URTSProductionCostComponent::GetFinishedSound() const
+{
+    return FinishedSound;
+}

@@ -66,7 +66,11 @@ public:
     static void StopGameplayFor(AActor* Actor);
 
     /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
-    static bool GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement);
+    static bool GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor,
+        TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement);
+
+    /** Checks whether the specified actor is owned by the local player. */
+    static bool IsOwnedByLocalPlayer(AActor* Actor);
 
 private:
 	/** Helper function - check if owner is a bot */

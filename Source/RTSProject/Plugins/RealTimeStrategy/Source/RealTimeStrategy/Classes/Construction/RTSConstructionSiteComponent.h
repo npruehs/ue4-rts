@@ -12,6 +12,9 @@
 #include "RTSConstructionSiteComponent.generated.h"
 
 
+class USoundCue;
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSConstructionSiteComponentConstructionStartedSignature, AActor*, ConstructionSite, float, TotalConstructionTime);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSConstructionSiteComponentConstructionProgressChangedSignature, AActor*, ConstructionSite, float, ProgressPercentage);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSConstructionSiteComponentConstructionFinishedSignature, AActor*, ConstructionSite);
@@ -122,6 +125,9 @@ public:
     UFUNCTION(BlueprintPure)
     TArray<AActor*> GetAssignedBuilders() const;
 
+    /** Event when the construction timer has been updated. */
+    virtual void NotifyOnConstructionProgressChanged(AActor* ConstructionSite, float ProgressPercentage);
+
 	/** Event when the construction timer has been started. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionStartedSignature OnConstructionStarted;
@@ -190,6 +196,10 @@ private:
     /** Whether the attack range of the building should be previewed while selecting a construction location. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     bool bPreviewAttackRange;
+
+    /** Sound to play when the actor finished construction. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* FinishedSound;
 
 	/** Whether the construction timer is currently being ticked, or not. */
     UPROPERTY(EditInstanceOnly, Replicated, Category = "RTS")

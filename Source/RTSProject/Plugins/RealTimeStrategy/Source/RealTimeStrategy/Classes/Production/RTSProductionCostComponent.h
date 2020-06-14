@@ -11,6 +11,9 @@
 #include "RTSProductionCostComponent.generated.h"
 
 
+class USoundCue;
+
+
 /** Specifies the time and resources required to construct the actor. */
 UCLASS(meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSProductionCostComponent : public UActorComponent
@@ -37,6 +40,10 @@ public:
     UFUNCTION(BlueprintPure)
     float GetRefundFactor() const;
 
+    /** Gets the sound to play when the actor finished production. */
+    UFUNCTION(BlueprintPure)
+    USoundCue* GetFinishedSound() const;
+
 
 private:
 	/** When to pay resources for production. */
@@ -54,4 +61,8 @@ private:
 	/** Resources to refund when canceling production. */
 	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	float RefundFactor;
+
+    /** Sound to play when the actor finished production. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* FinishedSound;
 };

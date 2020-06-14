@@ -10,6 +10,7 @@
 
 
 class AActor;
+class USoundCue;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSHealthComponentHealthChangedSignature, AActor*, Actor, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
@@ -50,6 +51,10 @@ public:
     float GetLastTimeDamageTaken() const;
 
 
+    /** Event when the current health of the actor has changed. */
+    virtual void NotifyOnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser);
+
+
 	/** Event when the current health of the actor has changed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSHealthComponentHealthChangedSignature OnHealthChanged;
@@ -74,6 +79,10 @@ private:
     /** How to handle depleted health. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     ERTSActorDeathType ActorDeathType;
+
+    /** Sound to play when the actor is killed. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* DeathSound;
 
     /** Current health of the actor. */
     UPROPERTY(ReplicatedUsing=ReceivedCurrentHealth)

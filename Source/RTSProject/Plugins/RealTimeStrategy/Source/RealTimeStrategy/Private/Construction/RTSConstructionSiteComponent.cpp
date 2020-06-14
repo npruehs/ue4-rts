@@ -1,7 +1,9 @@
 #include "Construction/RTSConstructionSiteComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSContainerComponent.h"
 #include "RTSGameplayTagsComponent.h"
@@ -11,6 +13,7 @@
 #include "Construction/RTSBuilderComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceType.h"
+#include "Libraries/RTSGameplayLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
 
 
@@ -183,15 +186,14 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
         HealthComponent->SetCurrentHealth(CurrentHealth + HealthIncrement, nullptr);
     }
 
+    // Notify listeners.
+    NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
+
 	// Check if finished.
 	if (RemainingConstructionTime <= 0)
 	{
 		FinishConstruction();
 	}
-    else
-    {
-        OnConstructionProgressChanged.Broadcast(GetOwner(), GetProgressPercentage());
-    }
 }
 
 bool URTSConstructionSiteComponent::CanAssignBuilder(AActor* Builder) const
@@ -434,7 +436,24 @@ TArray<AActor*> URTSConstructionSiteComponent::GetAssignedBuilders() const
     return AssignedBuilders;
 }
 
+void URTSConstructionSiteComponent::NotifyOnConstructionProgressChanged(AActor* ConstructionSite, float ProgressPercentage)
+{
+    ProgressPercentage = FMath::Clamp(ProgressPercentage, 0.0f, 1.0f);
+
+    // Notify listeners.
+    OnConstructionProgressChanged.Broadcast(ConstructionSite, ProgressPercentage);
+
+    // Play sound.
+    if (ProgressPercentage >= 1.0f && URTSGameplayLibrary::IsOwnedByLocalPlayer(ConstructionSite))
+    {
+        if (IsValid(FinishedSound))
+        {
+            UGameplayStatics::PlaySound2D(this, FinishedSound);
+        }
+    }
+}
+
 void URTSConstructionSiteComponent::ReceivedRemainingConstructionTime()
 {
-    OnConstructionProgressChanged.Broadcast(GetOwner(), GetProgressPercentage());
+    NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
 }

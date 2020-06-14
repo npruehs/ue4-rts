@@ -6,6 +6,7 @@
 #include "Engine/SCS_Node.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSGameMode.h"
 #include "RTSLog.h"
@@ -34,6 +35,7 @@ void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSProductionComponent, ProductionQueues);
+    DOREPLIFETIME(URTSProductionComponent, MostRecentProduct);
 }
 
 void URTSProductionComponent::BeginPlay()
@@ -51,6 +53,12 @@ void URTSProductionComponent::BeginPlay()
 void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    // Don't update production progress on clients - will be replicated from server.
+    if (GetNetMode() == NM_Client)
+    {
+        return;
+    }
 
     // Check for speed boosts.
     float SpeedBoostFactor = 1.0f;
@@ -377,8 +385,10 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 
 	UE_LOG(LogRTS, Log, TEXT("%s finished producing %s in queue %i."), *GetOwner()->GetName(), *Product->GetName(), QueueIndex);
 
+    MostRecentProduct = Product;
+
 	// Notify listeners.
-	OnProductionFinished.Broadcast(GetOwner(), Product, QueueIndex);
+	NotifyOnProductionFinished(GetOwner(), Product, QueueIndex);
 
 	// Remove product from queue.
 	DequeueProduct(QueueIndex);
@@ -484,6 +494,23 @@ int32 URTSProductionComponent::GetCapacityPerQueue() const
     return CapacityPerQueue;
 }
 
+void URTSProductionComponent::NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex)
+{
+    // Notify listeners.
+    OnProductionFinished.Broadcast(Actor, Product, QueueIndex);
+
+    // Play sound.
+    if (IsValid(Product) && URTSGameplayLibrary::IsOwnedByLocalPlayer(Actor))
+    {
+        URTSProductionCostComponent* ProductionCostComponent = Product->FindComponentByClass<URTSProductionCostComponent>();
+
+        if (IsValid(ProductionCostComponent) && IsValid(ProductionCostComponent->GetFinishedSound()))
+        {
+            UGameplayStatics::PlaySound2D(this, ProductionCostComponent->GetFinishedSound());
+        }
+    }
+}
+
 void URTSProductionComponent::DequeueProduct(int32 QueueIndex /*= 0*/, int32 ProductIndex /*= 0*/)
 {
 	// Get queue.
@@ -542,4 +569,9 @@ void URTSProductionComponent::ReceivedProductionQueues()
     {
         OnProductionProgressChanged.Broadcast(GetOwner(), QueueIndex, GetProgressPercentage(QueueIndex));
     }
+}
+
+void URTSProductionComponent::ReceivedMostRecentProduct()
+{
+    NotifyOnProductionFinished(GetOwner(), MostRecentProduct, -1);
 }
