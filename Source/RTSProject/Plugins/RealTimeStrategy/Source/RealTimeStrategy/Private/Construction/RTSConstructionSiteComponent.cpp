@@ -416,6 +416,12 @@ bool URTSConstructionSiteComponent::DoesStartImmediately() const
 {
     return bStartImmediately;
 }
+
+int32 URTSConstructionSiteComponent::GetGridWidthAndHeight() const
+{
+    return GridWidthAndHeight;
+}
+
 bool URTSConstructionSiteComponent::ShouldPreviewAttackRange() const
 {
     return bPreviewAttackRange;

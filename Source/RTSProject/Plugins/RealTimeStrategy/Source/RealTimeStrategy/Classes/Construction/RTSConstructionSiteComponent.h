@@ -110,6 +110,10 @@ public:
     UFUNCTION(BlueprintPure)
     bool DoesStartImmediately() const;
 
+    /** Gets the width and height of the construction site, in grid tiles. */
+    UFUNCTION(BlueprintPure)
+    int32 GetGridWidthAndHeight() const;
+
     /** Whether the attack range of the building should be previewed while selecting a construction location. */
     bool ShouldPreviewAttackRange() const;
 
@@ -192,6 +196,10 @@ private:
     /** Whether to start construction immediately after spawn, or not. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     bool bStartImmediately;
+
+    /** Width and height of the construction site, in grid tiles. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    int32 GridWidthAndHeight;
 
     /** Whether the attack range of the building should be previewed while selecting a construction location. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")

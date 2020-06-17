@@ -5,8 +5,6 @@
 #include "Camera/CameraComponent.h"
 #include "Components/BrushComponent.h"
 #include "Components/InputComponent.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
@@ -1438,73 +1436,15 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
-    // Check if we should preview attack range.
-    URTSConstructionSiteComponent* ConstructionSiteComponent =
-        URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
-
-    bool bPreviewAttackRange = false;
-    float AttackRange = 0.0f;
-
-    if (IsValid(ConstructionSiteComponent))
-    {
-        // Preview attack range.
-        bPreviewAttackRange = ConstructionSiteComponent->ShouldPreviewAttackRange();
-
-        if (bPreviewAttackRange)
-        {
-            URTSAttackComponent* AttackComponent =
-                URTSGameplayLibrary::FindDefaultComponentByClass<URTSAttackComponent>(BuildingClass);
-
-            if (IsValid(AttackComponent))
-            {
-                for (const FRTSAttackData& Attack : AttackComponent->GetAttacks())
-                {
-                    if (Attack.Range > AttackRange)
-                    {
-                        AttackRange = Attack.Range;
-                    }
-                }
-
-                AttackRange += URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2.0f;
-            }
-            else
-            {
-                bPreviewAttackRange = false;
-            }
-        }
-    }
-
     // Spawn preview building.
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	UStaticMeshComponent* StaticMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UStaticMeshComponent>(BuildingClass);
+    BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
 
-    if (IsValid(StaticMeshComponent))
-    {
-        BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
-        BuildingCursor->SetStaticMesh(StaticMeshComponent->GetStaticMesh(), StaticMeshComponent->GetRelativeTransform());
-    }
-    else
-    {
-        USkeletalMeshComponent* SkeletalMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<USkeletalMeshComponent>(BuildingClass);
-
-        if (IsValid(SkeletalMeshComponent))
-        {
-            BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
-            BuildingCursor->SetSkeletalMesh(SkeletalMeshComponent->SkeletalMesh, SkeletalMeshComponent->GetRelativeTransform());
-        }
-    }
-    
     if (IsValid(BuildingCursor))
     {
-        BuildingCursor->SetLocationValid(false);
-
-        // Show attack range.
-        if (bPreviewAttackRange && AttackRange > 0.0f)
-        {
-            BuildingCursor->SetRange(AttackRange);
-        }
+        BuildingCursor->SetupForBuilding(BuildingClass);
     }
 
 	BuildingBeingPlacedClass = BuildingClass;
@@ -1517,7 +1457,12 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
-	UWorld* World = GetWorld();
+    if (IsValid(BuildingCursor) && BuildingCursor->HasGrid())
+    {
+        return BuildingCursor->AreAllCellsValid();
+    }
+
+    UWorld* World = GetWorld();
     return URTSCollisionLibrary::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
@@ -2129,7 +2074,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
             // Update position of building being placed.
             if (BuildingCursor)
             {
-                BuildingCursor->SetActorLocation(HoveredWorldPosition);
+                BuildingCursor->SetCursorLocation(HoveredWorldPosition);
 
                 bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
                 BuildingCursor->SetLocationValid(bLocationValid);

@@ -28,7 +28,8 @@ namespace UnrealBuildTool.Rules
                     "RHI",
                     "RenderCore",
                     "Landscape",
-                    "GameplayTags"
+                    "GameplayTags",
+                    "NavigationSystem"
                 });
 		}
 	}

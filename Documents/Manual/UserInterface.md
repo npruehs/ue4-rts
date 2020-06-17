@@ -78,6 +78,7 @@ _You might want to make sure that the visibility of the widget is set to Hit Tes
 ### Building Cursors
 
 1. Create an actor deriving from `RTSBuildingCursor` (or use the `BP_RTSBuildingCursor` shipped with the plugin).
+1. If you want to use grid-based building placement, set the _Grid Cell Size_ of your building cursor, and set up its collision and navigation check settings as desired.
 1. In your player controller, set the building cursor reference.
 
 
