@@ -1,6 +1,7 @@
 #include "Vision/RTSVisibleComponent.h"
 
 #include "Engine/Engine.h"
+#include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -47,6 +48,26 @@ void URTSVisibleComponent::BeginPlay()
     bVisible = !Owner->IsHidden();
 }
 
+ERTSVisionState URTSVisibleComponent::GetVisionStateForPlayer(AController* Controller) const
+{
+    return VisionStates.FindRef(Controller);
+}
+
+bool URTSVisibleComponent::IsVisibleForPlayer(AController* Controller) const
+{
+    ERTSVisionState VisionState = GetVisionStateForPlayer(Controller);
+
+    // Check if we are visible anyway.
+    if (VisionState == ERTSVisionState::VISION_Visible)
+    {
+        return true;
+    }
+
+    // Check if it's a friendly unit.
+    URTSOwnerComponent* OwnerComponent = GetOwner()->FindComponentByClass<URTSOwnerComponent>();
+    return IsValid(OwnerComponent) && OwnerComponent->IsSameTeamAsController(Controller);
+}
+
 void URTSVisibleComponent::SetClientHideReason(const FGameplayTag& HideReason, bool bHidden)
 {
     if (bHidden)
@@ -71,6 +92,16 @@ void URTSVisibleComponent::SetClientVisionState(ERTSVisionState InVisionState)
     }
 
     UpdateClientHiddenFlag();
+}
+
+void URTSVisibleComponent::SetVisionStateForPlayer(AController* Controller, ERTSVisionState InVisionState)
+{
+    VisionStates.Add(Controller, InVisionState);
+
+    if (InVisionState >= ERTSVisionState::VISION_Visible)
+    {
+        bWasEverSeen.Add(Controller, true);
+    }
 }
 
 void URTSVisibleComponent::OnContainerChanged(AActor* Actor, AActor* NewContainer)

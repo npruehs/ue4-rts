@@ -2,8 +2,13 @@
 
 #include "EngineUtils.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 
+#include "RTSGameMode.h"
 #include "RTSLog.h"
+#include "RTSOwnerComponent.h"
+#include "RTSPlayerState.h"
+#include "RTSTeamInfo.h"
 #include "Vision/RTSFogOfWarActor.h"
 #include "Vision/RTSVisibleActor.h"
 #include "Vision/RTSVisibleComponent.h"
@@ -107,11 +112,55 @@ void ARTSVisionManager::Tick(float DeltaSeconds)
                 : FIntVector::ZeroValue;
         }
 
-        ERTSVisionState NewVision = IsValid(LocalVisionInfo)
-            ? LocalVisionInfo->GetVision(TileLocation.X, TileLocation.Y)
-            : ERTSVisionState::VISION_Visible;
+        if (GetNetMode() <= NM_ListenServer)
+        {
+            ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
-        VisibleActor.VisibleComponent->SetClientVisionState(NewVision);
+            // Update server vision.
+            for (ARTSTeamInfo* Team : GameMode->GetTeams())
+            {
+                // If friendly, always visible.
+                if (VisibleActor.OwnerComponent && VisibleActor.OwnerComponent->GetPlayerOwner() &&
+                    VisibleActor.OwnerComponent->GetPlayerOwner()->GetTeam() == Team)
+                {
+                    for (AController* Player : Team->GetTeamMembers())
+                    {
+                        // Set visibility according to team vision.
+                        VisibleActor.VisibleComponent->SetVisionStateForPlayer(Player, ERTSVisionState::VISION_Visible);
+                    }
+
+                    continue;
+                }
+
+                // Get matching vision info.
+                if (VisionInfos.IsValidIndex(Team->GetTeamIndex()))
+                {
+                    ARTSVisionInfo* TeamVision = VisionInfos[Team->GetTeamIndex()];
+                    ERTSVisionState NewVision = TeamVision->GetVision(TileLocation.X, TileLocation.Y);
+
+                    for (AController* Player : Team->GetTeamMembers())
+                    {
+                        // Set visibility according to team vision.
+                        VisibleActor.VisibleComponent->SetVisionStateForPlayer(Player, NewVision);
+                    }
+                }
+                else
+                {
+                    UE_LOG(LogRTS, Warning, TEXT("No vision info available for team %i."), Team->GetTeamIndex());
+                }
+                
+            }
+        }
+
+        if (GetNetMode() >= NM_ListenServer)
+        {
+            // Update client vision.
+            ERTSVisionState NewVision = IsValid(LocalVisionInfo)
+                ? LocalVisionInfo->GetVision(TileLocation.X, TileLocation.Y)
+                : ERTSVisionState::VISION_Visible;
+
+            VisibleActor.VisibleComponent->SetClientVisionState(NewVision);
+        }
     }
 }
 

@@ -38,6 +38,14 @@ Feel free to explore the plugin yourself by looking at what other functions and 
 | ![Transfer Ownership](Images/TransferOwnership.png) | Sets the specified player as the owner of the passed actor. |
 
 
+### RTSGameplayLibrary
+#### Functions
+
+| Node | Description |
+| --- | --- |
+| ![Is Visible For Actor](Images/IsVisibleForActor.png) | Checks whether Other is visible for Actor. |
+
+
 ### RTSHealthComponent
 #### Events
 

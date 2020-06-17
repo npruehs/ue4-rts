@@ -15,6 +15,7 @@
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Economy/RTSGathererComponent.h"
+#include "Vision/RTSVisibleComponent.h"
 
 
 UActorComponent* URTSGameplayLibrary::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)
@@ -106,6 +107,31 @@ void URTSGameplayLibrary::StopGameplayFor(AActor* Actor)
     DestroyComponentByClass<URTSAttackComponent>(Actor);
     DestroyComponentByClass<URTSGathererComponent>(Actor);
     DestroyComponentByClass<URTSConstructionSiteComponent>(Actor);
+}
+
+bool URTSGameplayLibrary::IsVisibleForActor(const AActor* Actor, const AActor* Other)
+{
+    if (!IsValid(Actor) || !IsValid(Other))
+    {
+        return false;
+    }
+
+    const URTSVisibleComponent* OtherVisibleComponent = Other->FindComponentByClass<URTSVisibleComponent>();
+
+    if (OtherVisibleComponent != nullptr)
+    {
+        if (Other->HasAuthority())
+        {
+            return OtherVisibleComponent->IsVisibleForPlayer(Cast<AController>(Actor->GetOwner()));
+        }
+
+        return OtherVisibleComponent->IsVisibleForLocalClient();
+    }
+    else
+    {
+        // No visible component? It must be always visible!
+        return true;
+    }
 }
 
 bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement)

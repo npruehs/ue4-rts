@@ -45,6 +45,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void TransferOwnership(AActor* Actor, AController* NewOwner);
 
+    /** Gets the teams of the current match. */
+    TArray<ARTSTeamInfo*> GetTeams() const;
+
 	/** Event when an actor has been killed. */
 	virtual void NotifyOnActorKilled(AActor* Actor, AController* ActorOwner);
 

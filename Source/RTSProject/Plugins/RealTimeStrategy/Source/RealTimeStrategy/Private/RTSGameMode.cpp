@@ -302,6 +302,11 @@ void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
     }   
 }
 
+TArray<ARTSTeamInfo*> ARTSGameMode::GetTeams() const
+{
+    return Teams;
+}
+
 void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
 {
 	if (DefeatConditionActorClasses.Num() <= 0)
