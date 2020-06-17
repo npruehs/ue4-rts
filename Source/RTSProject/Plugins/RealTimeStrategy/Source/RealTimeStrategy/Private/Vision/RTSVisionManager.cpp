@@ -78,18 +78,29 @@ void ARTSVisionManager::Initialize()
 
         URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
 
-        if (!IsValid(VisibleComponent))
+        if (IsValid(VisibleComponent))
         {
-            continue;
+            AddVisibleActor(Actor);
         }
 
-        AddVisibleActor(Actor);
+        URTSVisionComponent* VisionComponent = Actor->FindComponentByClass<URTSVisionComponent>();
+        
+        if (IsValid(VisionComponent))
+        {
+            AddVisionActor(Actor);
+        }
     }
 }
 
 void ARTSVisionManager::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+
+    // Update unit vision.
+    for (FRTSVisionActor& VisionActor : VisionActors)
+    {
+        UpdateVisionActor(VisionActor);
+    }
 
     // Update unit visibility.
     for (FRTSVisibleActor& VisibleActor : VisibleActors)
@@ -224,4 +235,111 @@ void ARTSVisionManager::RemoveVisibleActor(AActor* Actor)
     {
         VisibleActors.RemoveAt(IndexToRemove);
     }
+}
+
+void ARTSVisionManager::AddVisionActor(AActor* Actor)
+{
+    for (int32 Index = 0; Index < VisionActors.Num(); ++Index)
+    {
+        if (VisionActors[Index].Actor == Actor)
+        {
+            // Already added.
+            return;
+        }
+    }
+
+    FRTSVisionActor VisionActor(Actor);
+
+    if (!VisionActor.IsActorValid())
+    {
+        return;
+    }
+
+    VisionActors.Add(VisionActor);
+}
+
+void ARTSVisionManager::RemoveVisionActor(AActor* Actor)
+{
+    int32 IndexToRemove = -1;
+
+    for (int32 Index = 0; Index < VisionActors.Num(); ++Index)
+    {
+        if (VisionActors[Index].Actor == Actor)
+        {
+            IndexToRemove = Index;
+            break;
+        }
+    }
+
+    if (VisionActors.IsValidIndex(IndexToRemove))
+    {
+        ResetVisionForActor(VisionActors[IndexToRemove]);
+        VisionActors.RemoveAt(IndexToRemove);
+    }
+}
+
+void ARTSVisionManager::UpdateVisionActor(const FRTSVisionActor& VisionActor)
+{
+    if (VisionInfos.Num() == 0)
+    {
+        return;
+    }
+
+    for (ARTSVisionInfo* VisionInfo : VisionInfos)
+    {
+        if (!VisionInfo->IsInitialized())
+        {
+            return;
+        }
+    }
+
+    // We only need to update vision for actors who have moved onto a new tile.
+    if (!VisionActor.IsActorValid())
+    {
+        return;
+    }
+
+    FVector ActorLocationWorld = VisionActor.Actor->GetActorLocation();
+    FIntVector ActorLocationTile = VisionVolume->WorldToTile(ActorLocationWorld);
+    int32 ActorLocationHeightLevel = VisionVolume->GetTileHeight(ActorLocationTile);
+
+    if (VisionActor.VisionComponent->ActorLocationTile.X == ActorLocationTile.X &&
+        VisionActor.VisionComponent->ActorLocationTile.Y == ActorLocationTile.Y &&
+        VisionActor.VisionComponent->ActorLocationTile.Z == ActorLocationHeightLevel)
+    {
+        // Hasn't moved.
+        return;
+    }
+    else
+    {
+        // Moved to new grid cell.
+        VisionActor.VisionComponent->ActorLocationTile = ActorLocationTile;
+        VisionActor.VisionComponent->ActorLocationTile.Z = ActorLocationHeightLevel;
+    }
+
+    ResetVisionForActor(VisionActor);
+
+    // Apply vision.
+    TArray<int32> CachedVisionTiles;
+
+    for (ARTSVisionInfo* VisionInfo : VisionInfos)
+    {
+        VisionInfo->ApplyVisionForActor(VisionActor.Actor, CachedVisionTiles);
+    }
+}
+
+void ARTSVisionManager::ResetVisionForActor(const FRTSVisionActor& VisionActor)
+{
+    if (!VisionActor.IsActorValid())
+    {
+        return;
+    }
+
+    // Reset vision.
+    for (const FRTSVisionInfoTileList& VisionInfoTileList : VisionActor.VisionComponent->VisibleTiles)
+    {
+        VisionInfoTileList.VisionInfo->ResetVisionForActor(VisionActor.Actor);
+    }
+
+    VisionActor.VisionComponent->VisibleTiles.Empty();
 }

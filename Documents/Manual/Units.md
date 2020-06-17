@@ -28,6 +28,7 @@ As mentioned before, most features of the plugin are implemented by the means of
 ### Vision
 
 1. Add the `RTSVision` component to your units and set their _Sight Radius_ (e.g. 1000).
+1. If your actor should be able to ignore height levels for vision (e.g. watchtowers), check _Ignore Height Levels_.
 1. Add a `RTSVisible`component to your actor. That component will manage vibility of that actor, in case multiple effects want to show/hide it (e.g. fog of war, containers).
 
 ### Combat
