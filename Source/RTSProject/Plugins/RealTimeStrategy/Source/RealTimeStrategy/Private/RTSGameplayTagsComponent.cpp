@@ -3,7 +3,9 @@
 #include "GameFramework/Actor.h"
 #include "Net/UnrealNetwork.h"
 
+#include "RTSGameplayTagsProvider.h"
 #include "RTSLog.h"
+
 
 URTSGameplayTagsComponent::URTSGameplayTagsComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
@@ -21,6 +23,30 @@ void URTSGameplayTagsComponent::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 void URTSGameplayTagsComponent::BeginPlay()
 {
     Super::BeginPlay();
+
+    AActor* Owner = GetOwner();
+
+    if (!IsValid(Owner))
+    {
+        return;
+    }
+
+    IRTSGameplayTagsProvider* GameplayTagsProvider = Cast<IRTSGameplayTagsProvider>(Owner);
+
+    if (GameplayTagsProvider)
+    {
+        GameplayTagsProvider->AddGameplayTags(InitialTags);
+    }
+
+    for (UActorComponent* Component : Owner->GetComponents())
+    {
+        GameplayTagsProvider = Cast<IRTSGameplayTagsProvider>(Component);
+
+        if (GameplayTagsProvider)
+        {
+            GameplayTagsProvider->AddGameplayTags(InitialTags);
+        }
+    }
 
     for (const FGameplayTag& Tag : InitialTags)
     {

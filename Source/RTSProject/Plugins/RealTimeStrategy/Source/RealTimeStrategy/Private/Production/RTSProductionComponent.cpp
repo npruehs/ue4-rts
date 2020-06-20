@@ -15,6 +15,7 @@
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 #include "Production/RTSProductionCostComponent.h"
 
 
@@ -28,6 +29,8 @@ URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& Objec
 	// Set reasonable default values.
 	CapacityPerQueue = 5;
 	QueueCount = 1;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanProduce());
 }
 
 void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
