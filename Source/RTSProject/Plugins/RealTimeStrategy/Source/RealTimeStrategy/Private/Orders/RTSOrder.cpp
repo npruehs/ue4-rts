@@ -9,3 +9,13 @@ float URTSOrder::GetRequiredRange(const AActor* OrderedActor, int32 Index) const
 {
     return 0.0f;
 }
+
+ERTSOrderTargetType URTSOrder::GetTargetType() const
+{
+    return TargetType;
+}
+
+FRTSOrderTagRequirements URTSOrder::GetIssueTagRequirements() const
+{
+    return IssueTagRequirements;
+}

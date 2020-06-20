@@ -43,7 +43,7 @@ public:
 
 	/** Checks whether this player belong to the same team as the specified one. */
 	UFUNCTION(BlueprintPure)
-	bool IsSameTeamAs(ARTSPlayerState* Other) const;
+	bool IsSameTeamAs(const ARTSPlayerState* Other) const;
 
     /** Gets the list of actors currently owned by this player. */
     UFUNCTION(BlueprintPure)

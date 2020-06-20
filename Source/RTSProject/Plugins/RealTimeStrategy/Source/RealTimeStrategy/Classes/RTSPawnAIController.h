@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "Templates/SubclassOf.h"
 
+#include "Orders/RTSOrderData.h"
 #include "RTSOrderType.h"
 
 #include "RTSPawnAIController.generated.h"
@@ -36,6 +37,10 @@ public:
     /** Checks whether the pawn is idle, or has any orders. */
     UFUNCTION(BlueprintPure)
     bool IsIdle() const;
+
+    /** Makes the pawn carry out the specified order. */
+    UFUNCTION(BlueprintCallable)
+    void IssueOrder(const FRTSOrderData& Order);
 
 	/** Makes the pawn attack the specified target. */
 	UFUNCTION(BlueprintCallable)
@@ -94,6 +99,7 @@ private:
 
 	void SetBuildingClass(int32 BuildingIndex);
 	void SetHomeLocation(const FVector& HomeLocation);
+    void SetOrderClass(UClass* OrderClass);
 	void SetOrderType(const ERTSOrderType OrderType);
 	void SetTargetActor(AActor* TargetActor);
 	void SetTargetLocation(const FVector& TargetLocation);
@@ -106,4 +112,6 @@ private:
 		TArray<struct FHitResult>& OutHitResults);
 
 	bool VerifyBlackboard();
+
+    ERTSOrderType OrderClassToType(UClass* OrderClass) const;
 };

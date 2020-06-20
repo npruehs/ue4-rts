@@ -12,6 +12,7 @@ URTSAttackOrder::URTSAttackOrder(const FObjectInitializer& ObjectInitializer /*=
 
     IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Unarmed());
 
+    IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked());
     IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Alive());
     IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Relationship_Visible());
 

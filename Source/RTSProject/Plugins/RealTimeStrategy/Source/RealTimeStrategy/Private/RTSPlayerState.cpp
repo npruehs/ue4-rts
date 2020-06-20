@@ -47,7 +47,7 @@ void ARTSPlayerState::SetTeam(ARTSTeamInfo* InTeam)
     Team = InTeam;
 }
 
-bool ARTSPlayerState::IsSameTeamAs(ARTSPlayerState* Other) const
+bool ARTSPlayerState::IsSameTeamAs(const ARTSPlayerState* Other) const
 {
 	if (!Other)
 	{

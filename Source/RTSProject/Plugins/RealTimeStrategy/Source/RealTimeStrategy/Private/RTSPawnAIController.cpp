@@ -9,6 +9,7 @@
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
+#include "Orders/RTSAttackOrder.h"
 
 
 void ARTSPawnAIController::OnPossess(APawn* InPawn)
@@ -92,22 +93,32 @@ bool ARTSPawnAIController::IsIdle() const
     return HasOrder(ERTSOrderType::ORDER_None);
 }
 
+void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
+{
+    if (!VerifyBlackboard())
+    {
+        return;
+    }
+
+    // Update blackboard.
+    ERTSOrderType OrderType = OrderClassToType(Order.OrderClass);
+
+    SetOrderType(OrderType);
+    SetOrderClass(Order.OrderClass);
+    SetTargetActor(Order.TargetActor);
+    SetTargetLocation(Order.TargetLocation);
+
+    // Stop any current orders and start over.
+    ApplyOrders();
+}
+
 void ARTSPawnAIController::IssueAttackOrder(AActor* Target)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
+    FRTSOrderData Order;
+    Order.OrderClass = URTSAttackOrder::StaticClass();
+    Order.TargetActor = Target;
 
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_Attack);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(Target);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
@@ -257,8 +268,10 @@ void ARTSPawnAIController::ApplyOrders()
 	}
 
     // Notify listeners.
-    uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
-    OnOrderChanged.Broadcast(GetOwner(), (ERTSOrderType)NewOrder);
+    UClass* NewOrderClass = Blackboard->GetValueAsClass(TEXT("OrderClass"));
+    ERTSOrderType NewOrderType = OrderClassToType(NewOrderClass);
+
+    OnOrderChanged.Broadcast(GetOwner(), NewOrderType);
 }
 
 void ARTSPawnAIController::ClearBuildingClass()
@@ -289,6 +302,11 @@ void ARTSPawnAIController::SetBuildingClass(int32 BuildingIndex)
 void ARTSPawnAIController::SetHomeLocation(const FVector& HomeLocation)
 {
 	Blackboard->SetValueAsVector(TEXT("HomeLocation"), HomeLocation);
+}
+
+void ARTSPawnAIController::SetOrderClass(UClass* OrderClass)
+{
+    Blackboard->SetValueAsClass(TEXT("OrderClass"), OrderClass);
 }
 
 void ARTSPawnAIController::SetOrderType(const ERTSOrderType OrderType)
@@ -342,4 +360,14 @@ bool ARTSPawnAIController::VerifyBlackboard()
 	}
 
 	return true;
+}
+
+ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const
+{
+    if (OrderClass == URTSAttackOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_Attack;
+    }
+
+    return ERTSOrderType::ORDER_None;
 }

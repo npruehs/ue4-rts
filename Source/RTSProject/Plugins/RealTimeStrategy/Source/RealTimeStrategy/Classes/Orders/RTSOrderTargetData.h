@@ -23,7 +23,7 @@ public:
 
     /** Target location. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FVector2D Location;
+    FVector Location;
 
     /** Gameplay tags of the target. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")

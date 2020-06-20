@@ -24,6 +24,13 @@ public:
     /** Gets the maximum distance between the ordered actor and the target to fulfill this order. 0 means not applicable. */
     virtual float GetRequiredRange(const AActor* OrderedActor, int32 Index) const;
 
+    /** Gets the target required by this order. */
+    ERTSOrderTargetType GetTargetType() const;
+
+    /** Gets the tag requirements that must be fulfilled to issue the order. */
+    FRTSOrderTagRequirements GetIssueTagRequirements() const;
+
+
 protected:
     /** Target required by this order. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")

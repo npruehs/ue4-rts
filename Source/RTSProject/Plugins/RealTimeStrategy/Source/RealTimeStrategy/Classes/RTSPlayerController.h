@@ -7,6 +7,7 @@
 
 #include "RTSControlGroup.h"
 #include "RTSSelectionCameraFocusMode.h"
+#include "Orders/RTSOrderData.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -63,6 +64,10 @@ public:
 	/** Gets the team this player belongs to. */
 	UFUNCTION(BlueprintPure)
 	ARTSTeamInfo* GetTeamInfo() const;
+
+    /** Issues the specified order to all selected units. */
+    UFUNCTION(BlueprintCallable)
+    bool IssueOrder(const FRTSOrderData& Order);
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
@@ -256,6 +261,9 @@ public:
     /** Event when the game has ended. */
     virtual void NotifyOnGameHasEnded(bool bIsWinner);
 
+    /** Event when a pawn has received an order. */
+    virtual void NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
+
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
@@ -319,6 +327,10 @@ public:
     /** Event when the game has ended. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Game", meta = (DisplayName = "OnGameHasEnded"))
     void ReceiveOnGameHasEnded(bool bIsWinner);
+
+    /** Event when a pawn has received an order. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedOrder"))
+    void ReceiveOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
@@ -501,7 +513,7 @@ private:
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
-    void IssueOrder();
+    void IssueDefaultOrder();
 
 	/** Automatically issues the most reasonable order for the specified targets. */
 	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
@@ -516,10 +528,10 @@ private:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerCancelConstruction(AActor* ConstructionSite);
 
-	/** Orders the passed unit to attack the specified unit. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
-	
+    /** Issues the specified order to the passed pawn. */
+    UFUNCTION(Reliable, Server, WithValidation)
+    void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
+
 	/** Orders a selected builder to construct the specified building at the passed location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);

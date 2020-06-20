@@ -3,6 +3,9 @@
 #include "GameFramework/Actor.h"
 
 #include "RTSGameplayTagsComponent.h"
+#include "RTSOwnerComponent.h"
+#include "RTSPlayerState.h"
+#include "Libraries/RTSGameplayLibrary.h"
 
 
 void URTSGameplayTagLibrary::AddGameplayTag(const AActor* Actor, const FGameplayTag& Tag)
@@ -13,6 +16,12 @@ void URTSGameplayTagLibrary::AddGameplayTag(const AActor* Actor, const FGameplay
     {
         GameplayTagsComponent->AddGameplayTag(Tag);
     }
+}
+
+FGameplayTagContainer URTSGameplayTagLibrary::GetGameplayTags(const AActor* Actor)
+{
+    URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
+    return IsValid(GameplayTagsComponent) ? GameplayTagsComponent->GetCurrentTags() : FGameplayTagContainer::EmptyContainer;
 }
 
 bool URTSGameplayTagLibrary::HasGameplayTag(const AActor* Actor, const FGameplayTag& Tag)
@@ -34,6 +43,94 @@ void URTSGameplayTagLibrary::RemoveGameplayTag(const AActor* Actor, const FGamep
     {
         GameplayTagsComponent->RemoveGameplayTag(Tag);
     }
+}
+
+FGameplayTagContainer URTSGameplayTagLibrary::GetActorRelationshipTags(const AActor* Actor, const AActor* Other)
+{
+    FGameplayTagContainer RelationshipTags;
+
+    if (!IsValid(Actor) || !IsValid(Other))
+    {
+        RelationshipTags.AddTag(Relationship_Neutral());
+    }
+    else if (Actor == Other)
+    {
+        RelationshipTags.AddTag(Relationship_Friendly());
+        RelationshipTags.AddTag(Relationship_Self());
+        RelationshipTags.AddTag(Relationship_Visible());
+    }
+    else
+    {
+        const URTSOwnerComponent* ActorOwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+        const URTSOwnerComponent* OtherOwnerComponent = Other->FindComponentByClass<URTSOwnerComponent>();
+
+        if (!IsValid(ActorOwnerComponent) || !IsValid(OtherOwnerComponent))
+        {
+            RelationshipTags.AddTag(Relationship_Neutral());
+        }
+        else
+        {
+            const ARTSPlayerState* ActorPlayerState = ActorOwnerComponent->GetPlayerOwner();
+            const ARTSPlayerState* OtherPlayerState = OtherOwnerComponent->GetPlayerOwner();
+
+            FGameplayTagContainer PlayerRelationshipTags = GetPlayerRelationshipTags(ActorPlayerState, OtherPlayerState);
+            RelationshipTags.AppendTags(PlayerRelationshipTags);
+        }
+
+        if (!RelationshipTags.HasTag(Relationship_Visible()) && URTSGameplayLibrary::IsVisibleForActor(Actor, Other))
+        {
+            RelationshipTags.AddTag(Relationship_Visible());
+        }
+    }
+
+    return RelationshipTags;
+}
+
+FGameplayTagContainer URTSGameplayTagLibrary::GetPlayerRelationshipTags(const ARTSPlayerState* ActorPlayerState, const ARTSPlayerState* OtherPlayerState)
+{
+    FGameplayTagContainer RelationshipTags;
+
+    if (!IsValid(ActorPlayerState) || !IsValid(OtherPlayerState))
+    {
+        RelationshipTags.AddTag(Relationship_Neutral());
+    }
+    else if (!ActorPlayerState->IsSameTeamAs(OtherPlayerState))
+    {
+        RelationshipTags.AddTag(Relationship_Hostile());
+    }
+    else
+    {
+        RelationshipTags.AddTag(Relationship_Friendly());
+        RelationshipTags.AddTag(Relationship_Visible());
+
+        if (ActorPlayerState->GetPlayerIndex() == OtherPlayerState->GetPlayerIndex())
+        {
+            RelationshipTags.AddTag(Relationship_SamePlayer());
+        }
+    }
+
+    return RelationshipTags;
+}
+
+bool URTSGameplayTagLibrary::MeetsTagRequirements(const FGameplayTagContainer& Tags, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& BlockedTags)
+{
+    if (RequiredTags.Num())
+    {
+        if (!Tags.HasAll(RequiredTags))
+        {
+            return false;
+        }
+    }
+
+    if (BlockedTags.Num())
+    {
+        if (Tags.HasAny(BlockedTags))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Container_ConstructionSite()
@@ -60,9 +157,27 @@ const FGameplayTag& URTSGameplayTagLibrary::Relationship_Friendly()
     return Tag;
 }
 
+const FGameplayTag& URTSGameplayTagLibrary::Relationship_Neutral()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Neutral")));
+    return Tag;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::Relationship_Hostile()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Hostile")));
+    return Tag;
+}
+
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_SamePlayer()
 {
     static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.SamePlayer")));
+    return Tag;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::Relationship_Self()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Self")));
     return Tag;
 }
 

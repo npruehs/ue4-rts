@@ -8,6 +8,11 @@
 
 #include "RTSGameplayTagLibrary.generated.h"
 
+
+class AActor;
+class ARTSPlayerState;
+
+
 /**
 * Utility functions for adding, checking and removing gameplay tags.
 */
@@ -21,6 +26,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RTS")
     static void AddGameplayTag(const AActor* Actor, const FGameplayTag& Tag);
 
+    /** Gets the current set of gameplay tags of the specified actor. */
+    UFUNCTION(BlueprintPure, Category = "RTS")
+    static FGameplayTagContainer GetGameplayTags(const AActor* Actor);
+
     /** Checks whether the specified actor currently has the passed gameplay tag applied. */
     UFUNCTION(BlueprintPure, Category = "RTS")
     static bool HasGameplayTag(const AActor* Actor, const FGameplayTag& Tag);
@@ -28,6 +37,18 @@ public:
     /** Removes the passed gameplay tag from the specified actor. */
     UFUNCTION(BlueprintCallable, Category = "RTS")
     static void RemoveGameplayTag(const AActor* Actor, const FGameplayTag& Tag);
+
+    /** Gets the tags describing the relationship of the specified actor to the other one (friendly, hostile, neutral, same player, visibility. */
+    UFUNCTION(BlueprintPure, Category = "RTS")
+    static FGameplayTagContainer GetActorRelationshipTags(const AActor* Actor, const AActor* Other);
+
+    /** Gets the tags describing the relationship of the specified player to the other one (friendly, hostile, neutral). */
+    UFUNCTION(BlueprintPure, Category = "RTS")
+    static FGameplayTagContainer GetPlayerRelationshipTags(const ARTSPlayerState* ActorPlayerState, const ARTSPlayerState* OtherPlayerState);
+
+    /** Checks whether the specified tags contain all required tags and no blocked tags. */
+    UFUNCTION(BlueprintCallable, Category = "RTS")
+    static bool MeetsTagRequirements(const FGameplayTagContainer& Tags, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& BlockedTags);
 
     /** Actor can contain builders. */
     static const FGameplayTag& Container_ConstructionSite();
@@ -41,8 +62,17 @@ public:
     /** Actor is friendly towards the other actor. */
     static const FGameplayTag& Relationship_Friendly();
 
+    /** Actor is neutral towards the other actor. */
+    static const FGameplayTag& Relationship_Neutral();
+
+    /** Actor is hostile towards the other actor. */
+    static const FGameplayTag& Relationship_Hostile();
+
     /** Actor is owned by the same player as the other actor. */
     static const FGameplayTag& Relationship_SamePlayer();
+
+    /** Actor is the same as the other actor. */
+    static const FGameplayTag& Relationship_Self();
 
     /** Actor is visible for the other actor. */
     static const FGameplayTag& Relationship_Visible();
