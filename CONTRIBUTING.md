@@ -38,9 +38,9 @@ Internally, we're using the following checklist when preparing for a new release
 * Run all automated tests
 * Update documentation (README, images, spelling, table of contents)
 * Increase version number (and engine version, if necessary)
-* Create plugin package
+* Create plugin package (and remove intermediates)
 * Check plugin package in another project
 * Merge release branch with tag
-* Add a new GitHub release with release notes
+* Add a new GitHub release with release notes (including deprecation notes)
 * Update GitHub issues and milestones
 * Notify community (e.g. forums)
