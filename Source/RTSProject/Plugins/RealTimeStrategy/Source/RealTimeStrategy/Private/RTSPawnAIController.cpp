@@ -12,6 +12,7 @@
 #include "Libraries/RTSGameplayTagLibrary.h"
 #include "Orders/RTSAttackOrder.h"
 #include "Orders/RTSBeginConstructionOrder.h"
+#include "Orders/RTSContinueConstructionOrder.h"
 
 
 void ARTSPawnAIController::OnPossess(APawn* InPawn)
@@ -136,20 +137,10 @@ void ARTSPawnAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
 
 void ARTSPawnAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_ContinueConstruction);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(ConstructionSite);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSContinueConstructionOrder::StaticClass();
+    Order.TargetActor = ConstructionSite;
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueGatherOrder(AActor* ResourceSource)
@@ -351,6 +342,10 @@ ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const
     else if (OrderClass == URTSBeginConstructionOrder::StaticClass())
     {
         return ERTSOrderType::ORDER_BeginConstruction;
+    }
+    else if (OrderClass == URTSContinueConstructionOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_ContinueConstruction;
     }
 
     return ERTSOrderType::ORDER_None;

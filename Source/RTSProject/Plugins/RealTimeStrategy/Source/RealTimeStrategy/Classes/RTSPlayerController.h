@@ -536,10 +536,6 @@ private:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
 
-	/** Orders selected builders to finish constructing the specified building. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
-
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
