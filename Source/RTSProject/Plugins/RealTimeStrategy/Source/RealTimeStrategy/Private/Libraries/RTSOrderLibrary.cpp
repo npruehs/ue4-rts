@@ -35,6 +35,11 @@ bool URTSOrderLibrary::IsValidOrderTarget(TSubclassOf<URTSOrder> OrderClass, con
     return Order->IsValidTarget(OrderedActor, TargetData, Index);
 }
 
+ERTSOrderGroupExecutionType URTSOrderLibrary::GetOrderGroupExecutionType(TSubclassOf<URTSOrder> OrderClass)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetGroupExecutionType() : ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
+}
+
 FRTSOrderTargetData URTSOrderLibrary::GetOrderTargetData(const AActor* OrderedActor, AActor* TargetActor, const FVector& TargetLocation /*= FVector::ZeroVector*/)
 {
     FRTSOrderTargetData TargetData;

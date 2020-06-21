@@ -19,6 +19,8 @@ struct REALTIMESTRATEGY_API FRTSOrderData
     GENERATED_BODY()
 
 public:
+    FRTSOrderData();
+
     /** Type of the order to issue. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     TSubclassOf<URTSOrder> OrderClass;

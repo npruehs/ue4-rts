@@ -8,8 +8,10 @@
 #include "Economy/RTSGathererComponent.h"
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSBuilderComponent.h"
+#include "Libraries/RTSConstructionLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
 #include "Orders/RTSAttackOrder.h"
+#include "Orders/RTSBeginConstructionOrder.h"
 
 
 void ARTSPawnAIController::OnPossess(APawn* InPawn)
@@ -107,6 +109,7 @@ void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
     SetOrderClass(Order.OrderClass);
     SetTargetActor(Order.TargetActor);
     SetTargetLocation(Order.TargetLocation);
+    SetBuildingClass(Order.Index);
 
     // Stop any current orders and start over.
     ApplyOrders();
@@ -123,35 +126,12 @@ void ARTSPawnAIController::IssueAttackOrder(AActor* Target)
 
 void ARTSPawnAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
+    FRTSOrderData Order;
+    Order.OrderClass = URTSBeginConstructionOrder::StaticClass();
+    Order.Index = URTSConstructionLibrary::GetConstructableBuildingIndex(GetPawn(), BuildingClass);
+    Order.TargetLocation = TargetLocation;
 
-	// Somehow, classes are not properly serialized to blackboard values and back, so we're going to use the building index here instead.
-	URTSBuilderComponent* BuilderComponent = GetPawn()->FindComponentByClass<URTSBuilderComponent>();
-
-	if (!BuilderComponent)
-	{
-		return;
-	}
-
-	int32 BuildingIndex = BuilderComponent->GetConstructibleBuildingClasses().IndexOfByKey(BuildingClass);
-
-	if (BuildingIndex == INDEX_NONE)
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_BeginConstruction);
-	SetBuildingClass(BuildingIndex);
-	ClearHomeLocation();
-	ClearTargetActor();
-	SetTargetLocation(TargetLocation);
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
@@ -367,6 +347,10 @@ ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const
     if (OrderClass == URTSAttackOrder::StaticClass())
     {
         return ERTSOrderType::ORDER_Attack;
+    }
+    else if (OrderClass == URTSBeginConstructionOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_BeginConstruction;
     }
 
     return ERTSOrderType::ORDER_None;

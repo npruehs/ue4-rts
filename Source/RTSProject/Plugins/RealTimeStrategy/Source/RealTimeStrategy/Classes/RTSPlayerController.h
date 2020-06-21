@@ -532,10 +532,6 @@ private:
     UFUNCTION(Reliable, Server, WithValidation)
     void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
-	/** Orders a selected builder to construct the specified building at the passed location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
-	
 	/** Orders selected gatherers to gather resources from the specified source. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);

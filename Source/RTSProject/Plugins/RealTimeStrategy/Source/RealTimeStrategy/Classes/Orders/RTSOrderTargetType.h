@@ -16,11 +16,5 @@ enum class ERTSOrderTargetType : uint8
     ORDERTARGET_Actor,
 
     /** Order needs a vector location as target. */
-    ORDERTARGET_Location,
-
-    /** Order needs a vector target location that is used together with the current actor location as a direction. */
-    //ORDERTARGET_Direction,
-
-    /** Can't be activated. */
-    //PASSIVE
+    ORDERTARGET_Location
 };

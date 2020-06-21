@@ -15,6 +15,11 @@ ERTSOrderTargetType URTSOrder::GetTargetType() const
     return TargetType;
 }
 
+ERTSOrderGroupExecutionType URTSOrder::GetGroupExecutionType() const
+{
+    return GroupExecutionType;
+}
+
 FRTSOrderTagRequirements URTSOrder::GetIssueTagRequirements() const
 {
     return IssueTagRequirements;

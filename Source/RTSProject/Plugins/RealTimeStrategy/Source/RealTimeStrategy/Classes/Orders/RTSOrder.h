@@ -4,6 +4,7 @@
 
 #include "UObject/Object.h"
 
+#include "Orders/RTSOrderGroupExecutionType.h"
 #include "Orders/RTSOrderTagRequirements.h"
 #include "Orders/RTSOrderTargetData.h"
 #include "Orders/RTSOrderTargetType.h"
@@ -27,6 +28,9 @@ public:
     /** Gets the target required by this order. */
     ERTSOrderTargetType GetTargetType() const;
 
+    /** Gets how many and which of the selected actors the order should be issued to. */
+    ERTSOrderGroupExecutionType GetGroupExecutionType() const;
+
     /** Gets the tag requirements that must be fulfilled to issue the order. */
     FRTSOrderTagRequirements GetIssueTagRequirements() const;
 
@@ -35,6 +39,10 @@ protected:
     /** Target required by this order. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     ERTSOrderTargetType TargetType;
+
+    /** How many and which of the selected actors the order should be issued to. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    ERTSOrderGroupExecutionType GroupExecutionType;
 
     /** Tag requirements that must be fulfilled to issue the order. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
