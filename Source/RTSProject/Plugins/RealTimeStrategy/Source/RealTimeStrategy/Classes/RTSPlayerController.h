@@ -7,6 +7,7 @@
 
 #include "RTSControlGroup.h"
 #include "RTSSelectionCameraFocusMode.h"
+#include "Orders/RTSOrder.h"
 #include "Orders/RTSOrderData.h"
 
 #include "RTSPlayerController.generated.h"
@@ -421,6 +422,14 @@ private:
     /** Preview to use for placing buildings. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction")
     TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
+
+    /** Orders that should be tried to apply for the input action IssueOrder, in order. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Orders")
+    TArray<TSubclassOf<URTSOrder>> DefaultOrders;
+
+    /** Actor classes which should be ignored when tracing for default order targets. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Orders")
+    TArray<TSubclassOf<AActor>> DefaultOrderIgnoreTargetClasses;
 
     /** Provides bonuses for various gameplay elements for this player. */
     UPROPERTY(VisibleAnywhere, Category = "RTS")

@@ -64,6 +64,13 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
 	CameraScrollThreshold = 20.0f;
 
     DoubleGroupSelectionTime = 0.2f;
+
+    DefaultOrders.Add(URTSAttackOrder::StaticClass());
+    DefaultOrders.Add(URTSGatherOrder::StaticClass());
+    DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
+    DefaultOrders.Add(URTSMoveOrder::StaticClass());
+
+    DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -461,49 +468,41 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 		return;
 	}
 
-	// Get target location.
-    TOptional<FVector> TargetLocation;
-
+    // Try all default orders.
 	for (auto& HitResult : HitResults)
 	{
-        TargetLocation = HitResult.Location;
-
 		if (HitResult.Actor != nullptr)
 		{
-			// Issue attack order.
-			if (IssueAttackOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
-			
-			// Issue gather order.
-			if (IssueGatherOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
+            bool bIsIgnoredClass = false;
 
-			// Issue construct order.
-			if (IssueContinueConstructionOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
-
-            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
-
-            if (Landscape != nullptr)
+            for (TSubclassOf<AActor> IgnoredClass : DefaultOrderIgnoreTargetClasses)
             {
-                // Issue move order.
-                IssueMoveOrder(HitResult.Location);
-                return;
+                if (HitResult.Actor->IsA(IgnoredClass))
+                {
+                    bIsIgnoredClass = true;
+                    break;
+                }
+            }
+
+            if (bIsIgnoredClass)
+            {
+                continue;
+            }
+
+            for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+            {
+                FRTSOrderData Order;
+                Order.OrderClass = OrderClass;
+                Order.TargetActor = HitResult.Actor.Get();
+                Order.TargetLocation = HitResult.Location;
+
+                if (IssueOrder(Order))
+                {
+                    return;
+                }
             }
 		}
 	}
-
-    if (TargetLocation.IsSet())
-    {
-        // Issue move order.
-        IssueMoveOrder(TargetLocation.GetValue());
-    }
 }
 
 bool ARTSPlayerController::GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex)
