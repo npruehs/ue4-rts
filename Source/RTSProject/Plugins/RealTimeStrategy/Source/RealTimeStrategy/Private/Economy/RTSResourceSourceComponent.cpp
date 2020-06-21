@@ -19,6 +19,8 @@ URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitialize
 	MaximumResources = 1000.0f;
 	GatheringFactor = 1.0f;
 	GathererCapacity = 1;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeGathered());
 }
 
 void URTSResourceSourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -32,14 +34,20 @@ void URTSResourceSourceComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-	// Set container size.
+    URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
+
+    if (!IsValid(GameplayTagsComponent))
+    {
+        UE_LOG(LogRTS, Warning, TEXT("%s does not have an RTSGameplayTagsComponent attached. This will be required in future releases. Please add the component now to prevent issues later."),
+            *GetOwner()->GetName());
+    }
+
+    // Set container size.
 	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
 
 	if (ContainerComponent)
 	{
 		ContainerComponent->SetCapacity(GathererCapacity);
-
-        URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
 
         if (IsValid(GameplayTagsComponent))
         {

@@ -31,6 +31,13 @@ namespace UnrealBuildTool.Rules
                     "GameplayTags",
                     "NavigationSystem"
                 });
+
+            // Setup Gameplay Debugger.
+            if (Target.bBuildDeveloperTools || (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Configuration != UnrealTargetConfiguration.Test))
+            {
+                PrivateDependencyModuleNames.Add("GameplayDebugger");
+                PublicDefinitions.Add("WITH_GAMEPLAY_DEBUGGER=1");
+            }
 		}
 	}
 }

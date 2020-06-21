@@ -7,6 +7,8 @@
 
 #include "RTSControlGroup.h"
 #include "RTSSelectionCameraFocusMode.h"
+#include "Orders/RTSOrder.h"
+#include "Orders/RTSOrderData.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -63,6 +65,10 @@ public:
 	/** Gets the team this player belongs to. */
 	UFUNCTION(BlueprintPure)
 	ARTSTeamInfo* GetTeamInfo() const;
+
+    /** Issues the specified order to all selected units. */
+    UFUNCTION(BlueprintCallable)
+    bool IssueOrder(const FRTSOrderData& Order);
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
@@ -256,6 +262,9 @@ public:
     /** Event when the game has ended. */
     virtual void NotifyOnGameHasEnded(bool bIsWinner);
 
+    /** Event when a pawn has received an order. */
+    virtual void NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
+
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
@@ -319,6 +328,10 @@ public:
     /** Event when the game has ended. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Game", meta = (DisplayName = "OnGameHasEnded"))
     void ReceiveOnGameHasEnded(bool bIsWinner);
+
+    /** Event when a pawn has received an order. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedOrder"))
+    void ReceiveOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
@@ -409,6 +422,14 @@ private:
     /** Preview to use for placing buildings. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction")
     TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
+
+    /** Orders that should be tried to apply for the input action IssueOrder, in order. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Orders")
+    TArray<TSubclassOf<URTSOrder>> DefaultOrders;
+
+    /** Actor classes which should be ignored when tracing for default order targets. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Orders")
+    TArray<TSubclassOf<AActor>> DefaultOrderIgnoreTargetClasses;
 
     /** Provides bonuses for various gameplay elements for this player. */
     UPROPERTY(VisibleAnywhere, Category = "RTS")
@@ -501,7 +522,7 @@ private:
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
-    void IssueOrder();
+    void IssueDefaultOrder();
 
 	/** Automatically issues the most reasonable order for the specified targets. */
 	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
@@ -516,29 +537,9 @@ private:
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerCancelConstruction(AActor* ConstructionSite);
 
-	/** Orders the passed unit to attack the specified unit. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
-	
-	/** Orders a selected builder to construct the specified building at the passed location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
-	
-	/** Orders selected gatherers to gather resources from the specified source. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
-
-	/** Orders selected builders to finish constructing the specified building. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
-
-	/** Orders the passed unit to move to the specified location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
-
-	/** Orders the passed unit to stop all current actions. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueStopOrder(APawn* OrderedPawn);
+    /** Issues the specified order to the passed pawn. */
+    UFUNCTION(Reliable, Server, WithValidation)
+    void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
 	/** Start producing the specified product at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)

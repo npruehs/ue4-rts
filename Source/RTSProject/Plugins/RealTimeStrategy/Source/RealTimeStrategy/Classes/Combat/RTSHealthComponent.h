@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
 
 #include "Combat/RTSActorDeathType.h"
 
@@ -21,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSHealthComponentKilledSignatur
 * Adds health to the actor, e.g. for taking damage and dying.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSHealthComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSHealthComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 

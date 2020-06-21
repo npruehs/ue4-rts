@@ -5,6 +5,7 @@
 
 #include "RTSLog.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -14,6 +15,7 @@ URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer&
 
 	// Set reasonable default values.
 	GathererCapacity = 1;
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources());
 }
 
 float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)

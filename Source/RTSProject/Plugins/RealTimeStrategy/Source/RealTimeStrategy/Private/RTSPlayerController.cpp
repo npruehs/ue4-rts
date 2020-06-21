@@ -23,9 +23,6 @@
 #include "RTSPlayerState.h"
 #include "RTSSelectableComponent.h"
 #include "RTSTeamInfo.h"
-#include "Libraries/RTSCollisionLibrary.h"
-#include "Libraries/RTSGameplayLibrary.h"
-#include "Libraries/RTSGameplayTagLibrary.h"
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Construction/RTSBuildingCursor.h"
@@ -33,6 +30,17 @@
 #include "Economy/RTSGathererComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceSourceComponent.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSConstructionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
+#include "Libraries/RTSOrderLibrary.h"
+#include "Orders/RTSAttackOrder.h"
+#include "Orders/RTSBeginConstructionOrder.h"
+#include "Orders/RTSContinueConstructionOrder.h"
+#include "Orders/RTSGatherOrder.h"
+#include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSStopOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
@@ -56,6 +64,13 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
 	CameraScrollThreshold = 20.0f;
 
     DoubleGroupSelectionTime = 0.2f;
+
+    DefaultOrders.Add(URTSAttackOrder::StaticClass());
+    DefaultOrders.Add(URTSGatherOrder::StaticClass());
+    DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
+    DefaultOrders.Add(URTSMoveOrder::StaticClass());
+
+    DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -93,7 +108,7 @@ void ARTSPlayerController::SetupInputComponent()
     InputComponent->BindAction(TEXT("SelectNextSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectNextSubgroup);
     InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
 
-	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueOrder);
+	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueDefaultOrder);
 	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 
 	InputComponent->BindAction(TEXT("SaveControlGroup0"), IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
@@ -260,6 +275,76 @@ ARTSTeamInfo* ARTSPlayerController::GetTeamInfo() const
 	return nullptr;
 }
 
+bool ARTSPlayerController::IssueOrder(const FRTSOrderData& Order)
+{
+    ERTSOrderGroupExecutionType GroupExecutionType = URTSOrderLibrary::GetOrderGroupExecutionType(Order.OrderClass);
+
+    bool bSuccess = false;
+
+    for (auto SelectedActor : SelectedActors)
+    {
+        APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+        if (!IsValid(SelectedPawn))
+        {
+            continue;
+        }
+
+        if (SelectedPawn->GetOwner() != this)
+        {
+            continue;
+        }
+
+        FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(SelectedActor, Order.TargetActor, Order.TargetLocation);
+
+        if (!URTSOrderLibrary::IsValidOrderTarget(Order.OrderClass, SelectedActor, TargetData, Order.Index))
+        {
+            continue;
+        }
+
+        // Send order to server.
+        ServerIssueOrder(SelectedPawn, Order);
+
+        if (IsNetMode(NM_Client))
+        {
+            // Notify listeners.
+            NotifyOnIssuedOrder(SelectedPawn, Order);
+        }
+
+        if (GroupExecutionType == ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any)
+        {
+            // Just send a single actor.
+            return true;
+        }
+
+        bSuccess = true;
+    }
+
+    return bSuccess;
+}
+
+void ARTSPlayerController::ServerIssueOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
+
+    if (!PawnController)
+    {
+        return;
+    }
+
+    // Issue order.
+    PawnController->IssueOrder(Order);
+
+    // Notify listeners.
+    NotifyOnIssuedOrder(OrderedPawn, Order);
+}
+
+bool ARTSPlayerController::ServerIssueOrder_Validate(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    // Verify owner to prevent cheating.
+    return OrderedPawn->GetOwner() == this;
+}
+
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults) const
 {
     // Get local player viewport.
@@ -362,7 +447,7 @@ bool ARTSPlayerController::IsSelectableActor(AActor* Actor) const
 	return true;
 }
 
-void ARTSPlayerController::IssueOrder()
+void ARTSPlayerController::IssueDefaultOrder()
 {
     // Get objects at pointer position.
     TArray<FHitResult> HitResults;
@@ -383,49 +468,41 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 		return;
 	}
 
-	// Get target location.
-    TOptional<FVector> TargetLocation;
-
+    // Try all default orders.
 	for (auto& HitResult : HitResults)
 	{
-        TargetLocation = HitResult.Location;
-
 		if (HitResult.Actor != nullptr)
 		{
-			// Issue attack order.
-			if (IssueAttackOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
-			
-			// Issue gather order.
-			if (IssueGatherOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
+            bool bIsIgnoredClass = false;
 
-			// Issue construct order.
-			if (IssueContinueConstructionOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
-
-            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
-
-            if (Landscape != nullptr)
+            for (TSubclassOf<AActor> IgnoredClass : DefaultOrderIgnoreTargetClasses)
             {
-                // Issue move order.
-                IssueMoveOrder(HitResult.Location);
-                return;
+                if (HitResult.Actor->IsA(IgnoredClass))
+                {
+                    bIsIgnoredClass = true;
+                    break;
+                }
+            }
+
+            if (bIsIgnoredClass)
+            {
+                continue;
+            }
+
+            for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+            {
+                FRTSOrderData Order;
+                Order.OrderClass = OrderClass;
+                Order.TargetActor = HitResult.Actor.Get();
+                Order.TargetLocation = HitResult.Location;
+
+                if (IssueOrder(Order))
+                {
+                    return;
+                }
             }
 		}
 	}
-
-    if (TargetLocation.IsSet())
-    {
-        // Issue move order.
-        IssueMoveOrder(TargetLocation.GetValue());
-    }
 }
 
 bool ARTSPlayerController::GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex)
@@ -511,382 +588,71 @@ void ARTSPlayerController::SelectNextSubgroupInDirection(int32 Sign)
 
 bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 {
-	if (!Target)
-	{
-		return false;
-	}
+    FRTSOrderData AttackOrder;
+    AttackOrder.OrderClass = URTSAttackOrder::StaticClass();
+    AttackOrder.TargetActor = Target;
 
-	if (!URTSGameplayTagLibrary::HasGameplayTag(Target, URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
-	{
-		return false;
-	}
-
-	ARTSTeamInfo* MyTeam = GetPlayerState()->GetTeam();
-
-	// Issue attack orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify target.
-		auto TargetOwnerComponent = Target->FindComponentByClass<URTSOwnerComponent>();
-
-		if (TargetOwnerComponent && TargetOwnerComponent->IsSameTeamAsActor(SelectedActor))
-		{
-			continue;
-		}
-
-		if (SelectedActor->FindComponentByClass<URTSAttackComponent>() == nullptr)
-		{
-			continue;
-		}
-
-		// Send attack order to server.
-		ServerIssueAttackOrder(SelectedPawn, Target);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedAttackOrder(SelectedPawn, Target);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-void ARTSPlayerController::ServerIssueAttackOrder_Implementation(APawn* OrderedPawn, AActor* Target)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue attack order.
-	PawnController->IssueAttackOrder(Target);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *OrderedPawn->GetName(), *Target->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedAttackOrder(OrderedPawn, Target);
-}
-
-bool ARTSPlayerController::ServerIssueAttackOrder_Validate(APawn* OrderedPawn, AActor* Target)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+	return IssueOrder(AttackOrder);
 }
 
 bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	// Find suitable selected builder.
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Check if builder.
-		auto BuilderComponent = SelectedPawn->FindComponentByClass<URTSBuilderComponent>();
-
-		if (!BuilderComponent)
-		{
-			continue;
-		}
-
-		// Check if builder knows about building.
-		if (!BuilderComponent->GetConstructibleBuildingClasses().Contains(BuildingClass))
-		{
-			continue;
-		}
-
-		// Send construction order to server.
-		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
-
-            // Notify listeners.
-            NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-        }
-
-		// Just send one builder.
-		return true;
-	}
-
-	return false;
-}
-
-bool ARTSPlayerController::ServerIssueContinueConstructionOrder_Validate(APawn* OrderedPawn, AActor* ConstructionSite)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue construction order.
-	PawnController->IssueBeginConstructionOrder(BuildingClass, TargetLocation);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *OrderedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
-
-	// Notify listeners.
-	NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, TargetLocation);
-}
-
-bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
-{
-	if (!ConstructionSite)
-	{
-		return false;
-	}
-
-	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
-
-	if (!ConstructionSiteComponent || ConstructionSiteComponent->IsFinished())
-	{
-		return false;
-	}
-
-	ARTSTeamInfo* MyTeam = GetPlayerState()->GetTeam();
-
-	// Issue construction orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify target.
-		auto TargetOwnerComponent = ConstructionSite->FindComponentByClass<URTSOwnerComponent>();
-
-		if (TargetOwnerComponent && !TargetOwnerComponent->IsSameTeamAsActor(SelectedActor))
-		{
-			continue;
-		}
-
-		if (SelectedActor->FindComponentByClass<URTSBuilderComponent>() == nullptr)
-		{
-			continue;
-		}
-
-		// Send construction order to server.
-		ServerIssueContinueConstructionOrder(SelectedPawn, ConstructionSite);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
-{
-	if (!ResourceSource)
-	{
-		return false;
-	}
-
-	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
-
-	if (!ResourceSourceComponent)
-	{
-		return false;
-	}
-
-	// Issue gather orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify gatherer.
-		auto GathererComponent = SelectedActor->FindComponentByClass<URTSGathererComponent>();
-		if (!GathererComponent || !GathererComponent->CanGatherFrom(ResourceSource))
-		{
-			continue;
-		}
-
-		// Send gather order to server.
-		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedPawn, AActor* ResourceSource)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue gather order.
-	PawnController->IssueGatherOrder(ResourceSource);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedGatherOrder(OrderedPawn, ResourceSource);
-}
-
-bool ARTSPlayerController::ServerIssueGatherOrder_Validate(APawn* OrderedPawn, AActor* ResourceSourc)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(APawn* OrderedPawn, AActor* ConstructionSite)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue construction order.
-	PawnController->IssueContinueConstructionOrder(ConstructionSite);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *OrderedPawn->GetName(), *ConstructionSite->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedContinueConstructionOrder(OrderedPawn, ConstructionSite);
-}
-
-bool ARTSPlayerController::ServerIssueBeginConstructionOrder_Validate(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
-{
-    // Issue move orders.
-	bool bSuccess = false;
+    // Determine index.
+    int32 BuildingIndex = INDEX_NONE;
 
     for (auto SelectedActor : SelectedActors)
     {
-        // Verify pawn and owner.
-        auto SelectedPawn = Cast<APawn>(SelectedActor);
-
-        if (!SelectedPawn)
+        if (!IsValid(SelectedActor) || SelectedActor->GetOwner() != this)
         {
             continue;
         }
 
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
+        BuildingIndex = URTSConstructionLibrary::GetConstructableBuildingIndex(SelectedActor, BuildingClass);
 
-		// Send move order to server.
-		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
-
-        if (IsNetMode(NM_Client))
+        if (BuildingIndex != INDEX_NONE)
         {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
-
-            // Notify listeners.
-            NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
+            break;
         }
-
-		bSuccess = true;
     }
 
-	return bSuccess;
+    if (BuildingIndex == INDEX_NONE) 
+    {
+        return false;
+    }
+
+    FRTSOrderData BeginConstructionOrder;
+    BeginConstructionOrder.OrderClass = URTSBeginConstructionOrder::StaticClass();
+    BeginConstructionOrder.TargetLocation = TargetLocation;
+    BeginConstructionOrder.Index = BuildingIndex;
+
+    return IssueOrder(BeginConstructionOrder);
 }
 
-void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
+bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
+    FRTSOrderData ContinueConstructionOrder;
+    ContinueConstructionOrder.OrderClass = URTSContinueConstructionOrder::StaticClass();
+    ContinueConstructionOrder.TargetActor = ConstructionSite;
 
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue move order.
-	PawnController->IssueMoveOrder(TargetLocation);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
-
-	// Notify listeners.
-	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
+    return IssueOrder(ContinueConstructionOrder);
 }
 
-bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
+bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 {
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+    FRTSOrderData GatherOrder;
+    GatherOrder.OrderClass = URTSGatherOrder::StaticClass();
+    GatherOrder.TargetActor = ResourceSource;
+
+    return IssueOrder(GatherOrder);
+}
+
+bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
+{
+    FRTSOrderData MoveOrder;
+    MoveOrder.OrderClass = URTSMoveOrder::StaticClass();
+    MoveOrder.TargetLocation = TargetLocation;
+
+    return IssueOrder(MoveOrder);
 }
 
 AActor* ARTSPlayerController::GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const
@@ -989,56 +755,10 @@ void ARTSPlayerController::IssueProductionOrder(TSubclassOf<AActor> ProductClass
 
 void ARTSPlayerController::IssueStopOrder()
 {
-	// Issue stop orders.
-	for (auto SelectedActor : SelectedActors)
-	{
-		// Verify pawn and owner.
-		auto SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Send stop order to server.
-		ServerIssueStopOrder(SelectedPawn);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedStopOrder(SelectedPawn);
-        }
-	}
-}
-
-void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue stop order.
-	PawnController->IssueStopOrder();
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedStopOrder(OrderedPawn);
-}
-
-bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+    FRTSOrderData StopOrder;
+    StopOrder.OrderClass = URTSStopOrder::StaticClass();
+    
+    IssueOrder(StopOrder);
 }
 
 void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode)
@@ -1870,6 +1590,37 @@ void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
 void ARTSPlayerController::NotifyOnGameHasEnded(bool bIsWinner)
 {
     ReceiveOnGameHasEnded(bIsWinner);
+}
+
+void ARTSPlayerController::NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    ReceiveOnIssuedOrder(OrderedPawn, Order);
+
+    if (Order.OrderClass == URTSAttackOrder::StaticClass())
+    {
+        NotifyOnIssuedAttackOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSBeginConstructionOrder::StaticClass())
+    {
+        TSubclassOf<AActor> BuildingClass = URTSConstructionLibrary::GetConstructableBuildingClass(OrderedPawn, Order.Index);
+        NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, Order.TargetLocation);
+    }
+    else if (Order.OrderClass == URTSContinueConstructionOrder::StaticClass())
+    {
+        NotifyOnIssuedContinueConstructionOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSGatherOrder::StaticClass())
+    {
+        NotifyOnIssuedGatherOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSMoveOrder::StaticClass())
+    {
+        NotifyOnIssuedMoveOrder(OrderedPawn, Order.TargetLocation);
+    }
+    else if (Order.OrderClass == URTSStopOrder::StaticClass())
+    {
+        NotifyOnIssuedStopOrder(OrderedPawn);
+    }
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)

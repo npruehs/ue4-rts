@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
 
 #include "Combat/RTSAttackData.h"
 
@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSAttackComponentAttackedUsedSig
 * These can also be used for healing.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSAttackComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSAttackComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 

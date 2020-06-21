@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
+
 #include "Templates/SubclassOf.h"
 
 #include "Construction/RTSConstructionState.h"
@@ -25,7 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSConstructionSiteComponentCons
 
 /** Allows constructing the actor over time. */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 
@@ -33,7 +34,7 @@ public:
 	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+    virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer) override;
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;

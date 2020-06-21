@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
+
 #include "Templates/SubclassOf.h"
 
 #include "RTSBuilderComponent.generated.h"
@@ -21,11 +22,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSBuilderComponentConstructionF
  * Allows the actor to construct buildings.
  */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSBuilderComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSBuilderComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 
 public:
+    URTSBuilderComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+
 	/** Assigns the builder to the specified construction site. */
 	UFUNCTION(BlueprintCallable)
 	virtual void AssignToConstructionSite(AActor* ConstructionSite);

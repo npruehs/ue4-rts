@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
+
 #include "Templates/SubclassOf.h"
 
 #include "Production/RTSProductionQueue.h"
@@ -20,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProduction
 
 /** Allows producing actors over time. */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSProductionComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSProductionComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 

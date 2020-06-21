@@ -8,8 +8,10 @@
 #include "Sound/SoundCue.h"
 
 #include "RTSGameMode.h"
+#include "RTSGameplayTagsComponent.h"
 #include "RTSLog.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -21,6 +23,8 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 	MaximumHealth = 100.0f;
     bRegenerateHealth = false;
     ActorDeathType = ERTSActorDeathType::DEATH_Destroy;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Alive());
 }
 
 void URTSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -89,6 +93,9 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
 
         // Get owner before destruction.
         AController* OwningPlayer = Cast<AController>(Owner->GetOwner());
+
+        // Remove Alive tag.
+        URTSGameplayTagLibrary::RemoveGameplayTag(Owner, URTSGameplayTagLibrary::Status_Changing_Alive());
 
         // Notify listeners.
         OnKilled.Broadcast(Owner, OwningPlayer, DamageCauser);

@@ -36,6 +36,8 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
     InitialHealthPercentage = 0.1f;
 	RefundFactor = 0.5f;
 	bStartImmediately = true;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed());
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -44,6 +46,16 @@ void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 
 	DOREPLIFETIME(URTSConstructionSiteComponent, RemainingConstructionTime);
     DOREPLIFETIME(URTSConstructionSiteComponent, State);
+}
+
+void URTSConstructionSiteComponent::AddGameplayTags(FGameplayTagContainer& InOutTagContainer)
+{
+    Super::AddGameplayTags(InOutTagContainer);
+
+    if (State != ERTSConstructionState::CONSTRUCTIONSTATE_Finished)
+    {
+        InOutTagContainer.AddTag(URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
+    }
 }
 
 void URTSConstructionSiteComponent::BeginPlay()
@@ -304,6 +316,9 @@ void URTSConstructionSiteComponent::FinishConstruction()
 			OnBuilderConsumed.Broadcast(GetOwner(), Builder);
 		}
 	}
+
+    // Remove gameplay tags.
+    URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
 
 	// Notify listeners.
 	OnConstructionFinished.Broadcast(GetOwner());
