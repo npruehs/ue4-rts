@@ -39,6 +39,7 @@
 #include "Orders/RTSBeginConstructionOrder.h"
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
+#include "Orders/RTSMoveOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
@@ -647,62 +648,11 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 
 bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 {
-    // Issue move orders.
-	bool bSuccess = false;
+    FRTSOrderData MoveOrder;
+    MoveOrder.OrderClass = URTSMoveOrder::StaticClass();
+    MoveOrder.TargetLocation = TargetLocation;
 
-    for (auto SelectedActor : SelectedActors)
-    {
-        // Verify pawn and owner.
-        auto SelectedPawn = Cast<APawn>(SelectedActor);
-
-        if (!SelectedPawn)
-        {
-            continue;
-        }
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Send move order to server.
-		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
-
-            // Notify listeners.
-            NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
-        }
-
-		bSuccess = true;
-    }
-
-	return bSuccess;
-}
-
-void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue move order.
-	PawnController->IssueMoveOrder(TargetLocation);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
-
-	// Notify listeners.
-	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
-}
-
-bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+    return IssueOrder(MoveOrder);
 }
 
 AActor* ARTSPlayerController::GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const
@@ -1708,6 +1658,10 @@ void ARTSPlayerController::NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrd
     else if (Order.OrderClass == URTSGatherOrder::StaticClass())
     {
         NotifyOnIssuedGatherOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSMoveOrder::StaticClass())
+    {
+        NotifyOnIssuedMoveOrder(OrderedPawn, Order.TargetLocation);
     }
 }
 

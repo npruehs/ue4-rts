@@ -532,10 +532,6 @@ private:
     UFUNCTION(Reliable, Server, WithValidation)
     void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
-	/** Orders the passed unit to move to the specified location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
-
 	/** Orders the passed unit to stop all current actions. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueStopOrder(APawn* OrderedPawn);
