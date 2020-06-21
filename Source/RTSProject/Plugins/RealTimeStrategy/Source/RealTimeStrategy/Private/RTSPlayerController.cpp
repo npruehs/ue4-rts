@@ -38,6 +38,7 @@
 #include "Orders/RTSAttackOrder.h"
 #include "Orders/RTSBeginConstructionOrder.h"
 #include "Orders/RTSContinueConstructionOrder.h"
+#include "Orders/RTSGatherOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
@@ -637,80 +638,11 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
 
 bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 {
-	if (!ResourceSource)
-	{
-		return false;
-	}
+    FRTSOrderData GatherOrder;
+    GatherOrder.OrderClass = URTSGatherOrder::StaticClass();
+    GatherOrder.TargetActor = ResourceSource;
 
-	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
-
-	if (!ResourceSourceComponent)
-	{
-		return false;
-	}
-
-	// Issue gather orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify gatherer.
-		auto GathererComponent = SelectedActor->FindComponentByClass<URTSGathererComponent>();
-		if (!GathererComponent || !GathererComponent->CanGatherFrom(ResourceSource))
-		{
-			continue;
-		}
-
-		// Send gather order to server.
-		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedPawn, AActor* ResourceSource)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue gather order.
-	PawnController->IssueGatherOrder(ResourceSource);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedGatherOrder(OrderedPawn, ResourceSource);
-}
-
-bool ARTSPlayerController::ServerIssueGatherOrder_Validate(APawn* OrderedPawn, AActor* ResourceSourc)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+    return IssueOrder(GatherOrder);
 }
 
 bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
@@ -1772,6 +1704,10 @@ void ARTSPlayerController::NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrd
     else if (Order.OrderClass == URTSContinueConstructionOrder::StaticClass())
     {
         NotifyOnIssuedContinueConstructionOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSGatherOrder::StaticClass())
+    {
+        NotifyOnIssuedGatherOrder(OrderedPawn, Order.TargetActor);
     }
 }
 

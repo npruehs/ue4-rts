@@ -532,10 +532,6 @@ private:
     UFUNCTION(Reliable, Server, WithValidation)
     void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
-	/** Orders selected gatherers to gather resources from the specified source. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
-
 	/** Orders the passed unit to move to the specified location. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);

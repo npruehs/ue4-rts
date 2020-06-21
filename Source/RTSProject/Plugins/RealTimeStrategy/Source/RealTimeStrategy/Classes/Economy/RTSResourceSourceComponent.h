@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
 
 #include "Economy/RTSResourceType.h"
 
@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSResourceSourceComponentDepletedS
 * Adds resources to be gathered from the actor.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSResourceSourceComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSResourceSourceComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 
