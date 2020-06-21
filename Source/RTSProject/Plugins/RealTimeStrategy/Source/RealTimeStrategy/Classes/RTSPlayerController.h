@@ -532,10 +532,6 @@ private:
     UFUNCTION(Reliable, Server, WithValidation)
     void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
-	/** Orders the passed unit to stop all current actions. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueStopOrder(APawn* OrderedPawn);
-
 	/** Start producing the specified product at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerStartProduction(AActor* ProductionActor, TSubclassOf<AActor> ProductClass);

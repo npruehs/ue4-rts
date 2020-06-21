@@ -15,6 +15,7 @@
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
 #include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSStopOrder.h"
 
 
 void ARTSPawnAIController::OnPossess(APawn* InPawn)
@@ -114,6 +115,15 @@ void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
     SetTargetLocation(Order.TargetLocation);
     SetBuildingClass(Order.Index);
 
+    if (OrderType == ERTSOrderType::ORDER_None)
+    {
+        SetHomeLocation(GetPawn()->GetActorLocation());
+    }
+    else
+    {
+        ClearHomeLocation();
+    }
+
     // Stop any current orders and start over.
     ApplyOrders();
 }
@@ -195,20 +205,9 @@ void ARTSPawnAIController::IssueReturnResourcesOrder()
 
 void ARTSPawnAIController::IssueStopOrder()
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_None);
-	ClearBuildingClass();
-	SetHomeLocation(GetPawn()->GetActorLocation());
-	ClearTargetActor();
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSStopOrder::StaticClass();
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::ApplyOrders()

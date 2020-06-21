@@ -40,6 +40,7 @@
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
 #include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSStopOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
@@ -755,56 +756,10 @@ void ARTSPlayerController::IssueProductionOrder(TSubclassOf<AActor> ProductClass
 
 void ARTSPlayerController::IssueStopOrder()
 {
-	// Issue stop orders.
-	for (auto SelectedActor : SelectedActors)
-	{
-		// Verify pawn and owner.
-		auto SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Send stop order to server.
-		ServerIssueStopOrder(SelectedPawn);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedStopOrder(SelectedPawn);
-        }
-	}
-}
-
-void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue stop order.
-	PawnController->IssueStopOrder();
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedStopOrder(OrderedPawn);
-}
-
-bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+    FRTSOrderData StopOrder;
+    StopOrder.OrderClass = URTSStopOrder::StaticClass();
+    
+    IssueOrder(StopOrder);
 }
 
 void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode)
@@ -1662,6 +1617,10 @@ void ARTSPlayerController::NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrd
     else if (Order.OrderClass == URTSMoveOrder::StaticClass())
     {
         NotifyOnIssuedMoveOrder(OrderedPawn, Order.TargetLocation);
+    }
+    else if (Order.OrderClass == URTSStopOrder::StaticClass())
+    {
+        NotifyOnIssuedStopOrder(OrderedPawn);
     }
 }
 
