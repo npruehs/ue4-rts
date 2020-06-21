@@ -5,11 +5,6 @@ bool URTSOrder::IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetD
     return true;
 }
 
-float URTSOrder::GetRequiredRange(const AActor* OrderedActor, int32 Index) const
-{
-    return 0.0f;
-}
-
 ERTSOrderTargetType URTSOrder::GetTargetType() const
 {
     return TargetType;
@@ -23,4 +18,34 @@ ERTSOrderGroupExecutionType URTSOrder::GetGroupExecutionType() const
 FRTSOrderTagRequirements URTSOrder::GetIssueTagRequirements() const
 {
     return IssueTagRequirements;
+}
+
+UTexture2D* URTSOrder::GetNormalIcon() const
+{
+    return NormalIcon;
+}
+
+UTexture2D* URTSOrder::GetHoveredIcon() const
+{
+    return HoveredIcon;
+}
+
+UTexture2D* URTSOrder::GetPressedIcon() const
+{
+    return PressedIcon;
+}
+
+UTexture2D* URTSOrder::GetDisabledIcon() const
+{
+    return DisabledIcon;
+}
+
+FText URTSOrder::GetName() const
+{
+    return Name;
+}
+
+FText URTSOrder::GetDescription(const AActor* OrderedActor, int32 Index) const
+{
+    return Description;
 }

@@ -15,6 +15,4 @@ class REALTIMESTRATEGY_API URTSAttackOrder : public URTSOrder
 
 public:
     URTSAttackOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-    virtual float GetRequiredRange(const AActor* OrderedActor, int32 Index) const override;
 };

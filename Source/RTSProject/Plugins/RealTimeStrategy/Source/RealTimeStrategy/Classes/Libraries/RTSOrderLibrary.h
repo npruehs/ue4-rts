@@ -31,6 +31,24 @@ public:
     /** Gets how many and which of the selected actors the specified order should be issued to. */
     static ERTSOrderGroupExecutionType GetOrderGroupExecutionType(TSubclassOf<URTSOrder> OrderClass);
 
+    /** Gets the normal icon of the specified order. */
+    static UTexture2D* GetOrderNormalIcon(TSubclassOf<URTSOrder> OrderClass);
+
+    /** Gets the hovered icon of the specified order. */
+    static UTexture2D* GetOrderHoveredIcon(TSubclassOf<URTSOrder> OrderClass);
+
+    /** Gets the pressed icon of the specified order. */
+    static UTexture2D* GetOrderPressedIcon(TSubclassOf<URTSOrder> OrderClass);
+
+    /** Gets the disabled icon of the specified order. */
+    static UTexture2D* GetOrderDisabledIcon(TSubclassOf<URTSOrder> OrderClass);
+
+    /** Gets the name of the specified order. */
+    static FText GetOrderName(TSubclassOf<URTSOrder> OrderClass);
+
+    /** Gets the description of the specified order. */
+    static FText GetOrderDescription(TSubclassOf<URTSOrder> OrderClass, const AActor* OrderedActor, int32 Index);
+
     /** Gathers order target data, including relationship tags for the specified actors. */
     static FRTSOrderTargetData GetOrderTargetData(const AActor* OrderedActor, AActor* TargetActor, const FVector& TargetLocation = FVector::ZeroVector);
 

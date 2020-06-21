@@ -22,14 +22,3 @@ URTSAttackOrder::URTSAttackOrder(const FObjectInitializer& ObjectInitializer /*=
 
     SuccessTagRequirements.TargetBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Alive());
 }
-
-float URTSAttackOrder::GetRequiredRange(const AActor* OrderedActor, int32 Index) const
-{
-    if (!IsValid(OrderedActor))
-    {
-        return 0.0f;
-    }
-
-    URTSAttackComponent* AttackComponent = OrderedActor->FindComponentByClass<URTSAttackComponent>();
-    return IsValid(AttackComponent) ? AttackComponent->GetAttacks()[0].Range : 0.0f;
-}

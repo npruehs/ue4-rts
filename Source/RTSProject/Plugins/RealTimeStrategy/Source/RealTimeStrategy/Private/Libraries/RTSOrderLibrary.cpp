@@ -3,6 +3,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Libraries/RTSGameplayTagLibrary.h"
+#include "Orders/RTSOrder.h"
 #include "Orders/RTSOrderTagRequirements.h"
 
 
@@ -38,6 +39,36 @@ bool URTSOrderLibrary::IsValidOrderTarget(TSubclassOf<URTSOrder> OrderClass, con
 ERTSOrderGroupExecutionType URTSOrderLibrary::GetOrderGroupExecutionType(TSubclassOf<URTSOrder> OrderClass)
 {
     return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetGroupExecutionType() : ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
+}
+
+UTexture2D* URTSOrderLibrary::GetOrderNormalIcon(TSubclassOf<URTSOrder> OrderClass)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetNormalIcon() : nullptr;
+}
+
+UTexture2D* URTSOrderLibrary::GetOrderHoveredIcon(TSubclassOf<URTSOrder> OrderClass)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetHoveredIcon() : nullptr;
+}
+
+UTexture2D* URTSOrderLibrary::GetOrderPressedIcon(TSubclassOf<URTSOrder> OrderClass)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetPressedIcon() : nullptr;
+}
+
+UTexture2D* URTSOrderLibrary::GetOrderDisabledIcon(TSubclassOf<URTSOrder> OrderClass)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetDisabledIcon() : nullptr;
+}
+
+FText URTSOrderLibrary::GetOrderName(TSubclassOf<URTSOrder> OrderClass)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetName() : FText();
+}
+
+FText URTSOrderLibrary::GetOrderDescription(TSubclassOf<URTSOrder> OrderClass, const AActor* OrderedActor, int32 Index)
+{
+    return OrderClass != nullptr ? OrderClass->GetDefaultObject<URTSOrder>()->GetDescription(OrderedActor, Index) : FText();
 }
 
 FRTSOrderTargetData URTSOrderLibrary::GetOrderTargetData(const AActor* OrderedActor, AActor* TargetActor, const FVector& TargetLocation /*= FVector::ZeroVector*/)
