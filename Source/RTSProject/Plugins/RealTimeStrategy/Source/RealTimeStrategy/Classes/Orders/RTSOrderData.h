@@ -22,18 +22,18 @@ public:
     FRTSOrderData();
 
     /** Type of the order to issue. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
     TSubclassOf<URTSOrder> OrderClass;
 
     /** Target actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
     AActor* TargetActor;
 
     /** Target location. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
     FVector TargetLocation;
 
     /** Additional index. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
     int32 Index;
 };
