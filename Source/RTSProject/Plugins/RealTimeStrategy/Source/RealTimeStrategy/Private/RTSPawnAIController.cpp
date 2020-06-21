@@ -108,32 +108,39 @@ bool ARTSPawnAIController::IsIdle() const
 
 void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
 {
-    if (!VerifyBlackboard())
+    if (!Blackboard)
     {
+        UE_LOG(LogRTS, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
         return;
     }
 
     // Update blackboard.
     ERTSOrderType OrderType = OrderClassToType(Order.OrderClass);
-
-    SetOrderType(OrderType);
-    SetOrderClass(Order.OrderClass);
-    SetTargetActor(Order.TargetActor);
-    SetTargetLocation(Order.TargetLocation);
-    SetBuildingClass(Order.Index);
+    
+    Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderType);
+    Blackboard->SetValueAsClass(TEXT("OrderClass"), Order.OrderClass);
+    Blackboard->SetValueAsObject(TEXT("TargetActor"), Order.TargetActor);
+    Blackboard->SetValueAsVector(TEXT("TargetLocation"), Order.TargetLocation);
+    Blackboard->SetValueAsInt(TEXT("BuildingClass"), Order.Index);
 
     if (OrderType == ERTSOrderType::ORDER_None)
     {
-        SetHomeLocation(GetPawn()->GetActorLocation());
+        Blackboard->SetValueAsVector(TEXT("HomeLocation"), GetPawn()->GetActorLocation());
     }
     else
     {
-        ClearHomeLocation();
+        Blackboard->ClearValue(TEXT("HomeLocation"));
     }
 
-    // Stop any current orders and start over.
-    ApplyOrders();
+    // Update behavior tree.
+    UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+    if (BehaviorTreeComponent)
+    {
+        BehaviorTreeComponent->RestartTree();
+    }
 
+    // Notify listeners.
+    OnOrderChanged.Broadcast(GetOwner(), OrderType);
     OnCurrentOrderChanged.Broadcast(GetOwner(), Order);
 }
 
@@ -209,72 +216,6 @@ void ARTSPawnAIController::IssueStopOrder()
     IssueOrder(Order);
 }
 
-void ARTSPawnAIController::ApplyOrders()
-{
-    // Update behavior tree.
-	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
-	if (BehaviorTreeComponent)
-	{
-		BehaviorTreeComponent->RestartTree();
-	}
-
-    // Notify listeners.
-    UClass* NewOrderClass = Blackboard->GetValueAsClass(TEXT("OrderClass"));
-    ERTSOrderType NewOrderType = OrderClassToType(NewOrderClass);
-
-    OnOrderChanged.Broadcast(GetOwner(), NewOrderType);
-}
-
-void ARTSPawnAIController::ClearBuildingClass()
-{
-	Blackboard->ClearValue(TEXT("BuildingClass"));
-}
-
-void ARTSPawnAIController::ClearHomeLocation()
-{
-	Blackboard->ClearValue(TEXT("HomeLocation"));
-}
-
-void ARTSPawnAIController::ClearTargetActor()
-{
-	Blackboard->ClearValue(TEXT("TargetActor"));
-}
-
-void ARTSPawnAIController::ClearTargetLocation()
-{
-	Blackboard->ClearValue(TEXT("TargetLocation"));
-}
-
-void ARTSPawnAIController::SetBuildingClass(int32 BuildingIndex)
-{
-	Blackboard->SetValueAsInt(TEXT("BuildingClass"), BuildingIndex);
-}
-
-void ARTSPawnAIController::SetHomeLocation(const FVector& HomeLocation)
-{
-	Blackboard->SetValueAsVector(TEXT("HomeLocation"), HomeLocation);
-}
-
-void ARTSPawnAIController::SetOrderClass(UClass* OrderClass)
-{
-    Blackboard->SetValueAsClass(TEXT("OrderClass"), OrderClass);
-}
-
-void ARTSPawnAIController::SetOrderType(const ERTSOrderType OrderType)
-{
-	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderType);
-}
-
-void ARTSPawnAIController::SetTargetActor(AActor* TargetActor)
-{
-	Blackboard->SetValueAsObject(TEXT("TargetActor"), TargetActor);
-}
-
-void ARTSPawnAIController::SetTargetLocation(const FVector& TargetLocation)
-{
-	Blackboard->SetValueAsVector(TEXT("TargetLocation"), TargetLocation);
-}
-
 bool ARTSPawnAIController::TraceSphere(
 	const FVector& Location,
 	const float Radius,
@@ -300,17 +241,6 @@ bool ARTSPawnAIController::TraceSphere(
 		FCollisionObjectQueryParams(TraceChannel),
 		FCollisionShape::MakeSphere(Radius)
 	);
-}
-
-bool ARTSPawnAIController::VerifyBlackboard()
-{
-	if (!Blackboard)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
-		return false;
-	}
-
-	return true;
 }
 
 ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const

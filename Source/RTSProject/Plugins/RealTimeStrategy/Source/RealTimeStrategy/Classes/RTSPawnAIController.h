@@ -100,28 +100,12 @@ private:
     UPROPERTY()
 	URTSAttackComponent* AttackComponent;
 
-	void ApplyOrders();
-
-	void ClearBuildingClass();
-	void ClearHomeLocation();
-	void ClearTargetActor();
-	void ClearTargetLocation();
-
-	void SetBuildingClass(int32 BuildingIndex);
-	void SetHomeLocation(const FVector& HomeLocation);
-    void SetOrderClass(UClass* OrderClass);
-	void SetOrderType(const ERTSOrderType OrderType);
-	void SetTargetActor(AActor* TargetActor);
-	void SetTargetLocation(const FVector& TargetLocation);
-
 	bool TraceSphere(
 		const FVector& Location,
 		const float Radius,
 		AActor* ActorToIgnore,
 		ECollisionChannel TraceChannel,
 		TArray<struct FHitResult>& OutHitResults);
-
-	bool VerifyBlackboard();
 
     ERTSOrderType OrderClassToType(UClass* OrderClass) const;
 };
