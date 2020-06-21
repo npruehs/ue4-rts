@@ -80,6 +80,9 @@ public:
     /** Actor has positive health. */
     static const FGameplayTag& Status_Changing_Alive();
 
+    /** Actor is currently carrying gathered resources. */
+    static const FGameplayTag& Status_Changing_CarryingResources();
+
     /** Actor is currently working at a construction site. */
     static const FGameplayTag& Status_Changing_Constructing();
 
@@ -94,6 +97,9 @@ public:
 
     /** Actor is still being constructed by builders. */
     static const FGameplayTag& Status_Changing_UnderConstruction();
+
+    /** Actor allows other actors to return resources here. */
+    static const FGameplayTag& Status_Permanent_AcceptsReturnedResources();
 
     /** Actor can attack other actors. */
     static const FGameplayTag& Status_Permanent_CanAttack();

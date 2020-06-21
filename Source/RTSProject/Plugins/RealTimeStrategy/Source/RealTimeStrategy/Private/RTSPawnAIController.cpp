@@ -15,6 +15,7 @@
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
 #include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSReturnResourcesOrder.h"
 #include "Orders/RTSStopOrder.h"
 
 
@@ -181,11 +182,6 @@ void ARTSPawnAIController::IssueMoveOrder(const FVector& Location)
 
 void ARTSPawnAIController::IssueReturnResourcesOrder()
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
 	auto GathererComponent = GetPawn()->FindComponentByClass<URTSGathererComponent>();
 
 	if (!GathererComponent)
@@ -200,15 +196,10 @@ void ARTSPawnAIController::IssueReturnResourcesOrder()
 		return;
 	}
 
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_ReturnResources);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(ResourceDrain);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSReturnResourcesOrder::StaticClass();
+    Order.TargetActor = ResourceDrain;
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueStopOrder()
@@ -343,6 +334,10 @@ ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const
     else if (OrderClass == URTSMoveOrder::StaticClass())
     {
         return ERTSOrderType::ORDER_Move;
+    }
+    else if (OrderClass == URTSReturnResourcesOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_ReturnResources;
     }
 
     return ERTSOrderType::ORDER_None;

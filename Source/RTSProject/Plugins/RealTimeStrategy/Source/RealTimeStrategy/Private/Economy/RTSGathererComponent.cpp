@@ -24,6 +24,8 @@ URTSGathererComponent::URTSGathererComponent(const FObjectInitializer& ObjectIni
 
 	// Set reasonable default values.
 	ResourceSweepRadius = 1000.0f;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanGather());
 }
 
 void URTSGathererComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -212,6 +214,11 @@ bool URTSGathererComponent::IsGathering() const
 	return CurrentResourceSource != nullptr;
 }
 
+TSubclassOf<class URTSResourceType> URTSGathererComponent::GetCarriedResourceType() const
+{
+    return CarriedResourceType;
+}
+
 void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 {
 	if (!CanGatherFrom(ResourceSource))
@@ -241,7 +248,7 @@ void URTSGathererComponent::StartGatheringResources(AActor* ResourceSource)
 	}
 
 	// Reset carried amount.
-	CarriedResourceAmount = 0.0f;
+	SetCarriedResourceAmount(0.0f);
 	CarriedResourceType = ResourceSourceComponent->GetResourceType();
 
 	// Start cooldown before first gathering.
@@ -293,7 +300,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
 	float GatheredResourceAmount = ResourceSourceComponent->ExtractResources(GetOwner(), AmountToGather);
 
-	CarriedResourceAmount += GatheredResourceAmount;
+    SetCarriedResourceAmount(CarriedResourceAmount + GatheredResourceAmount);
 
 	// Start cooldown timer.
 	RemainingCooldown = GatherData.Cooldown;
@@ -334,7 +341,7 @@ float URTSGathererComponent::GatherResources(AActor* ResourceSource)
 
                     if (ReturnedResources > 0.0f)
                     {
-                        CarriedResourceAmount -= ReturnedResources;
+                        SetCarriedResourceAmount(CarriedResourceAmount - ReturnedResources);
 
                         UE_LOG(LogRTS, Log, TEXT("Actor %s returned %f %s without returning to drain."),
                             *GetOwner()->GetName(),
@@ -369,7 +376,7 @@ float URTSGathererComponent::ReturnResources(AActor* ResourceDrain)
 	auto ResourceDrainComponent = ResourceDrain->FindComponentByClass<URTSResourceDrainComponent>();
 	float ReturnedResources = ResourceDrainComponent->ReturnResources(GetOwner(), CarriedResourceType, CarriedResourceAmount);
 
-	CarriedResourceAmount -= ReturnedResources;
+	SetCarriedResourceAmount(CarriedResourceAmount - ReturnedResources);
 
 	UE_LOG(LogRTS, Log, TEXT("Actor %s returned %f %s to %s."),
 		*GetOwner()->GetName(),
@@ -443,4 +450,20 @@ void URTSGathererComponent::LeaveCurrentResourceSource()
 	CurrentResourceSource = nullptr;
 
 	PreviousResourceType = CarriedResourceType;
+}
+
+void URTSGathererComponent::SetCarriedResourceAmount(float NewAmount)
+{
+    CarriedResourceAmount = NewAmount;
+
+    if (IsCarryingResources() &&
+        !URTSGameplayTagLibrary::HasGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_CarryingResources()))
+    {
+        URTSGameplayTagLibrary::AddGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_CarryingResources());
+    }
+    else if (!IsCarryingResources() &&
+        URTSGameplayTagLibrary::HasGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_CarryingResources()))
+    {
+        URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_CarryingResources());
+    }
 }

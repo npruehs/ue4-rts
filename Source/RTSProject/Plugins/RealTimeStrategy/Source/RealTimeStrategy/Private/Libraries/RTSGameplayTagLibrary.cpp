@@ -193,6 +193,12 @@ const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Alive()
     return Tag;
 }
 
+const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_CarryingResources()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.CarryingResources")));
+    return Tag;
+}
+
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Constructing()
 {
     static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Constructing")));
@@ -220,6 +226,12 @@ const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Unarmed()
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_UnderConstruction()
 {
     static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.UnderConstruction")));
+    return Tag;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources()
+{
+    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.AcceptsReturnedResources")));
     return Tag;
 }
 
