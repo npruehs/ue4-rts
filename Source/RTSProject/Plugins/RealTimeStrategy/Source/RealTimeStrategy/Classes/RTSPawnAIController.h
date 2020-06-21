@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "Templates/SubclassOf.h"
 
+#include "Orders/RTSOrder.h"
 #include "Orders/RTSOrderData.h"
 #include "RTSOrderType.h"
 
@@ -15,6 +16,7 @@ class URTSAttackComponent;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSPawnAIControllerOrderChangedSignature, AActor*, Actor, ERTSOrderType, NewOrder);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSPawnAIControllerCurrentOrderChangedSignature, AActor*, Actor, const FRTSOrderData&, NewOrder);
 
 
 /**
@@ -33,6 +35,10 @@ public:
     /** Checks whether the pawn has an order of the specified type. */
     UFUNCTION(BlueprintPure)
     bool HasOrder(ERTSOrderType OrderType) const;
+
+    /** Checks whether the pawn has an order of the specified type. */
+    UFUNCTION(BlueprintPure)
+    bool HasOrderByClass(TSubclassOf<URTSOrder> OrderClass) const;
 
     /** Checks whether the pawn is idle, or has any orders. */
     UFUNCTION(BlueprintPure)
@@ -71,10 +77,13 @@ public:
 	void IssueStopOrder();
 
 
-    /** Event when the pawn has received a new order. */
+    /** Deprecated as of plugin version 1.2. Please use OnCurrentOrderChanged instead. */
     UPROPERTY(BlueprintAssignable, Category = "RTS")
     FRTSPawnAIControllerOrderChangedSignature OnOrderChanged;
 
+    /** Event when the pawn has received a new order. */
+    UPROPERTY(BlueprintAssignable, Category = "RTS")
+    FRTSPawnAIControllerCurrentOrderChangedSignature OnCurrentOrderChanged;
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
@@ -88,6 +97,7 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     UBlackboardData* PawnBlackboardAsset;
 
+    UPROPERTY()
 	URTSAttackComponent* AttackComponent;
 
 	void ApplyOrders();

@@ -14,6 +14,8 @@
 #include "Economy/RTSResourceDrainComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Orders/RTSBeginConstructionOrder.h"
+#include "Orders/RTSContinueConstructionOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
 
@@ -247,8 +249,8 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
             continue;
         }
 
-        if (PawnController->HasOrder(ERTSOrderType::ORDER_BeginConstruction) ||
-            PawnController->HasOrder(ERTSOrderType::ORDER_ContinueConstruction))
+        if (PawnController->HasOrderByClass(URTSBeginConstructionOrder::StaticClass()) ||
+            PawnController->HasOrderByClass(URTSContinueConstructionOrder::StaticClass()))
         {
             // Don't take builders away from constructing other buildings.
             continue;

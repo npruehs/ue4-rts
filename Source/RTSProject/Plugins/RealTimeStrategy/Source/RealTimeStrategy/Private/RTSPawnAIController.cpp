@@ -39,7 +39,7 @@ void ARTSPawnAIController::OnPossess(APawn* InPawn)
 
 void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 {
-	if (!AttackComponent)
+	if (!IsValid(AttackComponent))
 	{
 		return;
 	}
@@ -91,12 +91,18 @@ void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 
 bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
 {
+    UE_LOG(LogRTS, Warning, TEXT("ARTSPawnAIController::HasOrder has been deprecated as of plugin version 1.2. Please use HasOrderByClass instead."));
     return Blackboard->GetValueAsEnum(TEXT("OrderType")) == (uint8)OrderType;
+}
+
+bool ARTSPawnAIController::HasOrderByClass(TSubclassOf<URTSOrder> OrderClass) const
+{
+    return Blackboard->GetValueAsClass(TEXT("OrderClass")) == OrderClass;
 }
 
 bool ARTSPawnAIController::IsIdle() const
 {
-    return HasOrder(ERTSOrderType::ORDER_None);
+    return HasOrderByClass(URTSStopOrder::StaticClass());
 }
 
 void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
@@ -126,6 +132,8 @@ void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
 
     // Stop any current orders and start over.
     ApplyOrders();
+
+    OnCurrentOrderChanged.Broadcast(GetOwner(), Order);
 }
 
 void ARTSPawnAIController::IssueAttackOrder(AActor* Target)
