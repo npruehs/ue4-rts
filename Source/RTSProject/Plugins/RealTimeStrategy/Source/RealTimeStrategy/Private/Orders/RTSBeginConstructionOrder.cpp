@@ -8,6 +8,7 @@ URTSBeginConstructionOrder::URTSBeginConstructionOrder(const FObjectInitializer&
     : Super(ObjectInitializer)
 {
     TargetType = ERTSOrderTargetType::ORDERTARGET_Location;
+    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any;
 
     IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanConstruct());
 

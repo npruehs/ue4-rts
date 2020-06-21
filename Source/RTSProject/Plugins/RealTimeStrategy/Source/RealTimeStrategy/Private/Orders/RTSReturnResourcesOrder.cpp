@@ -12,6 +12,7 @@ URTSReturnResourcesOrder::URTSReturnResourcesOrder(const FObjectInitializer& Obj
     : Super(ObjectInitializer)
 {
     TargetType = ERTSOrderTargetType::ORDERTARGET_Actor;
+    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
 
     IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanGather());
     IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Changing_CarryingResources());

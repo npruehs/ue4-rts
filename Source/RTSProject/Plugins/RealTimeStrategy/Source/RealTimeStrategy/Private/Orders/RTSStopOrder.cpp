@@ -8,6 +8,7 @@ URTSStopOrder::URTSStopOrder(const FObjectInitializer& ObjectInitializer /*= FOb
     : Super(ObjectInitializer)
 {
     TargetType = ERTSOrderTargetType::ORDERTARGET_None;
+    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
 
     IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
 }

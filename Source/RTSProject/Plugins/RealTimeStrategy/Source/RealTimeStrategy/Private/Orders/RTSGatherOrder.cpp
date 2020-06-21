@@ -11,6 +11,7 @@ URTSGatherOrder::URTSGatherOrder(const FObjectInitializer& ObjectInitializer /*=
     : Super(ObjectInitializer)
 {
     TargetType = ERTSOrderTargetType::ORDERTARGET_Actor;
+    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
 
     IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanGather());
 
