@@ -175,6 +175,11 @@ void ARTSVisionManager::Tick(float DeltaSeconds)
     }
 }
 
+void ARTSVisionManager::SetLocalPlayerState(ARTSPlayerState* InLocalPlayerState)
+{
+    LocalPlayerState = InLocalPlayerState;
+}
+
 void ARTSVisionManager::SetLocalVisionInfo(ARTSVisionInfo* InLocalVisionInfo)
 {
     LocalVisionInfo = InLocalVisionInfo;
@@ -281,6 +286,11 @@ void ARTSVisionManager::RemoveVisionActor(AActor* Actor)
 void ARTSVisionManager::UpdateVisionActor(const FRTSVisionActor& VisionActor)
 {
     if (VisionInfos.Num() == 0)
+    {
+        return;
+    }
+
+    if (!IsValid(LocalPlayerState))
     {
         return;
     }

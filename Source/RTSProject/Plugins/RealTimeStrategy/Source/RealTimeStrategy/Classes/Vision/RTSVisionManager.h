@@ -11,6 +11,7 @@
 
 
 class ARTSFogOfWarActor;
+class ARTSPlayerState;
 class ARTSVisionInfo;
 class ARTSVisionVolume;
 
@@ -27,6 +28,9 @@ public:
     void Initialize();
 
     virtual void Tick(float DeltaSeconds) override;
+
+    /** Sets the player state to use for the local player. */
+    void SetLocalPlayerState(ARTSPlayerState* InLocalPlayerState);
 
     /** Sets the vision info to use for the local player. */
     void SetLocalVisionInfo(ARTSVisionInfo* InLocalVisionInfo);
@@ -51,6 +55,10 @@ private:
     /** Vision info for all teams. */
     UPROPERTY()
     TArray<ARTSVisionInfo*> VisionInfos;
+
+    /** Player State for the local player. */
+    UPROPERTY()
+    ARTSPlayerState* LocalPlayerState;
 
     /** Vision info for the local player. */
     UPROPERTY()

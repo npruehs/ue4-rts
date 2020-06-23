@@ -198,6 +198,19 @@ void ARTSPlayerController::OnPlayerStateAvailable(ARTSPlayerState* NewPlayerStat
         RTSPlayerState->DiscoverOwnActors();
     }
 
+    // Setup fog of war.
+    ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
+
+    if (IsValid(GameState))
+    {
+        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+
+        if (IsValid(VisionManager))
+        {
+            VisionManager->SetLocalPlayerState(NewPlayerState);
+        }
+    }
+
     // Notify listeners.
     ReceiveOnPlayerStateAvailable(RTSPlayerState);
 }

@@ -176,11 +176,6 @@ void ARTSVisionInfo::ApplyVisionForActor(AActor* Actor, TArray<int32>& CachedTil
 
     if (CachedTiles.Num() == 0)
     {
-        if (!VisionVolume)
-        {
-            return;
-        }
-
         // Convert location and sight radius to tile space.
         FVector ActorLocationWorld;
         FIntVector ActorLocationTile;
