@@ -52,15 +52,19 @@ public:
 
 private:
     /** Width and height of the vision grid imposed on the world. */
-    UPROPERTY(EditInstanceOnly, Category = "RTS")
+    UPROPERTY(EditAnywhere, Category = "RTS")
     int32 SizeInTiles;
 
     /** Height of a height level imposed on the world. */
-    UPROPERTY(EditInstanceOnly, Category = "RTS", meta = (ClampMin = 0))
+    UPROPERTY(EditAnywhere, Category = "RTS", meta = (ClampMin = 0))
     float LevelHeight;
 
+    /** Collision channel to trace for when determining tile heights. */
+    UPROPERTY(EditAnywhere, Category = "RTS")
+    TEnumAsByte<ECollisionChannel> HeightLevelTraceChannel;
+
     /** Minimum vision state of the world. Change this for removing the black part of fog of war, or disabling it entirely. */
-    UPROPERTY(EditInstanceOnly, Category = "RTS")
+    UPROPERTY(EditAnywhere, Category = "RTS")
     ERTSVisionState MinimumVisionState;
 
     /** Size of the vision volume, in world space. */

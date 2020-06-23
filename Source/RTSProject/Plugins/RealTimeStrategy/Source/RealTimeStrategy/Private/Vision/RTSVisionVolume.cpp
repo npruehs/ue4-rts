@@ -11,6 +11,7 @@ ARTSVisionVolume::ARTSVisionVolume(const FObjectInitializer& ObjectInitializer /
 	// Set reasonable default values.
 	SizeInTiles = 256;
     LevelHeight = 250.0f;
+    HeightLevelTraceChannel = ECC_WorldStatic;
 }
 
 void ARTSVisionVolume::Initialize()
@@ -112,7 +113,7 @@ float ARTSVisionVolume::CalculateWorldHeightAtLocation(const FVector2D& WorldLoc
     TArray<FHitResult> HitResults;
 
     GetWorld()->LineTraceMultiByChannel(HitResults, FVector(WorldLocation.X, WorldLocation.Y, 10000.0f),
-        FVector(WorldLocation.X, WorldLocation.Y, -10000.0f), ECC_WorldStatic);
+        FVector(WorldLocation.X, WorldLocation.Y, -10000.0f), HeightLevelTraceChannel);
 
     for (auto& HitResult : HitResults)
     {
