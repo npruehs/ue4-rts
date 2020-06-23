@@ -1,7 +1,9 @@
 #include "Vision/RTSVisionManager.h"
 
 #include "EngineUtils.h"
+#include "Engine/GameInstance.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "RTSGameMode.h"
@@ -27,6 +29,14 @@ ARTSVisionManager::ARTSVisionManager(const FObjectInitializer& ObjectInitializer
 void ARTSVisionManager::Initialize()
 {
     UWorld* World = GetWorld();
+
+    // Find local player.
+    APlayerController* FirstLocalPlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+
+    if (IsValid(FirstLocalPlayerController))
+    {
+        SetLocalPlayerState(FirstLocalPlayerController->GetPlayerState<ARTSPlayerState>());
+    }
 
     // Find manager and info actors.
     for (TActorIterator<AActor> It(World); It; ++It)
@@ -178,6 +188,11 @@ void ARTSVisionManager::Tick(float DeltaSeconds)
 void ARTSVisionManager::SetLocalPlayerState(ARTSPlayerState* InLocalPlayerState)
 {
     LocalPlayerState = InLocalPlayerState;
+
+    if (IsValid(InLocalPlayerState))
+    {
+        UE_LOG(LogRTS, Log, TEXT("Using local player state %s."), *InLocalPlayerState->GetName());
+    }
 }
 
 void ARTSVisionManager::SetLocalVisionInfo(ARTSVisionInfo* InLocalVisionInfo)
