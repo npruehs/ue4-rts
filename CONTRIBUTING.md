@@ -35,6 +35,7 @@ Internally, we're using the following checklist when preparing for a new release
 * Check pending pull requests
 * Create release branch
 * Add examples for new features where appropriate
+* Verify new features in multiplayer
 * Run all automated tests
 * Update documentation (README, images, spelling, table of contents)
 * Increase version number (and engine version, if necessary)

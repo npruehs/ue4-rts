@@ -4,7 +4,7 @@ Occasionally, you want to create additional gameplay (especially when creating a
 
 Feel free to explore the plugin yourself by looking at what other functions and events each component provides, and open an issue if you're missing something.
 
-Also note that much gameplay of the plugin relies on [Gameplay Tags](https://docs.unrealengine.com/en-US/Gameplay/Tags/index.html) as defined by `Content\Data\DT_RTSGameplayTags.uasset`. This enables you to create unique gameplay and abilities by applying/removing these tags to/from the `URTSGameplayTagsComponent` of your actors.
+Also note that much gameplay of the plugin relies on [Gameplay Tags](https://docs.unrealengine.com/en-US/Gameplay/Tags/index.html) as defined by `Content\Data\DT_RTSGameplayTags.uasset`. This enables you to create unique gameplay and abilities by applying/removing these tags to/from the `URTSGameplayTagsComponent` of your actors. Initially, many of the plugin components apply matching gameplay tags (e.g. `Status.Permanent.CanAttack` from `RTSAttackComponent`). When creating your own actor components, you can derive from `RTSActorComponent` to provide your own _Initial Gameplay Tags_ as well. The plugin also provides an own [Gameplay Debugger](https://docs.unrealengine.com/en-US/Gameplay/Tools/GameplayDebugger/index.html) category for checking the gameplay tags of selected actors.
 
 
 ### RTSBountyComponent
