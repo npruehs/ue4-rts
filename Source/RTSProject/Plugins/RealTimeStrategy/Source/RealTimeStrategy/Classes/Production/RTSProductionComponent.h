@@ -7,6 +7,7 @@
 #include "Templates/SubclassOf.h"
 
 #include "Production/RTSProductionQueue.h"
+#include "Production/RTSProductionRallyPoint.h"
 
 #include "RTSProductionComponent.generated.h"
 
@@ -79,6 +80,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelProduction(int32 QueueIndex = 0, int32 ProductIndex = 0);
 
+    /** Sets the rally point on the specified actor. */
+    void SetRallyPointToActor(AActor* Target);
+
+    /** Sets the rally point to the specified actor. */
+    void SetRallyPointToLocation(const FVector& TargetLocation);
+
+    /** Clears the rally point. */
+    void ClearRallyPoint();
+
 
     /** Gets the types of actors the actor can produce. */
     UFUNCTION(BlueprintPure)
@@ -91,6 +101,10 @@ public:
     /** Gets how many products may be queued per queue. */
     UFUNCTION(BlueprintPure)
     int32 GetCapacityPerQueue() const;
+    
+    /** Gets the actor or location to send new actors to. */
+    UFUNCTION(BlueprintPure)
+    FRTSProductionRallyPoint GetRallyPoint() const;
 
 
     /** Event when the production timer has expired. */
@@ -142,8 +156,14 @@ private:
     UPROPERTY(ReplicatedUsing=ReceivedMostRecentProduct)
     AActor* MostRecentProduct;
 
+    /** Actor or location to send new actors to. */
+    UPROPERTY(Replicated)
+    FRTSProductionRallyPoint RallyPoint;
+
 	void DequeueProduct(int32 QueueIndex = 0, int32 ProductIndex = 0);
 	void StartProductionInQueue(int32 QueueIndex = 0);
+    
+    void IssueRallyPointDependentOrder(AActor* ProducedActor);
 
     UFUNCTION()
     void ReceivedProductionQueues();

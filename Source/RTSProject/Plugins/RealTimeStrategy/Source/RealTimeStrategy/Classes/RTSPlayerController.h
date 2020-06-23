@@ -68,7 +68,10 @@ public:
 
     /** Issues the specified order to all selected units. */
     UFUNCTION(BlueprintCallable)
-    bool IssueOrder(const FRTSOrderData& Order);
+    bool IssueOrderToSelectedActors(const FRTSOrderData& Order);
+
+    /** Issues the first successful default order for the specified targets to the passed actor. */
+    void IssueDefaultOrderToActor(AActor* Actor, AActor* TargetActor, const FVector& TargetLocation);
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
@@ -522,10 +525,10 @@ private:
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
-    void IssueDefaultOrder();
+    void IssueDefaultOrderToSelectedActors();
 
 	/** Automatically issues the most reasonable order for the specified targets. */
-	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
+	void IssueOrderTargetingObjectsToSelectedActors(TArray<FHitResult>& HitResults);
 
     /** Gets any member of the currently selected subgroup of selected actors. */
     bool GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex);

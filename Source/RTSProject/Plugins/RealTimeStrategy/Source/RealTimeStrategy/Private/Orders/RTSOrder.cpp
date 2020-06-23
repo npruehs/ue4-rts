@@ -1,8 +1,43 @@
 #include "Orders/RTSOrder.h"
 
+#include "RTSPawnAIController.h"
+#include "GameFramework/Pawn.h"
+#include "Orders/RTSOrderData.h"
+
+bool URTSOrder::CanObeyOrder(const AActor* OrderedActor, int32 Index) const
+{
+    return true;
+}
+
 bool URTSOrder::IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
 {
     return true;
+}
+
+void URTSOrder::IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
+{
+    APawn* Pawn = Cast<APawn>(OrderedActor);
+
+    if (!IsValid(Pawn))
+    {
+        return;
+    }
+
+    ARTSPawnAIController* PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
+
+    if (!IsValid(PawnController))
+    {
+        return;
+    }
+
+    // Issue order.
+    FRTSOrderData Order;
+    Order.OrderClass = GetClass();
+    Order.TargetActor = TargetData.Actor;
+    Order.TargetLocation = TargetData.Location;
+    Order.Index = Index;
+
+    PawnController->IssueOrder(Order);
 }
 
 ERTSOrderTargetType URTSOrder::GetTargetType() const

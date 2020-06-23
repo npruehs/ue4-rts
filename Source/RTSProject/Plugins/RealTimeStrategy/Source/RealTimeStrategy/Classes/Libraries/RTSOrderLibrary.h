@@ -7,6 +7,7 @@
 #include "Templates/SubclassOf.h"
 
 #include "Orders/RTSOrder.h"
+#include "Orders/RTSOrderData.h"
 #include "Orders/RTSOrderGroupExecutionType.h"
 #include "Orders/RTSOrderTargetData.h"
 
@@ -25,8 +26,17 @@ class REALTIMESTRATEGY_API URTSOrderLibrary : public UBlueprintFunctionLibrary
     GENERATED_BODY()
 
 public:
+    /** Checks whether the passed actor can obey the specified order. */
+    static bool CanObeyOrder(TSubclassOf<URTSOrder> OrderClass, const AActor* OrderedActor, int32 Index);
+
     /** Checks whether the specified actor and/or location is a valid target for the passed order. */
     static bool IsValidOrderTarget(TSubclassOf<URTSOrder> OrderClass, const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index);
+
+    /** Issues the specified order to the passed actor. */
+    static void IssueOrder(AActor* OrderedActor, const FRTSOrderData& Order);
+
+    /** Issues the specified order to the passed actor. */
+    static void IssueOrder(TSubclassOf<URTSOrder> OrderClass, AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index);
 
     /** Gets how many and which of the selected actors the specified order should be issued to. */
     static ERTSOrderGroupExecutionType GetOrderGroupExecutionType(TSubclassOf<URTSOrder> OrderClass);

@@ -20,8 +20,19 @@ void URTSGameplayTagLibrary::AddGameplayTag(const AActor* Actor, const FGameplay
 
 FGameplayTagContainer URTSGameplayTagLibrary::GetGameplayTags(const AActor* Actor)
 {
+    if (!IsValid(Actor))
+    {
+        return FGameplayTagContainer::EmptyContainer;
+    }
+
     URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
-    return IsValid(GameplayTagsComponent) ? GameplayTagsComponent->GetCurrentTags() : FGameplayTagContainer::EmptyContainer;
+
+    if (!IsValid(GameplayTagsComponent))
+    {
+        return FGameplayTagContainer::EmptyContainer;
+    }
+
+    return GameplayTagsComponent->GetCurrentTags();
 }
 
 bool URTSGameplayTagLibrary::HasGameplayTag(const AActor* Actor, const FGameplayTag& Tag)

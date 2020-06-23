@@ -10,6 +10,7 @@
 #include "Construction/RTSBuilderComponent.h"
 #include "Libraries/RTSConstructionLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
+#include "Libraries/RTSOrderLibrary.h"
 #include "Orders/RTSAttackOrder.h"
 #include "Orders/RTSBeginConstructionOrder.h"
 #include "Orders/RTSContinueConstructionOrder.h"
@@ -138,6 +139,9 @@ void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
     {
         BehaviorTreeComponent->RestartTree();
     }
+
+    // Apply order logic.
+    URTSOrderLibrary::IssueOrder(GetOwner(), Order);
 
     // Notify listeners.
     OnOrderChanged.Broadcast(GetOwner(), OrderType);

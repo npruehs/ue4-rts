@@ -28,12 +28,22 @@ float URTSCollisionLibrary::GetActorDistance(AActor* First, AActor* Second, bool
 
 float URTSCollisionLibrary::GetCollisionSize(TSubclassOf<AActor> ActorClass)
 {
+    if (ActorClass == nullptr)
+    {
+        return 0.0;
+    }
+
     AActor* DefaultActor = ActorClass->GetDefaultObject<AActor>();
     return GetActorCollisionSize(DefaultActor) * DefaultActor->GetActorRelativeScale3D().X;
 }
 
 float URTSCollisionLibrary::GetCollisionHeight(TSubclassOf<AActor> ActorClass)
 {
+    if (ActorClass == nullptr)
+    {
+        return 0.0;
+    }
+
     AActor* DefaultActor = ActorClass->GetDefaultObject<AActor>();
     return GetActorCollisionHeight(DefaultActor) * DefaultActor->GetActorRelativeScale3D().Z;
 }

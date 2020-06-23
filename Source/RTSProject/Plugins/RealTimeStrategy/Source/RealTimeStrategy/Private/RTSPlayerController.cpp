@@ -40,6 +40,8 @@
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
 #include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSSetRallyPointToActorOrder.h"
+#include "Orders/RTSSetRallyPointToLocationOrder.h"
 #include "Orders/RTSStopOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
@@ -69,6 +71,8 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
     DefaultOrders.Add(URTSGatherOrder::StaticClass());
     DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
     DefaultOrders.Add(URTSMoveOrder::StaticClass());
+    DefaultOrders.Add(URTSSetRallyPointToActorOrder::StaticClass());
+    DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
 
     DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
 }
@@ -108,7 +112,7 @@ void ARTSPlayerController::SetupInputComponent()
     InputComponent->BindAction(TEXT("SelectNextSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectNextSubgroup);
     InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
 
-	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueDefaultOrder);
+	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueDefaultOrderToSelectedActors);
 	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 
 	InputComponent->BindAction(TEXT("SaveControlGroup0"), IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
@@ -275,7 +279,7 @@ ARTSTeamInfo* ARTSPlayerController::GetTeamInfo() const
 	return nullptr;
 }
 
-bool ARTSPlayerController::IssueOrder(const FRTSOrderData& Order)
+bool ARTSPlayerController::IssueOrderToSelectedActors(const FRTSOrderData& Order)
 {
     ERTSOrderGroupExecutionType GroupExecutionType = URTSOrderLibrary::GetOrderGroupExecutionType(Order.OrderClass);
 
@@ -291,6 +295,11 @@ bool ARTSPlayerController::IssueOrder(const FRTSOrderData& Order)
         }
 
         if (SelectedPawn->GetOwner() != this)
+        {
+            continue;
+        }
+
+        if (!URTSOrderLibrary::CanObeyOrder(Order.OrderClass, SelectedActor, Order.Index))
         {
             continue;
         }
@@ -323,17 +332,52 @@ bool ARTSPlayerController::IssueOrder(const FRTSOrderData& Order)
     return bSuccess;
 }
 
-void ARTSPlayerController::ServerIssueOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
+void ARTSPlayerController::IssueDefaultOrderToActor(AActor* Actor, AActor* TargetActor, const FVector& TargetLocation)
 {
-    auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
+    APawn* IssuedPawn = Cast<APawn>(Actor);
 
-    if (!PawnController)
+    if (!IsValid(IssuedPawn))
     {
         return;
     }
 
-    // Issue order.
-    PawnController->IssueOrder(Order);
+    for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+    {
+        if (!URTSOrderLibrary::CanObeyOrder(OrderClass, IssuedPawn, 0))
+        {
+            continue;
+        }
+
+        FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(IssuedPawn, TargetActor, TargetLocation);
+
+        if (!URTSOrderLibrary::IsValidOrderTarget(OrderClass, IssuedPawn, TargetData, 0))
+        {
+            continue;
+        }
+
+        // Send order to server.
+        FRTSOrderData Order;
+        Order.OrderClass = OrderClass;
+        Order.TargetActor = TargetActor;
+        Order.TargetLocation = TargetLocation;
+
+        ServerIssueOrder(IssuedPawn, Order);
+        return;
+    }
+}
+
+void ARTSPlayerController::ServerIssueOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    if (!Order.OrderClass)
+    {
+        return;
+    }
+
+    FRTSOrderTargetData OrderTargetData;
+    OrderTargetData.Actor = Order.TargetActor;
+    OrderTargetData.Location = Order.TargetLocation;
+
+    Order.OrderClass->GetDefaultObject<URTSOrder>()->IssueOrder(OrderedPawn, OrderTargetData, Order.Index);
 
     // Notify listeners.
     NotifyOnIssuedOrder(OrderedPawn, Order);
@@ -447,7 +491,7 @@ bool ARTSPlayerController::IsSelectableActor(AActor* Actor) const
 	return true;
 }
 
-void ARTSPlayerController::IssueDefaultOrder()
+void ARTSPlayerController::IssueDefaultOrderToSelectedActors()
 {
     // Get objects at pointer position.
     TArray<FHitResult> HitResults;
@@ -457,10 +501,10 @@ void ARTSPlayerController::IssueDefaultOrder()
         return;
     }
 
-	IssueOrderTargetingObjects(HitResults);
+	IssueOrderTargetingObjectsToSelectedActors(HitResults);
 }
 
-void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitResults)
+void ARTSPlayerController::IssueOrderTargetingObjectsToSelectedActors(TArray<FHitResult>& HitResults)
 {
 	// Check if there's anybody to receive the order.
 	if (SelectedActors.Num() == 0)
@@ -496,7 +540,7 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
                 Order.TargetActor = HitResult.Actor.Get();
                 Order.TargetLocation = HitResult.Location;
 
-                if (IssueOrder(Order))
+                if (IssueOrderToSelectedActors(Order))
                 {
                     return;
                 }
@@ -592,7 +636,7 @@ bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
     AttackOrder.OrderClass = URTSAttackOrder::StaticClass();
     AttackOrder.TargetActor = Target;
 
-	return IssueOrder(AttackOrder);
+	return IssueOrderToSelectedActors(AttackOrder);
 }
 
 bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
@@ -625,7 +669,7 @@ bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> Build
     BeginConstructionOrder.TargetLocation = TargetLocation;
     BeginConstructionOrder.Index = BuildingIndex;
 
-    return IssueOrder(BeginConstructionOrder);
+    return IssueOrderToSelectedActors(BeginConstructionOrder);
 }
 
 bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
@@ -634,7 +678,7 @@ bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSi
     ContinueConstructionOrder.OrderClass = URTSContinueConstructionOrder::StaticClass();
     ContinueConstructionOrder.TargetActor = ConstructionSite;
 
-    return IssueOrder(ContinueConstructionOrder);
+    return IssueOrderToSelectedActors(ContinueConstructionOrder);
 }
 
 bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
@@ -643,7 +687,7 @@ bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
     GatherOrder.OrderClass = URTSGatherOrder::StaticClass();
     GatherOrder.TargetActor = ResourceSource;
 
-    return IssueOrder(GatherOrder);
+    return IssueOrderToSelectedActors(GatherOrder);
 }
 
 bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
@@ -652,7 +696,7 @@ bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
     MoveOrder.OrderClass = URTSMoveOrder::StaticClass();
     MoveOrder.TargetLocation = TargetLocation;
 
-    return IssueOrder(MoveOrder);
+    return IssueOrderToSelectedActors(MoveOrder);
 }
 
 AActor* ARTSPlayerController::GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const
@@ -758,7 +802,7 @@ void ARTSPlayerController::IssueStopOrder()
     FRTSOrderData StopOrder;
     StopOrder.OrderClass = URTSStopOrder::StaticClass();
     
-    IssueOrder(StopOrder);
+    IssueOrderToSelectedActors(StopOrder);
 }
 
 void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode)
@@ -1725,7 +1769,7 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 			return;
 		}
 
-		IssueOrderTargetingObjects(HitResults);
+		IssueOrderTargetingObjectsToSelectedActors(HitResults);
 	}
 	
 	// Notify listeners.

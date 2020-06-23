@@ -39,6 +39,7 @@ void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 
 	DOREPLIFETIME(URTSProductionComponent, ProductionQueues);
     DOREPLIFETIME(URTSProductionComponent, MostRecentProduct);
+    DOREPLIFETIME(URTSProductionComponent, RallyPoint);
 }
 
 void URTSProductionComponent::BeginPlay()
@@ -163,6 +164,12 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
             OnProductionProgressChanged.Broadcast(OwningActor, QueueIndex, GetProgressPercentage(QueueIndex));
         }
 	}
+
+    // Verify rally points.
+    if (RallyPoint.bIsSet && IsValid(RallyPoint.TargetActor) && !URTSGameplayLibrary::IsVisibleForActor(GetOwner(), RallyPoint.TargetActor))
+    {
+        ClearRallyPoint();
+    }
 }
 
 bool URTSProductionComponent::CanAssignProduction(TSubclassOf<AActor> ProductClass) const
@@ -390,6 +397,9 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 
     MostRecentProduct = Product;
 
+    // Use rally point.
+    IssueRallyPointDependentOrder(Product);
+
 	// Notify listeners.
 	NotifyOnProductionFinished(GetOwner(), Product, QueueIndex);
 
@@ -482,6 +492,25 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 	}
 }
 
+void URTSProductionComponent::SetRallyPointToActor(AActor* Target)
+{
+    RallyPoint.TargetActor = Target;
+    RallyPoint.bIsSet = true;
+}
+
+void URTSProductionComponent::SetRallyPointToLocation(const FVector& TargetLocation)
+{
+    RallyPoint.TargetActor = nullptr;
+    RallyPoint.TargetLocation = TargetLocation;
+    RallyPoint.bIsSet = true;
+}
+
+void URTSProductionComponent::ClearRallyPoint()
+{
+    RallyPoint.TargetActor = nullptr;
+    RallyPoint.bIsSet = false;
+}
+
 TArray<TSubclassOf<AActor>> URTSProductionComponent::GetAvailableProducts() const
 {
     return AvailableProducts;
@@ -495,6 +524,11 @@ int32 URTSProductionComponent::GetQueueCount() const
 int32 URTSProductionComponent::GetCapacityPerQueue() const
 {
     return CapacityPerQueue;
+}
+
+FRTSProductionRallyPoint URTSProductionComponent::GetRallyPoint() const
+{
+    return RallyPoint;
 }
 
 void URTSProductionComponent::NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex)
@@ -564,6 +598,23 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 
 	// Notify listeners.
 	OnProductionStarted.Broadcast(GetOwner(), ProductClass, QueueIndex, ProductionTime);
+}
+
+void URTSProductionComponent::IssueRallyPointDependentOrder(AActor* ProducedActor)
+{
+    if (!RallyPoint.bIsSet)
+    {
+        return;
+    }
+
+    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(ProducedActor->GetOwner());
+
+    if (!IsValid(PlayerController))
+    {
+        return;
+    }
+
+    PlayerController->IssueDefaultOrderToActor(ProducedActor, RallyPoint.TargetActor, RallyPoint.TargetLocation);
 }
 
 void URTSProductionComponent::ReceivedProductionQueues()

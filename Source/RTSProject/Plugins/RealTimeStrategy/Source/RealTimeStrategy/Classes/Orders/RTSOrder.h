@@ -22,8 +22,14 @@ class REALTIMESTRATEGY_API URTSOrder : public UObject
     GENERATED_BODY()
 
 public:
+    /** Whether the specified actor can obey this order. */
+    virtual bool CanObeyOrder(const AActor* OrderedActor, int32 Index) const;
+
     /** Whether the specified actor and/or location is a valid target for this order. */
     virtual bool IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
+
+    /** Issues this order to the specified actor. */
+    virtual void IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
 
     /** Gets the target required by this order. */
     ERTSOrderTargetType GetTargetType() const;

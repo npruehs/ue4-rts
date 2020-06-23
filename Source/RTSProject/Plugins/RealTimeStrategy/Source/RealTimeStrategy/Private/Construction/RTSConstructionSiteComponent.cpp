@@ -38,6 +38,7 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 	bStartImmediately = true;
 
     InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed());
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

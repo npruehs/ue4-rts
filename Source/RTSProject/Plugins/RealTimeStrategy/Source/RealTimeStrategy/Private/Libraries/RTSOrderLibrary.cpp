@@ -7,6 +7,31 @@
 #include "Orders/RTSOrderTagRequirements.h"
 
 
+bool URTSOrderLibrary::CanObeyOrder(TSubclassOf<URTSOrder> OrderClass, const AActor* OrderedActor, int32 Index)
+{
+    if (OrderClass == nullptr)
+    {
+        return false;
+    }
+
+    if (!IsValid(OrderedActor))
+    {
+        return false;
+    }
+
+    const URTSOrder* Order = OrderClass->GetDefaultObject<URTSOrder>();
+
+    FGameplayTagContainer OrderedActorTags = URTSGameplayTagLibrary::GetGameplayTags(OrderedActor);
+    FRTSOrderTagRequirements TagRequirements = Order->GetIssueTagRequirements();
+
+    if (!URTSGameplayTagLibrary::MeetsTagRequirements(OrderedActorTags, TagRequirements.SourceRequiredTags, TagRequirements.SourceBlockedTags))
+    {
+        return false;
+    }
+
+    return Order->CanObeyOrder(OrderedActor, Index);
+}
+
 bool URTSOrderLibrary::IsValidOrderTarget(TSubclassOf<URTSOrder> OrderClass, const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index)
 {
     if (OrderClass == nullptr)
@@ -34,6 +59,27 @@ bool URTSOrderLibrary::IsValidOrderTarget(TSubclassOf<URTSOrder> OrderClass, con
     }
 
     return Order->IsValidTarget(OrderedActor, TargetData, Index);
+}
+
+void URTSOrderLibrary::IssueOrder(TSubclassOf<URTSOrder> OrderClass, AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index)
+{
+    if (OrderClass == nullptr)
+    {
+        return;
+    }
+
+    OrderClass->GetDefaultObject<URTSOrder>()->IssueOrder(OrderedActor, TargetData, Index);
+}
+
+void URTSOrderLibrary::IssueOrder(AActor* OrderedActor, const FRTSOrderData& Order)
+{
+    if (!IsValid(OrderedActor))
+    {
+        return;
+    }
+
+    FRTSOrderTargetData OrderTargetData = GetOrderTargetData(OrderedActor, Order.TargetActor, Order.TargetLocation);
+    IssueOrder(Order.OrderClass, OrderedActor, OrderTargetData, Order.Index);
 }
 
 ERTSOrderGroupExecutionType URTSOrderLibrary::GetOrderGroupExecutionType(TSubclassOf<URTSOrder> OrderClass)
