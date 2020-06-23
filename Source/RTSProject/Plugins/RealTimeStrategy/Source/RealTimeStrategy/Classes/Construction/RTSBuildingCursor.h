@@ -89,7 +89,7 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Grid", meta = (EditCondition = "bCheckCollision"))
     TArray<TEnumAsByte<EObjectTypeQuery>> BuildingLocationDetectionChannels;
 
-    /** Whether to check navigation for each grid cell. */
+    /** Whether to check navigation for each grid cell. You should enable Allow Client Side Navigation in your project settings when using this. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Grid")
     bool bCheckNavigation;
 

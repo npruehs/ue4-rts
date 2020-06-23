@@ -25,7 +25,7 @@ ARTSBuildingCursor::ARTSBuildingCursor(const FObjectInitializer& ObjectInitializ
     BuildingLocationDetectionChannels.Add(EObjectTypeQuery::ObjectTypeQuery2); // WorldDynamic
     BuildingLocationDetectionChannels.Add(EObjectTypeQuery::ObjectTypeQuery3); // Pawn
 
-    bCheckNavigation = true;
+    bCheckNavigation = false;
     NavigationQueryFilterClass = URecastFilter_UseDefaultArea::StaticClass();
     NavigationQueryExtent = FVector(10.0f, 10.0f, 1000.0f);
 
