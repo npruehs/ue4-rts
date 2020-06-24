@@ -34,6 +34,8 @@ For the plugin, you'll design and create your maps the same way you're used to w
 
 1. Add an `RTSVisionVolume` to the very center of your map, encompassing the whole valid visible map area.
 1. Set the _Size In Tiles_ of the vision volume to match your minimap background images (e.g. 256).
+1. Set the _Tile Height_ of the vision volume to the height of a single height level of your map, in cm (e.g. 250).
+1. Set the _Height Level Trace Channel_ if you want special geometry to affect your height levels, only.
 1. Add a `PostProcessVolume` to your map, and check _Infinite Extent (Unbound)_.
 1. Add an `RTSFogOfWarActor` to your map.
 1. Set the _Fog Of War Volume_ reference to the post process volume created before.

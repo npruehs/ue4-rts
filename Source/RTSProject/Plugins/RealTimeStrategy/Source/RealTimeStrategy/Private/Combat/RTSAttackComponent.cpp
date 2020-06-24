@@ -7,6 +7,7 @@
 #include "RTSLog.h"
 #include "RTSPlayerAdvantageComponent.h"
 #include "Combat/RTSProjectile.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -24,6 +25,8 @@ URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitial
 	DefaultAttack.Range = 200.0f;
 
 	Attacks.Add(DefaultAttack);
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanAttack());
 }
 
 void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)

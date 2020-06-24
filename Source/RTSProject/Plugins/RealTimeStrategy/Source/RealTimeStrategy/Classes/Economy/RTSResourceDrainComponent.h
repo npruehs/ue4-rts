@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
+
 #include "Templates/SubclassOf.h"
 
 #include "Economy/RTSResourceType.h"
@@ -17,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSResourceDrainComponentResource
 * Allows resources to be returned to the actor.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSResourceDrainComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSResourceDrainComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 

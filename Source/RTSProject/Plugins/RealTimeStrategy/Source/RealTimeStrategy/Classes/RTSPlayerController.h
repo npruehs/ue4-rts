@@ -6,6 +6,9 @@
 #include "Templates/SubclassOf.h"
 
 #include "RTSControlGroup.h"
+#include "RTSSelectionCameraFocusMode.h"
+#include "Orders/RTSOrder.h"
+#include "Orders/RTSOrderData.h"
 
 #include "RTSPlayerController.generated.h"
 
@@ -35,6 +38,8 @@ public:
     
     virtual void PlayerTick(float DeltaTime) override;
 
+    virtual void InitPlayerState() override;
+    virtual void OnRep_PlayerState() override;
 
 	/** Gets the actor currently hovered by this player. */
 	UFUNCTION(BlueprintPure)
@@ -60,6 +65,13 @@ public:
 	/** Gets the team this player belongs to. */
 	UFUNCTION(BlueprintPure)
 	ARTSTeamInfo* GetTeamInfo() const;
+
+    /** Issues the specified order to all selected units. */
+    UFUNCTION(BlueprintCallable)
+    bool IssueOrderToSelectedActors(const FRTSOrderData& Order);
+
+    /** Issues the first successful default order for the specified targets to the passed actor. */
+    void IssueDefaultOrderToActor(AActor* Actor, AActor* TargetActor, const FVector& TargetLocation);
 
 	/** Orders all selected units to attack the specified unit. */
 	UFUNCTION(BlueprintCallable)
@@ -98,7 +110,35 @@ public:
 
 	/** Selects the specified actors. */
 	UFUNCTION(BlueprintCallable)
-	void SelectActors(TArray<AActor*> Actors);
+	void SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode);
+
+    /** Gets the currently selected subgroup of selected actors. */
+    UFUNCTION(BlueprintPure)
+    TSubclassOf<AActor> GetSelectedSubgroup() const;
+
+    /** Gets any member of the currently selected subgroup of selected actors. */
+    UFUNCTION(BlueprintPure)
+    AActor* GetSelectedSubgroupActor();
+
+    /** Gets all members of the currently selected subgroup of selected actors. */
+    UFUNCTION(BlueprintPure)
+    void GetSelectedSubgroupActors(TArray<AActor*>& OutActors) const;
+
+    /** Selects the first subgroup of selected actors. */
+    UFUNCTION(BlueprintCallable)
+    void SelectFirstSubgroup();
+
+    /** Selects the next subgroup of selected actors, wrapping around. */
+    UFUNCTION(BlueprintCallable)
+    void SelectNextSubgroup();
+
+    /** Selects the previous subgroup of selected actors, wrapping around. */
+    UFUNCTION(BlueprintCallable)
+    void SelectPreviousSubgroup();
+
+    /** Selects the specified subgroup of selected actors. */
+    UFUNCTION(Category = RTS, BlueprintCallable)
+    void SelectSubgroup(TSubclassOf<AActor> NewSubgroup);
 
 	/** Saves the current selection to the specified control group. */
 	UFUNCTION(BlueprintCallable)
@@ -129,6 +169,40 @@ public:
 	UFUNCTION(BlueprintCallable) void LoadControlGroup7();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup8();
 	UFUNCTION(BlueprintCallable) void LoadControlGroup9();
+
+    /** Makes the camera focus the specified world location. */
+    UFUNCTION(BlueprintCallable)
+    void FocusCameraOnLocation(FVector2D NewCameraLocation);
+
+    /** Makes the camera focus the specified actor. */
+    UFUNCTION(BlueprintCallable)
+    void FocusCameraOnActor(AActor* Actor);
+
+    /** Makes the camera focus the specified actors. */
+    UFUNCTION(BlueprintCallable)
+    void FocusCameraOnActors(TArray<AActor*> Actors);
+
+    /** Saves the current camera location to the specified index. */
+    UFUNCTION(BlueprintCallable)
+    void SaveCameraLocation(int32 Index);
+
+    /** Saves the current camera location to the specified index. */
+    template <int32 Index>
+    void SaveCameraLocationWithIndex()
+    {
+        SaveCameraLocation(Index);
+    }
+
+    /** Restores the camera location with the specified index. */
+    UFUNCTION(BlueprintCallable)
+    void LoadCameraLocation(int32 Index);
+
+    /** Restores the camera location with the specified index. */
+    template <int32 Index>
+    void LoadCameraLocationWithIndex()
+    {
+        LoadCameraLocation(Index);
+    }
 
 	/** Whether the hotkey for showing all construction progress bars is currently pressed, or not. */
 	UFUNCTION(BlueprintPure)
@@ -191,6 +265,9 @@ public:
     /** Event when the game has ended. */
     virtual void NotifyOnGameHasEnded(bool bIsWinner);
 
+    /** Event when a pawn has received an order. */
+    virtual void NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
+
 	/** Event when an actor has received an attack order. */
 	virtual void NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
 
@@ -214,6 +291,9 @@ public:
 
 	/** Event when the player has clicked a spot on the minimap. */
 	virtual void NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
+
+    /** Event when the a new subgroup of actors has been selected. */
+    virtual void NotifyOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup);
 
     /** Event when the set of selected actors of this player has changed. */
     virtual void NotifyOnSelectionChanged(const TArray<AActor*>& Selection);
@@ -252,6 +332,10 @@ public:
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Game", meta = (DisplayName = "OnGameHasEnded"))
     void ReceiveOnGameHasEnded(bool bIsWinner);
 
+    /** Event when a pawn has received an order. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedOrder"))
+    void ReceiveOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
+
 	/** Event when an actor has received an attack order. */
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Orders", meta = (DisplayName = "OnIssuedAttackOrder"))
 	void ReceiveOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target);
@@ -284,6 +368,14 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Minimap", meta = (DisplayName = "OnMinimapClicked"))
 	void ReceiveOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition);
 
+    /** Event when the player state has been set up or replicated for this player. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS", meta = (DisplayName = "OnPlayerStateAvailable"))
+    void ReceiveOnPlayerStateAvailable(ARTSPlayerState* NewPlayerState);
+
+    /** Event when the a new subgroup of actors has been selected. */
+    UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectedSubgroupChanged"))
+    void ReceiveOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup);
+
     /** Event when the set of selected actors of this player has changed. */
     UFUNCTION(BlueprintImplementableEvent, Category = "RTS|Selection", meta = (DisplayName = "OnSelectionChanged"))
     void ReceiveOnSelectionChanged(const TArray<AActor*>& Selection);
@@ -301,6 +393,9 @@ protected:
     virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+    /** Player state has been created or replicated and is now available. */
+    virtual void OnPlayerStateAvailable(ARTSPlayerState* NewPlayerState);
 
 private:
     /** Movement speed of the camera when moved with keys or mouse, in cm/sec. */
@@ -323,9 +418,21 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
     int32 CameraScrollThreshold;
 
+    /** Time between two group selections to be considered a double-selection (e.g. for centering the camera on that group). */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Input", meta = (ClampMin = 0))
+    float DoubleGroupSelectionTime;
+
     /** Preview to use for placing buildings. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Construction")
     TSubclassOf<ARTSBuildingCursor> BuildingCursorClass;
+
+    /** Orders that should be tried to apply for the input action IssueOrder, in order. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Orders")
+    TArray<TSubclassOf<URTSOrder>> DefaultOrders;
+
+    /** Actor classes which should be ignored when tracing for default order targets. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS|Orders")
+    TArray<TSubclassOf<AActor>> DefaultOrderIgnoreTargetClasses;
 
     /** Provides bonuses for various gameplay elements for this player. */
     UPROPERTY(VisibleAnywhere, Category = "RTS")
@@ -362,6 +469,15 @@ private:
     /** Actors selected by this player. */
     UPROPERTY()
     TArray<AActor*> SelectedActors;
+
+    /** Type of actors whose subgroup is currently selected. */
+    TSubclassOf<AActor> SelectedSubgroup;
+
+    /** Last time a group was selected. */
+    float LastSelectionTime;
+
+    /** Saved camera locations of this player. */
+    TArray<FVector> CameraLocations;
 
 	/** Type of the building currently being placed, if any. */
 	TSubclassOf<AActor> BuildingBeingPlacedClass;
@@ -409,38 +525,24 @@ private:
 
     /** Automatically issues the most reasonable order for the current pointer position. */
     UFUNCTION()
-    void IssueOrder();
+    void IssueDefaultOrderToSelectedActors();
 
 	/** Automatically issues the most reasonable order for the specified targets. */
-	void IssueOrderTargetingObjects(TArray<FHitResult>& HitResults);
+	void IssueOrderTargetingObjectsToSelectedActors(TArray<FHitResult>& HitResults);
+
+    /** Gets any member of the currently selected subgroup of selected actors. */
+    bool GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex);
+
+    /** Selects the next or previous subgroup. */
+    void SelectNextSubgroupInDirection(int32 Sign);
 
 	/** Cancels constructing the specified actor, destroying the construction site. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerCancelConstruction(AActor* ConstructionSite);
 
-	/** Orders the passed unit to attack the specified unit. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueAttackOrder(APawn* OrderedPawn, AActor* Target);
-	
-	/** Orders a selected builder to construct the specified building at the passed location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueBeginConstructionOrder(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation);
-	
-	/** Orders selected gatherers to gather resources from the specified source. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueGatherOrder(APawn* OrderedPawn, AActor* ResourceSource);
-
-	/** Orders selected builders to finish constructing the specified building. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueContinueConstructionOrder(APawn* OrderedPawn, AActor* ConstructionSite);
-
-	/** Orders the passed unit to move to the specified location. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation);
-
-	/** Orders the passed unit to stop all current actions. */
-	UFUNCTION(Reliable, Server, WithValidation)
-	void ServerIssueStopOrder(APawn* OrderedPawn);
+    /** Issues the specified order to the passed pawn. */
+    UFUNCTION(Reliable, Server, WithValidation)
+    void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
 	/** Start producing the specified product at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)
@@ -462,6 +564,9 @@ private:
 
     /** Applies zoom input to camera movement. */
     void ZoomCamera(float Value);
+
+    /** Gets the distance from the player camera to an object, on the ground, in cm. */
+    float GetCameraDistance() const;
 
     /** Remembers the current mouse position for multi-selection, finished by FinishSelectActors. */
     UFUNCTION()

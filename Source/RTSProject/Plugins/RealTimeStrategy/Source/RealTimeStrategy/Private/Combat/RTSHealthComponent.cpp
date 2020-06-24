@@ -5,10 +5,13 @@
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSGameMode.h"
+#include "RTSGameplayTagsComponent.h"
 #include "RTSLog.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 
 
 URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -20,6 +23,8 @@ URTSHealthComponent::URTSHealthComponent(const FObjectInitializer& ObjectInitial
 	MaximumHealth = 100.0f;
     bRegenerateHealth = false;
     ActorDeathType = ERTSActorDeathType::DEATH_Destroy;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Alive());
 }
 
 void URTSHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -74,7 +79,7 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
     // Notify listeners.
     AActor* Owner = GetOwner();
 
-    OnHealthChanged.Broadcast(Owner, OldHealth, NewHealth, DamageCauser);
+    NotifyOnHealthChanged(Owner, OldHealth, NewHealth, DamageCauser);
 
     if (GetWorld() && OldHealth > NewHealth)
     {
@@ -88,6 +93,9 @@ void URTSHealthComponent::SetCurrentHealth(float NewHealth, AActor* DamageCauser
 
         // Get owner before destruction.
         AController* OwningPlayer = Cast<AController>(Owner->GetOwner());
+
+        // Remove Alive tag.
+        URTSGameplayTagLibrary::RemoveGameplayTag(Owner, URTSGameplayTagLibrary::Status_Changing_Alive());
 
         // Notify listeners.
         OnKilled.Broadcast(Owner, OwningPlayer, DamageCauser);
@@ -124,6 +132,19 @@ float URTSHealthComponent::GetLastTimeDamageTaken() const
     return LastTimeDamageTaken;
 }
 
+void URTSHealthComponent::NotifyOnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser)
+{
+    // Notify listeners.
+    OnHealthChanged.Broadcast(Actor, OldHealth, NewHealth, DamageCauser);
+
+    // Play sound.
+    if (NewHealth <= 0.0f && IsValid(DeathSound))
+    {
+        UGameplayStatics::PlaySoundAtLocation(this, DeathSound,
+            Actor->GetActorLocation(), Actor->GetActorRotation());
+    }
+}
+
 void URTSHealthComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
     SetCurrentHealth(CurrentHealth - Damage, DamageCauser);
@@ -142,5 +163,5 @@ void URTSHealthComponent::OnHealthRegenerationTimerElapsed()
 
 void URTSHealthComponent::ReceivedCurrentHealth(float OldHealth)
 {
-    OnHealthChanged.Broadcast(GetOwner(), OldHealth, CurrentHealth, nullptr);
+    NotifyOnHealthChanged(GetOwner(), OldHealth, CurrentHealth, nullptr);
 }

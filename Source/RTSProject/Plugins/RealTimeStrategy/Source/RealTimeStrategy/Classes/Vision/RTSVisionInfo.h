@@ -5,6 +5,7 @@
 #include "GameFramework/Info.h"
 
 #include "Vision/RTSVisionState.h"
+#include "Vision/RTSVisionTile.h"
 
 #include "RTSVisionInfo.generated.h"
 
@@ -30,7 +31,8 @@ public:
     /** Prepares this actor for gameplay. */
     void Initialize(ARTSVisionVolume* InVisionVolume);
 
-	virtual void Tick(float DeltaSeconds) override;
+    /** Whether vision info is already set up and available. */
+    bool IsInitialized() const;
 
     /** Whether the whole map is currently being considered revealed (e.g. cheat, cinematic mode.) */
     bool IsRevealed() const;
@@ -51,7 +53,16 @@ public:
 	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"))
 	static ARTSVisionInfo* GetVisionInfoForTeam(UObject* WorldContextObject, uint8 InTeamIndex);
 
+    /** Applies vision for the passed actor for this team. */
+    void ApplyVisionForActor(AActor* Actor, TArray<int32>& CachedTiles);
+
+    /** Resets all vision applied by the passed actor for this team. */
+    void ResetVisionForActor(AActor* Actor);
+
 private:
+    /** Whether vision info is already set up and available. */
+    bool bInitialized;
+
     /** Whether the whole map is currently being considered revealed (e.g. cheat, cinematic mode.) */
     bool bRevealed;
 
@@ -62,8 +73,15 @@ private:
     UPROPERTY()
 	ARTSVisionVolume* VisionVolume;
 
-	/** Which tiles are currently unknown, known and visible. */
-	TArray<ERTSVisionState> Tiles;
+    /** Which tiles are currently known. */
+    TArray<bool> KnownTiles;
+
+    /** Which tiles are currently visible. */
+    UPROPERTY()
+    TArray<FRTSVisionTile> VisibleTiles;
+
+    /** Temporary grid for line of sight checks. */
+    TArray<int32> LocalVisionGrid;
 
 	bool GetTileCoordinates(int Index, int* OutX, int* OutY) const;
 	int32 GetTileIndex(int X, int Y) const;
@@ -72,4 +90,9 @@ private:
 
 	UFUNCTION()
 	virtual void ReceivedTeamIndex();
+
+    /** Checks whether we've got vision on the specified tile; cached for a short duration. */
+    bool HasLocalVisionAt(int32 LocalTileX, int32 LocalTileY, int32 ActorSightRadiusTile, int32 GlobalTileX,
+        int32 GlobalTileY, int32 ActorLocationTileX, int32 ActorLocationTileY,
+        int32 ActorLocationHeightLevel);
 };

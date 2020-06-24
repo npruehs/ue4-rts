@@ -1,5 +1,6 @@
 #include "RTSOwnerComponent.h"
 
+#include "Engine/World.h"
 #include "GameFramework/Controller.h"
 #include "Net/UnrealNetwork.h"
 
@@ -30,22 +31,26 @@ ARTSPlayerState* URTSOwnerComponent::GetPlayerOwner() const
 
 void URTSOwnerComponent::SetPlayerOwner(AController* Controller)
 {
-	ARTSPlayerState* PreviousOwner = PlayerOwner;
+    if (!IsValid(Controller))
+    {
+        SetPlayerStateOwner(nullptr);
+    }
+    else
+    {
+        SetPlayerStateOwner(Cast<ARTSPlayerState>(Controller->PlayerState));
+    }
+}
 
-	if (!Controller)
-	{
-		PlayerOwner = nullptr;
-	}
-	else
-	{
-		PlayerOwner = Cast<ARTSPlayerState>(Controller->PlayerState);
-	}
+void URTSOwnerComponent::SetPlayerStateOwner(ARTSPlayerState* PlayerState)
+{
+    ARTSPlayerState* PreviousOwner = PlayerOwner;
 
-	if (PlayerOwner != PreviousOwner)
-	{
-		// Notify listeners.
-		OnOwnerChanged.Broadcast(GetOwner(), Controller);
-	}
+    PlayerOwner = PlayerState;
+
+    if (PlayerOwner != PreviousOwner)
+    {
+        NotifyOnOwnerChanged(PreviousOwner, PlayerOwner);
+    }
 }
 
 bool URTSOwnerComponent::IsSameTeamAsActor(AActor* Other) const
@@ -90,4 +95,32 @@ bool URTSOwnerComponent::IsSameTeamAsController(AController* C) const
 uint8 URTSOwnerComponent::GetInitialOwnerPlayerIndex()
 {
     return InitialOwnerPlayerIndex;
+}
+
+void URTSOwnerComponent::ReceivedPlayerOwner(ARTSPlayerState* PreviousOwner)
+{
+    NotifyOnOwnerChanged(PreviousOwner, PlayerOwner);
+}
+
+void URTSOwnerComponent::NotifyOnOwnerChanged(ARTSPlayerState* PreviousOwner, ARTSPlayerState* NewOwner)
+{
+    // Notify listeners.
+    OnOwnerChanged.Broadcast(GetOwner(), Cast<AController>(NewOwner->GetOwner()));
+
+    UWorld* World = GetWorld();
+
+    if (IsValid(World))
+    {
+        for (FConstControllerIterator It = World->GetControllerIterator(); It; ++It)
+        {
+            TWeakObjectPtr<AController> Controller = *It;
+            ARTSPlayerState* PlayerState = Controller->GetPlayerState<ARTSPlayerState>();
+
+            if (IsValid(PlayerState) && (PlayerState == PreviousOwner || PlayerState == NewOwner))
+            {
+                PlayerState->NotifyOnActorOwnerChanged(GetOwner(), PreviousOwner, NewOwner);
+                continue;
+            }
+        }
+    }
 }

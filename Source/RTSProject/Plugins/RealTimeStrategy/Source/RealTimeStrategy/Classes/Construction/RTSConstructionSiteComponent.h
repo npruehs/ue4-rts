@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
+
 #include "Templates/SubclassOf.h"
 
 #include "Construction/RTSConstructionState.h"
@@ -10,6 +11,9 @@
 #include "Economy/RTSResourceType.h"
 
 #include "RTSConstructionSiteComponent.generated.h"
+
+
+class USoundCue;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSConstructionSiteComponentConstructionStartedSignature, AActor*, ConstructionSite, float, TotalConstructionTime);
@@ -22,7 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSConstructionSiteComponentCons
 
 /** Allows constructing the actor over time. */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 
@@ -30,7 +34,7 @@ public:
 	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+    virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer) override;
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
@@ -107,6 +111,10 @@ public:
     UFUNCTION(BlueprintPure)
     bool DoesStartImmediately() const;
 
+    /** Gets the width and height of the construction site, in grid tiles. */
+    UFUNCTION(BlueprintPure)
+    int32 GetGridWidthAndHeight() const;
+
     /** Whether the attack range of the building should be previewed while selecting a construction location. */
     bool ShouldPreviewAttackRange() const;
 
@@ -121,6 +129,9 @@ public:
     /** Gets the builders currently working at this construction site. */
     UFUNCTION(BlueprintPure)
     TArray<AActor*> GetAssignedBuilders() const;
+
+    /** Event when the construction timer has been updated. */
+    virtual void NotifyOnConstructionProgressChanged(AActor* ConstructionSite, float ProgressPercentage);
 
 	/** Event when the construction timer has been started. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -187,9 +198,17 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     bool bStartImmediately;
 
+    /** Width and height of the construction site, in grid tiles. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+    int32 GridWidthAndHeight;
+
     /** Whether the attack range of the building should be previewed while selecting a construction location. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     bool bPreviewAttackRange;
+
+    /** Sound to play when the actor finished construction. */
+    UPROPERTY(EditDefaultsOnly, Category = "RTS")
+    USoundCue* FinishedSound;
 
 	/** Whether the construction timer is currently being ticked, or not. */
     UPROPERTY(EditInstanceOnly, Replicated, Category = "RTS")

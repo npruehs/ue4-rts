@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
+#include "RTSActorComponent.h"
+
 #include "Templates/SubclassOf.h"
 
 #include "Economy/RTSGatherData.h"
@@ -22,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSGathererComponentResourcesRetu
 * Allows the actor to gather resources.
 */
 UCLASS(meta = (BlueprintSpawnableComponent))
-class REALTIMESTRATEGY_API URTSGathererComponent : public UActorComponent
+class REALTIMESTRATEGY_API URTSGathererComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
 
@@ -61,6 +62,10 @@ public:
 	/** Whether this gatherer is currently gathering resources. */
 	UFUNCTION(BlueprintPure)
 	bool IsGathering() const;
+
+    /** Gets the type of resource the actor is carrying. */
+    UFUNCTION(BlueprintPure)
+    TSubclassOf<class URTSResourceType> GetCarriedResourceType() const;
 
 	/** Starts the cooldown timer for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
@@ -125,4 +130,5 @@ private:
 	bool GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData) const;
 	bool GetGatherDataForResourceType(TSubclassOf<URTSResourceType> ResourceType, FRTSGatherData* OutGatherData) const;
 	void LeaveCurrentResourceSource();
+    void SetCarriedResourceAmount(float NewAmount);
 };

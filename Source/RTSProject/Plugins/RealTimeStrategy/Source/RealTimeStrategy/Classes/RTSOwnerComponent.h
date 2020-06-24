@@ -37,6 +37,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerOwner(AController* Controller);
 
+    /** Sets the player owning the actor. */
+    UFUNCTION(BlueprintCallable)
+    void SetPlayerStateOwner(ARTSPlayerState* PlayerState);
+
 
 	/** Checks whether the actor belongs to the same team as the specified one. */
 	UFUNCTION(BlueprintPure)
@@ -61,6 +65,12 @@ private:
     uint8 InitialOwnerPlayerIndex;
 
 	/** Player owning this actor. */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=ReceivedPlayerOwner)
 	ARTSPlayerState* PlayerOwner;
+
+
+    UFUNCTION()
+    void ReceivedPlayerOwner(ARTSPlayerState* PreviousOwner);
+
+    void NotifyOnOwnerChanged(ARTSPlayerState* PreviousOwner, ARTSPlayerState* NewOwner);
 };

@@ -1,7 +1,9 @@
 #include "Construction/RTSConstructionSiteComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSContainerComponent.h"
 #include "RTSGameplayTagsComponent.h"
@@ -11,6 +13,7 @@
 #include "Construction/RTSBuilderComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceType.h"
+#include "Libraries/RTSGameplayLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
 
 
@@ -33,6 +36,9 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
     InitialHealthPercentage = 0.1f;
 	RefundFactor = 0.5f;
 	bStartImmediately = true;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed());
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -41,6 +47,16 @@ void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 
 	DOREPLIFETIME(URTSConstructionSiteComponent, RemainingConstructionTime);
     DOREPLIFETIME(URTSConstructionSiteComponent, State);
+}
+
+void URTSConstructionSiteComponent::AddGameplayTags(FGameplayTagContainer& InOutTagContainer)
+{
+    Super::AddGameplayTags(InOutTagContainer);
+
+    if (State != ERTSConstructionState::CONSTRUCTIONSTATE_Finished)
+    {
+        InOutTagContainer.AddTag(URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
+    }
 }
 
 void URTSConstructionSiteComponent::BeginPlay()
@@ -183,15 +199,14 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
         HealthComponent->SetCurrentHealth(CurrentHealth + HealthIncrement, nullptr);
     }
 
+    // Notify listeners.
+    NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
+
 	// Check if finished.
 	if (RemainingConstructionTime <= 0)
 	{
 		FinishConstruction();
 	}
-    else
-    {
-        OnConstructionProgressChanged.Broadcast(GetOwner(), GetProgressPercentage());
-    }
 }
 
 bool URTSConstructionSiteComponent::CanAssignBuilder(AActor* Builder) const
@@ -302,6 +317,9 @@ void URTSConstructionSiteComponent::FinishConstruction()
 			OnBuilderConsumed.Broadcast(GetOwner(), Builder);
 		}
 	}
+
+    // Remove gameplay tags.
+    URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
 
 	// Notify listeners.
 	OnConstructionFinished.Broadcast(GetOwner());
@@ -414,6 +432,12 @@ bool URTSConstructionSiteComponent::DoesStartImmediately() const
 {
     return bStartImmediately;
 }
+
+int32 URTSConstructionSiteComponent::GetGridWidthAndHeight() const
+{
+    return GridWidthAndHeight;
+}
+
 bool URTSConstructionSiteComponent::ShouldPreviewAttackRange() const
 {
     return bPreviewAttackRange;
@@ -434,7 +458,24 @@ TArray<AActor*> URTSConstructionSiteComponent::GetAssignedBuilders() const
     return AssignedBuilders;
 }
 
+void URTSConstructionSiteComponent::NotifyOnConstructionProgressChanged(AActor* ConstructionSite, float ProgressPercentage)
+{
+    ProgressPercentage = FMath::Clamp(ProgressPercentage, 0.0f, 1.0f);
+
+    // Notify listeners.
+    OnConstructionProgressChanged.Broadcast(ConstructionSite, ProgressPercentage);
+
+    // Play sound.
+    if (ProgressPercentage >= 1.0f && URTSGameplayLibrary::IsOwnedByLocalPlayer(ConstructionSite))
+    {
+        if (IsValid(FinishedSound))
+        {
+            UGameplayStatics::PlaySound2D(this, FinishedSound);
+        }
+    }
+}
+
 void URTSConstructionSiteComponent::ReceivedRemainingConstructionTime()
 {
-    OnConstructionProgressChanged.Broadcast(GetOwner(), GetProgressPercentage());
+    NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
 }

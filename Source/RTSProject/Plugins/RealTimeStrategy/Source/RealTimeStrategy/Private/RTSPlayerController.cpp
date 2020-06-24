@@ -3,9 +3,8 @@
 #include "EngineUtils.h"
 #include "Landscape.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BrushComponent.h"
 #include "Components/InputComponent.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/SkeletalMesh.h"
@@ -24,9 +23,6 @@
 #include "RTSPlayerState.h"
 #include "RTSSelectableComponent.h"
 #include "RTSTeamInfo.h"
-#include "Libraries/RTSCollisionLibrary.h"
-#include "Libraries/RTSGameplayLibrary.h"
-#include "Libraries/RTSGameplayTagLibrary.h"
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Construction/RTSBuildingCursor.h"
@@ -34,6 +30,19 @@
 #include "Economy/RTSGathererComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Economy/RTSResourceSourceComponent.h"
+#include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSConstructionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
+#include "Libraries/RTSOrderLibrary.h"
+#include "Orders/RTSAttackOrder.h"
+#include "Orders/RTSBeginConstructionOrder.h"
+#include "Orders/RTSContinueConstructionOrder.h"
+#include "Orders/RTSGatherOrder.h"
+#include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSSetRallyPointToActorOrder.h"
+#include "Orders/RTSSetRallyPointToLocationOrder.h"
+#include "Orders/RTSStopOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
 #include "Vision/RTSFogOfWarActor.h"
@@ -55,6 +64,17 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
 	MaxCameraDistance = 2500.0f;
 
 	CameraScrollThreshold = 20.0f;
+
+    DoubleGroupSelectionTime = 0.2f;
+
+    DefaultOrders.Add(URTSAttackOrder::StaticClass());
+    DefaultOrders.Add(URTSGatherOrder::StaticClass());
+    DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
+    DefaultOrders.Add(URTSMoveOrder::StaticClass());
+    DefaultOrders.Add(URTSSetRallyPointToActorOrder::StaticClass());
+    DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
+
+    DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -89,7 +109,10 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Pressed, this, &ARTSPlayerController::StartToggleSelection);
 	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Released, this, &ARTSPlayerController::StopToggleSelection);
 
-	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueOrder);
+    InputComponent->BindAction(TEXT("SelectNextSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectNextSubgroup);
+    InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
+
+	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueDefaultOrderToSelectedActors);
 	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 
 	InputComponent->BindAction(TEXT("SaveControlGroup0"), IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
@@ -118,6 +141,18 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAxis(TEXT("MoveCameraUpDown"), this, &ARTSPlayerController::MoveCameraUpDown);
     InputComponent->BindAxis(TEXT("ZoomCamera"), this, &ARTSPlayerController::ZoomCamera);
 
+    InputComponent->BindAction(TEXT("SaveCameraLocation0"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<0>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation1"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<1>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation2"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<2>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation3"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<3>);
+    InputComponent->BindAction(TEXT("SaveCameraLocation4"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<4>);
+
+    InputComponent->BindAction(TEXT("LoadCameraLocation0"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<0>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation1"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<1>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation2"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<2>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation3"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<3>);
+    InputComponent->BindAction(TEXT("LoadCameraLocation4"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<4>);
+
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowHealthBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingHealthBars);
@@ -143,13 +178,41 @@ void ARTSPlayerController::SetupInputComponent()
 		UE_LOG(LogRTS, Warning, TEXT("No RTSCameraBoundsVolume found. Camera will be able to move anywhere."));
 	}
 
-	// Setup control groups.
+	// Setup control groups and camera locations.
 	ControlGroups.SetNum(10);
+    CameraLocations.SetNum(5);
 }
 
 void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void ARTSPlayerController::OnPlayerStateAvailable(ARTSPlayerState* NewPlayerState)
+{
+    // Discover own actors.
+    ARTSPlayerState* RTSPlayerState = GetPlayerState();
+
+    if (IsValid(RTSPlayerState))
+    {
+        RTSPlayerState->DiscoverOwnActors();
+    }
+
+    // Setup fog of war.
+    ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
+
+    if (IsValid(GameState))
+    {
+        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+
+        if (IsValid(VisionManager))
+        {
+            VisionManager->SetLocalPlayerState(NewPlayerState);
+        }
+    }
+
+    // Notify listeners.
+    ReceiveOnPlayerStateAvailable(RTSPlayerState);
 }
 
 AActor* ARTSPlayerController::GetHoveredActor() const
@@ -227,6 +290,116 @@ ARTSTeamInfo* ARTSPlayerController::GetTeamInfo() const
 	}
 	
 	return nullptr;
+}
+
+bool ARTSPlayerController::IssueOrderToSelectedActors(const FRTSOrderData& Order)
+{
+    ERTSOrderGroupExecutionType GroupExecutionType = URTSOrderLibrary::GetOrderGroupExecutionType(Order.OrderClass);
+
+    bool bSuccess = false;
+
+    for (auto SelectedActor : SelectedActors)
+    {
+        APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+        if (!IsValid(SelectedPawn))
+        {
+            continue;
+        }
+
+        if (SelectedPawn->GetOwner() != this)
+        {
+            continue;
+        }
+
+        if (!URTSOrderLibrary::CanObeyOrder(Order.OrderClass, SelectedActor, Order.Index))
+        {
+            continue;
+        }
+
+        FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(SelectedActor, Order.TargetActor, Order.TargetLocation);
+
+        if (!URTSOrderLibrary::IsValidOrderTarget(Order.OrderClass, SelectedActor, TargetData, Order.Index))
+        {
+            continue;
+        }
+
+        // Send order to server.
+        ServerIssueOrder(SelectedPawn, Order);
+
+        if (IsNetMode(NM_Client))
+        {
+            // Notify listeners.
+            NotifyOnIssuedOrder(SelectedPawn, Order);
+        }
+
+        if (GroupExecutionType == ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any)
+        {
+            // Just send a single actor.
+            return true;
+        }
+
+        bSuccess = true;
+    }
+
+    return bSuccess;
+}
+
+void ARTSPlayerController::IssueDefaultOrderToActor(AActor* Actor, AActor* TargetActor, const FVector& TargetLocation)
+{
+    APawn* IssuedPawn = Cast<APawn>(Actor);
+
+    if (!IsValid(IssuedPawn))
+    {
+        return;
+    }
+
+    for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+    {
+        if (!URTSOrderLibrary::CanObeyOrder(OrderClass, IssuedPawn, 0))
+        {
+            continue;
+        }
+
+        FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(IssuedPawn, TargetActor, TargetLocation);
+
+        if (!URTSOrderLibrary::IsValidOrderTarget(OrderClass, IssuedPawn, TargetData, 0))
+        {
+            continue;
+        }
+
+        // Send order to server.
+        FRTSOrderData Order;
+        Order.OrderClass = OrderClass;
+        Order.TargetActor = TargetActor;
+        Order.TargetLocation = TargetLocation;
+
+        ServerIssueOrder(IssuedPawn, Order);
+        return;
+    }
+}
+
+void ARTSPlayerController::ServerIssueOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    if (!Order.OrderClass)
+    {
+        return;
+    }
+
+    FRTSOrderTargetData OrderTargetData;
+    OrderTargetData.Actor = Order.TargetActor;
+    OrderTargetData.Location = Order.TargetLocation;
+
+    Order.OrderClass->GetDefaultObject<URTSOrder>()->IssueOrder(OrderedPawn, OrderTargetData, Order.Index);
+
+    // Notify listeners.
+    NotifyOnIssuedOrder(OrderedPawn, Order);
+}
+
+bool ARTSPlayerController::ServerIssueOrder_Validate(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    // Verify owner to prevent cheating.
+    return OrderedPawn->GetOwner() == this;
 }
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults) const
@@ -331,7 +504,7 @@ bool ARTSPlayerController::IsSelectableActor(AActor* Actor) const
 	return true;
 }
 
-void ARTSPlayerController::IssueOrder()
+void ARTSPlayerController::IssueDefaultOrderToSelectedActors()
 {
     // Get objects at pointer position.
     TArray<FHitResult> HitResults;
@@ -341,10 +514,10 @@ void ARTSPlayerController::IssueOrder()
         return;
     }
 
-	IssueOrderTargetingObjects(HitResults);
+	IssueOrderTargetingObjectsToSelectedActors(HitResults);
 }
 
-void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitResults)
+void ARTSPlayerController::IssueOrderTargetingObjectsToSelectedActors(TArray<FHitResult>& HitResults)
 {
 	// Check if there's anybody to receive the order.
 	if (SelectedActors.Num() == 0)
@@ -352,429 +525,191 @@ void ARTSPlayerController::IssueOrderTargetingObjects(TArray<FHitResult>& HitRes
 		return;
 	}
 
-	// Get target location.
-    TOptional<FVector> TargetLocation;
-
+    // Try all default orders.
 	for (auto& HitResult : HitResults)
 	{
-        TargetLocation = HitResult.Location;
-
 		if (HitResult.Actor != nullptr)
 		{
-			// Issue attack order.
-			if (IssueAttackOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
-			
-			// Issue gather order.
-			if (IssueGatherOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
+            bool bIsIgnoredClass = false;
 
-			// Issue construct order.
-			if (IssueContinueConstructionOrder(HitResult.Actor.Get()))
-			{
-				return;
-			}
-
-            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
-
-            if (Landscape != nullptr)
+            for (TSubclassOf<AActor> IgnoredClass : DefaultOrderIgnoreTargetClasses)
             {
-                // Issue move order.
-                IssueMoveOrder(HitResult.Location);
-                return;
+                if (HitResult.Actor->IsA(IgnoredClass))
+                {
+                    bIsIgnoredClass = true;
+                    break;
+                }
+            }
+
+            if (bIsIgnoredClass)
+            {
+                continue;
+            }
+
+            for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+            {
+                FRTSOrderData Order;
+                Order.OrderClass = OrderClass;
+                Order.TargetActor = HitResult.Actor.Get();
+                Order.TargetLocation = HitResult.Location;
+
+                if (IssueOrderToSelectedActors(Order))
+                {
+                    return;
+                }
             }
 		}
 	}
+}
 
-    if (TargetLocation.IsSet())
+bool ARTSPlayerController::GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex)
+{
+    *OutSelectedSubgroupActor = nullptr;
+    *OutSelectedSubgroupActorIndex = -1;
+
+    if (SelectedActors.Num() <= 0)
     {
-        // Issue move order.
-        IssueMoveOrder(TargetLocation.GetValue());
+        return false;
+    }
+
+    for (int32 Index = 0; Index < SelectedActors.Num(); ++Index)
+    {
+        AActor* SelectedActor = SelectedActors[Index];
+
+        if (!IsValid(SelectedActors[Index]))
+        {
+            continue;
+        }
+
+        if (SelectedActor->GetClass() == GetSelectedSubgroup())
+        {
+            *OutSelectedSubgroupActor = SelectedActor;
+            *OutSelectedSubgroupActorIndex = Index;
+            return true;
+        }
+    }
+
+    // Selected subgroup invalid.
+    return false;
+}
+
+void ARTSPlayerController::SelectNextSubgroupInDirection(int32 Sign)
+{
+    // Find first actor in selected subgroup.
+    AActor* OldSelectedSubgroupActor = nullptr;
+    int32 OldSelectedSubgroupActorIndex = 0;
+
+    if (!GetSelectedSubgroupActorAndIndex(&OldSelectedSubgroupActor, &OldSelectedSubgroupActorIndex))
+    {
+        SelectFirstSubgroup();
+        return;
+    }
+
+    // Iterate all other selected actors, wrapping around.
+    AActor* NewSelectedSubgroupActor = nullptr;
+    int NewSelectedSubgroupActorIndex = OldSelectedSubgroupActorIndex + Sign;
+
+    while (SelectedActors.IsValidIndex(NewSelectedSubgroupActorIndex))
+    {
+        if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
+        {
+            NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
+            break;
+        }
+
+        NewSelectedSubgroupActorIndex += Sign;
+    }
+
+    if (!IsValid(NewSelectedSubgroupActor))
+    {
+        NewSelectedSubgroupActorIndex = Sign >= 0 ? 0 : SelectedActors.Num() - 1;
+
+        while (NewSelectedSubgroupActorIndex != OldSelectedSubgroupActorIndex)
+        {
+            if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
+            {
+                NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
+                break;
+            }
+
+            NewSelectedSubgroupActorIndex += Sign;
+        }
+    }
+
+    // Select new subgroup.
+    if (IsValid(NewSelectedSubgroupActor))
+    {
+        SelectSubgroup(NewSelectedSubgroupActor->GetClass());
     }
 }
 
 bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 {
-	if (!Target)
-	{
-		return false;
-	}
+    FRTSOrderData AttackOrder;
+    AttackOrder.OrderClass = URTSAttackOrder::StaticClass();
+    AttackOrder.TargetActor = Target;
 
-	if (!URTSGameplayTagLibrary::HasGameplayTag(Target, URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
-	{
-		return false;
-	}
-
-	ARTSTeamInfo* MyTeam = GetPlayerState()->GetTeam();
-
-	// Issue attack orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify target.
-		auto TargetOwnerComponent = Target->FindComponentByClass<URTSOwnerComponent>();
-
-		if (TargetOwnerComponent && TargetOwnerComponent->IsSameTeamAsActor(SelectedActor))
-		{
-			continue;
-		}
-
-		if (SelectedActor->FindComponentByClass<URTSAttackComponent>() == nullptr)
-		{
-			continue;
-		}
-
-		// Send attack order to server.
-		ServerIssueAttackOrder(SelectedPawn, Target);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *SelectedActor->GetName(), *Target->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedAttackOrder(SelectedPawn, Target);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-void ARTSPlayerController::ServerIssueAttackOrder_Implementation(APawn* OrderedPawn, AActor* Target)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue attack order.
-	PawnController->IssueAttackOrder(Target);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to attack %s."), *OrderedPawn->GetName(), *Target->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedAttackOrder(OrderedPawn, Target);
-}
-
-bool ARTSPlayerController::ServerIssueAttackOrder_Validate(APawn* OrderedPawn, AActor* Target)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+	return IssueOrderToSelectedActors(AttackOrder);
 }
 
 bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	// Find suitable selected builder.
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Check if builder.
-		auto BuilderComponent = SelectedPawn->FindComponentByClass<URTSBuilderComponent>();
-
-		if (!BuilderComponent)
-		{
-			continue;
-		}
-
-		// Check if builder knows about building.
-		if (!BuilderComponent->GetConstructibleBuildingClasses().Contains(BuildingClass))
-		{
-			continue;
-		}
-
-		// Send construction order to server.
-		ServerIssueBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *SelectedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
-
-            // Notify listeners.
-            NotifyOnIssuedBeginConstructionOrder(SelectedPawn, BuildingClass, TargetLocation);
-        }
-
-		// Just send one builder.
-		return true;
-	}
-
-	return false;
-}
-
-bool ARTSPlayerController::ServerIssueContinueConstructionOrder_Validate(APawn* OrderedPawn, AActor* ConstructionSite)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-void ARTSPlayerController::ServerIssueBeginConstructionOrder_Implementation(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue construction order.
-	PawnController->IssueBeginConstructionOrder(BuildingClass, TargetLocation);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to begin constructing %s at %s."), *OrderedPawn->GetName(), *BuildingClass->GetName(), *TargetLocation.ToString());
-
-	// Notify listeners.
-	NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, TargetLocation);
-}
-
-bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
-{
-	if (!ConstructionSite)
-	{
-		return false;
-	}
-
-	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
-
-	if (!ConstructionSiteComponent || ConstructionSiteComponent->IsFinished())
-	{
-		return false;
-	}
-
-	ARTSTeamInfo* MyTeam = GetPlayerState()->GetTeam();
-
-	// Issue construction orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify target.
-		auto TargetOwnerComponent = ConstructionSite->FindComponentByClass<URTSOwnerComponent>();
-
-		if (TargetOwnerComponent && !TargetOwnerComponent->IsSameTeamAsActor(SelectedActor))
-		{
-			continue;
-		}
-
-		if (SelectedActor->FindComponentByClass<URTSBuilderComponent>() == nullptr)
-		{
-			continue;
-		}
-
-		// Send construction order to server.
-		ServerIssueContinueConstructionOrder(SelectedPawn, ConstructionSite);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *SelectedActor->GetName(), *ConstructionSite->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedContinueConstructionOrder(SelectedPawn, ConstructionSite);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
-{
-	if (!ResourceSource)
-	{
-		return false;
-	}
-
-	auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
-
-	if (!ResourceSourceComponent)
-	{
-		return false;
-	}
-
-	// Issue gather orders.
-	bool bSuccess = false;
-
-	for (auto SelectedActor : SelectedActors)
-	{
-		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
-
-		if (!SelectedPawn)
-		{
-			continue;
-		}
-
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
-
-		// Verify gatherer.
-		auto GathererComponent = SelectedActor->FindComponentByClass<URTSGathererComponent>();
-		if (!GathererComponent || !GathererComponent->CanGatherFrom(ResourceSource))
-		{
-			continue;
-		}
-
-		// Send gather order to server.
-		ServerIssueGatherOrder(SelectedPawn, ResourceSource);
-
-        if (IsNetMode(NM_Client))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *SelectedActor->GetName(), *ResourceSource->GetName());
-
-            // Notify listeners.
-            NotifyOnIssuedGatherOrder(SelectedPawn, ResourceSource);
-        }
-
-		bSuccess = true;
-	}
-
-	return bSuccess;
-}
-
-void ARTSPlayerController::ServerIssueGatherOrder_Implementation(APawn* OrderedPawn, AActor* ResourceSource)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue gather order.
-	PawnController->IssueGatherOrder(ResourceSource);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to gather resources from %s."), *OrderedPawn->GetName(), *ResourceSource->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedGatherOrder(OrderedPawn, ResourceSource);
-}
-
-bool ARTSPlayerController::ServerIssueGatherOrder_Validate(APawn* OrderedPawn, AActor* ResourceSourc)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-void ARTSPlayerController::ServerIssueContinueConstructionOrder_Implementation(APawn* OrderedPawn, AActor* ConstructionSite)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue construction order.
-	PawnController->IssueContinueConstructionOrder(ConstructionSite);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to continue constructing %s."), *OrderedPawn->GetName(), *ConstructionSite->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedContinueConstructionOrder(OrderedPawn, ConstructionSite);
-}
-
-bool ARTSPlayerController::ServerIssueBeginConstructionOrder_Validate(APawn* OrderedPawn, TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
-{
-    // Issue move orders.
-	bool bSuccess = false;
+    // Determine index.
+    int32 BuildingIndex = INDEX_NONE;
 
     for (auto SelectedActor : SelectedActors)
     {
-        // Verify pawn and owner.
-        auto SelectedPawn = Cast<APawn>(SelectedActor);
-
-        if (!SelectedPawn)
+        if (!IsValid(SelectedActor) || SelectedActor->GetOwner() != this)
         {
             continue;
         }
 
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
+        BuildingIndex = URTSConstructionLibrary::GetConstructableBuildingIndex(SelectedActor, BuildingClass);
 
-		// Send move order to server.
-		ServerIssueMoveOrder(SelectedPawn, TargetLocation);
-
-        if (IsNetMode(NM_Client))
+        if (BuildingIndex != INDEX_NONE)
         {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *SelectedActor->GetName(), *TargetLocation.ToString());
-
-            // Notify listeners.
-            NotifyOnIssuedMoveOrder(SelectedPawn, TargetLocation);
+            break;
         }
-
-		bSuccess = true;
     }
 
-	return bSuccess;
+    if (BuildingIndex == INDEX_NONE) 
+    {
+        return false;
+    }
+
+    FRTSOrderData BeginConstructionOrder;
+    BeginConstructionOrder.OrderClass = URTSBeginConstructionOrder::StaticClass();
+    BeginConstructionOrder.TargetLocation = TargetLocation;
+    BeginConstructionOrder.Index = BuildingIndex;
+
+    return IssueOrderToSelectedActors(BeginConstructionOrder);
 }
 
-void ARTSPlayerController::ServerIssueMoveOrder_Implementation(APawn* OrderedPawn, const FVector& TargetLocation)
+bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
+    FRTSOrderData ContinueConstructionOrder;
+    ContinueConstructionOrder.OrderClass = URTSContinueConstructionOrder::StaticClass();
+    ContinueConstructionOrder.TargetActor = ConstructionSite;
 
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue move order.
-	PawnController->IssueMoveOrder(TargetLocation);
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to move to %s."), *OrderedPawn->GetName(), *TargetLocation.ToString());
-
-	// Notify listeners.
-	NotifyOnIssuedMoveOrder(OrderedPawn, TargetLocation);
+    return IssueOrderToSelectedActors(ContinueConstructionOrder);
 }
 
-bool ARTSPlayerController::ServerIssueMoveOrder_Validate(APawn* OrderedPawn, const FVector& TargetLocation)
+bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 {
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
+    FRTSOrderData GatherOrder;
+    GatherOrder.OrderClass = URTSGatherOrder::StaticClass();
+    GatherOrder.TargetActor = ResourceSource;
+
+    return IssueOrderToSelectedActors(GatherOrder);
+}
+
+bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
+{
+    FRTSOrderData MoveOrder;
+    MoveOrder.OrderClass = URTSMoveOrder::StaticClass();
+    MoveOrder.TargetLocation = TargetLocation;
+
+    return IssueOrderToSelectedActors(MoveOrder);
 }
 
 AActor* ARTSPlayerController::GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const
@@ -877,60 +812,56 @@ void ARTSPlayerController::IssueProductionOrder(TSubclassOf<AActor> ProductClass
 
 void ARTSPlayerController::IssueStopOrder()
 {
-	// Issue stop orders.
-	for (auto SelectedActor : SelectedActors)
-	{
-		// Verify pawn and owner.
-		auto SelectedPawn = Cast<APawn>(SelectedActor);
+    FRTSOrderData StopOrder;
+    StopOrder.OrderClass = URTSStopOrder::StaticClass();
+    
+    IssueOrderToSelectedActors(StopOrder);
+}
 
-		if (!SelectedPawn)
-		{
-			continue;
-		}
+void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode)
+{
+    // Check for double-selection.
+    UWorld* World = GetWorld();
 
-		if (SelectedPawn->GetOwner() != this)
-		{
-			continue;
-		}
+    if (!World)
+    {
+        return;
+    }
 
-		// Send stop order to server.
-		ServerIssueStopOrder(SelectedPawn);
+    const float CurrentSelectionTime = World->GetRealTimeSeconds();
+    const float SelectionTimeDelta = CurrentSelectionTime - LastSelectionTime;
+    LastSelectionTime = CurrentSelectionTime;
 
-        if (IsNetMode(NM_Client))
+    if (CameraFocusMode == ERTSSelectionCameraFocusMode::SELECTIONFOCUS_FocusOnDoubleSelection &&
+        DoubleGroupSelectionTime > 0.0f && SelectionTimeDelta < DoubleGroupSelectionTime)
+    {
+        // Compare groups.
+        if (Actors.Num() == SelectedActors.Num())
         {
-            UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *SelectedActor->GetName());
+            bool bSameSelection = true;
 
-            // Notify listeners.
-            NotifyOnIssuedStopOrder(SelectedPawn);
+            for (AActor* Actor : Actors)
+            {
+                if (!SelectedActors.Contains(Actor))
+                {
+                    bSameSelection = false;
+                    break;
+                }
+            }
+
+            if (bSameSelection)
+            {
+                // Focus selected actors instead.
+                if (SelectedActors.Num() > 0)
+                {
+                    FocusCameraOnActor(SelectedActors[0]);
+                }
+
+                return;
+            }
         }
-	}
-}
+    }
 
-void ARTSPlayerController::ServerIssueStopOrder_Implementation(APawn* OrderedPawn)
-{
-	auto PawnController = Cast<ARTSPawnAIController>(OrderedPawn->GetController());
-
-	if (!PawnController)
-	{
-		return;
-	}
-
-	// Issue stop order.
-	PawnController->IssueStopOrder();
-	UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to stop."), *OrderedPawn->GetName());
-
-	// Notify listeners.
-	NotifyOnIssuedStopOrder(OrderedPawn);
-}
-
-bool ARTSPlayerController::ServerIssueStopOrder_Validate(APawn* OrderedPawn)
-{
-	// Verify owner to prevent cheating.
-	return OrderedPawn->GetOwner() == this;
-}
-
-void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
-{
 	// Clear selection.
 	for (AActor* SelectedActor : SelectedActors)
 	{
@@ -987,7 +918,9 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 			SelectableComponent->SelectActor();
 
             // Play selection sound.
-            if (SelectionSoundCooldownRemaining <= 0.0f && IsValid(SelectableComponent->GetSelectedSound()))
+            if (SelectionSoundCooldownRemaining <= 0.0f &&
+                URTSGameplayLibrary::IsOwnedByLocalPlayer(SelectedActor) &&
+                IsValid(SelectableComponent->GetSelectedSound()))
             {
                 UGameplayStatics::PlaySound2D(this, SelectableComponent->GetSelectedSound());
                 SelectionSoundCooldownRemaining = SelectableComponent->GetSelectedSound()->GetDuration();
@@ -995,8 +928,84 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors)
 		}
 	}
 
+    // Initially, select first subgroup.
+    SelectFirstSubgroup();
+
 	// Notify listeners.
 	NotifyOnSelectionChanged(SelectedActors);
+}
+
+TSubclassOf<AActor> ARTSPlayerController::GetSelectedSubgroup() const
+{
+    return SelectedSubgroup;
+}
+
+AActor* ARTSPlayerController::GetSelectedSubgroupActor()
+{
+    AActor* SelectedSubgroupActor;
+    int32 SelectedSubgroupActorIndex;
+    return GetSelectedSubgroupActorAndIndex(&SelectedSubgroupActor, &SelectedSubgroupActorIndex) ? SelectedSubgroupActor
+        : nullptr;
+}
+
+void ARTSPlayerController::GetSelectedSubgroupActors(TArray<AActor*>& OutActors) const
+{
+    for (AActor* Actor : SelectedActors)
+    {
+        if (!IsValid(Actor))
+        {
+            continue;
+        }
+
+        if (Actor->GetClass() == SelectedSubgroup)
+        {
+            OutActors.Add(Actor);
+        }
+    }
+}
+
+void ARTSPlayerController::SelectFirstSubgroup()
+{
+    if (SelectedActors.Num() > 0)
+    {
+        SelectSubgroup(SelectedActors[0]->GetClass());
+    }
+    else
+    {
+        SelectSubgroup(nullptr);
+    }
+}
+
+void ARTSPlayerController::SelectNextSubgroup()
+{
+    SelectNextSubgroupInDirection(+1);
+}
+
+void ARTSPlayerController::SelectPreviousSubgroup()
+{
+    SelectNextSubgroupInDirection(-1);
+}
+
+void ARTSPlayerController::SelectSubgroup(TSubclassOf<AActor> NewSubgroup)
+{
+    if (SelectedSubgroup == NewSubgroup)
+    {
+        return;
+    }
+
+    SelectedSubgroup = NewSubgroup;
+
+    if (NewSubgroup == nullptr)
+    {
+        UE_LOG(LogRTS, Verbose, TEXT("Cleared selected subgroup."));
+    }
+    else
+    {
+        UE_LOG(LogRTS, Verbose, TEXT("Selected subgroup %s."), *NewSubgroup->GetName());
+    }
+
+    // Notify listeners.
+    NotifyOnSelectedSubgroupChanged(NewSubgroup);
 }
 
 void ARTSPlayerController::SaveControlGroup(int32 Index)
@@ -1032,7 +1041,7 @@ void ARTSPlayerController::LoadControlGroup(int32 Index)
 		return;
 	}
 
-	SelectActors(ControlGroups[Index].Actors);
+	SelectActors(ControlGroups[Index].Actors, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_FocusOnDoubleSelection);
 
 	UE_LOG(LogRTS, Log, TEXT("Loaded selection from control group %d."), Index);
 }
@@ -1047,6 +1056,107 @@ void ARTSPlayerController::LoadControlGroup6() { LoadControlGroup(6); }
 void ARTSPlayerController::LoadControlGroup7() { LoadControlGroup(7); }
 void ARTSPlayerController::LoadControlGroup8() { LoadControlGroup(8); }
 void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
+
+void ARTSPlayerController::FocusCameraOnLocation(FVector2D NewCameraLocation)
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return;
+    }
+
+    // Calculate where to put the camera, considering its angle, to center on the specified location.
+    FVector FinalCameraLocation = FVector(NewCameraLocation.X - GetCameraDistance(), NewCameraLocation.Y, 0.0f);
+
+    // Enforce camera bounds.
+    if (IsValid(CameraBoundsVolume) && !CameraBoundsVolume->EncompassesPoint(FinalCameraLocation))
+    {
+        UBrushComponent* CameraBoundsBrushComponent = CameraBoundsVolume->GetBrushComponent();
+        FTransform CameraBoundsBrushTransform = CameraBoundsBrushComponent->GetComponentTransform();
+        FBoxSphereBounds Bounds = CameraBoundsBrushComponent->CalcBounds(CameraBoundsBrushTransform);
+
+        FinalCameraLocation.X = FMath::Clamp(FinalCameraLocation.X, Bounds.GetBox().Min.X, Bounds.GetBox().Max.X);
+        FinalCameraLocation.Y = FMath::Clamp(FinalCameraLocation.Y, Bounds.GetBox().Min.Y, Bounds.GetBox().Max.Y);
+    }
+
+    // Keep camera height.
+    FinalCameraLocation.Z = PlayerPawn->GetActorLocation().Z;
+
+    // Update camera location.
+    PlayerPawn->SetActorLocation(FinalCameraLocation);
+}
+
+void ARTSPlayerController::FocusCameraOnActor(AActor* Actor)
+{
+    TArray<AActor*> Actors;
+    Actors.Add(Actor);
+    FocusCameraOnActors(Actors);
+}
+
+void ARTSPlayerController::FocusCameraOnActors(TArray<AActor*> Actors)
+{
+    // Get center of group.
+    FVector2D Locations = FVector2D::ZeroVector;
+    int32 NumActors = 0;
+
+    for (auto Actor : Actors)
+    {
+        if (!IsValid(Actor))
+        {
+            continue;
+        }
+
+        FVector ActorLocation = Actor->GetActorLocation();
+        Locations.X += ActorLocation.X;
+        Locations.Y += ActorLocation.Y;
+
+        ++NumActors;
+    }
+
+    FVector2D Location = Locations / NumActors;
+    FocusCameraOnLocation(Location);
+}
+
+void ARTSPlayerController::SaveCameraLocation(int32 Index)
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return;
+    }
+
+    if (!CameraLocations.IsValidIndex(Index))
+    {
+        return;
+    }
+
+    // Save camera location.
+    CameraLocations[Index] = PlayerPawn->GetActorLocation();
+
+    UE_LOG(LogRTS, Log, TEXT("Saved camera location to index %d."), Index);
+}
+
+void ARTSPlayerController::LoadCameraLocation(int32 Index)
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return;
+    }
+
+    if (!CameraLocations.IsValidIndex(Index))
+    {
+        return;
+    }
+
+    // Restore camera.
+    PlayerPawn->SetActorLocation(CameraLocations[Index]);
+
+    UE_LOG(LogRTS, Log, TEXT("Loaded camera location with index %d."), Index);
+}
 
 bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed() const
 {
@@ -1103,73 +1213,15 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
-    // Check if we should preview attack range.
-    URTSConstructionSiteComponent* ConstructionSiteComponent =
-        URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
-
-    bool bPreviewAttackRange = false;
-    float AttackRange = 0.0f;
-
-    if (IsValid(ConstructionSiteComponent))
-    {
-        // Preview attack range.
-        bPreviewAttackRange = ConstructionSiteComponent->ShouldPreviewAttackRange();
-
-        if (bPreviewAttackRange)
-        {
-            URTSAttackComponent* AttackComponent =
-                URTSGameplayLibrary::FindDefaultComponentByClass<URTSAttackComponent>(BuildingClass);
-
-            if (IsValid(AttackComponent))
-            {
-                for (const FRTSAttackData& Attack : AttackComponent->GetAttacks())
-                {
-                    if (Attack.Range > AttackRange)
-                    {
-                        AttackRange = Attack.Range;
-                    }
-                }
-
-                AttackRange += URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2.0f;
-            }
-            else
-            {
-                bPreviewAttackRange = false;
-            }
-        }
-    }
-
     // Spawn preview building.
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	UStaticMeshComponent* StaticMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UStaticMeshComponent>(BuildingClass);
+    BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
 
-    if (IsValid(StaticMeshComponent))
-    {
-        BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
-        BuildingCursor->SetStaticMesh(StaticMeshComponent->GetStaticMesh(), StaticMeshComponent->GetRelativeTransform());
-    }
-    else
-    {
-        USkeletalMeshComponent* SkeletalMeshComponent = URTSGameplayLibrary::FindDefaultComponentByClass<USkeletalMeshComponent>(BuildingClass);
-
-        if (IsValid(SkeletalMeshComponent))
-        {
-            BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
-            BuildingCursor->SetSkeletalMesh(SkeletalMeshComponent->SkeletalMesh, SkeletalMeshComponent->GetRelativeTransform());
-        }
-    }
-    
     if (IsValid(BuildingCursor))
     {
-        BuildingCursor->SetLocationValid(false);
-
-        // Show attack range.
-        if (bPreviewAttackRange && AttackRange > 0.0f)
-        {
-            BuildingCursor->SetRange(AttackRange);
-        }
+        BuildingCursor->SetupForBuilding(BuildingClass);
     }
 
 	BuildingBeingPlacedClass = BuildingClass;
@@ -1182,7 +1234,12 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
-	UWorld* World = GetWorld();
+    if (IsValid(BuildingCursor) && BuildingCursor->HasGrid())
+    {
+        return BuildingCursor->AreAllCellsValid();
+    }
+
+    UWorld* World = GetWorld();
     return URTSCollisionLibrary::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
@@ -1283,7 +1340,7 @@ void ARTSPlayerController::FinishSelectActors()
 		}
     }
 
-	SelectActors(ActorsToSelect);
+	SelectActors(ActorsToSelect, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_DoNothing);
 
 	bCreatingSelectionFrame = false;
 }
@@ -1528,6 +1585,35 @@ void ARTSPlayerController::ZoomCamera(float Value)
     CameraZoomAxisValue = Value;
 }
 
+float ARTSPlayerController::GetCameraDistance() const
+{
+    APawn* PlayerPawn = GetPawnOrSpectator();
+
+    if (!IsValid(PlayerPawn))
+    {
+        return 0.0f;
+    }
+
+    UCameraComponent* Camera = PlayerPawn->FindComponentByClass<UCameraComponent>();
+
+    if (!IsValid(Camera))
+    {
+        return 0.0f;
+    }
+
+    // Get camera angle.
+    float CameraAngle = Camera->GetRelativeRotation().Pitch;
+
+    if (CameraAngle < 0.0f)
+    {
+        CameraAngle += 90.0f;
+    }
+
+    // Get camera distance using trigonometry.
+    // We are assuming that the terrain is flat, centered at the origin, and the camera has no roll or yaw.
+    return Camera->GetRelativeLocation().Z * FMath::Tan(FMath::DegreesToRadians(CameraAngle));
+}
+
 void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
 {
 	ReceiveOnActorOwnerChanged(Actor);
@@ -1561,6 +1647,37 @@ void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
 void ARTSPlayerController::NotifyOnGameHasEnded(bool bIsWinner)
 {
     ReceiveOnGameHasEnded(bIsWinner);
+}
+
+void ARTSPlayerController::NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order)
+{
+    ReceiveOnIssuedOrder(OrderedPawn, Order);
+
+    if (Order.OrderClass == URTSAttackOrder::StaticClass())
+    {
+        NotifyOnIssuedAttackOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSBeginConstructionOrder::StaticClass())
+    {
+        TSubclassOf<AActor> BuildingClass = URTSConstructionLibrary::GetConstructableBuildingClass(OrderedPawn, Order.Index);
+        NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, Order.TargetLocation);
+    }
+    else if (Order.OrderClass == URTSContinueConstructionOrder::StaticClass())
+    {
+        NotifyOnIssuedContinueConstructionOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSGatherOrder::StaticClass())
+    {
+        NotifyOnIssuedGatherOrder(OrderedPawn, Order.TargetActor);
+    }
+    else if (Order.OrderClass == URTSMoveOrder::StaticClass())
+    {
+        NotifyOnIssuedMoveOrder(OrderedPawn, Order.TargetLocation);
+    }
+    else if (Order.OrderClass == URTSStopOrder::StaticClass())
+    {
+        NotifyOnIssuedStopOrder(OrderedPawn);
+    }
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
@@ -1642,7 +1759,7 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 
 void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEvent, const FVector2D& MinimapPosition, const FVector& WorldPosition)
 {
-	APawn* PlayerPawn = GetPawn();
+	APawn* PlayerPawn = GetPawnOrSpectator();
 
 	if (!PlayerPawn)
 	{
@@ -1665,11 +1782,16 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 			return;
 		}
 
-		IssueOrderTargetingObjects(HitResults);
+		IssueOrderTargetingObjectsToSelectedActors(HitResults);
 	}
 	
 	// Notify listeners.
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
+}
+
+void ARTSPlayerController::NotifyOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup)
+{
+    ReceiveOnSelectedSubgroupChanged(Subgroup);
 }
 
 void ARTSPlayerController::PlayerTick(float DeltaTime)
@@ -1682,7 +1804,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
         SelectionSoundCooldownRemaining -= DeltaTime;
     }
 
-    APawn* PlayerPawn = GetPawn();
+    APawn* PlayerPawn = GetPawnOrSpectator();
 
     if (!PlayerPawn)
     {
@@ -1760,7 +1882,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
             // Update position of building being placed.
             if (BuildingCursor)
             {
-                BuildingCursor->SetActorLocation(HoveredWorldPosition);
+                BuildingCursor->SetCursorLocation(HoveredWorldPosition);
 
                 bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
                 BuildingCursor->SetLocationValid(bLocationValid);
@@ -1786,7 +1908,19 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-	SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+	int32 DeselectedActors = SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+
+    if (DeselectedActors > 0)
+    {
+        // Notify listeners.
+        NotifyOnSelectionChanged(SelectedActors);
+
+        // Verify subgroup.
+        if (SelectedActors.Num() > 0 && !IsValid(GetSelectedSubgroupActor()))
+        {
+            SelectFirstSubgroup();
+        }
+    }
 
     // Notify listeners.
     if (OldHoveredActor != HoveredActor)
@@ -1811,4 +1945,34 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
             }
         }
     }
+}
+
+void ARTSPlayerController::InitPlayerState()
+{
+    Super::InitPlayerState();
+
+    if (!IsValid(PlayerState))
+    {
+        return;
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Player %s set up player state %s (%s)."), *GetName(), *PlayerState->GetName(),
+        *PlayerState->GetPlayerName());
+
+    OnPlayerStateAvailable(GetPlayerState());
+}
+
+void ARTSPlayerController::OnRep_PlayerState()
+{
+    Super::OnRep_PlayerState();
+
+    if (!IsValid(PlayerState))
+    {
+        return;
+    }
+
+    UE_LOG(LogRTS, Log, TEXT("Player %s received player state %s (%s)."), *GetName(), *PlayerState->GetName(),
+        *PlayerState->GetPlayerName());
+
+    OnPlayerStateAvailable(GetPlayerState());
 }

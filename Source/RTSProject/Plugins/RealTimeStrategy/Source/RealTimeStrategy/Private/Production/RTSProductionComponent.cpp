@@ -6,6 +6,7 @@
 #include "Engine/SCS_Node.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 #include "RTSGameMode.h"
 #include "RTSLog.h"
@@ -14,6 +15,7 @@
 #include "Economy/RTSPlayerResourcesComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
+#include "Libraries/RTSGameplayTagLibrary.h"
 #include "Production/RTSProductionCostComponent.h"
 
 
@@ -27,6 +29,8 @@ URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& Objec
 	// Set reasonable default values.
 	CapacityPerQueue = 5;
 	QueueCount = 1;
+
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanProduce());
 }
 
 void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -34,6 +38,8 @@ void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSProductionComponent, ProductionQueues);
+    DOREPLIFETIME(URTSProductionComponent, MostRecentProduct);
+    DOREPLIFETIME(URTSProductionComponent, RallyPoint);
 }
 
 void URTSProductionComponent::BeginPlay()
@@ -51,6 +57,12 @@ void URTSProductionComponent::BeginPlay()
 void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+    // Don't update production progress on clients - will be replicated from server.
+    if (GetNetMode() == NM_Client)
+    {
+        return;
+    }
 
     // Check for speed boosts.
     float SpeedBoostFactor = 1.0f;
@@ -152,6 +164,12 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
             OnProductionProgressChanged.Broadcast(OwningActor, QueueIndex, GetProgressPercentage(QueueIndex));
         }
 	}
+
+    // Verify rally points.
+    if (RallyPoint.bIsSet && IsValid(RallyPoint.TargetActor) && !URTSGameplayLibrary::IsVisibleForActor(GetOwner(), RallyPoint.TargetActor))
+    {
+        ClearRallyPoint();
+    }
 }
 
 bool URTSProductionComponent::CanAssignProduction(TSubclassOf<AActor> ProductClass) const
@@ -377,8 +395,13 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 
 	UE_LOG(LogRTS, Log, TEXT("%s finished producing %s in queue %i."), *GetOwner()->GetName(), *Product->GetName(), QueueIndex);
 
+    MostRecentProduct = Product;
+
+    // Use rally point.
+    IssueRallyPointDependentOrder(Product);
+
 	// Notify listeners.
-	OnProductionFinished.Broadcast(GetOwner(), Product, QueueIndex);
+	NotifyOnProductionFinished(GetOwner(), Product, QueueIndex);
 
 	// Remove product from queue.
 	DequeueProduct(QueueIndex);
@@ -469,6 +492,25 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 	}
 }
 
+void URTSProductionComponent::SetRallyPointToActor(AActor* Target)
+{
+    RallyPoint.TargetActor = Target;
+    RallyPoint.bIsSet = true;
+}
+
+void URTSProductionComponent::SetRallyPointToLocation(const FVector& TargetLocation)
+{
+    RallyPoint.TargetActor = nullptr;
+    RallyPoint.TargetLocation = TargetLocation;
+    RallyPoint.bIsSet = true;
+}
+
+void URTSProductionComponent::ClearRallyPoint()
+{
+    RallyPoint.TargetActor = nullptr;
+    RallyPoint.bIsSet = false;
+}
+
 TArray<TSubclassOf<AActor>> URTSProductionComponent::GetAvailableProducts() const
 {
     return AvailableProducts;
@@ -482,6 +524,28 @@ int32 URTSProductionComponent::GetQueueCount() const
 int32 URTSProductionComponent::GetCapacityPerQueue() const
 {
     return CapacityPerQueue;
+}
+
+FRTSProductionRallyPoint URTSProductionComponent::GetRallyPoint() const
+{
+    return RallyPoint;
+}
+
+void URTSProductionComponent::NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex)
+{
+    // Notify listeners.
+    OnProductionFinished.Broadcast(Actor, Product, QueueIndex);
+
+    // Play sound.
+    if (IsValid(Product) && URTSGameplayLibrary::IsOwnedByLocalPlayer(Actor))
+    {
+        URTSProductionCostComponent* ProductionCostComponent = Product->FindComponentByClass<URTSProductionCostComponent>();
+
+        if (IsValid(ProductionCostComponent) && IsValid(ProductionCostComponent->GetFinishedSound()))
+        {
+            UGameplayStatics::PlaySound2D(this, ProductionCostComponent->GetFinishedSound());
+        }
+    }
 }
 
 void URTSProductionComponent::DequeueProduct(int32 QueueIndex /*= 0*/, int32 ProductIndex /*= 0*/)
@@ -536,10 +600,32 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 	OnProductionStarted.Broadcast(GetOwner(), ProductClass, QueueIndex, ProductionTime);
 }
 
+void URTSProductionComponent::IssueRallyPointDependentOrder(AActor* ProducedActor)
+{
+    if (!RallyPoint.bIsSet)
+    {
+        return;
+    }
+
+    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(ProducedActor->GetOwner());
+
+    if (!IsValid(PlayerController))
+    {
+        return;
+    }
+
+    PlayerController->IssueDefaultOrderToActor(ProducedActor, RallyPoint.TargetActor, RallyPoint.TargetLocation);
+}
+
 void URTSProductionComponent::ReceivedProductionQueues()
 {
     for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
     {
         OnProductionProgressChanged.Broadcast(GetOwner(), QueueIndex, GetProgressPercentage(QueueIndex));
     }
+}
+
+void URTSProductionComponent::ReceivedMostRecentProduct()
+{
+    NotifyOnProductionFinished(GetOwner(), MostRecentProduct, -1);
 }

@@ -3,7 +3,9 @@
 #include "EngineUtils.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
+#include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 #include "RTSOwnerComponent.h"
@@ -13,6 +15,7 @@
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Economy/RTSGathererComponent.h"
+#include "Vision/RTSVisibleComponent.h"
 
 
 UActorComponent* URTSGameplayLibrary::FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass)
@@ -106,6 +109,31 @@ void URTSGameplayLibrary::StopGameplayFor(AActor* Actor)
     DestroyComponentByClass<URTSConstructionSiteComponent>(Actor);
 }
 
+bool URTSGameplayLibrary::IsVisibleForActor(const AActor* Actor, const AActor* Other)
+{
+    if (!IsValid(Actor) || !IsValid(Other))
+    {
+        return false;
+    }
+
+    const URTSVisibleComponent* OtherVisibleComponent = Other->FindComponentByClass<URTSVisibleComponent>();
+
+    if (OtherVisibleComponent != nullptr)
+    {
+        if (Other->HasAuthority())
+        {
+            return OtherVisibleComponent->IsVisibleForPlayer(Cast<AController>(Actor->GetOwner()));
+        }
+
+        return OtherVisibleComponent->IsVisibleForLocalClient();
+    }
+    else
+    {
+        // No visible component? It must be always visible!
+        return true;
+    }
+}
+
 bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement)
 {
     if (!WorldContextObject || !OwnedActor || !OwnedActor->GetOwner())
@@ -156,6 +184,37 @@ bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, 
 
     OutMissingRequirement = RequiredActors[0];
     return true;
+}
+
+bool URTSGameplayLibrary::IsOwnedByLocalPlayer(AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return false;
+    }
+
+    URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+    if (!IsValid(OwnerComponent))
+    {
+        return false;
+    }
+
+    UWorld* World = Actor->GetWorld();
+    
+    if (!IsValid(World))
+    {
+        return false;
+    }
+    
+    APlayerController* PlayerController = World->GetFirstPlayerController();
+
+    if (!IsValid(PlayerController))
+    {
+        return false;
+    }
+
+    return OwnerComponent->GetPlayerOwner() == PlayerController->GetPlayerState<ARTSPlayerState>();
 }
 
 bool URTSGameplayLibrary::IsOwnerABot(URTSOwnerComponent* OwnerComponent)

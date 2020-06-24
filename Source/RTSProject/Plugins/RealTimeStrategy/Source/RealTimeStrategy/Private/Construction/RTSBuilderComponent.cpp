@@ -6,12 +6,20 @@
 #include "RTSPawnAIController.h"
 #include "RTSContainerComponent.h"
 #include "RTSGameMode.h"
+#include "RTSGameplayTagsComponent.h"
 #include "RTSLog.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
 
+
+URTSBuilderComponent::URTSBuilderComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+    : Super(ObjectInitializer)
+{
+    // Set reasonable default values.
+    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanConstruct());
+}
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 {
@@ -45,6 +53,9 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 
 		if (bEnterConstructionSite)
 		{
+            // Apply tags.
+            URTSGameplayTagLibrary::AddGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_Constructing());
+
 			// Enter construction site.
 			auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
@@ -176,6 +187,9 @@ void URTSBuilderComponent::LeaveConstructionSite()
 
 	if (bEnterConstructionSite)
 	{
+        // Remove tags.
+        URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_Constructing());
+
 		// Leave construction site.
 		auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 

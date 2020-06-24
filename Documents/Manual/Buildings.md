@@ -15,6 +15,8 @@ From the perspective of the plugin, buildings are just units with a few addition
 1. Set the _Progress Made Automatically_ and _Progress Made Per Builder_ factors.
 1. Set _Initial Health Percentage_ to a value between 0 and 1 to specify how much health the construction site should start with.
 1. Set the _Start Immediately_ flag unless you want to trigger construction start from script.
+1. If you want to use grid-based building placement, set the _Grid Width and Height_.
+1. Set the _Finished Sound_ to the sound cue to play when the construction is finished.
 1. Add an `RTSContainerComponent` if you want builders to enter the building site while building. Its capacity value will be automatically set at runtime to reflect _Max Assigned Builders_ of the construction site.
 1. Add your `RTSConstructionProgressBarWidgetComponent` (see [User Interface](UserInterface.md)).
 

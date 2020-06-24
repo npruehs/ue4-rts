@@ -8,7 +8,16 @@
 #include "Economy/RTSGathererComponent.h"
 #include "Combat/RTSAttackComponent.h"
 #include "Construction/RTSBuilderComponent.h"
+#include "Libraries/RTSConstructionLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
+#include "Libraries/RTSOrderLibrary.h"
+#include "Orders/RTSAttackOrder.h"
+#include "Orders/RTSBeginConstructionOrder.h"
+#include "Orders/RTSContinueConstructionOrder.h"
+#include "Orders/RTSGatherOrder.h"
+#include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSReturnResourcesOrder.h"
+#include "Orders/RTSStopOrder.h"
 
 
 void ARTSPawnAIController::OnPossess(APawn* InPawn)
@@ -32,7 +41,7 @@ void ARTSPawnAIController::OnPossess(APawn* InPawn)
 
 void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 {
-	if (!AttackComponent)
+	if (!IsValid(AttackComponent))
 	{
 		return;
 	}
@@ -84,126 +93,106 @@ void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 
 bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
 {
+    UE_LOG(LogRTS, Warning, TEXT("ARTSPawnAIController::HasOrder has been deprecated as of plugin version 1.2. Please use HasOrderByClass instead."));
     return Blackboard->GetValueAsEnum(TEXT("OrderType")) == (uint8)OrderType;
+}
+
+bool ARTSPawnAIController::HasOrderByClass(TSubclassOf<URTSOrder> OrderClass) const
+{
+    return Blackboard->GetValueAsClass(TEXT("OrderClass")) == OrderClass;
 }
 
 bool ARTSPawnAIController::IsIdle() const
 {
-    return HasOrder(ERTSOrderType::ORDER_None);
+    return HasOrderByClass(URTSStopOrder::StaticClass());
+}
+
+void ARTSPawnAIController::IssueOrder(const FRTSOrderData& Order)
+{
+    if (!Blackboard)
+    {
+        UE_LOG(LogRTS, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
+        return;
+    }
+
+    // Update blackboard.
+    ERTSOrderType OrderType = OrderClassToType(Order.OrderClass);
+    
+    Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderType);
+    Blackboard->SetValueAsClass(TEXT("OrderClass"), Order.OrderClass);
+    Blackboard->SetValueAsObject(TEXT("TargetActor"), Order.TargetActor);
+    Blackboard->SetValueAsVector(TEXT("TargetLocation"), Order.TargetLocation);
+    Blackboard->SetValueAsInt(TEXT("BuildingClass"), Order.Index);
+
+    if (OrderType == ERTSOrderType::ORDER_None)
+    {
+        Blackboard->SetValueAsVector(TEXT("HomeLocation"), GetPawn()->GetActorLocation());
+    }
+    else
+    {
+        Blackboard->ClearValue(TEXT("HomeLocation"));
+    }
+
+    // Update behavior tree.
+    UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+    if (BehaviorTreeComponent)
+    {
+        BehaviorTreeComponent->RestartTree();
+    }
+
+    // Apply order logic.
+    URTSOrderLibrary::IssueOrder(GetOwner(), Order);
+
+    // Notify listeners.
+    OnOrderChanged.Broadcast(GetOwner(), OrderType);
+    OnCurrentOrderChanged.Broadcast(GetOwner(), Order);
 }
 
 void ARTSPawnAIController::IssueAttackOrder(AActor* Target)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
+    FRTSOrderData Order;
+    Order.OrderClass = URTSAttackOrder::StaticClass();
+    Order.TargetActor = Target;
 
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_Attack);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(Target);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
+    FRTSOrderData Order;
+    Order.OrderClass = URTSBeginConstructionOrder::StaticClass();
+    Order.Index = URTSConstructionLibrary::GetConstructableBuildingIndex(GetPawn(), BuildingClass);
+    Order.TargetLocation = TargetLocation;
 
-	// Somehow, classes are not properly serialized to blackboard values and back, so we're going to use the building index here instead.
-	URTSBuilderComponent* BuilderComponent = GetPawn()->FindComponentByClass<URTSBuilderComponent>();
-
-	if (!BuilderComponent)
-	{
-		return;
-	}
-
-	int32 BuildingIndex = BuilderComponent->GetConstructibleBuildingClasses().IndexOfByKey(BuildingClass);
-
-	if (BuildingIndex == INDEX_NONE)
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_BeginConstruction);
-	SetBuildingClass(BuildingIndex);
-	ClearHomeLocation();
-	ClearTargetActor();
-	SetTargetLocation(TargetLocation);
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_ContinueConstruction);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(ConstructionSite);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSContinueConstructionOrder::StaticClass();
+    Order.TargetActor = ConstructionSite;
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueGatherOrder(AActor* ResourceSource)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_Gather);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(ResourceSource);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSGatherOrder::StaticClass();
+    Order.TargetActor = ResourceSource;
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueMoveOrder(const FVector& Location)
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
-    // Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_Move);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	ClearTargetActor();
-	SetTargetLocation(Location);
-
-    // Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSMoveOrder::StaticClass();
+    Order.TargetLocation = Location;
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueReturnResourcesOrder()
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
 	auto GathererComponent = GetPawn()->FindComponentByClass<URTSGathererComponent>();
 
 	if (!GathererComponent)
@@ -218,92 +207,17 @@ void ARTSPawnAIController::IssueReturnResourcesOrder()
 		return;
 	}
 
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_ReturnResources);
-	ClearBuildingClass();
-	ClearHomeLocation();
-	SetTargetActor(ResourceDrain);
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
+    FRTSOrderData Order;
+    Order.OrderClass = URTSReturnResourcesOrder::StaticClass();
+    Order.TargetActor = ResourceDrain;
+    IssueOrder(Order);
 }
 
 void ARTSPawnAIController::IssueStopOrder()
 {
-	if (!VerifyBlackboard())
-	{
-		return;
-	}
-
-	// Update blackboard.
-	SetOrderType(ERTSOrderType::ORDER_None);
-	ClearBuildingClass();
-	SetHomeLocation(GetPawn()->GetActorLocation());
-	ClearTargetActor();
-	ClearTargetLocation();
-
-	// Stop any current orders and start over.
-	ApplyOrders();
-}
-
-void ARTSPawnAIController::ApplyOrders()
-{
-    // Update behavior tree.
-	UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
-	if (BehaviorTreeComponent)
-	{
-		BehaviorTreeComponent->RestartTree();
-	}
-
-    // Notify listeners.
-    uint8 NewOrder = Blackboard->GetValueAsEnum(TEXT("OrderType"));
-    OnOrderChanged.Broadcast(GetOwner(), (ERTSOrderType)NewOrder);
-}
-
-void ARTSPawnAIController::ClearBuildingClass()
-{
-	Blackboard->ClearValue(TEXT("BuildingClass"));
-}
-
-void ARTSPawnAIController::ClearHomeLocation()
-{
-	Blackboard->ClearValue(TEXT("HomeLocation"));
-}
-
-void ARTSPawnAIController::ClearTargetActor()
-{
-	Blackboard->ClearValue(TEXT("TargetActor"));
-}
-
-void ARTSPawnAIController::ClearTargetLocation()
-{
-	Blackboard->ClearValue(TEXT("TargetLocation"));
-}
-
-void ARTSPawnAIController::SetBuildingClass(int32 BuildingIndex)
-{
-	Blackboard->SetValueAsInt(TEXT("BuildingClass"), BuildingIndex);
-}
-
-void ARTSPawnAIController::SetHomeLocation(const FVector& HomeLocation)
-{
-	Blackboard->SetValueAsVector(TEXT("HomeLocation"), HomeLocation);
-}
-
-void ARTSPawnAIController::SetOrderType(const ERTSOrderType OrderType)
-{
-	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderType);
-}
-
-void ARTSPawnAIController::SetTargetActor(AActor* TargetActor)
-{
-	Blackboard->SetValueAsObject(TEXT("TargetActor"), TargetActor);
-}
-
-void ARTSPawnAIController::SetTargetLocation(const FVector& TargetLocation)
-{
-	Blackboard->SetValueAsVector(TEXT("TargetLocation"), TargetLocation);
+    FRTSOrderData Order;
+    Order.OrderClass = URTSStopOrder::StaticClass();
+    IssueOrder(Order);
 }
 
 bool ARTSPawnAIController::TraceSphere(
@@ -333,13 +247,32 @@ bool ARTSPawnAIController::TraceSphere(
 	);
 }
 
-bool ARTSPawnAIController::VerifyBlackboard()
+ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const
 {
-	if (!Blackboard)
-	{
-		UE_LOG(LogRTS, Warning, TEXT("Blackboard not set up for %s, can't receive orders. Check AI Controller Class and Auto Possess AI."), *GetPawn()->GetName());
-		return false;
-	}
+    if (OrderClass == URTSAttackOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_Attack;
+    }
+    else if (OrderClass == URTSBeginConstructionOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_BeginConstruction;
+    }
+    else if (OrderClass == URTSContinueConstructionOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_ContinueConstruction;
+    }
+    else if (OrderClass == URTSGatherOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_Gather;
+    }
+    else if (OrderClass == URTSMoveOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_Move;
+    }
+    else if (OrderClass == URTSReturnResourcesOrder::StaticClass())
+    {
+        return ERTSOrderType::ORDER_ReturnResources;
+    }
 
-	return true;
+    return ERTSOrderType::ORDER_None;
 }
