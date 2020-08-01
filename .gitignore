@@ -60,9 +60,12 @@ Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-Source/RTS/Binaries/
-Source/RTS/Intermediate/
-Source/RTS/Saved/
-Source/RTS/Plugins/RTSPlugin/Binaries/
-Source/RTS/Plugins/RTSPlugin/Intermediate/
-Source/RTS/DerivedDataCache/
+Source/RTSProject/Binaries/
+Source/RTSProject/Intermediate/
+Source/RTSProject/Plugins/RealTimeStrategy/Binaries/
+Source/RTSProject/Plugins/RealTimeStrategy/Intermediate/
+Source/RTSProject/Saved/
+Source/RTSProject/Plugins/RealTimeStrategyTests/Binaries/
+Source/RTSProject/Plugins/RealTimeStrategyTests/Intermediate/
+Source/RTSProject/Plugins/DaedalicTestAutomationPlugin/Binaries/
+Source/RTSProject/Plugins/DaedalicTestAutomationPlugin/Intermediate/
