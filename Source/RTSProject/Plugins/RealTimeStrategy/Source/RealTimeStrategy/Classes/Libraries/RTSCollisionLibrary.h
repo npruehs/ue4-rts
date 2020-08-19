@@ -60,4 +60,14 @@ public:
     */
     UFUNCTION(BlueprintPure, Category = "RTS")
     static bool IsSuitableLocationForActor(UWorld* World, TSubclassOf<AActor> ActorClass, const FVector& Location);
+private:
+	static UActorComponent* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass);
+
+	template<class T>
+	static T* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass)
+	{
+		static_assert(TPointerIsConvertibleFromTo<T, const UActorComponent>::Value, "'T' template parameter to FindDefaultComponentByClass must be derived from UActorComponent");
+
+		return (T*)FindDefaultComponentByClass(InActorClass, T::StaticClass());
+	}
 };
