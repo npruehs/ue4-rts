@@ -20,7 +20,7 @@ class UShapeComponent;
 UCLASS()
 class REALTIMESTRATEGY_API URTSCollisionLibrary : public UBlueprintFunctionLibrary
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
     /** Gets the distance between the two specified actors, optionally subtracting their collision sizes. */
@@ -61,13 +61,13 @@ public:
     UFUNCTION(BlueprintPure, Category = "RTS")
     static bool IsSuitableLocationForActor(UWorld* World, TSubclassOf<AActor> ActorClass, const FVector& Location);
 private:
-	static UActorComponent* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass);
+    static UActorComponent* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass, const TSubclassOf<UActorComponent> InComponentClass);
 
-	template<class T>
-	static T* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass)
-	{
-		static_assert(TPointerIsConvertibleFromTo<T, const UActorComponent>::Value, "'T' template parameter to FindDefaultComponentByClass must be derived from UActorComponent");
+    template<class T>
+    static T* FindDefaultComponentByClass(const TSubclassOf<AActor> InActorClass)
+    {
+        static_assert(TPointerIsConvertibleFromTo<T, const UActorComponent>::Value, "'T' template parameter to FindDefaultComponentByClass must be derived from UActorComponent");
 
-		return (T*)FindDefaultComponentByClass(InActorClass, T::StaticClass());
-	}
+        return (T*)FindDefaultComponentByClass(InActorClass, T::StaticClass());
+    }
 };
