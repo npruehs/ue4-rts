@@ -20,7 +20,7 @@ class UShapeComponent;
 UCLASS()
 class REALTIMESTRATEGY_API URTSCollisionLibrary : public UBlueprintFunctionLibrary
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
     /** Gets the distance between the two specified actors, optionally subtracting their collision sizes. */
