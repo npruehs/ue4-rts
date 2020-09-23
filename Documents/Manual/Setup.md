@@ -96,4 +96,28 @@ At _Edit > Project Settings > Engine > Input_ ...
 
 The plugin makes use of [gameplay tags](https://docs.unrealengine.com/en-US/Gameplay/Tags/index.html) for enabling condition-based gameplay (such as whether a unit can be attacked or not). 
 
-At _Edit > Project Settings > Project > Gameplay Tags_, add `DT_RTSGameplayTags` to the _Gameplay Tag Table List_.
+At _Edit > Project Settings > Project > Gameplay Tags_, add the following gameplay tags to the _Gameplay Tag Table List_:
+    _Container.ConstructionSite_
+    _Container.ResourceSource_
+    _HideReason.Container_
+    _Relationship.Friendly_
+    _Relationship.Neutral_
+    _Relationship.Hostile_
+    _Relationship.SamePlayer_
+    _Relationship.Self_
+    _Relationship.Visible_
+    _Status.Changing.Alive_
+    _Status.Changing.CarryingResources_
+    _Status.Changing.Constructing_
+    _Status.Changing.Immobilized_
+    _Status.Changing.Invulnerable_
+    _Status.Changing.Unarmed_
+    _Status.Changing.UnderConstruction_
+    _Status.Permanent.AcceptsReturnedResources_
+    _Status.Permanent.CanAttack_
+    _Status.Permanent.CanBeAttacked_
+    _Status.Permanent.CanConstruct_
+    _Status.Permanent.CanBeConstructed_
+    _Status.Permanent.CanGather_
+    _Status.Permanent.CanBeGathered_
+    _Status.Permanent.CanProduce_
