@@ -14,7 +14,7 @@ As mentioned before, most features of the plugin are implemented by the means of
 1. Add an `RTSDescriptionComponent` and set its localized text if you want to show it in any kind of ingame UI. 
 1. Add an `RTSPortraitComponent` and set its portrait if you want to show it in any kind of ingame UI.
 1. Add an `RTSSelectableComponent`, and set its selection circle material (e.g. to `M_RTSSelectionCircle`) and selection sound.
-1. If the selection order of your actors matters (e.g. for grouping in your UI), set the _Selection Priority_ as well.
+1. If the selection order of your actors matters (e.g. for grouping in your UI), set the _Selection Priority_ as well. Untick _Receives Decals_ on the static or skeletal mesh to prevent adjacent decals rendering on the unit when in close proximity to other selected units.
 1. In case you got special visual effects for highlighting hovered actors, you can listen for the `OnHovered` and `OnUnhovered` events of the component.
 1. Add an `RTSOwnerComponent`. This will be used to store (and replicate) the owner of the unit for all players (e.g. for showing team colors).
 1. Add your `RTSHoveredActorWidgetComponent` (see [User Interface](UserInterface.md)).
@@ -42,8 +42,7 @@ As mentioned before, units are not directly possessed by player controllers in t
 
 #### Health & Damage
 
-1. Add an `RTSAttackableComponent` and `RTSGameplayTagsComponent` to any actors that can be attacked.
-1. Add the `Status.Permanent.CanBeAttacked` tag to the `RTSGameplayTagsComponent`.
+1. Add the `RTSGameplayTagsComponent` and add the `Status.Permanent.CanBeAttacked` tag to the `RTSGameplayTagsComponent` to any actors that can be attacked.
 1. Set the _Maximum Health_ of the `RTSHealthComponent`.
 1. In case your actor should regenerate health, check _Regenerate Health_ and set the _Health Regeneration Rate_.
 1. If you want to play animations or visual effects when the actor dies, set _Actor Death Type_ to _Stop Gameplay_. In that case, you're responsible of destroying the actor yourself as soon as all of your visual clues have finished playing.

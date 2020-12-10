@@ -1917,7 +1917,15 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-	int32 DeselectedActors = SelectedActors.RemoveAll([=](AActor* SelectedActor) { return SelectedActor->IsHidden(); });
+	int32 DeselectedActors = SelectedActors.RemoveAll([=](AActor* SelectedActor)
+	{
+		// Validate before accessing due to a crash caused occasionally
+		if(IsValid(SelectedActor))
+		{
+			return SelectedActor->IsHidden();
+		}
+		return false;		
+	});
 
     if (DeselectedActors > 0)
     {
