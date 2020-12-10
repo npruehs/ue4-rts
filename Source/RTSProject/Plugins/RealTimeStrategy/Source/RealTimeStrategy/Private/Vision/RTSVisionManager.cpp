@@ -197,6 +197,11 @@ void ARTSVisionManager::SetLocalPlayerState(ARTSPlayerState* InLocalPlayerState)
 
 void ARTSVisionManager::SetLocalVisionInfo(ARTSVisionInfo* InLocalVisionInfo)
 {
+    if (!IsValid(InLocalVisionInfo))
+    {
+        return;
+    }
+
     LocalVisionInfo = InLocalVisionInfo;
 
     if (!VisionInfos.Contains(LocalVisionInfo))
@@ -211,10 +216,7 @@ void ARTSVisionManager::SetLocalVisionInfo(ARTSVisionInfo* InLocalVisionInfo)
         FogOfWarActor->SetupVisionInfo(LocalVisionInfo);
     }
 
-    if (IsValid(LocalVisionInfo))
-    {
-        UE_LOG(LogRTS, Log, TEXT("Using local vision info %s."), *LocalVisionInfo->GetName());
-    }
+    UE_LOG(LogRTS, Log, TEXT("Using local vision info %s."), *LocalVisionInfo->GetName());
 }
 
 void ARTSVisionManager::AddVisibleActor(AActor* Actor)

@@ -1726,7 +1726,11 @@ void ARTSPlayerController::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 	{
 		// Notify listeners that new vision info is available now.
 		ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetVisionInfoForTeam(GetWorld(), NewTeam->GetTeamIndex());
-		NotifyOnVisionInfoAvailable(VisionInfo);
+
+        if (IsValid(VisionInfo))
+        {
+            NotifyOnVisionInfoAvailable(VisionInfo);
+        }
 	}
 }
 
@@ -1739,6 +1743,11 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 	{
 		return;
 	}
+
+    if (!IsValid(VisionInfo))
+    {
+        return;
+    }
 
 	// Setup fog of war.
     ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
