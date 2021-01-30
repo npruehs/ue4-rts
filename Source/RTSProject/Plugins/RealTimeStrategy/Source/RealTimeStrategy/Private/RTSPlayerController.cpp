@@ -45,9 +45,11 @@
 #include "Orders/RTSStopOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
+#include "UI/RTSMinimapVolume.h"
 #include "Vision/RTSFogOfWarActor.h"
 #include "Vision/RTSVisionInfo.h"
 #include "Vision/RTSVisionManager.h"
+#include "Vision/RTSVisionVolume.h"
 
 
 ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -75,6 +77,8 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
     DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
 
     DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
+    DefaultOrderIgnoreTargetClasses.Add(ARTSVisionVolume::StaticClass());
+    DefaultOrderIgnoreTargetClasses.Add(ARTSMinimapVolume::StaticClass());
 }
 
 void ARTSPlayerController::BeginPlay()
