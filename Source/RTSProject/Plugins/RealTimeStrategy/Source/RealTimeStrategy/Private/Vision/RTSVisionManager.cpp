@@ -173,7 +173,7 @@ void ARTSVisionManager::Tick(float DeltaSeconds)
             }
         }
 
-        if (GetNetMode() >= NM_ListenServer)
+        if (GetNetMode() != NM_DedicatedServer)
         {
             // Update client vision.
             ERTSVisionState NewVision = IsValid(LocalVisionInfo)
