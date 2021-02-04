@@ -134,6 +134,29 @@ bool URTSGameplayLibrary::IsVisibleForActor(const AActor* Actor, const AActor* O
     }
 }
 
+bool URTSGameplayLibrary::IsFullyVisibleForLocalClient(const AActor* Actor)
+{
+    if (!IsValid(Actor))
+    {
+        return false;
+    }
+
+    // Check if visible.
+    if (Actor->IsHidden())
+    {
+        return false;
+    }
+
+    URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
+
+    if (IsValid(VisibleComponent) && !VisibleComponent->IsVisibleForLocalClient())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool URTSGameplayLibrary::GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor, TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement)
 {
     if (!WorldContextObject || !OwnedActor || !OwnedActor->GetOwner())

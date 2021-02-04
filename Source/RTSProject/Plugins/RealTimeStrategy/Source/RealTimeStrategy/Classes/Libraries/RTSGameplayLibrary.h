@@ -69,6 +69,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RTS")
     static bool IsVisibleForActor(const AActor* Actor, const AActor* Other);
 
+    /** Checks whether the specified actor is not covered by any level of fog of war. */
+    UFUNCTION(BlueprintPure, Category = "RTS")
+    static bool IsFullyVisibleForLocalClient(const AActor* Actor);
+
     /** Checks if the owner of the specified actor meets all requirements for producing the desired new actor. */
     static bool GetMissingRequirementFor(UObject* WorldContextObject, AActor* OwnedActor,
     TSubclassOf<AActor> DesiredProduct, TSubclassOf<AActor>& OutMissingRequirement);
