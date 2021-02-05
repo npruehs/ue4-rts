@@ -17,7 +17,7 @@ ARTSVisionInfo::ARTSVisionInfo(const FObjectInitializer& ObjectInitializer /*= F
     : Super(ObjectInitializer)
 {
 	// Enable replication.
-	SetReplicates(true);
+	bReplicates = true;
 	bAlwaysRelevant = true;
 	NetUpdateFrequency = 1.0f;
 

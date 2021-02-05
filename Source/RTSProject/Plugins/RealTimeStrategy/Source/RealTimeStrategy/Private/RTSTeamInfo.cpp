@@ -10,7 +10,7 @@
 ARTSTeamInfo::ARTSTeamInfo(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
     : Super(ObjectInitializer)
 {
-	SetReplicates(true);
+	bReplicates = true;
 	bAlwaysRelevant = true;
 	NetUpdateFrequency = 1.0f;
 
