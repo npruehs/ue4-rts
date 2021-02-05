@@ -242,9 +242,9 @@ bool URTSGameplayLibrary::IsOwnedByLocalPlayer(AActor* Actor)
 
 bool URTSGameplayLibrary::IsOwnerABot(URTSOwnerComponent* OwnerComponent)
 {
-	#if ENGINE_MINOR_VERSION < 25
-		return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->bIsABot;
+    #if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
+        return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->IsABot();
 	#else
-		return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->IsABot();
+		return OwnerComponent->GetPlayerOwner() && OwnerComponent->GetPlayerOwner()->bIsABot;
 	#endif
 }
