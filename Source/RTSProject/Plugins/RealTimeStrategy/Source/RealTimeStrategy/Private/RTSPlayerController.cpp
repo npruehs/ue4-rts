@@ -1921,17 +1921,37 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-	int32 DeselectedActors = SelectedActors.RemoveAll([=](AActor* SelectedActor)
-	{
-		// Validate before accessing due to a crash caused occasionally
-		if(IsValid(SelectedActor))
-		{
-			return SelectedActor->IsHidden();
-		}
-		return false;		
-	});
+    int32 OldNumSelectedActors = SelectedActors.Num();
 
-    if (DeselectedActors > 0)
+    for (int32 SelectedActorIndex = SelectedActors.Num() - 1; SelectedActorIndex >= 0; --SelectedActorIndex)
+    {
+        AActor* SelectedActor = SelectedActors[SelectedActorIndex];
+
+        if (!IsValid(SelectedActor))
+        {
+            // Remove invalid actors.
+            SelectedActors.RemoveAt(SelectedActorIndex);
+            continue;
+        }
+
+        if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(SelectedActor))
+        {
+            // Remove invisible actors.
+            SelectedActors.RemoveAt(SelectedActorIndex);
+
+            // Update selection effects.
+            URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
+
+            if (IsValid(SelectableComponent))
+            {
+                SelectableComponent->DeselectActor();
+            }
+
+            continue;
+        }
+    }
+
+    if (SelectedActors.Num() != OldNumSelectedActors)
     {
         // Notify listeners.
         NotifyOnSelectionChanged(SelectedActors);
