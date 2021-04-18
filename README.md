@@ -44,6 +44,7 @@ Real-Time Strategy Plugin for Unreal Engine 4 currently supports the following U
 
 * 4.24
 * 4.25
+* 4.26
 
 ### Adding The Plugin (Blueprint Project)
 
