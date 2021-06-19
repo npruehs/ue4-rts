@@ -532,13 +532,13 @@ void ARTSPlayerController::IssueOrderTargetingObjectsToSelectedActors(TArray<FHi
     // Try all default orders.
 	for (auto& HitResult : HitResults)
 	{
-		if (HitResult.Actor != nullptr)
+		if (HitResult.HasValidHitObjectHandle())
 		{
             bool bIsIgnoredClass = false;
 
             for (TSubclassOf<AActor> IgnoredClass : DefaultOrderIgnoreTargetClasses)
             {
-                if (HitResult.Actor->IsA(IgnoredClass))
+                if (HitResult.GetActor()->IsA(IgnoredClass))
                 {
                     bIsIgnoredClass = true;
                     break;
@@ -554,7 +554,7 @@ void ARTSPlayerController::IssueOrderTargetingObjectsToSelectedActors(TArray<FHi
             {
                 FRTSOrderData Order;
                 Order.OrderClass = OrderClass;
-                Order.TargetActor = HitResult.Actor.Get();
+                Order.TargetActor = HitResult.GetActor();
                 Order.TargetLocation = HitResult.Location;
 
                 if (IssueOrderToSelectedActors(Order))
@@ -1307,7 +1307,12 @@ void ARTSPlayerController::FinishSelectActors()
 
     for (auto& HitResult : HitResults)
     {
-		if (!IsSelectableActor(HitResult.Actor.Get()))
+    	if (!HitResult.HasValidHitObjectHandle())
+    	{
+    		continue;
+    	}
+    	
+		if (!IsSelectableActor(HitResult.GetActor()))
 		{
 			continue;
 		}
@@ -1315,32 +1320,32 @@ void ARTSPlayerController::FinishSelectActors()
 		// Check how to apply selection.
 		if (bToggleSelectionHotkeyPressed)
 		{
-			if (SelectedActors.Contains(HitResult.Actor))
+			if (SelectedActors.Contains(HitResult.GetActor()))
 			{
 				// Deselect actor.
-				ActorsToSelect.Remove(HitResult.Actor.Get());
+				ActorsToSelect.Remove(HitResult.GetActor());
 
-				UE_LOG(LogRTS, Log, TEXT("Deselected actor %s."), *HitResult.Actor->GetName());
+				UE_LOG(LogRTS, Log, TEXT("Deselected actor %s."), *HitResult.GetActor()->GetName());
 			}
-			else if (!ActorsToSelect.Contains(HitResult.Actor))
+			else if (!ActorsToSelect.Contains(HitResult.GetActor()))
 			{
 				// Select actor.
-				ActorsToSelect.Add(HitResult.Actor.Get());
+				ActorsToSelect.Add(HitResult.GetActor());
 
-				UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+				UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.GetActor()->GetName());
 			}
 		}
 		else
 		{
-			if (ActorsToSelect.Contains(HitResult.Actor))
+			if (ActorsToSelect.Contains(HitResult.GetActor()))
 			{
 				continue;
 			}
 
 			// Select actor.
-			ActorsToSelect.Add(HitResult.Actor.Get());
+			ActorsToSelect.Add(HitResult.GetActor());
 
-			UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.Actor->GetName());
+			UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.GetActor()->GetName());
 		}
     }
 
@@ -1902,13 +1907,13 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
             }
 
 			// Check if hit any actor.
-			if (HitResult.Actor == nullptr || Cast<ALandscape>(HitResult.Actor.Get()) != nullptr)
+			if (!HitResult.HasValidHitObjectHandle() || Cast<ALandscape>(HitResult.GetActor()) != nullptr)
 			{
 				continue;
 			}
 
 			// Check if hit selectable actor.
-			auto SelectableComponent = HitResult.Actor->FindComponentByClass<URTSSelectableComponent>();
+			auto SelectableComponent = HitResult.GetActor()->FindComponentByClass<URTSSelectableComponent>();
 
 			if (!SelectableComponent)
 			{
@@ -1916,7 +1921,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			}
 
 			// Set hovered actor.
-			HoveredActor = HitResult.Actor.Get();
+			HoveredActor = HitResult.GetActor();
 		}
 	}
 

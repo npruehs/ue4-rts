@@ -53,19 +53,19 @@ void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 	// Find target to acquire.
 	for (auto& HitResult : HitResults)
 	{
-		if (HitResult.Actor == nullptr)
+		if (!HitResult.HasValidHitObjectHandle())
 		{
 			continue;
 		}
 
-		if (HitResult.Actor == GetPawn())
+		if (HitResult.GetActor() == GetPawn())
 		{
 			continue;
 		}
 		
 		// Check owner.
 		auto MyActor = GetPawn();
-		auto TargetActor = HitResult.Actor.Get();
+		auto TargetActor = HitResult.GetActor();
 
 		if (MyActor && TargetActor)
 		{
@@ -78,15 +78,15 @@ void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 		}
 
 		// Check if found attackable actor.
-		if (!URTSGameplayTagLibrary::HasGameplayTag(HitResult.Actor.Get(), URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
+		if (!URTSGameplayTagLibrary::HasGameplayTag(HitResult.GetActor(), URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
 		{
 			continue;
 		}
 
 		// Acquire target.
-		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.Actor.Get());
+		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.GetActor());
 
-		UE_LOG(LogRTS, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.Actor->GetName());
+		UE_LOG(LogRTS, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.GetActor()->GetName());
 		return;
 	}
 }
