@@ -55,8 +55,8 @@ float URTSCollisionLibrary::GetActorCollisionSize(AActor* Actor)
         return 0.0f;
     }
 
-	const TSubclassOf<AActor> ActorClass = Actor->GetClass();
-	UShapeComponent* ShapeComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UShapeComponent>(ActorClass);
+    const TSubclassOf<AActor> ActorClass = Actor->GetClass();
+    UShapeComponent* ShapeComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UShapeComponent>(ActorClass);
     return GetShapeCollisionSize(ShapeComponent);
 }
 
@@ -67,8 +67,8 @@ float URTSCollisionLibrary::GetActorCollisionHeight(AActor* Actor)
         return 0.0f;
     }
 
-	const TSubclassOf<AActor> ActorClass = Actor->GetClass();
-	UShapeComponent* ShapeComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UShapeComponent>(ActorClass);
+    const TSubclassOf<AActor> ActorClass = Actor->GetClass();
+    UShapeComponent* ShapeComponent = URTSGameplayLibrary::FindDefaultComponentByClass<UShapeComponent>(ActorClass);
     return GetShapeCollisionHeight(ShapeComponent);
 }
 
