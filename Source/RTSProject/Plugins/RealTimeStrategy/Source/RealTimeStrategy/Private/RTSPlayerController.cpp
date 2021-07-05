@@ -45,9 +45,11 @@
 #include "Orders/RTSStopOrder.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionCostComponent.h"
+#include "UI/RTSMinimapVolume.h"
 #include "Vision/RTSFogOfWarActor.h"
 #include "Vision/RTSVisionInfo.h"
 #include "Vision/RTSVisionManager.h"
+#include "Vision/RTSVisionVolume.h"
 
 
 ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -75,6 +77,8 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
     DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
 
     DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
+    DefaultOrderIgnoreTargetClasses.Add(ARTSVisionVolume::StaticClass());
+    DefaultOrderIgnoreTargetClasses.Add(ARTSMinimapVolume::StaticClass());
 }
 
 void ARTSPlayerController::BeginPlay()
@@ -1726,7 +1730,11 @@ void ARTSPlayerController::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 	{
 		// Notify listeners that new vision info is available now.
 		ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetVisionInfoForTeam(GetWorld(), NewTeam->GetTeamIndex());
-		NotifyOnVisionInfoAvailable(VisionInfo);
+
+        if (IsValid(VisionInfo))
+        {
+            NotifyOnVisionInfoAvailable(VisionInfo);
+        }
 	}
 }
 
@@ -1739,6 +1747,11 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 	{
 		return;
 	}
+
+    if (!IsValid(VisionInfo))
+    {
+        return;
+    }
 
 	// Setup fog of war.
     ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
@@ -1908,17 +1921,37 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-	int32 DeselectedActors = SelectedActors.RemoveAll([=](AActor* SelectedActor)
-	{
-		// Validate before accessing due to a crash caused occasionally
-		if(IsValid(SelectedActor))
-		{
-			return SelectedActor->IsHidden();
-		}
-		return false;		
-	});
+    int32 OldNumSelectedActors = SelectedActors.Num();
 
-    if (DeselectedActors > 0)
+    for (int32 SelectedActorIndex = SelectedActors.Num() - 1; SelectedActorIndex >= 0; --SelectedActorIndex)
+    {
+        AActor* SelectedActor = SelectedActors[SelectedActorIndex];
+
+        if (!IsValid(SelectedActor))
+        {
+            // Remove invalid actors.
+            SelectedActors.RemoveAt(SelectedActorIndex);
+            continue;
+        }
+
+        if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(SelectedActor))
+        {
+            // Remove invisible actors.
+            SelectedActors.RemoveAt(SelectedActorIndex);
+
+            // Update selection effects.
+            URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
+
+            if (IsValid(SelectableComponent))
+            {
+                SelectableComponent->DeselectActor();
+            }
+
+            continue;
+        }
+    }
+
+    if (SelectedActors.Num() != OldNumSelectedActors)
     {
         // Notify listeners.
         NotifyOnSelectionChanged(SelectedActors);

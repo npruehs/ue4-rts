@@ -8,6 +8,7 @@
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Construction/RTSConstructionProgressBarWidgetComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
+#include "Libraries/RTSGameplayLibrary.h"
 #include "Production/RTSProductionComponent.h"
 #include "Production/RTSProductionProgressBarWidgetComponent.h"
 #include "UI/RTSFloatingCombatTextComponent.h"
@@ -177,6 +178,12 @@ void ARTSHUD::DrawHealthBars()
     {
         AActor* Actor = *ActorIt;
        
+        if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(Actor))
+        {
+            HideHealthBar(Actor);
+            continue;
+        }
+
         // Check override conditions.
         if (bAlwaysShowHealthBars || (bShowHotkeyHealthBars && PlayerController->IsHealthBarHotkeyPressed()))
         {
@@ -260,6 +267,12 @@ void ARTSHUD::DrawConstructionProgressBars()
     for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
     {
         AActor* Actor = *ActorIt;
+
+        if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(Actor))
+        {
+            HideConstructionProgressBar(Actor);
+            continue;
+        }
 
         // Check override conditions.
         if (bAlwaysShowConstructionProgressBars || (bShowHotkeyConstructionProgressBars && PlayerController->IsConstructionProgressBarHotkeyPressed()))
@@ -396,6 +409,12 @@ void ARTSHUD::DrawProductionProgressBars()
     for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
     {
         AActor* Actor = *ActorIt;
+
+        if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(Actor))
+        {
+            HideProductionProgressBar(Actor);
+            continue;
+        }
 
         // Check override conditions.
         if (bAlwaysShowProductionProgressBars || (bShowHotkeyProductionProgressBars && PlayerController->IsProductionProgressBarHotkeyPressed()))
