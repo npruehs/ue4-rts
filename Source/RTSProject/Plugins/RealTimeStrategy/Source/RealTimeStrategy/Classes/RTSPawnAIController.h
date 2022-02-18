@@ -32,6 +32,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FindTargetInAcquisitionRadius();
 
+	/** Gets the class of the order currently issued to the pawn. */
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<URTSOrder> GetCurrentOrder() const;
+	
     /** Checks whether the pawn has an order of the specified type. */
     UFUNCTION(BlueprintPure)
     bool HasOrder(ERTSOrderType OrderType) const;

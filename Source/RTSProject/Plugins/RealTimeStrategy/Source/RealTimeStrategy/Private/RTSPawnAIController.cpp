@@ -91,6 +91,11 @@ void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 	}
 }
 
+TSubclassOf<URTSOrder> ARTSPawnAIController::GetCurrentOrder() const
+{
+	return Blackboard->GetValueAsClass(TEXT("OrderClass"));
+}
+
 bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
 {
     UE_LOG(LogRTS, Warning, TEXT("ARTSPawnAIController::HasOrder has been deprecated as of plugin version 1.2. Please use HasOrderByClass instead."));
@@ -99,7 +104,7 @@ bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
 
 bool ARTSPawnAIController::HasOrderByClass(TSubclassOf<URTSOrder> OrderClass) const
 {
-    return Blackboard->GetValueAsClass(TEXT("OrderClass")) == OrderClass;
+    return GetCurrentOrder() == OrderClass;
 }
 
 bool ARTSPawnAIController::IsIdle() const
