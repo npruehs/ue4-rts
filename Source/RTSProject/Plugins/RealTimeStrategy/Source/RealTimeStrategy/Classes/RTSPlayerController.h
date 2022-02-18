@@ -406,11 +406,11 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
     float CameraZoomSpeed;
 
-    /** Maximum distance of the camera from the player pawn, in cm. */
+    /** Minimum distance of the camera from the player pawn, in cm. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
     float MinCameraDistance;
 
-    /** Minimum distance of the camera from the player pawn, in cm. */
+    /** Maximum distance of the camera from the player pawn, in cm. */
     UPROPERTY(EditDefaultsOnly, Category = "RTS|Camera", meta = (ClampMin = 0))
     float MaxCameraDistance;
 
