@@ -101,15 +101,12 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     UBlackboardData* PawnBlackboardAsset;
 
+	/** Types of actors to filter for when trying to find targets in the acquisition radius. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> AcquisitionObjectTypes;
+	
     UPROPERTY()
 	URTSAttackComponent* AttackComponent;
-
-	bool TraceSphere(
-		const FVector& Location,
-		const float Radius,
-		AActor* ActorToIgnore,
-		ECollisionChannel TraceChannel,
-		TArray<struct FHitResult>& OutHitResults);
 
     ERTSOrderType OrderClassToType(UClass* OrderClass) const;
 };
