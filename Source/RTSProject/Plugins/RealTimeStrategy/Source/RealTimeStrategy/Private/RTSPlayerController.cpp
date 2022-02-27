@@ -40,6 +40,7 @@
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
 #include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSReturnResourcesOrder.h"
 #include "Orders/RTSSetRallyPointToActorOrder.h"
 #include "Orders/RTSSetRallyPointToLocationOrder.h"
 #include "Orders/RTSStopOrder.h"
@@ -72,6 +73,7 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
     DefaultOrders.Add(URTSAttackOrder::StaticClass());
     DefaultOrders.Add(URTSGatherOrder::StaticClass());
     DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
+	DefaultOrders.Add(URTSReturnResourcesOrder::StaticClass());
     DefaultOrders.Add(URTSMoveOrder::StaticClass());
     DefaultOrders.Add(URTSSetRallyPointToActorOrder::StaticClass());
     DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
