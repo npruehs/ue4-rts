@@ -1219,6 +1219,11 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
+	if (IsValid(BuildingCursor))
+	{
+		BuildingCursor->Destroy();
+	}
+	
     // Spawn preview building.
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
