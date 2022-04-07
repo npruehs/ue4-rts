@@ -117,7 +117,7 @@ float ARTSVisionVolume::CalculateWorldHeightAtLocation(const FVector2D& WorldLoc
 
     for (auto& HitResult : HitResults)
     {
-        if (HitResult.Actor != nullptr)
+        if (HitResult.HasValidHitObjectHandle())
         {
             return HitResult.Location.Z;
         }

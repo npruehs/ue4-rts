@@ -1,10 +1,10 @@
 [![license](https://img.shields.io/github/license/npruehs/ue4-rts.svg?maxAge=2592000)](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE)
 
-# Real-Time Strategy Plugin for Unreal Engine 4
+# Real-Time Strategy Plugin for Unreal Engine 5
 
-Open source Real-Time Strategy Plugin for Unreal Engine 4 developed by the original creators of [Hostile Worlds](http://www.indiedb.com/games/hostile-worlds/) for Unreal Engine 3.
+Open source Real-Time Strategy Plugin for Unreal Engine 5 developed by the original creators of [Hostile Worlds](http://www.indiedb.com/games/hostile-worlds/) for Unreal Engine 3.
 
-We really love the spirit of Unreal 4 moving to open-source, and we'd love to give something back.
+We really love the spirit of Unreal 5 moving to open-source, and we'd love to give something back.
 
 Note that we're still in heavy development. Some things are already in place, such as
 
@@ -40,7 +40,7 @@ For a quick look, just open `Source/RTSProject/RTSProject.uproject`,  load `Maps
 
 ### Prerequisites
 
-Real-Time Strategy Plugin for Unreal Engine 4 provides plugin content which is usually not backwards-compatible: Content saved with a newer engine version cannot be opened again with an older engine version. Thus, every time a feature or bugfix requires a plugin content update, the plugin does not support older engine versions anymore. The following table summarizes plugin compatibility with engine versions:
+Real-Time Strategy Plugin for Unreal Engine 5 provides plugin content which is usually not backwards-compatible: Content saved with a newer engine version cannot be opened again with an older engine version. Thus, every time a feature or bugfix requires a plugin content update, the plugin does not support older engine versions anymore. The following table summarizes plugin compatibility with engine versions:
 
 | Plugin Version | Supported Engine Versions |
 | -------------- | ------------------------- |
@@ -48,7 +48,7 @@ Real-Time Strategy Plugin for Unreal Engine 4 provides plugin content which is u
 | 1.1.0 | 4.25 |
 | 1.2.0 | 4.25 |
 | Git (master) | 4.27 |
-| Git (feature/ue5) | 5.0EA |
+| Git (feature/ue5) | 5.0 |
 
 ### Adding The Plugin (Blueprint Project)
 
@@ -100,9 +100,9 @@ https://github.com/npruehs/ue4-rts/releases
 
 ## Contributing
 
-You want to contribute to  Real-Time Strategy Plugin for Unreal Engine 4? Great! Take a look at [Contributing](CONTRIBUTING.md) to get started right away!
+You want to contribute to  Real-Time Strategy Plugin for Unreal Engine 5? Great! Take a look at [Contributing](CONTRIBUTING.md) to get started right away!
 
 
 ## License
 
-Real-Time Strategy Plugin for Unreal Engine 4 is released under the [MIT License](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE).
+Real-Time Strategy Plugin for Unreal Engine 5 is released under the [MIT License](https://github.com/npruehs/ue4-rts/blob/develop/LICENSE).
