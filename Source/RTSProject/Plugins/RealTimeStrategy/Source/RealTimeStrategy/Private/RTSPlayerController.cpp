@@ -1312,13 +1312,13 @@ void ARTSPlayerController::FinishSelectActors()
 		ActorsToSelect = SelectedActors;
 	}
 
-    for (auto& HitResult : HitResults)
+  for (auto& HitResult : HitResults)
+  {
+
+    if (!HitResult.HasValidHitObjectHandle())
     {
-        if (!HitResult.HasValidHitObjectHandle())
-    	{
-    		continue;
-    	}
-        
+      continue;
+    }
 		if (!IsSelectableActor(HitResult.GetActor()))
 		{
 			continue;
@@ -1354,7 +1354,7 @@ void ARTSPlayerController::FinishSelectActors()
 
 			UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.GetActor()->GetName());
 		}
-    }
+  }
 
 	SelectActors(ActorsToSelect, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_DoNothing);
 
@@ -1914,7 +1914,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
             }
 
 			// Check if hit any actor.
-			if (HitResult.GetActor() == nullptr || Cast<ALandscape>(HitResult.GetActor()) != nullptr)
+			if (!HitResult.HasValidHitObjectHandle() || Cast<ALandscape>(HitResult.GetActor()) != nullptr)
 			{
 				continue;
 			}
