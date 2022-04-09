@@ -40,9 +40,15 @@ For a quick look, just open `Source/RTSProject/RTSProject.uproject`,  load `Maps
 
 ### Prerequisites
 
-Real-Time Strategy Plugin for Unreal Engine 5 currently supports the following Unreal Engine Versions:
+Real-Time Strategy Plugin for Unreal Engine 5 provides plugin content which is usually not backwards-compatible: Content saved with a newer engine version cannot be opened again with an older engine version. Thus, every time a feature or bugfix requires a plugin content update, the plugin does not support older engine versions anymore. The following table summarizes plugin compatibility with engine versions:
 
-* 5.0EA
+| Plugin Version | Supported Engine Versions |
+| -------------- | ------------------------- |
+| 1.0.0 | 4.24, 4.25 |
+| 1.1.0 | 4.25 |
+| 1.2.0 | 4.25 |
+| Git (master) | 4.27 |
+| Git (feature/ue5) | 5.0 |
 
 ### Adding The Plugin (Blueprint Project)
 

@@ -32,6 +32,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FindTargetInAcquisitionRadius();
 
+	/** Gets the class of the order currently issued to the pawn. */
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<URTSOrder> GetCurrentOrder() const;
+	
     /** Checks whether the pawn has an order of the specified type. */
     UFUNCTION(BlueprintPure)
     bool HasOrder(ERTSOrderType OrderType) const;
@@ -97,15 +101,12 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "RTS")
     UBlackboardData* PawnBlackboardAsset;
 
+	/** Types of actors to filter for when trying to find targets in the acquisition radius. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<TEnumAsByte<EObjectTypeQuery>> AcquisitionObjectTypes;
+	
     UPROPERTY()
 	URTSAttackComponent* AttackComponent;
-
-	bool TraceSphere(
-		const FVector& Location,
-		const float Radius,
-		AActor* ActorToIgnore,
-		ECollisionChannel TraceChannel,
-		TArray<struct FHitResult>& OutHitResults);
 
     ERTSOrderType OrderClassToType(UClass* OrderClass) const;
 };

@@ -3,6 +3,7 @@
 #if WITH_GAMEPLAY_DEBUGGER
 
 #include "RTSGameplayTagsComponent.h"
+#include "RTSPawnAIController.h"
 #include "RTSPlayerController.h"
 
 
@@ -13,7 +14,7 @@ FRTSGameplayDebuggerCategory::FRTSGameplayDebuggerCategory()
 
 void FRTSGameplayDebuggerCategory::DrawData(APlayerController* OwnerPC, FGameplayDebuggerCanvasContext& CanvasContext)
 {
-    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(OwnerPC);
+    const ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(OwnerPC);
 
     if (!IsValid(PlayerController))
     {
@@ -27,15 +28,17 @@ void FRTSGameplayDebuggerCategory::DrawData(APlayerController* OwnerPC, FGamepla
         return;
     }
 
-    AActor* SelectedActor = SelectedActors[0];
+    const AActor* SelectedActor = SelectedActors[0];
 
     if (!IsValid(SelectedActor))
     {
         return;
     }
 
+    // Show selected actor name.
     CanvasContext.Printf(TEXT("Selected Actor: %s"), *SelectedActor->GetName());
 
+    // Show active gameplay tags.
     URTSGameplayTagsComponent* GameplayTagsComponent = SelectedActor->FindComponentByClass<URTSGameplayTagsComponent>();
 
     if (IsValid(GameplayTagsComponent))
@@ -48,6 +51,25 @@ void FRTSGameplayDebuggerCategory::DrawData(APlayerController* OwnerPC, FGamepla
         {
             CanvasContext.Printf(TEXT("%s"), *Tag.ToString());
         }
+    }
+
+    // Show current order (server only).
+    const APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+
+    if (!IsValid(SelectedPawn))
+    {
+        return;
+    }
+
+    const ARTSPawnAIController* PawnAIController = SelectedPawn->GetController<ARTSPawnAIController>();
+
+    if (IsValid(PawnAIController))
+    {
+        const TSubclassOf<URTSOrder> CurrentOrder = PawnAIController->GetCurrentOrder();
+        const FString OrderName = CurrentOrder != nullptr ? CurrentOrder->GetName() : TEXT("none");
+        
+        CanvasContext.Printf(TEXT(""));
+        CanvasContext.Printf(TEXT("Current Order: %s"), *OrderName);
     }
 }
 

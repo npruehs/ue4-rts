@@ -40,6 +40,7 @@
 #include "Orders/RTSContinueConstructionOrder.h"
 #include "Orders/RTSGatherOrder.h"
 #include "Orders/RTSMoveOrder.h"
+#include "Orders/RTSReturnResourcesOrder.h"
 #include "Orders/RTSSetRallyPointToActorOrder.h"
 #include "Orders/RTSSetRallyPointToLocationOrder.h"
 #include "Orders/RTSStopOrder.h"
@@ -72,6 +73,7 @@ ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectIniti
     DefaultOrders.Add(URTSAttackOrder::StaticClass());
     DefaultOrders.Add(URTSGatherOrder::StaticClass());
     DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
+	DefaultOrders.Add(URTSReturnResourcesOrder::StaticClass());
     DefaultOrders.Add(URTSMoveOrder::StaticClass());
     DefaultOrders.Add(URTSSetRallyPointToActorOrder::StaticClass());
     DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
@@ -1217,6 +1219,11 @@ bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> Bu
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
+	if (IsValid(BuildingCursor))
+	{
+		BuildingCursor->Destroy();
+	}
+	
     // Spawn preview building.
     FActorSpawnParameters SpawnParams;
     SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -1305,13 +1312,13 @@ void ARTSPlayerController::FinishSelectActors()
 		ActorsToSelect = SelectedActors;
 	}
 
-    for (auto& HitResult : HitResults)
+  for (auto& HitResult : HitResults)
+  {
+
+    if (!HitResult.HasValidHitObjectHandle())
     {
-    	if (!HitResult.HasValidHitObjectHandle())
-    	{
-    		continue;
-    	}
-    	
+      continue;
+    }
 		if (!IsSelectableActor(HitResult.GetActor()))
 		{
 			continue;
@@ -1347,7 +1354,7 @@ void ARTSPlayerController::FinishSelectActors()
 
 			UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.GetActor()->GetName());
 		}
-    }
+  }
 
 	SelectActors(ActorsToSelect, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_DoNothing);
 

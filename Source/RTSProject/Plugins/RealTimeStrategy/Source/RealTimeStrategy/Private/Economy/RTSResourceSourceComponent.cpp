@@ -15,7 +15,6 @@ URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitialize
 	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
-	CurrentResources = 1000.0f;
 	MaximumResources = 1000.0f;
 	GatheringFactor = 1.0f;
 	GathererCapacity = 1;
@@ -54,6 +53,9 @@ void URTSResourceSourceComponent::BeginPlay()
             GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ResourceSource());
         }
 	}
+
+	 // Set initial resources.
+	CurrentResources = MaximumResources;
 }
 
 float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float ResourceAmount)

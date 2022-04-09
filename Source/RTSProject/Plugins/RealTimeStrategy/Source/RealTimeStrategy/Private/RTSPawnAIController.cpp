@@ -2,12 +2,12 @@
 
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 #include "RTSLog.h"
 #include "RTSOwnerComponent.h"
 #include "Economy/RTSGathererComponent.h"
 #include "Combat/RTSAttackComponent.h"
-#include "Construction/RTSBuilderComponent.h"
 #include "Libraries/RTSConstructionLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
 #include "Libraries/RTSOrderLibrary.h"
@@ -47,48 +47,52 @@ void ARTSPawnAIController::FindTargetInAcquisitionRadius()
 	}
 
 	// Find nearby actors.
-	TArray<struct FHitResult> HitResults;
-	TraceSphere(GetPawn()->GetActorLocation(), AttackComponent->GetAcquisitionRadius(), GetPawn(), ECC_Pawn, HitResults);
-
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetPawn());
+	
+	TArray<AActor*> NearbyActors;
+	UKismetSystemLibrary::SphereOverlapActors(this, GetPawn()->GetActorLocation(),
+		AttackComponent->GetAcquisitionRadius(), AcquisitionObjectTypes, APawn::StaticClass(), ActorsToIgnore,
+		NearbyActors);
+	
 	// Find target to acquire.
-	for (auto& HitResult : HitResults)
+	for (AActor* NearbyActor : NearbyActors)
 	{
-		if (!HitResult.HasValidHitObjectHandle())
+		if (!IsValid(NearbyActor))
 		{
 			continue;
 		}
 
-		if (HitResult.GetActor() == GetPawn())
-		{
-			continue;
-		}
-		
 		// Check owner.
-		auto MyActor = GetPawn();
-		auto TargetActor = HitResult.GetActor();
+		const AActor* MyActor = GetPawn();
 
-		if (MyActor && TargetActor)
+		if (IsValid(MyActor))
 		{
-			auto MyOwnerComponent = MyActor->FindComponentByClass<URTSOwnerComponent>();
+			const URTSOwnerComponent* MyOwnerComponent = MyActor->FindComponentByClass<URTSOwnerComponent>();
 
-			if (MyOwnerComponent && MyOwnerComponent->IsSameTeamAsActor(TargetActor))
+			if (MyOwnerComponent && MyOwnerComponent->IsSameTeamAsActor(NearbyActor))
 			{
 				continue;
 			}
 		}
 
 		// Check if found attackable actor.
-		if (!URTSGameplayTagLibrary::HasGameplayTag(HitResult.GetActor(), URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
+		if (!URTSGameplayTagLibrary::HasGameplayTag(NearbyActor, URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()))
 		{
 			continue;
 		}
 
 		// Acquire target.
-		Blackboard->SetValueAsObject(TEXT("TargetActor"), HitResult.GetActor());
+		Blackboard->SetValueAsObject(TEXT("TargetActor"), NearbyActor);
 
-		UE_LOG(LogRTS, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *HitResult.GetActor()->GetName());
+		UE_LOG(LogRTS, Log, TEXT("%s automatically acquired target %s."), *GetPawn()->GetName(), *NearbyActor->GetName());
 		return;
 	}
+}
+
+TSubclassOf<URTSOrder> ARTSPawnAIController::GetCurrentOrder() const
+{
+	return Blackboard->GetValueAsClass(TEXT("OrderClass"));
 }
 
 bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
@@ -99,7 +103,7 @@ bool ARTSPawnAIController::HasOrder(ERTSOrderType OrderType) const
 
 bool ARTSPawnAIController::HasOrderByClass(TSubclassOf<URTSOrder> OrderClass) const
 {
-    return Blackboard->GetValueAsClass(TEXT("OrderClass")) == OrderClass;
+    return GetCurrentOrder() == OrderClass;
 }
 
 bool ARTSPawnAIController::IsIdle() const
@@ -218,33 +222,6 @@ void ARTSPawnAIController::IssueStopOrder()
     FRTSOrderData Order;
     Order.OrderClass = URTSStopOrder::StaticClass();
     IssueOrder(Order);
-}
-
-bool ARTSPawnAIController::TraceSphere(
-	const FVector& Location,
-	const float Radius,
-	AActor* ActorToIgnore,
-	ECollisionChannel TraceChannel,
-	TArray<struct FHitResult>& OutHitResults)
-{
-	UWorld* World = GetWorld();
-
-	if (!World)
-	{
-		return false;
-	}
-
-	const FVector Start = Location;
-	const FVector End = Location + FVector::ForwardVector * Radius;
-
-	return World->SweepMultiByObjectType(
-		OutHitResults,
-		Start,
-		End,
-		FQuat(),
-		FCollisionObjectQueryParams(TraceChannel),
-		FCollisionShape::MakeSphere(Radius)
-	);
 }
 
 ERTSOrderType ARTSPawnAIController::OrderClassToType(UClass* OrderClass) const
