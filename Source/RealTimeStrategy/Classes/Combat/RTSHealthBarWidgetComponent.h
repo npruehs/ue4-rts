@@ -1,35 +1,37 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RTSHealthComponent.h"
+#include "Components/ProgressBar.h"
 
 #include "UI/RTSActorWidgetComponent.h"
 
 #include "RTSHealthBarWidgetComponent.generated.h"
 
 
-class URTSHealthComponent;
+class URTSCombatComponent;
 
 
 /**
 * Adds a health bar widget to the actor.
 */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, Category = "RTS")
 class REALTIMESTRATEGY_API URTSHealthBarWidgetComponent : public URTSActorWidgetComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-    /** Event when the current health of the actor has changed. */
-    UFUNCTION(BlueprintImplementableEvent, Category = "RTS")
-    void UpdateHealthBar(float HealthPercentage);
-
+	/** Event when the current health of the actor has changed. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS")
+	void UpdateHealthBar(float HealthPercentage);
 
 private:
-    UPROPERTY()
-    URTSHealthComponent* HealthComponent;
+	UPROPERTY()
+	URTSCombatComponent* CombatComponent;
+	UPROPERTY()
+	URTSHealthComponent* HealthComponent;
 
-    UFUNCTION()
-    void OnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

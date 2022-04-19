@@ -4,20 +4,23 @@
 #include "Production/RTSProductionComponent.h"
 
 URTSSetRallyPointToLocationOrder::URTSSetRallyPointToLocationOrder(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    TargetType = ERTSOrderTargetType::ORDERTARGET_Location;
-    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
+	TargetType = ERTSOrderTargetType::ORDERTARGET_Location;
+	GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
 
-    IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanProduce());
+	IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanProduce());
 }
 
-void URTSSetRallyPointToLocationOrder::IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
+void URTSSetRallyPointToLocationOrder::AddOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
 {
-    URTSProductionComponent* ProductionComponent = OrderedActor->FindComponentByClass<URTSProductionComponent>();
+	SetOrder(OrderedActor, TargetData, Index);
+}
 
-    if (IsValid(ProductionComponent))
-    {
-        ProductionComponent->SetRallyPointToLocation(TargetData.Location);
-    }
+void URTSSetRallyPointToLocationOrder::SetOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
+{
+	if (URTSProductionComponent* ProductionComponent = OrderedActor->FindComponentByClass<URTSProductionComponent>(); IsValid(ProductionComponent))
+	{
+		ProductionComponent->SetRallyPointToLocation(TargetData.Location);
+	}
 }

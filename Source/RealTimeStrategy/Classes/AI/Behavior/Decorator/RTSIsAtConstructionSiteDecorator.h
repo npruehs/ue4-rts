@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTDecorator.h"
+#include "UObject/Object.h"
 #include "RTSIsAtConstructionSiteDecorator.generated.h"
 
 /**

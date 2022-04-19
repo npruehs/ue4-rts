@@ -33,12 +33,12 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
 	MaxAssignedBuilders = 1;
 	ProgressMadeAutomatically = 0.0f;
 	ProgressMadePerBuilder = 1.0f;
-    InitialHealthPercentage = 0.1f;
+	InitialHealthPercentage = 0.1f;
 	RefundFactor = 0.5f;
 	bStartImmediately = true;
 
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed());
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed());
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
 }
 
 void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -46,17 +46,17 @@ void URTSConstructionSiteComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSConstructionSiteComponent, RemainingConstructionTime);
-    DOREPLIFETIME(URTSConstructionSiteComponent, State);
+	DOREPLIFETIME(URTSConstructionSiteComponent, State);
 }
 
 void URTSConstructionSiteComponent::AddGameplayTags(FGameplayTagContainer& InOutTagContainer)
 {
-    Super::AddGameplayTags(InOutTagContainer);
+	Super::AddGameplayTags(InOutTagContainer);
 
-    if (State != ERTSConstructionState::CONSTRUCTIONSTATE_Finished)
-    {
-        InOutTagContainer.AddTag(URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
-    }
+	if (State != ERTSConstructionState::CONSTRUCTIONSTATE_Finished)
+	{
+		InOutTagContainer.AddTag(URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
+	}
 }
 
 void URTSConstructionSiteComponent::BeginPlay()
@@ -64,30 +64,30 @@ void URTSConstructionSiteComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// Set container size.
-	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
+	const auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
 
 	if (ContainerComponent)
 	{
 		ContainerComponent->SetCapacity(MaxAssignedBuilders);
 
-        URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
+		URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
 
-        if (IsValid(GameplayTagsComponent))
-        {
-            GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ConstructionSite());
-        }
+		if (IsValid(GameplayTagsComponent))
+		{
+			GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ConstructionSite());
+		}
 	}
 }
 
-void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    // Don't update construction progress on clients - will be replicated from server.
-    if (GetNetMode() == NM_Client)
-    {
-        return;
-    }
+	// Don't update construction progress on clients - will be replicated from server.
+	if (GetNetMode() == NM_Client)
+	{
+		return;
+	}
 
 	// Check for autostart.
 	if (State == ERTSConstructionState::CONSTRUCTIONSTATE_NotStarted && bStartImmediately)
@@ -99,47 +99,47 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		return;
 	}
 
-    // Check for speed boosts.
-    float SpeedBoostFactor = 1.0f;
-    AActor* OwningActor = GetOwner();
+	// Check for speed boosts.
+	float SpeedBoostFactor = 1.0f;
+	const AActor* OwningActor = GetOwner();
 
-    if (OwningActor)
-    {
-        AActor* OwningPlayer = OwningActor->GetOwner();
+	if (OwningActor)
+	{
+		const AActor* OwningPlayer = OwningActor->GetOwner();
 
-        if (OwningPlayer)
-        {
-            URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
+		if (OwningPlayer)
+		{
+			const URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-            if (PlayerAdvantageComponent)
-            {
-                SpeedBoostFactor = PlayerAdvantageComponent->GetSpeedBoostFactor();
-            }
-        }
-    }
+			if (PlayerAdvantageComponent)
+			{
+				SpeedBoostFactor = PlayerAdvantageComponent->GetSpeedBoostFactor();
+			}
+		}
+	}
 
 	// Compute construction progress based on number of assigned builders.
-	float ConstructionProgress =
-        (DeltaTime * ProgressMadeAutomatically * SpeedBoostFactor) +
-        (DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num() * SpeedBoostFactor);
+	const float ConstructionProgress =
+		(DeltaTime * ProgressMadeAutomatically * SpeedBoostFactor) +
+		(DeltaTime * ProgressMadePerBuilder * AssignedBuilders.Num() * SpeedBoostFactor);
 
-    UE_LOG(LogRTS, Verbose, TEXT("DeltaTime: %f, ProgressMadeAutomatically: %f, ProgressMadePerBuilder: %f, SpeedBoostFactor: %f, AssignedBuilders: %i,"), DeltaTime, ProgressMadeAutomatically, ProgressMadePerBuilder,
-        SpeedBoostFactor, AssignedBuilders.Num());
+	UE_LOG(LogRTS, Verbose, TEXT("DeltaTime: %f, ProgressMadeAutomatically: %f, ProgressMadePerBuilder: %f, SpeedBoostFactor: %f, AssignedBuilders: %i,"), DeltaTime, ProgressMadeAutomatically, ProgressMadePerBuilder,
+	       SpeedBoostFactor, AssignedBuilders.Num());
 
 	// Check construction costs.
 	bool bConstructionCostPaid = false;
 
 	if (ConstructionCostType == ERTSPaymentType::PAYMENT_PayOverTime)
 	{
-        auto Owner = GetOwner()->GetOwner();
+		const auto Owner = GetOwner()->GetOwner();
 
-        if (!Owner)
-        {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
-            return;
-        }
+		if (!Owner)
+		{
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
+			return;
+		}
 
-        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+		const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
 		if (!PlayerResourcesComponent)
 		{
@@ -149,9 +149,9 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 
 		bool bCanPayAllConstructionCosts = true;
 
-		for (auto& Resource : ConstructionCosts)
+		for (const auto& Resource : ConstructionCosts)
 		{
-			float ResourceAmount = Resource.Value * ConstructionProgress / ConstructionTime;
+			const float ResourceAmount = Resource.Value * ConstructionProgress / ConstructionTime;
 
 			if (!PlayerResourcesComponent->CanPayResources(Resource.Key, ResourceAmount))
 			{
@@ -164,10 +164,10 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 		if (bCanPayAllConstructionCosts)
 		{
 			// Pay construction costs.
-			for (auto& Resource : ConstructionCosts)
+			for (const auto& Resource : ConstructionCosts)
 			{
-				float ResourceAmount = Resource.Value * ConstructionProgress / ConstructionTime;
-                PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
+				const float ResourceAmount = Resource.Value * ConstructionProgress / ConstructionTime;
+				PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
 			}
 
 			bConstructionCostPaid = true;
@@ -186,21 +186,21 @@ void URTSConstructionSiteComponent::TickComponent(float DeltaTime, enum ELevelTi
 	// Update construction progress.
 	RemainingConstructionTime -= ConstructionProgress;
 
-    // Update health.
-    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+	// Update health.
+	URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
 
-    if (IsValid(HealthComponent))
-    {
-        float CurrentHealth = HealthComponent->GetCurrentHealth();
-        float MaximumHealth = HealthComponent->GetMaximumHealth();
+	if (IsValid(HealthComponent))
+	{
+		const float CurrentHealth = HealthComponent->GetCurrentHealth();
+		const float MaximumHealth = HealthComponent->GetMaximumHealth();
 
-        float HealthIncrement = MaximumHealth * (1 - InitialHealthPercentage) * ConstructionProgress / ConstructionTime;
+		const float HealthIncrement = MaximumHealth * (1 - InitialHealthPercentage) * ConstructionProgress / ConstructionTime;
 
-        HealthComponent->SetCurrentHealth(CurrentHealth + HealthIncrement, nullptr);
-    }
+		HealthComponent->SetCurrentHealth(CurrentHealth + HealthIncrement, nullptr);
+	}
 
-    // Notify listeners.
-    NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
+	// Notify listeners.
+	NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
 
 	// Check if finished.
 	if (RemainingConstructionTime <= 0)
@@ -216,12 +216,12 @@ bool URTSConstructionSiteComponent::CanAssignBuilder(AActor* Builder) const
 
 void URTSConstructionSiteComponent::AssignBuilder(AActor* Builder)
 {
-    AssignedBuilders.Add(Builder);
+	AssignedBuilders.Add(Builder);
 }
 
 void URTSConstructionSiteComponent::UnassignBuilder(AActor* Builder)
 {
-    AssignedBuilders.Remove(Builder);
+	AssignedBuilders.Remove(Builder);
 }
 
 float URTSConstructionSiteComponent::GetProgressPercentage() const
@@ -249,15 +249,15 @@ void URTSConstructionSiteComponent::StartConstruction()
 	// Check construction cost.
 	if (ConstructionCostType == ERTSPaymentType::PAYMENT_PayImmediately)
 	{
-        auto Owner = GetOwner()->GetOwner();
+		const auto Owner = GetOwner()->GetOwner();
 
-        if (!Owner)
-        {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
-            return;
-        }
+		if (!Owner)
+		{
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for construction, but has no owner."), *GetOwner()->GetName());
+			return;
+		}
 
-        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+		const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
 		if (!PlayerResourcesComponent)
 		{
@@ -269,14 +269,14 @@ void URTSConstructionSiteComponent::StartConstruction()
 		if (!PlayerResourcesComponent->CanPayAllResources(ConstructionCosts))
 		{
 			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for constructing %s, but does not have enough resources."),
-				*Owner->GetName(),
-				*GetOwner()->GetName());
+			       *Owner->GetName(),
+			       *GetOwner()->GetName());
 			CancelConstruction();
 			return;
 		}
 
 		// Pay construction costs.
-        PlayerResourcesComponent->PayAllResources(ConstructionCosts);
+		PlayerResourcesComponent->PayAllResources(ConstructionCosts);
 	}
 
 	// Start construction.
@@ -285,17 +285,16 @@ void URTSConstructionSiteComponent::StartConstruction()
 
 	UE_LOG(LogRTS, Log, TEXT("Construction %s started."), *GetOwner()->GetName());
 
-    // Set initial health.
-    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+	// Set initial health.
+	URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
 
-    if (IsValid(HealthComponent))
-    {
-        float MaximumHealth = HealthComponent->GetMaximumHealth();
-        float InitialHealth = MaximumHealth * InitialHealthPercentage;
+	if (IsValid(HealthComponent))
+	{
+		const float MaximumHealth = HealthComponent->GetMaximumHealth();
+		const float InitialHealth = MaximumHealth * InitialHealthPercentage;
 
-        HealthComponent->SetCurrentHealth(InitialHealth, nullptr);
-
-    }
+		HealthComponent->SetCurrentHealth(InitialHealth, nullptr);
+	}
 
 	// Notify listeners.
 	OnConstructionStarted.Broadcast(GetOwner(), ConstructionTime);
@@ -318,8 +317,8 @@ void URTSConstructionSiteComponent::FinishConstruction()
 		}
 	}
 
-    // Remove gameplay tags.
-    URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
+	// Remove gameplay tags.
+	URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
 
 	// Notify listeners.
 	OnConstructionFinished.Broadcast(GetOwner());
@@ -335,54 +334,54 @@ void URTSConstructionSiteComponent::CancelConstruction()
 	UE_LOG(LogRTS, Log, TEXT("Construction %s canceled."), *GetOwner()->GetName());
 
 	// Refund resources.
-    auto Owner = GetOwner()->GetOwner();
+	const auto Owner = GetOwner()->GetOwner();
 
-    if (Owner)
-    {
-        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+	if (Owner)
+	{
+		const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-        if (!PlayerResourcesComponent)
-        {
-            float TimeRefundFactor = 0.0f;
+		if (!PlayerResourcesComponent)
+		{
+			float TimeRefundFactor = 0.0f;
 
-            if (ConstructionCostType == ERTSPaymentType::PAYMENT_PayImmediately)
-            {
-                TimeRefundFactor = 1.0f;
-            }
-            else if (ConstructionCostType == ERTSPaymentType::PAYMENT_PayOverTime)
-            {
-                TimeRefundFactor = GetProgressPercentage();
-            }
+			if (ConstructionCostType == ERTSPaymentType::PAYMENT_PayImmediately)
+			{
+				TimeRefundFactor = 1.0f;
+			}
+			else if (ConstructionCostType == ERTSPaymentType::PAYMENT_PayOverTime)
+			{
+				TimeRefundFactor = GetProgressPercentage();
+			}
 
-            float ActualRefundFactor = RefundFactor * TimeRefundFactor;
+			const float ActualRefundFactor = RefundFactor * TimeRefundFactor;
 
-            // Refund construction costs.
-            for (auto& Resource : ConstructionCosts)
-            {
-                TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
-                float ResourceAmount = Resource.Value * ActualRefundFactor;
+			// Refund construction costs.
+			for (const auto& Resource : ConstructionCosts)
+			{
+				const TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
+				float ResourceAmount = Resource.Value * ActualRefundFactor;
 
-                PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
+				PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
-                UE_LOG(LogRTS, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
+				UE_LOG(LogRTS, Log, TEXT("%f %s of construction costs refunded."), ResourceAmount, *ResourceType->GetName());
 
-                // Notify listeners.
-                OnConstructionCostRefunded.Broadcast(GetOwner(), ResourceType, ResourceAmount);
-            }
-        }
-    }
+				// Notify listeners.
+				OnConstructionCostRefunded.Broadcast(GetOwner(), ResourceType, ResourceAmount);
+			}
+		}
+	}
 
 	// Destroy construction site.
-    URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
+	URTSHealthComponent* HealthComponent = GetOwner()->FindComponentByClass<URTSHealthComponent>();
 
-    if (IsValid(HealthComponent))
-    {
-        HealthComponent->KillActor(GetOwner());
-    }
-    else
-    {
-        GetOwner()->Destroy();
-    }
+	if (IsValid(HealthComponent))
+	{
+		HealthComponent->KillActor(GetOwner());
+	}
+	else
+	{
+		GetOwner()->Destroy();
+	}
 
 	// Notify listeners.
 	OnConstructionCanceled.Broadcast(GetOwner());
@@ -390,92 +389,92 @@ void URTSConstructionSiteComponent::CancelConstruction()
 
 ERTSPaymentType URTSConstructionSiteComponent::GetConstructionCostType() const
 {
-    return ConstructionCostType;
+	return ConstructionCostType;
 }
 
 TMap<TSubclassOf<URTSResourceType>, float> URTSConstructionSiteComponent::GetConstructionCosts() const
 {
-    return ConstructionCosts;
+	return ConstructionCosts;
 }
 
 float URTSConstructionSiteComponent::GetConstructionTime() const
 {
-    return ConstructionTime;
+	return ConstructionTime;
 }
 
 bool URTSConstructionSiteComponent::ConsumesBuilders() const
 {
-    return bConsumesBuilders;
+	return bConsumesBuilders;
 }
 
 int32 URTSConstructionSiteComponent::GetMaxAssignedBuilders() const
 {
-    return MaxAssignedBuilders;
+	return MaxAssignedBuilders;
 }
 
 float URTSConstructionSiteComponent::GetProgressMadeAutomatically() const
 {
-    return ProgressMadeAutomatically;
+	return ProgressMadeAutomatically;
 }
 
 float URTSConstructionSiteComponent::GetProgressMadePerBuilder() const
 {
-    return ProgressMadePerBuilder;
+	return ProgressMadePerBuilder;
 }
 
 float URTSConstructionSiteComponent::GetRefundFactor() const
 {
-    return RefundFactor;
+	return RefundFactor;
 }
 
 bool URTSConstructionSiteComponent::DoesStartImmediately() const
 {
-    return bStartImmediately;
+	return bStartImmediately;
 }
 
 int32 URTSConstructionSiteComponent::GetGridWidthAndHeight() const
 {
-    return GridWidthAndHeight;
+	return GridWidthAndHeight;
 }
 
 bool URTSConstructionSiteComponent::ShouldPreviewAttackRange() const
 {
-    return bPreviewAttackRange;
+	return bPreviewAttackRange;
 }
 
 ERTSConstructionState URTSConstructionSiteComponent::GetState() const
 {
-    return State;
+	return State;
 }
 
 float URTSConstructionSiteComponent::GetRemainingConstructionTime() const
 {
-    return RemainingConstructionTime;
+	return RemainingConstructionTime;
 }
 
 TArray<AActor*> URTSConstructionSiteComponent::GetAssignedBuilders() const
 {
-    return AssignedBuilders;
+	return AssignedBuilders;
 }
 
 void URTSConstructionSiteComponent::NotifyOnConstructionProgressChanged(AActor* ConstructionSite, float ProgressPercentage)
 {
-    ProgressPercentage = FMath::Clamp(ProgressPercentage, 0.0f, 1.0f);
+	ProgressPercentage = FMath::Clamp(ProgressPercentage, 0.0f, 1.0f);
 
-    // Notify listeners.
-    OnConstructionProgressChanged.Broadcast(ConstructionSite, ProgressPercentage);
+	// Notify listeners.
+	OnConstructionProgressChanged.Broadcast(ConstructionSite, ProgressPercentage);
 
-    // Play sound.
-    if (ProgressPercentage >= 1.0f && URTSGameplayLibrary::IsOwnedByLocalPlayer(ConstructionSite))
-    {
-        if (IsValid(FinishedSound))
-        {
-            UGameplayStatics::PlaySound2D(this, FinishedSound);
-        }
-    }
+	// Play sound.
+	if (ProgressPercentage >= 1.0f && URTSGameplayLibrary::IsOwnedByLocalPlayer(ConstructionSite))
+	{
+		if (IsValid(FinishedSound))
+		{
+			UGameplayStatics::PlaySound2D(this, FinishedSound);
+		}
+	}
 }
 
 void URTSConstructionSiteComponent::ReceivedRemainingConstructionTime()
 {
-    NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
+	NotifyOnConstructionProgressChanged(GetOwner(), GetProgressPercentage());
 }

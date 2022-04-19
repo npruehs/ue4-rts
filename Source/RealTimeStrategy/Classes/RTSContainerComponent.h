@@ -3,12 +3,12 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "GameFramework/Controller.h"
 
 #include "RTSContainerComponent.generated.h"
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainerComponentActorEnteredSignature, AActor*, Container, AActor*, Actor);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainerComponentActorLeftSignature, AActor*, Container, AActor*, Actor);
 
 
@@ -21,12 +21,12 @@ class REALTIMESTRATEGY_API URTSContainerComponent : public UActorComponent
 public:
 	URTSContainerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 
-    /** Gets whether the specified actor is inside this container. */
-    UFUNCTION(BlueprintPure)
-    bool ContainsActor(const AActor* Actor) const;
+	/** Gets whether the specified actor is inside this container. */
+	UFUNCTION(BlueprintPure)
+	bool ContainsActor(const AActor* Actor) const;
 
 	/** Whether the specified actor can enter this container. */
 	UFUNCTION(BlueprintPure)
@@ -40,20 +40,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void UnloadActor(AActor* Actor);
 
-    /** Removes all actors from this container. */
-    void UnloadAll();
+	/** Removes all actors from this container. */
+	void UnloadAll();
 
 
-    /** Gets how many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
-    UFUNCTION(BlueprintPure)
-    int32 GetCapacity() const;
+	/** Gets how many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
+	UFUNCTION(BlueprintPure)
+	int32 GetCapacity() const;
 
-    /** Sets how many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
-    void SetCapacity(int32 InCapacity);
+	/** Sets how many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
+	void SetCapacity(int32 InCapacity);
 
-    /** Gets the actors currently held by this container. */
-    UFUNCTION(BlueprintPure)
-    TArray<AActor*> GetContainedActors() const;
+	/** Gets the actors currently held by this container. */
+	UFUNCTION(BlueprintPure)
+	TArray<AActor*> GetContainedActors() const;
 
 
 	/** Event when a new actor has entered this container. */
@@ -65,14 +65,14 @@ public:
 	FRTSContainerComponentActorLeftSignature OnActorLeft;
 
 private:
-    /** How many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    int32 Capacity;
+	/** How many actors may enter this container at the same time. Negative number means unlimited capacity, or will be set elsewhere. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	int32 Capacity;
 
-    /** Actors currently held by this container. */
-    UPROPERTY()
-    TArray<AActor*> ContainedActors;
+	/** Actors currently held by this container. */
+	UPROPERTY()
+	TArray<AActor*> ContainedActors;
 
-    UFUNCTION()
-    void OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser);
+	UFUNCTION()
+	void OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser);
 };

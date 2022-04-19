@@ -4,6 +4,7 @@
 
 #include "RTSPawnAIController.h"
 #include "Economy/RTSGathererComponent.h"
+#include "GameFramework/Controller.h"
 
 
 URTSIssueReturnResourcesTask::URTSIssueReturnResourcesTask(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
@@ -31,7 +32,7 @@ EBTNodeResult::Type URTSIssueReturnResourcesTask::ExecuteTask(UBehaviorTreeCompo
 		return EBTNodeResult::Failed;
 	}
 
-	Controller->IssueReturnResourcesOrder();
+	Controller->InsertReturnResourcesOrder();
 
 	return EBTNodeResult::Succeeded;
 }

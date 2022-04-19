@@ -6,81 +6,98 @@
 
 bool URTSOrder::CanObeyOrder(const AActor* OrderedActor, int32 Index) const
 {
-    return true;
+	return true;
 }
 
 bool URTSOrder::IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
 {
-    return true;
+	return true;
 }
 
-void URTSOrder::IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
+void URTSOrder::AddOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
 {
-    APawn* Pawn = Cast<APawn>(OrderedActor);
+	IssueOrder(OrderedActor, TargetData, Index, true);
+}
 
-    if (!IsValid(Pawn))
-    {
-        return;
-    }
+void URTSOrder::SetOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
+{
+	IssueOrder(OrderedActor, TargetData, Index, false);
+}
 
-    ARTSPawnAIController* PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
+void URTSOrder::IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index, bool bAdd) const
+{
+	const APawn* Pawn = Cast<APawn>(OrderedActor);
 
-    if (!IsValid(PawnController))
-    {
-        return;
-    }
+	if (!IsValid(Pawn))
+	{
+		return;
+	}
 
-    // Issue order.
-    FRTSOrderData Order;
-    Order.OrderClass = GetClass();
-    Order.TargetActor = TargetData.Actor;
-    Order.TargetLocation = TargetData.Location;
-    Order.Index = Index;
+	ARTSPawnAIController* PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
 
-    PawnController->IssueOrder(Order);
+	if (!IsValid(PawnController))
+	{
+		return;
+	}
+
+	// Issue order.
+	FRTSOrderData Order;
+	Order.OrderClass = GetClass();
+	Order.TargetActor = TargetData.Actor;
+	Order.TargetLocation = TargetData.Location;
+	Order.Index = Index;
+
+	if (bAdd)
+	{
+		PawnController->AddOrder(Order);
+	}
+	else
+	{
+		PawnController->IssueOrder(Order);
+	}
 }
 
 ERTSOrderTargetType URTSOrder::GetTargetType() const
 {
-    return TargetType;
+	return TargetType;
 }
 
 ERTSOrderGroupExecutionType URTSOrder::GetGroupExecutionType() const
 {
-    return GroupExecutionType;
+	return GroupExecutionType;
 }
 
 FRTSOrderTagRequirements URTSOrder::GetIssueTagRequirements() const
 {
-    return IssueTagRequirements;
+	return IssueTagRequirements;
 }
 
 UTexture2D* URTSOrder::GetNormalIcon() const
 {
-    return NormalIcon;
+	return NormalIcon;
 }
 
 UTexture2D* URTSOrder::GetHoveredIcon() const
 {
-    return HoveredIcon;
+	return HoveredIcon;
 }
 
 UTexture2D* URTSOrder::GetPressedIcon() const
 {
-    return PressedIcon;
+	return PressedIcon;
 }
 
 UTexture2D* URTSOrder::GetDisabledIcon() const
 {
-    return DisabledIcon;
+	return DisabledIcon;
 }
 
 FText URTSOrder::GetName() const
 {
-    return Name;
+	return Name;
 }
 
 FText URTSOrder::GetDescription(const AActor* OrderedActor, int32 Index) const
 {
-    return Description;
+	return Description;
 }

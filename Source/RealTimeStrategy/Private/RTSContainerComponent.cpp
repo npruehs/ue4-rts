@@ -26,7 +26,7 @@ void URTSContainerComponent::BeginPlay()
 		return;
 	}
 
-    URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
+	URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
 
 	if (HealthComponent == nullptr)
 	{

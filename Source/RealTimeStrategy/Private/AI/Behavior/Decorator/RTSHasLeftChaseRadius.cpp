@@ -5,6 +5,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Combat/RTSAttackComponent.h"
+#include "Combat/RTSCombatComponent.h"
 #include "GameFramework/Controller.h"
 #include "Libraries/RTSFunctionLibrary.h"
 
@@ -27,13 +28,19 @@ bool URTSHasLeftChaseRadius::CalculateRawConditionValue(UBehaviorTreeComponent& 
 		return false;
 	}
 
-	const URTSAttackComponent* AttackComponent = Pawn->FindComponentByClass<URTSAttackComponent>();
-	if (!IsValid(AttackComponent))
+	const URTSCombatComponent* CombatComponent = Pawn->FindComponentByClass<URTSCombatComponent>();
+	if (!IsValid(CombatComponent))
 	{
-		return false;
+		const URTSAttackComponent* AttackComponent = Pawn->FindComponentByClass<URTSAttackComponent>();
+		if (!IsValid(AttackComponent))
+		{
+			return false;
+		}
+
+		return AttackComponent->GetChaseRadius() < (Pawn->GetActorLocation() - OwnerComp.GetBlackboardComponent()->GetValueAsVector(BlackboardKey.SelectedKeyName)).Length();
 	}
 
-	return AttackComponent->GetChaseRadius() < (Pawn->GetActorLocation() - OwnerComp.GetBlackboardComponent()->GetValueAsVector(BlackboardKey.SelectedKeyName)).Length();
+	return CombatComponent->GetChaseRadius() < (Pawn->GetActorLocation() - OwnerComp.GetBlackboardComponent()->GetValueAsVector(BlackboardKey.SelectedKeyName)).Length();
 }
 
 FString URTSHasLeftChaseRadius::GetStaticDescription() const

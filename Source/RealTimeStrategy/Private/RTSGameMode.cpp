@@ -24,34 +24,34 @@ ARTSGameMode::ARTSGameMode(const FObjectInitializer& ObjectInitializer /*= FObje
 	: Super(ObjectInitializer)
 {
 	// Set reasonable default values.
-    TeamClass = ARTSTeamInfo::StaticClass();
+	TeamClass = ARTSTeamInfo::StaticClass();
 	NumTeams = 2;
 }
 
 void ARTSGameMode::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    // Parse options.
-    FString NumAIPlayersString = UGameplayStatics::ParseOption(OptionsString, TEXT("NumAIPlayers"));
+	// Parse options.
+	const FString NumAIPlayersString = UGameplayStatics::ParseOption(OptionsString, TEXT("NumAIPlayers"));
 
-    if (!NumAIPlayersString.IsEmpty())
-    {
-        NumAIPlayers = FCString::Atoi(*NumAIPlayersString);
-    }
+	if (!NumAIPlayersString.IsEmpty())
+	{
+		NumAIPlayers = FCString::Atoi(*NumAIPlayersString);
+	}
 
-    UE_LOG(LogRTS, Log, TEXT("NumAIPlayers = %i"), NumAIPlayers);
+	UE_LOG(LogRTS, Log, TEXT("NumAIPlayers = %i"), NumAIPlayers);
 
-    // Spawn AI players.
-    for (int32 Index = 0; Index < NumAIPlayers; ++Index)
-    {
-        ARTSPlayerAIController* NewAI = StartAIPlayer();
+	// Spawn AI players.
+	for (int32 Index = 0; Index < NumAIPlayers; ++Index)
+	{
+		const ARTSPlayerAIController* NewAI = StartAIPlayer();
 
-        if (NewAI != nullptr)
-        {
-            NewAI->PlayerState->SetPlayerName(FString::Printf(TEXT("AI Player %i"), Index + 1));
-        }
-    }
+		if (NewAI != nullptr)
+		{
+			NewAI->PlayerState->SetPlayerName(FString::Printf(TEXT("AI Player %i"), Index + 1));
+		}
+	}
 }
 
 void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -59,10 +59,10 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 	AGameModeBase::InitGame(MapName, Options, ErrorMessage);
 
 	// Set up teams.
-    if (TeamClass == nullptr)
-    {
-        TeamClass = ARTSTeamInfo::StaticClass();
-    }
+	if (TeamClass == nullptr)
+	{
+		TeamClass = ARTSTeamInfo::StaticClass();
+	}
 
 	for (uint8 TeamIndex = 0; TeamIndex < NumTeams; ++TeamIndex)
 	{
@@ -70,18 +70,18 @@ void ARTSGameMode::InitGame(const FString& MapName, const FString& Options, FStr
 		ARTSTeamInfo* NewTeam = GetWorld()->SpawnActor<ARTSTeamInfo>(TeamClass);
 		NewTeam->SetTeamIndex(TeamIndex);
 
-        if (Teams.Num() <= TeamIndex)
-        {
-            Teams.SetNum(TeamIndex + 1);
-        }
+		if (Teams.Num() <= TeamIndex)
+		{
+			Teams.SetNum(TeamIndex + 1);
+		}
 
-        Teams[TeamIndex] = NewTeam;
+		Teams[TeamIndex] = NewTeam;
 
 		// Setup vision.
 		ARTSVisionInfo* TeamVision = GetWorld()->SpawnActor<ARTSVisionInfo>();
 		TeamVision->SetTeamIndex(TeamIndex);
 
-        UE_LOG(LogRTS, Log, TEXT("Set up team %s (team index %i)."), *NewTeam->GetName(), TeamIndex);
+		UE_LOG(LogRTS, Log, TEXT("Set up team %s (team index %i)."), *NewTeam->GetName(), TeamIndex);
 	}
 }
 
@@ -144,12 +144,13 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 		return;
 	}
 
-    ARTSGameState* RTSGameState = GetGameState<ARTSGameState>();
+	const ARTSGameState* RTSGameState = GetGameState<ARTSGameState>();
 
-    if (!IsValid(RTSGameState))
-    {
-        return;
-    }
+	if (!IsValid(RTSGameState))
+	{
+		return;
+	}
+
 
 	// Occupy start spot.
 	ARTSPlayerStart* PlayerStart = Cast<ARTSPlayerStart>(StartSpot);
@@ -173,80 +174,81 @@ void ARTSGameMode::RestartPlayerAtPlayerStart(AController* NewPlayer, AActor* St
 	// Build spawn transform.
 	// Don't allow initial actors to be spawned with any pitch or roll.
 	FRotator SpawnRotation(ForceInit);
-	SpawnRotation.Yaw = StartSpot->GetActorRotation().Yaw;
+	FRotator ActorRotation = StartSpot->GetActorRotation();
+	double X = SpawnRotation.Yaw = ActorRotation.Yaw;
 
-	// Build spawn info.
-	for (int32 Index = 0; Index < InitialActors.Num(); ++Index)
+	ARTSPlayerState* PlayerState = Cast<ARTSPlayerState>(NewPlayer->PlayerState);
+
+	if (URTSRace* Race = PlayerState->GetRace(); IsValid(Race))
 	{
-        TSubclassOf<AActor> ActorClass = InitialActors[Index];
+		// Build spawn info.
+		for (int32 Index = 0; Index < Race->InitialActors.Num(); ++Index)
+		{
+			const TSubclassOf<AActor> ActorClass = Race->InitialActors[Index];
 
-		// Spawn actor.
-        FVector SpawnLocation = StartSpot->GetActorLocation();
+			// Spawn actor.
+			FVector SpawnLocation = StartSpot->GetActorLocation();
 
-        if (Index < InitialActorLocations.Num())
-        {
-            SpawnLocation += InitialActorLocations[Index];
-        }
-        
-        FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
-		AActor* SpawnedActor = SpawnActorForPlayer(ActorClass, NewPlayer, SpawnTransform);
+			if (Index < Race->InitialActorLocations.Num())
+			{
+				SpawnLocation += ActorRotation.RotateVector(Race->InitialActorLocations[Index]);
+			}
 
-        // Finish construction of initial buildings immediately.
-        if (SpawnedActor != nullptr)
-        {
-            URTSConstructionSiteComponent* ConstructionSiteComponent = SpawnedActor->FindComponentByClass<URTSConstructionSiteComponent>();
+			FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
 
-            if (ConstructionSiteComponent != nullptr)
-            {
-                ConstructionSiteComponent->FinishConstruction();
-            }
-        }
+			// Finish construction of initial buildings immediately.
+			if (const AActor* SpawnedActor = SpawnActorForPlayer(ActorClass, NewPlayer, SpawnTransform); SpawnedActor != nullptr)
+			{
+				if (URTSConstructionSiteComponent* ConstructionSiteComponent = SpawnedActor->FindComponentByClass<URTSConstructionSiteComponent>(); ConstructionSiteComponent != nullptr)
+				{
+					ConstructionSiteComponent->FinishConstruction();
+				}
+			}
+		}
 	}
 
-    // Transfer ownership of pre-placed units.
-    ARTSPlayerState* PlayerState = Cast<ARTSPlayerState>(NewPlayer->PlayerState);
+	// Transfer ownership of pre-placed units.
+	if (IsValid(PlayerState))
+	{
+		const uint8 PlayerIndex = GetAvailablePlayerIndex();
+		PlayerState->SetPlayerIndex(PlayerIndex);
 
-    if (IsValid(PlayerState))
-    {
-        uint8 PlayerIndex = GetAvailablePlayerIndex();
-        PlayerState->SetPlayerIndex(PlayerIndex);
+		for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			AActor* Actor = *ActorItr;
 
-        for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-        {
-            AActor* Actor = *ActorItr;
+			// Check owner.
+			URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
 
-            // Check owner.
-            URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
-
-            if (IsValid(OwnerComponent) && OwnerComponent->GetInitialOwnerPlayerIndex() == PlayerIndex)
-            {
-                TransferOwnership(Actor, NewPlayer);
-            }
-        }
-    }
+			if (IsValid(OwnerComponent) && OwnerComponent->GetInitialOwnerPlayerIndex() == PlayerIndex)
+			{
+				TransferOwnership(Actor, NewPlayer);
+			}
+		}
+	}
 }
 
 ARTSPlayerAIController* ARTSGameMode::StartAIPlayer()
 {
-    FActorSpawnParameters SpawnInfo;
-    SpawnInfo.Instigator = GetInstigator();
-    SpawnInfo.ObjectFlags |= RF_Transient;	// We never want to save player controllers into a map
-    SpawnInfo.bDeferConstruction = true;
-    ARTSPlayerAIController* NewAI = GetWorld()->SpawnActor<ARTSPlayerAIController>(PlayerAIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
-    if (NewAI)
-    {
-        UGameplayStatics::FinishSpawningActor(NewAI, FTransform(FRotator::ZeroRotator, FVector::ZeroVector));
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Instigator = GetInstigator();
+	SpawnInfo.ObjectFlags |= RF_Transient; // We never want to save player controllers into a map
+	SpawnInfo.bDeferConstruction = true;
+	ARTSPlayerAIController* NewAI = GetWorld()->SpawnActor<ARTSPlayerAIController>(PlayerAIControllerClass, FVector::ZeroVector, FRotator::ZeroRotator, SpawnInfo);
+	if (NewAI)
+	{
+		UGameplayStatics::FinishSpawningActor(NewAI, FTransform(FRotator::ZeroRotator, FVector::ZeroVector));
 
-        UE_LOG(LogRTS, Log, TEXT("Spawned AI player %s."), *NewAI->GetName());
-    }
-    else
-    {
-        UE_LOG(LogRTS, Error, TEXT("Failed to spawn AI player."));
-        return nullptr;
-    }
+		UE_LOG(LogRTS, Log, TEXT("Spawned AI player %s."), *NewAI->GetName());
+	}
+	else
+	{
+		UE_LOG(LogRTS, Error, TEXT("Failed to spawn AI player."));
+		return nullptr;
+	}
 
-    RestartPlayer(NewAI);
-    return NewAI;
+	RestartPlayer(NewAI);
+	return NewAI;
 }
 
 AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, AController* ActorOwner, const FTransform& SpawnTransform)
@@ -271,65 +273,69 @@ AActor* ARTSGameMode::SpawnActorForPlayer(TSubclassOf<AActor> ActorClass, AContr
 
 void ARTSGameMode::TransferOwnership(AActor* Actor, AController* NewOwner)
 {
-    if (!Actor || !NewOwner)
-    {
-        return;
-    }
-
-    // Set owning player.
-    Actor->SetOwner(NewOwner);
-
-    URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
-
-    if (OwnerComponent)
-    {
-        OwnerComponent->SetPlayerOwner(NewOwner);
-    }
-
-    UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *NewOwner->GetName(), *Actor->GetName());
-
-    // Check for god mode.
-    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = NewOwner->FindComponentByClass<URTSPlayerAdvantageComponent>();
-
-    if (PlayerAdvantageComponent)
-    {
-        APawn* Pawn = Cast<APawn>(Actor);
-
-        if (Pawn)
-        {
-            Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
-        }
-    }   
-}
-
-TArray<ARTSTeamInfo*> ARTSGameMode::GetTeams() const
-{
-    return Teams;
-}
-
-void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
-{
-	if (DefeatConditionActorClasses.Num() <= 0)
+	if (!Actor || !NewOwner)
 	{
 		return;
 	}
 
-	ARTSPlayerController* OwningPlayer = Cast<ARTSPlayerController>(ActorOwner);
+	// Set owning player.
+	Actor->SetOwner(NewOwner);
 
-	if (OwningPlayer == nullptr)
+	URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+
+	if (OwnerComponent)
 	{
-        ARTSPlayerAIController* OwningAIPlayer = Cast<ARTSPlayerAIController>(ActorOwner);
+		OwnerComponent->SetPlayerOwner(NewOwner);
+	}
 
-        if (OwningAIPlayer == nullptr)
-        {
-            return;
-        }
+	UE_LOG(LogRTS, Log, TEXT("Player %s is now owning %s."), *NewOwner->GetName(), *Actor->GetName());
+
+	// Check for god mode.
+	const URTSPlayerAdvantageComponent* PlayerAdvantageComponent = NewOwner->FindComponentByClass<URTSPlayerAdvantageComponent>();
+
+	if (PlayerAdvantageComponent)
+	{
+		APawn* Pawn = Cast<APawn>(Actor);
+
+		if (Pawn)
+		{
+			Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
+		}
+	}
+}
+
+TArray<ARTSTeamInfo*> ARTSGameMode::GetTeams() const
+{
+	return Teams;
+}
+
+void ARTSGameMode::NotifyOnActorKilled(AActor* Actor, AController* ActorOwner)
+{
+	if (const ARTSPlayerController* OwningPlayer = Cast<ARTSPlayerController>(ActorOwner); OwningPlayer == nullptr)
+	{
+		if (const ARTSPlayerAIController* OwningAIPlayer = Cast<ARTSPlayerAIController>(ActorOwner); OwningAIPlayer == nullptr)
+		{
+			return;
+		}
+	}
+
+	const ARTSPlayerState* PlayerState = ActorOwner->GetPlayerState<ARTSPlayerState>();
+	if (!IsValid(PlayerState))
+	{
+		return;
+	}
+
+	const URTSRace* Race = PlayerState->GetRace();
+
+	if (!IsValid(Race) || Race->DefeatConditionActorClasses.Num() <= 0)
+	{
+		return;
 	}
 
 	// Check if any required actors are still alive.
-	for (AActor* OwnedActor : ActorOwner->Children)
+	for (const AActor* OwnedActor : ActorOwner->Children)
 	{
-		if (DefeatConditionActorClasses.Contains(OwnedActor->GetClass()))
+		if (Race->DefeatConditionActorClasses.Contains(OwnedActor->GetClass()))
 		{
 			return;
 		}
@@ -348,32 +354,33 @@ void ARTSGameMode::NotifyOnPlayerDefeated(AController* Player)
 
 uint8 ARTSGameMode::GetAvailablePlayerIndex()
 {
-    UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 
-    if (!IsValid(World))
-    {
-        return ARTSPlayerState::PLAYER_INDEX_NONE;
-    }
+	if (!IsValid(World))
+	{
+		return ARTSPlayerState::PLAYER_INDEX_NONE;
+	}
 
-    uint8 PlayerIndex = 0;
-    bool bPlayerIndexInUse = false;
+	uint8 PlayerIndex = 0;
+	bool bPlayerIndexInUse = false;
 
-    do
-    {
-        bPlayerIndexInUse = false;
+	do
+	{
+		bPlayerIndexInUse = false;
 
-        for (TActorIterator<ARTSPlayerState> PlayerIt(World); PlayerIt; ++PlayerIt)
-        {
-            ARTSPlayerState* PlayerState = *PlayerIt;
+		for (TActorIterator<ARTSPlayerState> PlayerIt(World); PlayerIt; ++PlayerIt)
+		{
+			const ARTSPlayerState* PlayerState = *PlayerIt;
 
-            if (PlayerState->GetPlayerIndex() == PlayerIndex)
-            {
-                bPlayerIndexInUse = true;
-                ++PlayerIndex;
-                break;
-            }
-        }
-    } while (bPlayerIndexInUse && PlayerIndex < ARTSPlayerState::PLAYER_INDEX_NONE);
+			if (PlayerState->GetPlayerIndex() == PlayerIndex)
+			{
+				bPlayerIndexInUse = true;
+				++PlayerIndex;
+				break;
+			}
+		}
+	}
+	while (bPlayerIndexInUse && PlayerIndex < ARTSPlayerState::PLAYER_INDEX_NONE);
 
-    return PlayerIndex;
+	return PlayerIndex;
 }

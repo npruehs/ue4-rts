@@ -38,15 +38,10 @@ TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 	TMap<TSubclassOf<AActor>, int32> OwnPawns;
 
 	const ARTSPlayerState* RTSPlayerState = GetPlayerState<ARTSPlayerState>();
-	TArray<AActor*> OwnActors = RTSPlayerState->GetOwnActors();
+	TArray<AActor*> OwnActors = RTSPlayerState->GetOwnActors();;
 
 	for (const AActor* OwnActor : OwnActors)
 	{
-		if (!IsValid(OwnActor))
-		{
-			continue;
-		}
-
 		int32& NumOwnedPawns = OwnPawns.FindOrAdd(OwnActor->GetClass());
 		++NumOwnedPawns;
 	}
@@ -55,7 +50,7 @@ TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 
 	// Check build order.
 	TMap<TSubclassOf<AActor>, int32> BuildOrderPawns;
-	for (TSubclassOf<AActor> PawnClass : BuildOrder)
+	for (TSubclassOf<AActor> PawnClass : RTSPlayerState->GetRace()->GetBuildOrder())
 	{
 		int32& NumRequiredPawns = BuildOrderPawns.FindOrAdd(PawnClass);
 		++NumRequiredPawns;

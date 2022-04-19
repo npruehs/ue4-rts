@@ -32,7 +32,7 @@ void URTSContainableComponent::BeginPlay()
 		return;
 	}
 
-    URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
+	URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
 
 	if (!IsValid(HealthComponent))
 	{

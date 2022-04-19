@@ -13,12 +13,14 @@
 UCLASS()
 class REALTIMESTRATEGY_API URTSActorWidgetComponent : public UWidgetComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSActorWidgetComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSActorWidgetComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    /** Event when the size of the actor on screen been calculated from its collision size. */
-    UFUNCTION(BlueprintImplementableEvent, Category = "RTS")
-    void UpdatePositionAndSize(const FVector2D& ActorScreenSize);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	/** Event when the size of the actor on screen been calculated from its collision size. */
+	UFUNCTION(BlueprintNativeEvent, Category = "RTS")
+	void UpdatePositionAndSize(const FVector2D& ActorScreenSize);
 };

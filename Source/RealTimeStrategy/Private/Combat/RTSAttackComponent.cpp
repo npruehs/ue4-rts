@@ -18,7 +18,7 @@ URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitial
 	// Set reasonable default values.
 	AcquisitionRadius = 1000.0f;
 	ChaseRadius = 1000.0f;
-	
+
 	FRTSAttackData DefaultAttack;
 	DefaultAttack.Cooldown = 0.5f;
 	DefaultAttack.Damage = 10.0f;
@@ -26,10 +26,10 @@ URTSAttackComponent::URTSAttackComponent(const FObjectInitializer& ObjectInitial
 
 	Attacks.Add(DefaultAttack);
 
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanAttack());
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanAttack());
 }
 
-void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+void URTSAttackComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	// Update cooldown timer.
 	if (RemainingCooldown > 0)
@@ -63,25 +63,25 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 		return;
 	}
 
-    // Calculate damage.
-    if (!Attacks.IsValidIndex(AttackIndex))
-    {
-        return;
-    }
+	// Calculate damage.
+	if (!Attacks.IsValidIndex(AttackIndex))
+	{
+		return;
+	}
 
-    const FRTSAttackData& Attack = Attacks[AttackIndex];
+	const FRTSAttackData& Attack = Attacks[AttackIndex];
 
-    float Damage = Attack.Damage;
+	float Damage = Attack.Damage;
 
-    if (IsValid(OwnerController))
-    {
-        URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwnerController->FindComponentByClass<URTSPlayerAdvantageComponent>();
+	if (IsValid(OwnerController))
+	{
+		const URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwnerController->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-        if (IsValid(PlayerAdvantageComponent))
-        {
-            Damage *= PlayerAdvantageComponent->GetOutgoingDamageFactor();
-        }
-    }
+		if (IsValid(PlayerAdvantageComponent))
+		{
+			Damage *= PlayerAdvantageComponent->GetOutgoingDamageFactor();
+		}
+	}
 
 	// Use attack.
 	UE_LOG(LogRTS, Log, TEXT("Actor %s attacks %s."), *Owner->GetName(), *Target->GetName());
@@ -92,9 +92,9 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 	{
 		// Fire projectile.
 		// Build spawn transform.
-		FVector SpawnLocation = Owner->GetActorLocation();
-		FRotator SpawnRotation = Owner->GetActorRotation();
-		FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
+		const FVector SpawnLocation = Owner->GetActorLocation();
+		const FRotator SpawnRotation = Owner->GetActorRotation();
+		const FTransform SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
 
 		// Build spawn info.
 		FActorSpawnParameters SpawnInfo;
@@ -132,20 +132,20 @@ void URTSAttackComponent::UseAttack(int32 AttackIndex, AActor* Target)
 
 float URTSAttackComponent::GetAcquisitionRadius() const
 {
-    return AcquisitionRadius;
+	return AcquisitionRadius;
 }
 
 float URTSAttackComponent::GetChaseRadius() const
 {
-    return ChaseRadius;
+	return ChaseRadius;
 }
 
 TArray<FRTSAttackData> URTSAttackComponent::GetAttacks() const
 {
-    return Attacks;
+	return Attacks;
 }
 
 float URTSAttackComponent::GetRemainingCooldown() const
 {
-    return RemainingCooldown;
+	return RemainingCooldown;
 }

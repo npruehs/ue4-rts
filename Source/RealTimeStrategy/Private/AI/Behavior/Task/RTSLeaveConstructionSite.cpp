@@ -1,7 +1,6 @@
 ﻿// © Acinex Games 2021
 
 #include "AI/Behavior/Task/RTSLeaveConstructionSite.h"
-
 #include "Construction/RTSBuilderComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"

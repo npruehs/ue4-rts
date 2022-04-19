@@ -12,7 +12,7 @@
 
 
 ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -21,19 +21,19 @@ ARTSProjectile::ARTSProjectile(const FObjectInitializer& ObjectInitializer /*= F
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 	ProjectileMovement->InitialSpeed = 1000.0f;
 
-    bFired = false;
+	bFired = false;
 
 	// Enable replication.
 	// This might change in the future, as we don't really care about exact projectile positions on client-side.
 	bReplicates = true;
 
-    // Set reasonable default values.
-    BallisticTrajectoryFactor = 600.0f;
+	// Set reasonable default values.
+	BallisticTrajectoryFactor = 600.0f;
 
-    AreaOfEffect = 1000.0f;
-    AreaOfEffectTargetObjectTypeFilter.Add(EObjectTypeQuery::ObjectTypeQuery2); // WorldDynamic
-    AreaOfEffectTargetObjectTypeFilter.Add(EObjectTypeQuery::ObjectTypeQuery3); // Pawn
-    AreaOfEffectTargetClassFilter = APawn::StaticClass();
+	AreaOfEffect = 1000.0f;
+	AreaOfEffectTargetObjectTypeFilter.Add(EObjectTypeQuery::ObjectTypeQuery2); // WorldDynamic
+	AreaOfEffectTargetObjectTypeFilter.Add(EObjectTypeQuery::ObjectTypeQuery3); // Pawn
+	AreaOfEffectTargetClassFilter = APawn::StaticClass();
 }
 
 void ARTSProjectile::FireAt(
@@ -54,62 +54,62 @@ void ARTSProjectile::FireAt(
 
 void ARTSProjectile::Tick(float DeltaSeconds)
 {
-    if (!bFired)
-    {
-        return;
-    }
+	if (!bFired)
+	{
+		return;
+	}
 
-    TimeToImpact -= DeltaSeconds;
+	TimeToImpact -= DeltaSeconds;
 
-    // Update ballistic trajectory.
-    if (bBallisticTrajectory)
-    {
-        static const float G = 9.8067f;
+	// Update ballistic trajectory.
+	if (bBallisticTrajectory)
+	{
+		static const float G = 9.8067f;
 
-        // Calculate traveled distance.
-        float InitialTravelTime = InitialDistance / ProjectileMovement->InitialSpeed;
-        float PassedTravelTime = InitialTravelTime - TimeToImpact;
-        float TraveledDistance = PassedTravelTime * ProjectileMovement->InitialSpeed;
+		// Calculate traveled distance.
+		const float InitialTravelTime = InitialDistance / ProjectileMovement->InitialSpeed;
+		const float PassedTravelTime = InitialTravelTime - TimeToImpact;
+		const float TraveledDistance = PassedTravelTime * ProjectileMovement->InitialSpeed;
 
-        // Calculate current height.
-        float ProjectileHeight = TraveledDistance * FMath::Tan(LaunchAngle) -
-            ((G * (TraveledDistance * TraveledDistance)) /
-            (2 * FMath::Pow(ProjectileMovement->InitialSpeed * FMath::Cos(LaunchAngle), 2)));
+		// Calculate current height.
+		const float ProjectileHeight = TraveledDistance * FMath::Tan(LaunchAngle) -
+		((G * (TraveledDistance * TraveledDistance)) /
+			(2 * FMath::Pow(ProjectileMovement->InitialSpeed * FMath::Cos(LaunchAngle), 2)));
 
-        FVector ProjectileLocation = GetActorLocation();
-        ProjectileLocation.Z = InitialHeight + (ProjectileHeight * BallisticTrajectoryFactor) +
-            ((TargetHeight - InitialHeight) * (PassedTravelTime / InitialTravelTime));
-        SetActorLocation(ProjectileLocation);
-    }
+		FVector ProjectileLocation = GetActorLocation();
+		ProjectileLocation.Z = InitialHeight + (ProjectileHeight * BallisticTrajectoryFactor) +
+			((TargetHeight - InitialHeight) * (PassedTravelTime / InitialTravelTime));
+		SetActorLocation(ProjectileLocation);
+	}
 
 	if (TimeToImpact > 0.0f)
 	{
-        return;
+		return;
 	}
 
-    if (HasAuthority())
-    {
-        if (!bApplyAreaOfEffect)
-        {
-            HitTargetActor(Target);
-        }
-        else
-        {
-            HitTargetLocation();
-        }
-    }
+	if (HasAuthority())
+	{
+		if (!bApplyAreaOfEffect)
+		{
+			HitTargetActor(Target);
+		}
+		else
+		{
+			HitTargetLocation();
+		}
+	}
 
-    // Notify listeners.
-    NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
+	// Notify listeners.
+	NotifyOnProjectileDetonated(Target, Damage, DamageType, EventInstigator, DamageCauser);
 
-    // Play sound.
-    if (IsValid(ImpactSound))
-    {
-        UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), GetActorRotation());
-    }
+	// Play sound.
+	if (IsValid(ImpactSound))
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), GetActorRotation());
+	}
 
-    // Destroy projectile.
-    Destroy();
+	// Destroy projectile.
+	Destroy();
 }
 
 void ARTSProjectile::NotifyOnProjectileDetonated(
@@ -124,112 +124,112 @@ void ARTSProjectile::NotifyOnProjectileDetonated(
 
 void ARTSProjectile::HitTargetActor(AActor* Actor)
 {
-    if (!IsValid(Actor))
-    {
-        return;
-    }
+	if (!IsValid(Actor))
+	{
+		return;
+	}
 
-    UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Actor->GetName(), Damage);
+	UE_LOG(LogRTS, Log, TEXT("Projectile %s hit target %s for %f damage."), *GetName(), *Actor->GetName(), Damage);
 
-    // Deal damage.
-    Actor->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
+	// Deal damage.
+	Actor->TakeDamage(Damage, FDamageEvent(DamageType), EventInstigator, DamageCauser);
 }
 
 void ARTSProjectile::HitTargetLocation()
 {
-    // Overlap actors in target area.
-    TArray<AActor*> OverlapedActors;
-    TArray<AActor*> ActorsToIgnore;
+	// Overlap actors in target area.
+	TArray<AActor*> OverlapedActors;
+	const TArray<AActor*> ActorsToIgnore;
 
-    UKismetSystemLibrary::CapsuleOverlapActors(this, FVector(TargetLocation.X, TargetLocation.Y, 0.0f),
-        AreaOfEffect, 10000.0f,
-        AreaOfEffectTargetObjectTypeFilter, AreaOfEffectTargetClassFilter,
-        ActorsToIgnore, OverlapedActors);
+	UKismetSystemLibrary::CapsuleOverlapActors(this, FVector(TargetLocation.X, TargetLocation.Y, 0.0f),
+	                                           AreaOfEffect, 10000.0f,
+	                                           AreaOfEffectTargetObjectTypeFilter, AreaOfEffectTargetClassFilter,
+	                                           ActorsToIgnore, OverlapedActors);
 
-    // Collect valid targets (e.g. by owner).
-    for (AActor* OverlapedActor : OverlapedActors)
-    {
-        if (!IsValid(OverlapedActor))
-        {
-            continue;
-        }
+	// Collect valid targets (e.g. by owner).
+	for (AActor* OverlapedActor : OverlapedActors)
+	{
+		if (!IsValid(OverlapedActor))
+		{
+			continue;
+		}
 
-        // Note that we always apply the effects to the real projectile target.
-        // This is necessary for forced attacks to friendly units.
-        if (OverlapedActor == Target)
-        {
-            HitTargetActor(OverlapedActor);
-            continue;
-        }
+		// Note that we always apply the effects to the real projectile target.
+		// This is necessary for forced attacks to friendly units.
+		if (OverlapedActor == Target)
+		{
+			HitTargetActor(OverlapedActor);
+			continue;
+		}
 
-        // Check owner.
-        URTSOwnerComponent* OwnerComponent = OverlapedActor->FindComponentByClass<URTSOwnerComponent>();
+		// Check owner.
+		const URTSOwnerComponent* OwnerComponent = OverlapedActor->FindComponentByClass<URTSOwnerComponent>();
 
-        if (IsValid(OwnerComponent) && !OwnerComponent->IsSameTeamAsActor(DamageCauser))
-        {
-            HitTargetActor(OverlapedActor);
-            continue;
-        }
-    }
+		if (IsValid(OwnerComponent) && !OwnerComponent->IsSameTeamAsActor(DamageCauser))
+		{
+			HitTargetActor(OverlapedActor);
+			continue;
+		}
+	}
 }
 
 void ARTSProjectile::MulticastFireAt_Implementation(AActor* ProjectileTarget, float ProjectileDamage,
-    TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator,
-    AActor* ProjectileDamageCauser)
+                                                    TSubclassOf<class UDamageType> ProjectileDamageType, AController* ProjectileEventInstigator,
+                                                    AActor* ProjectileDamageCauser)
 {
-    Target = ProjectileTarget;
-    Damage = ProjectileDamage;
-    DamageType = ProjectileDamageType;
-    EventInstigator = ProjectileEventInstigator;
-    DamageCauser = ProjectileDamageCauser;
+	Target = ProjectileTarget;
+	Damage = ProjectileDamage;
+	DamageType = ProjectileDamageType;
+	EventInstigator = ProjectileEventInstigator;
+	DamageCauser = ProjectileDamageCauser;
 
-    // Find target location.
-    URTSProjectileTargetComponent* ProjectileTargetComponent =
-        Target->FindComponentByClass<URTSProjectileTargetComponent>();
+	// Find target location.
+	const URTSProjectileTargetComponent* ProjectileTargetComponent =
+		Target->FindComponentByClass<URTSProjectileTargetComponent>();
 
-    if (IsValid(ProjectileTargetComponent))
-    {
-        TargetLocation = ProjectileTargetComponent->GetRandomProjectileTargetLocation();
-    }
-    else
-    {
-        TargetLocation = Target->GetActorLocation();
-    }
+	if (IsValid(ProjectileTargetComponent))
+	{
+		TargetLocation = ProjectileTargetComponent->GetRandomProjectileTargetLocation();
+	}
+	else
+	{
+		TargetLocation = Target->GetActorLocation();
+	}
 
-    // Set direction.
-    FVector Direction = TargetLocation - GetActorLocation();
-    FVector DirectionNormalized = Direction.GetSafeNormal(0.01f);
+	// Set direction.
+	const FVector Direction = TargetLocation - GetActorLocation();
+	const FVector DirectionNormalized = Direction.GetSafeNormal(0.01f);
 
-    InitialDistance = Direction.Size();
-    InitialHeight = GetActorLocation().Z;
-    TargetHeight = TargetLocation.Z;
+	InitialDistance = Direction.Size();
+	InitialHeight = GetActorLocation().Z;
+	TargetHeight = TargetLocation.Z;
 
-    ProjectileMovement->Velocity = DirectionNormalized * ProjectileMovement->InitialSpeed;
+	ProjectileMovement->Velocity = DirectionNormalized * ProjectileMovement->InitialSpeed;
 
-    if (ProjectileMovement->bIsHomingProjectile)
-    {
-        // Set target.
-        ProjectileMovement->HomingTargetComponent = Target->GetRootComponent();
-    }
+	if (ProjectileMovement->bIsHomingProjectile)
+	{
+		// Set target.
+		ProjectileMovement->HomingTargetComponent = Target->GetRootComponent();
+	}
 
-    // Set time to impact.
-    TimeToImpact = InitialDistance / ProjectileMovement->InitialSpeed;
-    bFired = true;
+	// Set time to impact.
+	TimeToImpact = InitialDistance / ProjectileMovement->InitialSpeed;
+	bFired = true;
 
-    // Setup ballistic trajectory.
-    if (bBallisticTrajectory)
-    {
-        // Calculate angle of reach.
-        static const float G = 9.8067f;
-        LaunchAngle = 0.5f * FMath::Asin(G * InitialDistance / (ProjectileMovement->InitialSpeed * ProjectileMovement->InitialSpeed));
-    }
+	// Setup ballistic trajectory.
+	if (bBallisticTrajectory)
+	{
+		// Calculate angle of reach.
+		static const float G = 9.8067f;
+		LaunchAngle = 0.5f * FMath::Asin(G * InitialDistance / (ProjectileMovement->InitialSpeed * ProjectileMovement->InitialSpeed));
+	}
 
-    // Play sound.
-    if (IsValid(FiredSound))
-    {
-        UGameplayStatics::PlaySoundAtLocation(this, FiredSound, GetActorLocation(), GetActorRotation());
-    }
+	// Play sound.
+	if (IsValid(FiredSound))
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FiredSound, GetActorLocation(), GetActorRotation());
+	}
 
-    // Clients will take it from here.
-    TearOff();
+	// Clients will take it from here.
+	TearOff();
 }

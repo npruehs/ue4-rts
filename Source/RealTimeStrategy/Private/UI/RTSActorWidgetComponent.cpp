@@ -2,8 +2,17 @@
 
 
 URTSActorWidgetComponent::URTSActorWidgetComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    // Set reasonable default values.
-    Space = EWidgetSpace::Screen;
+	// Set reasonable default values.
+	Space = EWidgetSpace::World;
+}
+
+void URTSActorWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void URTSActorWidgetComponent::UpdatePositionAndSize_Implementation(const FVector2D& ActorScreenSize)
+{
 }

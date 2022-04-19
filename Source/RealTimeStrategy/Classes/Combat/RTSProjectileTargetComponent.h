@@ -11,27 +11,27 @@ class UMeshComponent;
 
 
 /** Specifies valid locations to fire projectiles at. */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(meta = (BlueprintSpawnableComponent), Category = "RTS")
 class REALTIMESTRATEGY_API URTSProjectileTargetComponent : public UActorComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-    /** Gets a random world location to fire a projectile at. */
-    UFUNCTION(BlueprintPure)
-    FVector GetRandomProjectileTargetLocation() const;
+	/** Gets a random world location to fire a projectile at. */
+	UFUNCTION(BlueprintPure)
+	FVector GetRandomProjectileTargetLocation() const;
 
 private:
-    /** Sockets to fire projectiles at. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<FName> TargetSockets;
+	/** Sockets to fire projectiles at. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<FName> TargetSockets;
 
-    /** Component tag of the mesh component to look for sockets at. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FName PrimaryMeshComponentTag;
+	/** Component tag of the mesh component to look for sockets at. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FName PrimaryMeshComponentTag;
 
-    UPROPERTY()
-    UMeshComponent* MeshComponent;
+	UPROPERTY()
+	UMeshComponent* MeshComponent;
 };

@@ -11,79 +11,79 @@
 
 void URTSBountyComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	const AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
+	URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
 
-    if (IsValid(HealthComponent))
-    {
-        HealthComponent->OnKilled.AddDynamic(this, &URTSBountyComponent::OnKilled);
-    }
+	if (IsValid(HealthComponent))
+	{
+		HealthComponent->OnKilled.AddDynamic(this, &URTSBountyComponent::OnKilled);
+	}
 }
 
 void URTSBountyComponent::OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser)
 {
-    AActor* Owner = GetOwner();
+	AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    if (!IsValid(PreviousOwner))
-    {
-        return;
-    }
+	if (!IsValid(PreviousOwner))
+	{
+		return;
+	}
 
-    if (!GivesBounty(PreviousOwner))
-    {
-        return;
-    }
+	if (!GivesBounty(PreviousOwner))
+	{
+		return;
+	}
 
-    if (!IsValid(DamageCauser))
-    {
-        return;
-    }
+	if (!IsValid(DamageCauser))
+	{
+		return;
+	}
 
-    AController* DamageCausingPlayer = Cast<AController>(DamageCauser->GetOwner());
+	AController* DamageCausingPlayer = Cast<AController>(DamageCauser->GetOwner());
 
-    if (!IsValid(DamageCausingPlayer))
-    {
-        return;
-    }
+	if (!IsValid(DamageCausingPlayer))
+	{
+		return;
+	}
 
-    URTSPlayerResourcesComponent* PlayerResourcesComponent =
-        DamageCausingPlayer->FindComponentByClass<URTSPlayerResourcesComponent>();
+	URTSPlayerResourcesComponent* PlayerResourcesComponent =
+		DamageCausingPlayer->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-    if (!IsValid(PlayerResourcesComponent))
-    {
-        return;
-    }
+	if (!IsValid(PlayerResourcesComponent))
+	{
+		return;
+	}
 
-    for (auto& Resource : Bounties)
-    {
-        TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
-        float ResourceAmount = Resource.Value;
+	for (const auto& Resource : Bounties)
+	{
+		const TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
+		float ResourceAmount = Resource.Value;
 
-        PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
+		PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
-        UE_LOG(LogRTS, Log, TEXT("%s collected %f %s bounty from %s."), *DamageCausingPlayer->GetName(), ResourceAmount, *ResourceType->GetName(),
-             *Actor->GetName());
+		UE_LOG(LogRTS, Log, TEXT("%s collected %f %s bounty from %s."), *DamageCausingPlayer->GetName(), ResourceAmount, *ResourceType->GetName(),
+		       *Actor->GetName());
 
-        // Notify listeners.
-        OnBountyCollected.Broadcast(Owner, DamageCausingPlayer, ResourceType, ResourceAmount);
-    }
+		// Notify listeners.
+		OnBountyCollected.Broadcast(Owner, DamageCausingPlayer, ResourceType, ResourceAmount);
+	}
 }
 
 bool URTSBountyComponent::GivesBounty(AController* Player)
 {
-    ARTSPlayerAIController* PlayerAIController = Cast<ARTSPlayerAIController>(Player);
-    return IsValid(PlayerAIController) && PlayerAIController->GivesBounty();
+	const ARTSPlayerAIController* PlayerAIController = Cast<ARTSPlayerAIController>(Player);
+	return IsValid(PlayerAIController) && PlayerAIController->GivesBounty();
 }

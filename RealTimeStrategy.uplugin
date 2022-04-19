@@ -22,5 +22,11 @@
 			"LoadingPhase" : "Default",
 			"WhitelistPlatforms": [ "Win64" ]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
+		}
 	]
 }

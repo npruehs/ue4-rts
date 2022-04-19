@@ -4,6 +4,7 @@
 #include "RTSLog.h"
 
 #include "RTSPlayerController.h"
+#include "Combat/RTSCombatComponent.h"
 #include "Combat/RTSHealthComponent.h"
 #include "Combat/RTSHealthBarWidgetComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"

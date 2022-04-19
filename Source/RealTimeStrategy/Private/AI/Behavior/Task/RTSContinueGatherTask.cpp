@@ -24,19 +24,12 @@ EBTNodeResult::Type URTSContinueGatherTask::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Failed;
 	}
 
-	const URTSGathererComponent* GathererComponent = Pawn->FindComponentByClass<URTSGathererComponent>();
-	if (!IsValid(GathererComponent))
+	if (const URTSGathererComponent* GathererComponent = Pawn->FindComponentByClass<URTSGathererComponent>(); !IsValid(GathererComponent))
 	{
 		return EBTNodeResult::Failed;
 	}
 
-	AActor* PreferredResourceSource = GathererComponent->GetPreferredResourceSource();
-	if (!IsValid(PreferredResourceSource))
-	{
-		return EBTNodeResult::Failed;
-	}
-
-	Controller->IssueGatherOrder(PreferredResourceSource);
+	Controller->InsertContinueGathersOrder();
 
 	return EBTNodeResult::Succeeded;
 }

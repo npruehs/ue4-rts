@@ -84,9 +84,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	ERTSPaymentType GetConstructionCostType() const;
 
-    /** Gets the resources to pay for constructing the actor. */
-    UFUNCTION(BlueprintPure)
-    TMap<TSubclassOf<URTSResourceType>, float> GetConstructionCosts() const;
+	/** Gets the resources to pay for constructing the actor. */
+	UFUNCTION(BlueprintPure)
+	TMap<TSubclassOf<URTSResourceType>, float> GetConstructionCosts() const;
 
 	/** Gets the time for constructing the actor, in seconds. */
 	UFUNCTION(BlueprintPure)
@@ -108,9 +108,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetProgressMadePerBuilder() const;
 
-    /** Gets the resources to refund when canceling construction. */
-    UFUNCTION(BlueprintPure)
-    float GetRefundFactor() const;
+	/** Gets the resources to refund when canceling construction. */
+	UFUNCTION(BlueprintPure)
+	float GetRefundFactor() const;
 
 	/** Whether to start construction immediately after spawn, or not. */
 	UFUNCTION(BlueprintPure)

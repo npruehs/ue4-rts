@@ -234,9 +234,9 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 		{
 			if (OwnerComponent->GetPlayerOwner() == Player->PlayerState)
 			{
-                // Check if the unit has been taking damage lately.
-                URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
-                float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
+				// Check if the unit has been taking damage lately.
+				const URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
+				const float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
 
 				if (!IsValid(HealthComponent) ||
 					HealthComponent->GetLastTimeDamageTaken() <= 0.0f ||

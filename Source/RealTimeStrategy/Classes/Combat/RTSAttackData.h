@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Abilities/GameplayAbility.h"
 
 #include "GameFramework/DamageType.h"
 #include "Templates/SubclassOf.h"
@@ -10,12 +11,11 @@
 #include "RTSAttackData.generated.h"
 
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Category = "RTS")
 struct REALTIMESTRATEGY_API FRTSAttackData
 {
 	GENERATED_BODY()
 
-public:
 	/** Time before this attack can be used again, in seconds. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
 	float Cooldown;
@@ -35,4 +35,8 @@ public:
 	/** Type of the projectile to spawn. If not set, damage will be dealt instantly. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
 	TSubclassOf<ARTSProjectile> ProjectileClass;
+
+	/** Type of the projectile to spawn. If not set, damage will be dealt instantly. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RTS")
+	TSubclassOf<UGameplayAbility> AbilityClass;
 };

@@ -33,6 +33,8 @@ namespace UnrealBuildTool.Rules
 					"NavigationSystem"
 				});
 
+			PrivateDependencyModuleNames.AddRange(new [] {"GameplayAbilities"});
+
 			// Setup Gameplay Debugger.
 			if (Target.bBuildDeveloperTools || (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Configuration != UnrealTargetConfiguration.Test))
 			{
