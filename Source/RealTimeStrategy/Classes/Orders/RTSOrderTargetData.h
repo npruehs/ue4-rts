@@ -14,18 +14,18 @@ class AActor;
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSOrderTargetData
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Target actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    AActor* Actor;
+	/** Target actor. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	AActor* Actor;
 
-    /** Target location. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FVector Location;
+	/** Target location. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FVector Location;
 
-    /** Gameplay tags of the target. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FGameplayTagContainer TargetTags;
+	/** Gameplay tags of the target. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FGameplayTagContainer TargetTags;
 };

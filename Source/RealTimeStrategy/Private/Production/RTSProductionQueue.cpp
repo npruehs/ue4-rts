@@ -19,7 +19,7 @@ int32 FRTSProductionQueue::Num() const
 void FRTSProductionQueue::RemoveAt(int32 Index)
 {
 	// Advance all products.
-	int32 Slots = Queue.Num();
+	const int32 Slots = Queue.Num();
 
 	for (int32 SlotToUpdate = Index; SlotToUpdate < Slots - 1; ++SlotToUpdate)
 	{

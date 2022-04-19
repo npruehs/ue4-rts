@@ -6,27 +6,27 @@
 
 void URTSProductionProgressBarWidgetComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	const AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    URTSProductionComponent* ProductionComponent = Owner->FindComponentByClass<URTSProductionComponent>();
+	URTSProductionComponent* ProductionComponent = Owner->FindComponentByClass<URTSProductionComponent>();
 
-    if (!IsValid(ProductionComponent))
-    {
-        return;
-    }
+	if (!IsValid(ProductionComponent))
+	{
+		return;
+	}
 
-    ProductionComponent->OnProductionProgressChanged.AddDynamic(this,
-        &URTSProductionProgressBarWidgetComponent::OnProductionProgressChanged);
+	ProductionComponent->OnProductionProgressChanged.AddDynamic(this,
+	                                                            &URTSProductionProgressBarWidgetComponent::OnProductionProgressChanged);
 }
 
 void URTSProductionProgressBarWidgetComponent::OnProductionProgressChanged(AActor* Actor, int32 QueueIndex, float ProgressPercentage)
 {
-    UpdateProductionProgressBar(QueueIndex, ProgressPercentage);
+	UpdateProductionProgressBar(QueueIndex, ProgressPercentage);
 }

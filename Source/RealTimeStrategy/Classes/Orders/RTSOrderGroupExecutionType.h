@@ -8,9 +8,9 @@
 UENUM(BlueprintType)
 enum class ERTSOrderGroupExecutionType : uint8
 {
-    /** Order is simply issued to all selected actors. */
-    ORDERGROUPEXECUTION_All,
+	/** Order is simply issued to all selected actors. */
+	ORDERGROUPEXECUTION_All,
 
-    /** Order is issued to a single selected actor. */
-    ORDERGROUPEXECUTION_Any,
+	/** Order is issued to a single selected actor. */
+	ORDERGROUPEXECUTION_Any,
 };

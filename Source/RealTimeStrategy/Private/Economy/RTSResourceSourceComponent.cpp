@@ -10,7 +10,7 @@
 
 
 URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 
@@ -19,7 +19,7 @@ URTSResourceSourceComponent::URTSResourceSourceComponent(const FObjectInitialize
 	GatheringFactor = 1.0f;
 	GathererCapacity = 1;
 
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeGathered());
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeGathered());
 }
 
 void URTSResourceSourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -31,30 +31,30 @@ void URTSResourceSourceComponent::GetLifetimeReplicatedProps(TArray<FLifetimePro
 
 void URTSResourceSourceComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
+	URTSGameplayTagsComponent* GameplayTagsComponent = GetOwner()->FindComponentByClass<URTSGameplayTagsComponent>();
 
-    if (!IsValid(GameplayTagsComponent))
-    {
-        UE_LOG(LogRTS, Warning, TEXT("%s does not have an RTSGameplayTagsComponent attached. This will be required in future releases. Please add the component now to prevent issues later."),
-            *GetOwner()->GetName());
-    }
+	if (!IsValid(GameplayTagsComponent))
+	{
+		UE_LOG(LogRTS, Warning, TEXT("%s does not have an RTSGameplayTagsComponent attached. This will be required in future releases. Please add the component now to prevent issues later."),
+		       *GetOwner()->GetName());
+	}
 
-    // Set container size.
-	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
+	// Set container size.
+	const auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
 
 	if (ContainerComponent)
 	{
 		ContainerComponent->SetCapacity(GathererCapacity);
 
-        if (IsValid(GameplayTagsComponent))
-        {
-            GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ResourceSource());
-        }
+		if (IsValid(GameplayTagsComponent))
+		{
+			GameplayTagsComponent->AddGameplayTag(URTSGameplayTagLibrary::Container_ResourceSource());
+		}
 	}
 
-	 // Set initial resources.
+	// Set initial resources.
 	CurrentResources = MaximumResources;
 }
 
@@ -69,16 +69,16 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 	}
 
 	// Deduct resources.
-	float OldResources = CurrentResources;
+	const float OldResources = CurrentResources;
 	CurrentResources -= GatheredAmount;
-	float NewResources = CurrentResources;
+	const float NewResources = CurrentResources;
 
 	UE_LOG(LogRTS, Log, TEXT("Actor %s has gathered %f resources of type %s from %s, reducing remaining resources to %f."),
-		*Gatherer->GetName(),
-		GatheredAmount,
-		*ResourceType->GetName(),
-		*GetOwner()->GetName(),
-		CurrentResources);
+	       *Gatherer->GetName(),
+	       GatheredAmount,
+	       *ResourceType->GetName(),
+	       *GetOwner()->GetName(),
+	       CurrentResources);
 
 	// Notify listeners.
 	OnResourcesChanged.Broadcast(GetOwner(), OldResources, NewResources);
@@ -88,8 +88,8 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 	{
 		UE_LOG(LogRTS, Log, TEXT("Actor %s has been depleted."), *GetOwner()->GetName());
 
-        // Notify listeners.
-        OnDepleted.Broadcast(GetOwner());
+		// Notify listeners.
+		OnDepleted.Broadcast(GetOwner());
 
 		// Destroy this actor.
 		GetOwner()->Destroy();
@@ -100,36 +100,36 @@ float URTSResourceSourceComponent::ExtractResources(AActor* Gatherer, float Reso
 
 bool URTSResourceSourceComponent::CanGathererEnter(AActor* Gatherer) const
 {
-	auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
+	const auto ContainerComponent = GetOwner()->FindComponentByClass<URTSContainerComponent>();
 	return !ContainerComponent || ContainerComponent->GetContainedActors().Contains(Gatherer) || ContainerComponent->CanLoadActor(Gatherer);
 }
 
 TSubclassOf<URTSResourceType> URTSResourceSourceComponent::GetResourceType() const
 {
-    return ResourceType;
+	return ResourceType;
 }
 
 float URTSResourceSourceComponent::GetMaximumResources() const
 {
-    return MaximumResources;
+	return MaximumResources;
 }
 
 float URTSResourceSourceComponent::GetGatheringFactor() const
 {
-    return GatheringFactor;
+	return GatheringFactor;
 }
 
 bool URTSResourceSourceComponent::MustGathererEnter() const
 {
-    return bGathererMustEnter;
+	return bGathererMustEnter;
 }
 
 int32 URTSResourceSourceComponent::GetGathererCapacity() const
 {
-    return GathererCapacity;
+	return GathererCapacity;
 }
 
 float URTSResourceSourceComponent::GetCurrentResources() const
 {
-    return CurrentResources;
+	return CurrentResources;
 }

@@ -13,10 +13,15 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductQueuedSignature, AActor*, Actor, TSubclassOf<AActor>, ProductClass, int32, QueueIndex);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSProductionComponentProductionStartedSignature, AActor*, Actor, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, TotalProductionTime);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionProgressChangedSignature, AActor*, Actor, int32, QueueIndex, float, ProgressPercentage);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionFinishedSignature, AActor*, Actor, AActor*, Product, int32, QueueIndex);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSProductionComponentProductionCanceledSignature, AActor*, Actor, TSubclassOf<AActor>, ProductClass, int32, QueueIndex, float, ElapsedProductionTime);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionCostRefundedSignature, AActor*, Actor, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
 
@@ -33,7 +38,7 @@ public:
 
 
 	virtual void BeginPlay() override;
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 
 	/** Checks whether the actor can start producing the specified product. */
@@ -80,35 +85,35 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelProduction(int32 QueueIndex = 0, int32 ProductIndex = 0);
 
-    /** Sets the rally point on the specified actor. */
-    void SetRallyPointToActor(AActor* Target);
+	/** Sets the rally point on the specified actor. */
+	void SetRallyPointToActor(AActor* Target);
 
-    /** Sets the rally point to the specified actor. */
-    void SetRallyPointToLocation(const FVector& TargetLocation);
+	/** Sets the rally point to the specified actor. */
+	void SetRallyPointToLocation(const FVector& TargetLocation);
 
-    /** Clears the rally point. */
-    void ClearRallyPoint();
-
-
-    /** Gets the types of actors the actor can produce. */
-    UFUNCTION(BlueprintPure)
-    TArray<TSubclassOf<AActor>> GetAvailableProducts() const;
-
-    /** Gets how many products can be produced simultaneously. */
-    UFUNCTION(BlueprintPure)
-    int32 GetQueueCount() const;
-
-    /** Gets how many products may be queued per queue. */
-    UFUNCTION(BlueprintPure)
-    int32 GetCapacityPerQueue() const;
-    
-    /** Gets the actor or location to send new actors to. */
-    UFUNCTION(BlueprintPure)
-    FRTSProductionRallyPoint GetRallyPoint() const;
+	/** Clears the rally point. */
+	void ClearRallyPoint();
 
 
-    /** Event when the production timer has expired. */
-    virtual void NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex);
+	/** Gets the types of actors the actor can produce. */
+	UFUNCTION(BlueprintPure)
+	TArray<TSubclassOf<AActor>> GetAvailableProducts() const;
+
+	/** Gets how many products can be produced simultaneously. */
+	UFUNCTION(BlueprintPure)
+	int32 GetQueueCount() const;
+
+	/** Gets how many products may be queued per queue. */
+	UFUNCTION(BlueprintPure)
+	int32 GetCapacityPerQueue() const;
+
+	/** Gets the actor or location to send new actors to. */
+	UFUNCTION(BlueprintPure)
+	FRTSProductionRallyPoint GetRallyPoint() const;
+
+
+	/** Event when the production timer has expired. */
+	virtual void NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex);
 
 
 	/** Event when a product has been queued for production. */
@@ -119,9 +124,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSProductionComponentProductionStartedSignature OnProductionStarted;
 
-    /** Event when the production timer has been updated. */
-    UPROPERTY(BlueprintAssignable, Category = "RTS")
-    FRTSProductionComponentProductionProgressChangedSignature OnProductionProgressChanged;
+	/** Event when the production timer has been updated. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSProductionComponentProductionProgressChangedSignature OnProductionProgressChanged;
 
 	/** Event when the production timer has expired. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -136,38 +141,38 @@ public:
 	FRTSProductionComponentProductionCostRefundedSignature OnProductionCostRefunded;
 
 private:
-    /** Types of actors the actor can produce. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<TSubclassOf<AActor>> AvailableProducts;
+	/** Types of actors the actor can produce. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<TSubclassOf<AActor>> AvailableProducts;
 
-    /** How many products can be produced simultaneously. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
-    int32 QueueCount;
+	/** How many products can be produced simultaneously. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
+	int32 QueueCount;
 
-    /** How many products may be queued per queue. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
-    int32 CapacityPerQueue;
+	/** How many products may be queued per queue. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
+	int32 CapacityPerQueue;
 
-    /** Products queued for production. */
-    UPROPERTY(ReplicatedUsing=ReceivedProductionQueues)
-    TArray<FRTSProductionQueue> ProductionQueues;
+	/** Products queued for production. */
+	UPROPERTY(ReplicatedUsing=ReceivedProductionQueues)
+	TArray<FRTSProductionQueue> ProductionQueues;
 
-    /** Product that the actor finished most recently. */
-    UPROPERTY(ReplicatedUsing=ReceivedMostRecentProduct)
-    AActor* MostRecentProduct;
+	/** Product that the actor finished most recently. */
+	UPROPERTY(ReplicatedUsing=ReceivedMostRecentProduct)
+	AActor* MostRecentProduct;
 
-    /** Actor or location to send new actors to. */
-    UPROPERTY(Replicated)
-    FRTSProductionRallyPoint RallyPoint;
+	/** Actor or location to send new actors to. */
+	UPROPERTY(Replicated)
+	FRTSProductionRallyPoint RallyPoint;
 
 	void DequeueProduct(int32 QueueIndex = 0, int32 ProductIndex = 0);
 	void StartProductionInQueue(int32 QueueIndex = 0);
-    
-    void IssueRallyPointDependentOrder(AActor* ProducedActor);
 
-    UFUNCTION()
-    void ReceivedProductionQueues();
+	void IssueRallyPointDependentOrder(AActor* ProducedActor);
 
-    UFUNCTION()
-    void ReceivedMostRecentProduct();
+	UFUNCTION()
+	void ReceivedProductionQueues();
+
+	UFUNCTION()
+	void ReceivedMostRecentProduct();
 };

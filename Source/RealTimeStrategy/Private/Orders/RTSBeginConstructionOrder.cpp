@@ -5,13 +5,13 @@
 
 
 URTSBeginConstructionOrder::URTSBeginConstructionOrder(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    TargetType = ERTSOrderTargetType::ORDERTARGET_Location;
-    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any;
+	TargetType = ERTSOrderTargetType::ORDERTARGET_Location;
+	GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any;
 
-    IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanConstruct());
+	IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanConstruct());
 
-    IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
-    IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
+	IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
+	IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
 }

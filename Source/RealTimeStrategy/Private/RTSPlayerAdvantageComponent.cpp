@@ -1,39 +1,39 @@
 #include "RTSPlayerAdvantageComponent.h"
 
 URTSPlayerAdvantageComponent::URTSPlayerAdvantageComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    bGodModeEnabled = false;
-    OutgoingDamageFactor = 1.0f;
-    SpeedBoostFactor = 1.0f;
+	bGodModeEnabled = false;
+	OutgoingDamageFactor = 1.0f;
+	SpeedBoostFactor = 1.0f;
 }
 
 bool URTSPlayerAdvantageComponent::IsGodModeEnabled() const
 {
-    return bGodModeEnabled;
+	return bGodModeEnabled;
 }
 
 float URTSPlayerAdvantageComponent::GetSpeedBoostFactor() const
 {
-    return SpeedBoostFactor;
+	return SpeedBoostFactor;
 }
 
 float URTSPlayerAdvantageComponent::GetOutgoingDamageFactor() const
 {
-    return OutgoingDamageFactor;
+	return OutgoingDamageFactor;
 }
 
 void URTSPlayerAdvantageComponent::SetGodModeEnabled(bool bInGodModeEnabled)
 {
-    bGodModeEnabled = bInGodModeEnabled;
+	bGodModeEnabled = bInGodModeEnabled;
 }
 
 void URTSPlayerAdvantageComponent::SetSpeedBoostFactor(float InSpeedBoostFactor)
 {
-    SpeedBoostFactor = InSpeedBoostFactor;
+	SpeedBoostFactor = InSpeedBoostFactor;
 }
 
 void URTSPlayerAdvantageComponent::SetOutgoingDamageFactor(float InOutgoingDamageFactor)
 {
-    OutgoingDamageFactor = InOutgoingDamageFactor;
+	OutgoingDamageFactor = InOutgoingDamageFactor;
 }

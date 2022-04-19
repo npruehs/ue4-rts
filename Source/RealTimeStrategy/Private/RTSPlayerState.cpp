@@ -14,37 +14,37 @@ const uint8 ARTSPlayerState::PLAYER_INDEX_NONE = 255;
 
 
 ARTSPlayerState::ARTSPlayerState(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    PlayerIndex = PLAYER_INDEX_NONE;
+	PlayerIndex = PLAYER_INDEX_NONE;
 }
 
 void ARTSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(ARTSPlayerState, PlayerIndex);
-    DOREPLIFETIME(ARTSPlayerState, Team);
+	DOREPLIFETIME(ARTSPlayerState, PlayerIndex);
+	DOREPLIFETIME(ARTSPlayerState, Team);
 }
 
 uint8 ARTSPlayerState::GetPlayerIndex() const
 {
-    return PlayerIndex;
+	return PlayerIndex;
 }
 
 ARTSTeamInfo* ARTSPlayerState::GetTeam() const
 {
-    return Team;
+	return Team;
 }
 
 void ARTSPlayerState::SetPlayerIndex(uint8 InPlayerIndex)
 {
-    PlayerIndex = InPlayerIndex;
+	PlayerIndex = InPlayerIndex;
 }
 
 void ARTSPlayerState::SetTeam(ARTSTeamInfo* InTeam)
 {
-    Team = InTeam;
+	Team = InTeam;
 }
 
 bool ARTSPlayerState::IsSameTeamAs(const ARTSPlayerState* Other) const
@@ -54,8 +54,8 @@ bool ARTSPlayerState::IsSameTeamAs(const ARTSPlayerState* Other) const
 		return false;
 	}
 
-	ARTSTeamInfo* FirstTeam = Team;
-	ARTSTeamInfo* SecondTeam = Other->Team;
+	const ARTSTeamInfo* FirstTeam = Team;
+	const ARTSTeamInfo* SecondTeam = Other->Team;
 
 	if (!FirstTeam || !SecondTeam)
 	{
@@ -67,29 +67,39 @@ bool ARTSPlayerState::IsSameTeamAs(const ARTSPlayerState* Other) const
 
 TArray<AActor*> ARTSPlayerState::GetOwnActors() const
 {
-    return OwnActors;
+	TArray<AActor*> Actors;
+
+	for (TWeakObjectPtr<AActor> WeakObjectPtr : OwnActors)
+	{
+		if (WeakObjectPtr.IsValid())
+		{
+			Actors.Add(WeakObjectPtr.Get());
+		}
+	}
+
+	return Actors;
 }
 
 void ARTSPlayerState::DiscoverOwnActors()
 {
-    OwnActors.Empty();
+	OwnActors.Empty();
 
-    for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
-    {
-        AActor* Actor = *ActorIt;
+	for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+	{
+		AActor* Actor = *ActorIt;
 
-        if (!IsValid(Actor))
-        {
-            continue;
-        }
+		if (!IsValid(Actor))
+		{
+			continue;
+		}
 
-        URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+		const URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
 
-        if (IsValid(OwnerComponent) && OwnerComponent->GetPlayerOwner() == this)
-        {
-            OwnActors.AddUnique(Actor);
-        }
-    }
+		if (IsValid(OwnerComponent) && OwnerComponent->GetPlayerOwner() == this)
+		{
+			OwnActors.AddUnique(Actor);
+		}
+	}
 }
 
 void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
@@ -107,9 +117,8 @@ void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 	ReceiveOnTeamChanged(NewTeam);
 
 	// Notify player.
-	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner());
 
-	if (PlayerController)
+	if (ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner()); IsValid(PlayerController))
 	{
 		PlayerController->NotifyOnTeamChanged(NewTeam);
 	}
@@ -117,26 +126,25 @@ void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 
 void ARTSPlayerState::NotifyOnActorOwnerChanged(AActor* Actor, ARTSPlayerState* OldOwner, ARTSPlayerState* NewOwner)
 {
-    // Update list of own actors.
-    if (NewOwner == this)
-    {
-        OwnActors.AddUnique(Actor);
-    }
-    else
-    {
-        OwnActors.Remove(Actor);
-    }
+	// Update list of own actors.
+	if (NewOwner == this)
+	{
+		OwnActors.AddUnique(Actor);
+	}
+	else
+	{
+		OwnActors.Remove(Actor);
+	}
 
-    // Notify listeners.
-    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner());
+	// Notify listeners.
 
-    if (IsValid(PlayerController))
-    {
-        PlayerController->NotifyOnActorOwnerChanged(Actor);
-    }
+	if (ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner()); IsValid(PlayerController))
+	{
+		PlayerController->NotifyOnActorOwnerChanged(Actor);
+	}
 }
 
 void ARTSPlayerState::OnTeamChanged()
 {
-    NotifyOnTeamChanged(Team);
+	NotifyOnTeamChanged(Team);
 }

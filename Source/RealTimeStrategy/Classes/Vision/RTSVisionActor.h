@@ -13,17 +13,17 @@ class URTSVisionComponent;
 USTRUCT()
 struct REALTIMESTRATEGY_API FRTSVisionActor
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    FRTSVisionActor();
-    FRTSVisionActor(AActor* InActor);
+	FRTSVisionActor();
+	FRTSVisionActor(AActor* InActor);
 
-    UPROPERTY()
-    AActor* Actor;
+	UPROPERTY()
+	AActor* Actor;
 
-    UPROPERTY()
-    URTSVisionComponent* VisionComponent;
+	UPROPERTY()
+	URTSVisionComponent* VisionComponent;
 
-    bool IsActorValid() const;
+	bool IsActorValid() const;
 };

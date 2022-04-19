@@ -15,23 +15,23 @@ class URTSOwnerComponent;
 USTRUCT()
 struct REALTIMESTRATEGY_API FRTSVisibleActor
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    FRTSVisibleActor();
-    FRTSVisibleActor(AActor* InActor);
+	FRTSVisibleActor();
+	FRTSVisibleActor(AActor* InActor);
 
-    UPROPERTY()
-    AActor* Actor;
+	UPROPERTY()
+	AActor* Actor;
 
-    UPROPERTY()
-    URTSOwnerComponent* OwnerComponent;
+	UPROPERTY()
+	URTSOwnerComponent* OwnerComponent;
 
-    UPROPERTY()
-    URTSVisibleComponent* VisibleComponent;
+	UPROPERTY()
+	URTSVisibleComponent* VisibleComponent;
 
-    UPROPERTY()
-    URTSVisionComponent* VisionComponent;
+	UPROPERTY()
+	URTSVisionComponent* VisionComponent;
 
-    bool IsActorValid() const;
+	bool IsActorValid() const;
 };

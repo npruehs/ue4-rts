@@ -11,8 +11,8 @@
 UCLASS()
 class REALTIMESTRATEGY_API URTSStopOrder : public URTSOrder
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSStopOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSStopOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

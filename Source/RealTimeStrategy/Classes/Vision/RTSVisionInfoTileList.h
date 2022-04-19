@@ -10,11 +10,11 @@ class ARTSVisionInfo;
 USTRUCT()
 struct REALTIMESTRATEGY_API FRTSVisionInfoTileList
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    UPROPERTY()
-    ARTSVisionInfo* VisionInfo;
+	UPROPERTY()
+	ARTSVisionInfo* VisionInfo;
 
-    TArray<int32> VisibleTiles;
+	TArray<int32> VisibleTiles;
 };

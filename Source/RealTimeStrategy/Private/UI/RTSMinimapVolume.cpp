@@ -3,5 +3,5 @@
 
 UTexture2D* ARTSMinimapVolume::GetMinimapImage() const
 {
-    return MinimapImage;
+	return MinimapImage;
 }

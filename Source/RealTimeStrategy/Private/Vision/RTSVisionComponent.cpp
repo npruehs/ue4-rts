@@ -15,49 +15,49 @@ URTSVisionComponent::URTSVisionComponent(const FObjectInitializer& ObjectInitial
 
 void URTSVisionComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    // Register actor with game.
-    ARTSGameState* GameState = Cast<ARTSGameState>(UGameplayStatics::GetGameState(this));
+	// Register actor with game.
+	const ARTSGameState* GameState = Cast<ARTSGameState>(UGameplayStatics::GetGameState(this));
 
-    if (IsValid(GameState))
-    {
-        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+	if (IsValid(GameState))
+	{
+		ARTSVisionManager* VisionManager = GameState->GetVisionManager();
 
-        if (IsValid(VisionManager))
-        {
-            VisionManager->AddVisionActor(GetOwner());
-        }
-    }
+		if (IsValid(VisionManager))
+		{
+			VisionManager->AddVisionActor(GetOwner());
+		}
+	}
 }
 
 void URTSVisionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    Super::EndPlay(EndPlayReason);
+	Super::EndPlay(EndPlayReason);
 
-    if (EndPlayReason == EEndPlayReason::Destroyed)
-    {
-        // Unregister actor from game.
-        ARTSGameState* GameState = Cast<ARTSGameState>(UGameplayStatics::GetGameState(this));
+	if (EndPlayReason == EEndPlayReason::Destroyed)
+	{
+		// Unregister actor from game.
+		const ARTSGameState* GameState = Cast<ARTSGameState>(UGameplayStatics::GetGameState(this));
 
-        if (IsValid(GameState))
-        {
-            ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+		if (IsValid(GameState))
+		{
+			ARTSVisionManager* VisionManager = GameState->GetVisionManager();
 
-            if (IsValid(VisionManager))
-            {
-                VisionManager->RemoveVisionActor(GetOwner());
-            }
-        }
-    }
+			if (IsValid(VisionManager))
+			{
+				VisionManager->RemoveVisionActor(GetOwner());
+			}
+		}
+	}
 }
 
 float URTSVisionComponent::GetSightRadius() const
 {
-    return SightRadius;
+	return SightRadius;
 }
 
 bool URTSVisionComponent::IgnoresHeightLevels() const
 {
-    return bIgnoreHeightLevels;
+	return bIgnoreHeightLevels;
 }

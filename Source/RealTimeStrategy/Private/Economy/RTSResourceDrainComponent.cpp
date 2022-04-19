@@ -11,31 +11,31 @@
 URTSResourceDrainComponent::URTSResourceDrainComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	: Super(ObjectInitializer)
 {
-    SetIsReplicatedByDefault(true);
+	SetIsReplicatedByDefault(true);
 
 	// Set reasonable default values.
 	GathererCapacity = 1;
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources());
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources());
 }
 
 float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
 	// Notify player.
-	auto Owner = GetOwner()->GetOwner();
+	const auto Owner = GetOwner()->GetOwner();
 
 	if (!Owner)
 	{
 		return 0.0f;
 	}
 
-    auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+	const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-    if (!PlayerResourcesComponent)
-    {
-        return 0.0f;
-    }
+	if (!PlayerResourcesComponent)
+	{
+		return 0.0f;
+	}
 
-	float ReturnedResources = PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
+	const float ReturnedResources = PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
 	if (ReturnedResources <= 0.0f)
 	{
@@ -43,32 +43,32 @@ float URTSResourceDrainComponent::ReturnResources(AActor* Gatherer, TSubclassOf<
 	}
 
 	// Notify listeners.
-    NotifyOnResourcesReturned(Gatherer, ResourceType, ReturnedResources);
+	NotifyOnResourcesReturned(Gatherer, ResourceType, ReturnedResources);
 	return ReturnedResources;
 }
 
 TArray<TSubclassOf<URTSResourceType>> URTSResourceDrainComponent::GetResourceTypes() const
 {
-    return ResourceTypes;
+	return ResourceTypes;
 }
 
 bool URTSResourceDrainComponent::MustGathererEnter() const
 {
-    return bGathererMustEnter;
+	return bGathererMustEnter;
 }
 
 int32 URTSResourceDrainComponent::GetGathererCapacity() const
 {
-    return GathererCapacity;
+	return GathererCapacity;
 }
 
 void URTSResourceDrainComponent::NotifyOnResourcesReturned_Implementation(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount)
 {
-    UE_LOG(LogRTS, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),
-        *Gatherer->GetName(),
-        ResourceAmount,
-        *ResourceType->GetName(),
-        *GetOwner()->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Actor %s has returned %f resources of type %s to %s."),
+	       *Gatherer->GetName(),
+	       ResourceAmount,
+	       *ResourceType->GetName(),
+	       *GetOwner()->GetName());
 
-    OnResourcesReturned.Broadcast(GetOwner(), Gatherer, ResourceType, ResourceAmount);
+	OnResourcesReturned.Broadcast(GetOwner(), Gatherer, ResourceType, ResourceAmount);
 }

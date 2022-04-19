@@ -9,73 +9,73 @@
 
 FRTSGameplayDebuggerCategory::FRTSGameplayDebuggerCategory()
 {
-    bShowOnlyWithDebugActor = false;
+	bShowOnlyWithDebugActor = false;
 }
 
 void FRTSGameplayDebuggerCategory::DrawData(APlayerController* OwnerPC, FGameplayDebuggerCanvasContext& CanvasContext)
 {
-    const ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(OwnerPC);
+	const ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(OwnerPC);
 
-    if (!IsValid(PlayerController))
-    {
-        return;
-    }
+	if (!IsValid(PlayerController))
+	{
+		return;
+	}
 
-    TArray<AActor*> SelectedActors = PlayerController->GetSelectedActors();
+	TArray<AActor*> SelectedActors = PlayerController->GetSelectedActors();
 
-    if (SelectedActors.Num() <= 0)
-    {
-        return;
-    }
+	if (SelectedActors.Num() <= 0)
+	{
+		return;
+	}
 
-    const AActor* SelectedActor = SelectedActors[0];
+	const AActor* SelectedActor = SelectedActors[0];
 
-    if (!IsValid(SelectedActor))
-    {
-        return;
-    }
+	if (!IsValid(SelectedActor))
+	{
+		return;
+	}
 
-    // Show selected actor name.
-    CanvasContext.Printf(TEXT("Selected Actor: %s"), *SelectedActor->GetName());
+	// Show selected actor name.
+	CanvasContext.Printf(TEXT("Selected Actor: %s"), *SelectedActor->GetName());
 
-    // Show active gameplay tags.
-    URTSGameplayTagsComponent* GameplayTagsComponent = SelectedActor->FindComponentByClass<URTSGameplayTagsComponent>();
+	// Show active gameplay tags.
+	const URTSGameplayTagsComponent* GameplayTagsComponent = SelectedActor->FindComponentByClass<URTSGameplayTagsComponent>();
 
-    if (IsValid(GameplayTagsComponent))
-    {
-        CanvasContext.Printf(TEXT(""));
-        CanvasContext.Printf(TEXT("Gameplay Tags:"));
-        CanvasContext.Printf(TEXT(""));
+	if (IsValid(GameplayTagsComponent))
+	{
+		CanvasContext.Printf(TEXT(""));
+		CanvasContext.Printf(TEXT("Gameplay Tags:"));
+		CanvasContext.Printf(TEXT(""));
 
-        for (const FGameplayTag& Tag : GameplayTagsComponent->GetCurrentTags())
-        {
-            CanvasContext.Printf(TEXT("%s"), *Tag.ToString());
-        }
-    }
+		for (const FGameplayTag& Tag : GameplayTagsComponent->GetCurrentTags())
+		{
+			CanvasContext.Printf(TEXT("%s"), *Tag.ToString());
+		}
+	}
 
-    // Show current order (server only).
-    const APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+	// Show current order (server only).
+	const APawn* SelectedPawn = Cast<APawn>(SelectedActor);
 
-    if (!IsValid(SelectedPawn))
-    {
-        return;
-    }
+	if (!IsValid(SelectedPawn))
+	{
+		return;
+	}
 
-    const ARTSPawnAIController* PawnAIController = SelectedPawn->GetController<ARTSPawnAIController>();
+	const ARTSPawnAIController* PawnAIController = SelectedPawn->GetController<ARTSPawnAIController>();
 
-    if (IsValid(PawnAIController))
-    {
-        const TSubclassOf<URTSOrder> CurrentOrder = PawnAIController->GetCurrentOrder();
-        const FString OrderName = CurrentOrder != nullptr ? CurrentOrder->GetName() : TEXT("none");
-        
-        CanvasContext.Printf(TEXT(""));
-        CanvasContext.Printf(TEXT("Current Order: %s"), *OrderName);
-    }
+	if (IsValid(PawnAIController))
+	{
+		const TSubclassOf<URTSOrder> CurrentOrder = PawnAIController->GetCurrentOrder();
+		const FString OrderName = CurrentOrder != nullptr ? CurrentOrder->GetName() : TEXT("none");
+
+		CanvasContext.Printf(TEXT(""));
+		CanvasContext.Printf(TEXT("Current Order: %s"), *OrderName);
+	}
 }
 
 TSharedRef<FGameplayDebuggerCategory> FRTSGameplayDebuggerCategory::MakeInstance()
 {
-    return MakeShareable(new FRTSGameplayDebuggerCategory());
+	return MakeShareable(new FRTSGameplayDebuggerCategory());
 }
 
 #endif // WITH_GAMEPLAY_DEBUGGER

@@ -16,6 +16,7 @@ class URTSResourceType;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSGathererComponentResourcesGatheredSignature, AActor*, Gatherer, AActor*, ResourceSource, const FRTSGatherData&, GatherData, float, GatheredAmount);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSGathererComponentResourcesReturnedSignature, AActor*, Gatherer, AActor*, ResourceDrain, TSubclassOf<class URTSResourceType>, ResourceType, float, ReturnedAmount);
 
 
@@ -32,7 +33,7 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 
 	/** Checks whether the actor can gather from the specified source, e.g. is allowed to gather, and is not at capacity limit. */
@@ -47,9 +48,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual AActor* GetPreferredResourceSource() const;
 
-    /** Gets the closest resource source of the specified type within the passed maximum distance around the actor (0 means anywhere). */
-    UFUNCTION(BlueprintPure)
-    virtual AActor* GetClosestResourceSource(TSubclassOf<class URTSResourceType> DesiredResourceType, float MaxDistance) const;
+	/** Gets the closest resource source of the specified type within the passed maximum distance around the actor (0 means anywhere). */
+	UFUNCTION(BlueprintPure)
+	virtual AActor* GetClosestResourceSource(TSubclassOf<class URTSResourceType> DesiredResourceType, float MaxDistance) const;
 
 	/** Gets the maximum distance for gathering resources from the specified source. */
 	UFUNCTION(BlueprintPure)
@@ -63,9 +64,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsGathering() const;
 
-    /** Gets the type of resource the actor is carrying. */
-    UFUNCTION(BlueprintPure)
-    TSubclassOf<class URTSResourceType> GetCarriedResourceType() const;
+	/** Gets the type of resource the actor is carrying. */
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<class URTSResourceType> GetCarriedResourceType() const;
 
 	/** Starts the cooldown timer for gathering resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
@@ -79,9 +80,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float ReturnResources(AActor* ResourceDrain);
 
-    /** Gets the before the next resources are gathered, in seconds. */
-    UFUNCTION(BlueprintPure)
-    float GetRemainingCooldown() const;
+	/** Gets the before the next resources are gathered, in seconds. */
+	UFUNCTION(BlueprintPure)
+	float GetRemainingCooldown() const;
 
 	/** Event when the actor has gathered resources from a source. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -92,36 +93,36 @@ public:
 	FRTSGathererComponentResourcesReturnedSignature OnResourcesReturned;
 
 private:
-    /** Resources that can be gathered by the actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<FRTSGatherData> GatheredResources;
+	/** Resources that can be gathered by the actor. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<FRTSGatherData> GatheredResources;
 
-    /** Types of actors the gatherer can gather resources from. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<TSubclassOf<AActor>> ResourceSourceActorClasses;
+	/** Types of actors the gatherer can gather resources from. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<TSubclassOf<AActor>> ResourceSourceActorClasses;
 
-    /** Radius in which the actor will automatically gather resources from, in cm. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
-    float ResourceSweepRadius;
+	/** Radius in which the actor will automatically gather resources from, in cm. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+	float ResourceSweepRadius;
 
-    /** Amount of resources the actor is carrying. */
-    UPROPERTY(Replicated)
-    float CarriedResourceAmount;
+	/** Amount of resources the actor is carrying. */
+	UPROPERTY(Replicated)
+	float CarriedResourceAmount;
 
-    /** Type of resource the actor is carrying. */
-    UPROPERTY(Replicated)
-    TSubclassOf<class URTSResourceType> CarriedResourceType;
+	/** Type of resource the actor is carrying. */
+	UPROPERTY(Replicated)
+	TSubclassOf<class URTSResourceType> CarriedResourceType;
 
-    /** Resource source the actor is currently gathering from .*/
-    UPROPERTY()
-    AActor* CurrentResourceSource;
+	/** Resource source the actor is currently gathering from .*/
+	UPROPERTY()
+	AActor* CurrentResourceSource;
 
-    /** Resource source the actor has been gathering from before.*/
-    UPROPERTY()
-    AActor* PreviousResourceSource;
+	/** Resource source the actor has been gathering from before.*/
+	UPROPERTY()
+	AActor* PreviousResourceSource;
 
-    /** Time before the next resources are gathered, in seconds. */
-    float RemainingCooldown;
+	/** Time before the next resources are gathered, in seconds. */
+	float RemainingCooldown;
 
 	/** Type of resource gathered before. */
 	TSubclassOf<class URTSResourceType> PreviousResourceType;
@@ -130,5 +131,5 @@ private:
 	bool GetGatherDataForResourceSource(AActor* ResourceSource, FRTSGatherData* OutGatherData) const;
 	bool GetGatherDataForResourceType(TSubclassOf<URTSResourceType> ResourceType, FRTSGatherData* OutGatherData) const;
 	void LeaveCurrentResourceSource();
-    void SetCarriedResourceAmount(float NewAmount);
+	void SetCarriedResourceAmount(float NewAmount);
 };

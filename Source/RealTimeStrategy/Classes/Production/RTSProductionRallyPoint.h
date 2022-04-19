@@ -11,18 +11,18 @@
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSProductionRallyPoint
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Location to send new actors to. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    FVector TargetLocation;
+	/** Location to send new actors to. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	FVector TargetLocation;
 
-    /** Actor to send new actors to. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    AActor* TargetActor;
+	/** Actor to send new actors to. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	AActor* TargetActor;
 
-    /** Whether this rally is currently active. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    bool bIsSet;
+	/** Whether this rally is currently active. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	bool bIsSet;
 };

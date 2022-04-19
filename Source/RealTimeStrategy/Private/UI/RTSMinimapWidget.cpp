@@ -19,10 +19,10 @@
 
 
 URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    // Set reasonable default values.
-    DamagedUnitBlinkTimeSeconds = 3.0f;
+	// Set reasonable default values.
+	DamagedUnitBlinkTimeSeconds = 3.0f;
 }
 
 void URTSMinimapWidget::NotifyOnDrawUnit(
@@ -48,66 +48,66 @@ void URTSMinimapWidget::NativeConstruct()
 
 	if (MinimapVolume)
 	{
-        // Set size.
-		UBrushComponent* MinimapBrushComponent = MinimapVolume->GetBrushComponent();
-		FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->GetComponentTransform());
+		// Set size.
+		const UBrushComponent* MinimapBrushComponent = MinimapVolume->GetBrushComponent();
+		const FBoxSphereBounds MinimapBounds = MinimapBrushComponent->CalcBounds(MinimapBrushComponent->GetComponentTransform());
 
 		MinimapWorldSize = MinimapBounds.BoxExtent * 2;
 
-        // Set background image.
-        MinimapBackground.SetResourceObject(MinimapVolume->GetMinimapImage());
+		// Set background image.
+		MinimapBackground.SetResourceObject(MinimapVolume->GetMinimapImage());
 	}
 	else
 	{
 		UE_LOG(LogRTS, Warning, TEXT("No RTSMinimapVolume found. Minimap won't be showing unit positions."));
-    }
+	}
 
-    // Get fog of war actor.
-    if (bDrawVision)
-    {
-        for (TActorIterator<ARTSFogOfWarActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-        {
-            FogOfWarActor = *ActorItr;
-            break;
-        }
+	// Get fog of war actor.
+	if (bDrawVision)
+	{
+		for (TActorIterator<ARTSFogOfWarActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			FogOfWarActor = *ActorItr;
+			break;
+		}
 
-        if (FogOfWarActor)
-        {
-            // Setup fog of war material.
-            FogOfWarMaterialInstance = UMaterialInstanceDynamic::Create(FogOfWarMaterial, nullptr);
-        }
-        else
-        {
-            UE_LOG(LogRTS, Warning, TEXT("No fog of war actor found, won't draw vision on minimap."));
-            bDrawVision = false;
-        }
-    }
+		if (FogOfWarActor)
+		{
+			// Setup fog of war material.
+			FogOfWarMaterialInstance = UMaterialInstanceDynamic::Create(FogOfWarMaterial, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogRTS, Warning, TEXT("No fog of war actor found, won't draw vision on minimap."));
+			bDrawVision = false;
+		}
+	}
 }
 
 void URTSMinimapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-    if (!IsVisible())
-    {
-        return;
-    }
+	if (!IsVisible())
+	{
+		return;
+	}
 
-    if (!bDrawVision)
-    {
-        return;
-    }
+	if (!bDrawVision)
+	{
+		return;
+	}
 
-    if (!IsValid(FogOfWarActor) || !IsValid(FogOfWarActor->GetFogOfWarTexture()) || !IsValid(FogOfWarMaterialInstance))
-    {
-        return;
-    }
+	if (!IsValid(FogOfWarActor) || !IsValid(FogOfWarActor->GetFogOfWarTexture()) || !IsValid(FogOfWarMaterialInstance))
+	{
+		return;
+	}
 
-    // Update material.
-    FogOfWarMaterialInstance->SetTextureParameterValue(FName(TEXT("VisibilityMask")),
-        FogOfWarActor->GetFogOfWarTexture());
+	// Update material.
+	FogOfWarMaterialInstance->SetTextureParameterValue(FName(TEXT("VisibilityMask")),
+	                                                   FogOfWarActor->GetFogOfWarTexture());
 
-    FogOfWarBrush.ImageSize =
-        FVector2D(FogOfWarActor->GetFogOfWarTexture()->GetSizeX(), FogOfWarActor->GetFogOfWarTexture()->GetSizeY());
-    FogOfWarBrush.SetResourceObject(FogOfWarMaterialInstance);
+	FogOfWarBrush.ImageSize =
+		FVector2D(FogOfWarActor->GetFogOfWarTexture()->GetSizeX(), FogOfWarActor->GetFogOfWarTexture()->GetSizeY());
+	FogOfWarBrush.SetResourceObject(FogOfWarMaterialInstance);
 }
 
 #if ENGINE_MAJOR_VERSION > 4 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 20)
@@ -214,21 +214,21 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 	{
 		AActor* Actor = *ActorIt;
 
-        if (!IsValid(Actor))
-        {
-            continue;
-        }
+		if (!IsValid(Actor))
+		{
+			continue;
+		}
 
-        if (Actor->IsHidden())
-        {
-            continue;
-        }
+		if (Actor->IsHidden())
+		{
+			continue;
+		}
 
-		URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+		const URTSOwnerComponent* OwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
 
 		FVector ActorLocationWorld = Actor->GetActorLocation();
 		FVector2D ActorLocationMinimap = WorldToMinimap(ActorLocationWorld);
-		
+
 		// Draw on minimap.
 		if (bDrawUnitsWithTeamColors && OwnerComponent)
 		{
@@ -238,24 +238,24 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
                 URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
                 float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
 
-                if (!IsValid(HealthComponent) ||
-                    HealthComponent->GetLastTimeDamageTaken() <= 0.0f ||
-                    HealthComponent->GetLastTimeDamageTaken() + DamagedUnitBlinkTimeSeconds < RealTimeSeconds)
-                {
-                    DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
-                }
-                else
-                {
-                    // Have unit blink while taking damage.
-                    if (RealTimeSeconds - FMath::FloorToFloat(RealTimeSeconds) <= 0.5)
-                    {
-                        DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
-                    }
-                    else
-                    {
-                        DrawBoxWithBrush(InContext, ActorLocationMinimap, DamagedUnitsBlinkBrush);
-                    }
-                }
+				if (!IsValid(HealthComponent) ||
+					HealthComponent->GetLastTimeDamageTaken() <= 0.0f ||
+					HealthComponent->GetLastTimeDamageTaken() + DamagedUnitBlinkTimeSeconds < RealTimeSeconds)
+				{
+					DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+				}
+				else
+				{
+					// Have unit blink while taking damage.
+					if (RealTimeSeconds - FMath::FloorToFloat(RealTimeSeconds) <= 0.5)
+					{
+						DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+					}
+					else
+					{
+						DrawBoxWithBrush(InContext, ActorLocationMinimap, DamagedUnitsBlinkBrush);
+					}
+				}
 			}
 			else if (OwnerComponent->GetPlayerOwner() != nullptr && !OwnerComponent->IsSameTeamAsController(Player))
 			{
@@ -266,7 +266,7 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 				DrawBoxWithBrush(InContext, ActorLocationMinimap, NeutralUnitsBrush);
 			}
 		}
-		
+
 		// Allow custom drawing.
 		NotifyOnDrawUnit(
 			InContext,
@@ -279,17 +279,17 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 
 void URTSMinimapWidget::DrawVision(FPaintContext& InContext) const
 {
-    if (!bDrawVision)
-    {
-        return;
-    }
+	if (!bDrawVision)
+	{
+		return;
+	}
 
-    if (!FogOfWarActor || !FogOfWarActor->GetFogOfWarTexture() || !FogOfWarMaterialInstance)
-    {
-        return;
-    }
+	if (!FogOfWarActor || !FogOfWarActor->GetFogOfWarTexture() || !FogOfWarMaterialInstance)
+	{
+		return;
+	}
 
-    DrawBoxWithBrush(InContext, FVector2D::ZeroVector, FogOfWarBrush);
+	DrawBoxWithBrush(InContext, FVector2D::ZeroVector, FogOfWarBrush);
 }
 
 void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
@@ -313,10 +313,10 @@ void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 	Player->GetViewportSize(ViewportWidth, ViewportHeight);
 
 	// Cast four rays.
-	FVector2D ViewportTopLeft(0, 0);
-	FVector2D ViewportTopRight(ViewportWidth, 0);
-	FVector2D ViewportBottomLeft(0, ViewportHeight);
-	FVector2D ViewportBottomRight(ViewportWidth, ViewportHeight);
+	const FVector2D ViewportTopLeft(0, 0);
+	const FVector2D ViewportTopRight(ViewportWidth, 0);
+	const FVector2D ViewportBottomLeft(0, ViewportHeight);
+	const FVector2D ViewportBottomRight(ViewportWidth, ViewportHeight);
 
 	FVector WorldTopLeft;
 	FVector WorldTopRight;
@@ -329,10 +329,10 @@ void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 	ViewportToWorld(Player, ViewportBottomRight, WorldBottomRight);
 
 	// Convert to minimap space.
-	FVector2D MinimapTopLeft = WorldToMinimap(WorldTopLeft);
-	FVector2D MinimapTopRight = WorldToMinimap(WorldTopRight);
-	FVector2D MinimapBottomLeft = WorldToMinimap(WorldBottomLeft);
-	FVector2D MinimapBottomRight = WorldToMinimap(WorldBottomRight);
+	const FVector2D MinimapTopLeft = WorldToMinimap(WorldTopLeft);
+	const FVector2D MinimapTopRight = WorldToMinimap(WorldTopRight);
+	const FVector2D MinimapBottomLeft = WorldToMinimap(WorldBottomLeft);
+	const FVector2D MinimapBottomRight = WorldToMinimap(WorldBottomRight);
 
 	// Draw view frustum.
 	TArray<FVector2D> Points;
@@ -371,8 +371,8 @@ FReply URTSMinimapWidget::HandleMinimapClick(const FGeometry& InGeometry, const 
 	}
 
 	// Convert clicked minimap position to world space.
-	FVector2D MinimapPosition = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	FVector WorldPosition = MinimapToWorld(MinimapPosition);
+	const FVector2D MinimapPosition = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	const FVector WorldPosition = MinimapToWorld(MinimapPosition);
 
 	// Notify player.
 	Player->NotifyOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
@@ -386,13 +386,13 @@ FVector URTSMinimapWidget::MinimapToWorld(const FVector2D& MinimapPosition) cons
 	float RelativeMinimapY = MinimapPosition.Y / MinimapBackground.ImageSize.Y;
 
 	// Rotate to match UI coordinate system.
-	float Temp = RelativeMinimapX;
+	const float Temp = RelativeMinimapX;
 	RelativeMinimapX = 1 - RelativeMinimapY;
 	RelativeMinimapY = Temp;
 
 	// Convert to world coordinates.
-	float WorldX = (RelativeMinimapX - 0.5) * MinimapWorldSize.X;
-	float WorldY = (RelativeMinimapY - 0.5) * MinimapWorldSize.Y;
+	const float WorldX = (RelativeMinimapX - 0.5) * MinimapWorldSize.X;
+	const float WorldY = (RelativeMinimapY - 0.5) * MinimapWorldSize.Y;
 
 	return FVector(WorldX, WorldY, 0.0f);
 }
@@ -408,7 +408,7 @@ bool URTSMinimapWidget::ViewportToWorld(ARTSPlayerController* Player, const FVec
 	}
 
 	// Make plane.
-	FPlane ZPlane = FPlane(FVector::ZeroVector, FVector::UpVector);
+	const FPlane ZPlane = FPlane(FVector::ZeroVector, FVector::UpVector);
 
 	// Calculate intersection point.
 	OutWorldPosition = FMath::LinePlaneIntersection(WorldOrigin, WorldOrigin + WorldDirection * 1000.0f, ZPlane);
@@ -422,13 +422,13 @@ FVector2D URTSMinimapWidget::WorldToMinimap(const FVector& WorldPosition) const
 	float RelativeWorldY = WorldPosition.Y / MinimapWorldSize.Y + 0.5f;
 
 	// Rotate to match UI coordinate system.
-	float Temp = RelativeWorldX;
+	const float Temp = RelativeWorldX;
 	RelativeWorldX = RelativeWorldY;
 	RelativeWorldY = 1 - Temp;
 
 	// Convert to minimap coordinates.
-	float MinimapX = RelativeWorldX * MinimapBackground.ImageSize.X;
-	float MinimapY = RelativeWorldY * MinimapBackground.ImageSize.Y;
+	const float MinimapX = RelativeWorldX * MinimapBackground.ImageSize.X;
+	const float MinimapY = RelativeWorldY * MinimapBackground.ImageSize.Y;
 
 	return FVector2D(MinimapX, MinimapY);
 }

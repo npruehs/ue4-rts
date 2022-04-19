@@ -74,7 +74,7 @@ private:
 
     /** Actors this player owns. */
     UPROPERTY()
-    TArray<AActor*> OwnActors;
+    TArray<TWeakObjectPtr<AActor>> OwnActors;
 
 
     UFUNCTION()

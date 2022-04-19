@@ -9,11 +9,11 @@
 class FRTSGameplayDebuggerCategory : public FGameplayDebuggerCategory
 {
 public:
-    FRTSGameplayDebuggerCategory();
+	FRTSGameplayDebuggerCategory();
 
-    virtual void DrawData(APlayerController* OwnerPC, FGameplayDebuggerCanvasContext& CanvasContext) override;
+	virtual void DrawData(APlayerController* OwnerPC, FGameplayDebuggerCanvasContext& CanvasContext) override;
 
-    static TSharedRef<FGameplayDebuggerCategory> MakeInstance();
+	static TSharedRef<FGameplayDebuggerCategory> MakeInstance();
 };
 
 #endif // WITH_GAMEPLAY_DEBUGGER

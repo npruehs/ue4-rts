@@ -19,12 +19,12 @@ class REALTIMESTRATEGY_API ARTSMinimapVolume : public AVolume
 	GENERATED_BODY()
 
 public:
-    /** Gets the Background image of the minimap. */
-    UFUNCTION(BlueprintPure)
-    UTexture2D* GetMinimapImage() const;
+	/** Gets the Background image of the minimap. */
+	UFUNCTION(BlueprintPure)
+	UTexture2D* GetMinimapImage() const;
 
 private:
-    /** Background image of the minimap. */
-    UPROPERTY(EditInstanceOnly, Category = "RTS")
-    UTexture2D* MinimapImage;
+	/** Background image of the minimap. */
+	UPROPERTY(EditInstanceOnly, Category = "RTS")
+	UTexture2D* MinimapImage;
 };

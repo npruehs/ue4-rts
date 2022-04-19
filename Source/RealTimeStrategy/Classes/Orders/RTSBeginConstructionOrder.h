@@ -11,8 +11,8 @@
 UCLASS()
 class REALTIMESTRATEGY_API URTSBeginConstructionOrder : public URTSOrder
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSBeginConstructionOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSBeginConstructionOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

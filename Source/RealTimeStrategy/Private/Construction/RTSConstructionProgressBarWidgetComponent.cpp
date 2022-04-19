@@ -7,27 +7,27 @@
 
 void URTSConstructionProgressBarWidgetComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	const AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    URTSConstructionSiteComponent* ConstructionSiteComponent = Owner->FindComponentByClass<URTSConstructionSiteComponent>();
+	URTSConstructionSiteComponent* ConstructionSiteComponent = Owner->FindComponentByClass<URTSConstructionSiteComponent>();
 
-    if (!IsValid(ConstructionSiteComponent))
-    {
-        return;
-    }
+	if (!IsValid(ConstructionSiteComponent))
+	{
+		return;
+	}
 
-    ConstructionSiteComponent->OnConstructionProgressChanged.AddDynamic(this,
-        &URTSConstructionProgressBarWidgetComponent::OnConstructionProgressChanged);
+	ConstructionSiteComponent->OnConstructionProgressChanged.AddDynamic(this,
+	                                                                    &URTSConstructionProgressBarWidgetComponent::OnConstructionProgressChanged);
 }
 
 void URTSConstructionProgressBarWidgetComponent::OnConstructionProgressChanged(AActor* Actor, float ProgressPercentage)
 {
-    UpdateConstructionProgressBar(ProgressPercentage);
+	UpdateConstructionProgressBar(ProgressPercentage);
 }

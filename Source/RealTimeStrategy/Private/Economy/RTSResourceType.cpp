@@ -2,15 +2,15 @@
 
 FText URTSResourceType::GetResourceName() const
 {
-    return ResourceName;
+	return ResourceName;
 }
 
 UTexture2D* URTSResourceType::GetResourceIcon() const
 {
-    return ResourceIcon;
+	return ResourceIcon;
 }
 
 FLinearColor URTSResourceType::GetResourceColor() const
 {
-    return ResourceColor;
+	return ResourceColor;
 }

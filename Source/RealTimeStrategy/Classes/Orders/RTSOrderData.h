@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RTSOrderType.h"
 
 #include "Templates/SubclassOf.h"
 
@@ -16,24 +17,24 @@ class AActor;
 USTRUCT(BlueprintType)
 struct REALTIMESTRATEGY_API FRTSOrderData
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
-public:
-    FRTSOrderData();
+	FRTSOrderData();
+	ERTSOrderType GetOrderType() const;
 
-    /** Type of the order to issue. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    TSubclassOf<URTSOrder> OrderClass;
+	/** Type of the order to issue. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	TSubclassOf<URTSOrder> OrderClass;
 
-    /** Target actor. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    AActor* TargetActor;
+	/** Target actor. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	AActor* TargetActor;
 
-    /** Target location. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    FVector TargetLocation;
+	/** Target location. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	FVector TargetLocation;
 
-    /** Additional index. */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
-    int32 Index;
+	/** Additional index. */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
+	int32 Index;
 };

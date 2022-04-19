@@ -2,18 +2,18 @@
 
 
 URTSPawnMovementComponent::URTSPawnMovementComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    // Set reasonable default values.
-    bUpdateRotation = true;
+	// Set reasonable default values.
+	bUpdateRotation = true;
 }
 
 void URTSPawnMovementComponent::UpdateComponentVelocity()
 {
-    Super::UpdateComponentVelocity();
+	Super::UpdateComponentVelocity();
 
-    if (bUpdateRotation && !Velocity.IsNearlyZero())
-    {
-        MoveUpdatedComponent(FVector::ZeroVector, Velocity.Rotation(), false);
-    }
+	if (bUpdateRotation && !Velocity.IsNearlyZero())
+	{
+		MoveUpdatedComponent(FVector::ZeroVector, Velocity.Rotation(), false);
+	}
 }

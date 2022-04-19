@@ -11,8 +11,8 @@
 UCLASS()
 class REALTIMESTRATEGY_API URTSAttackOrder : public URTSOrder
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSAttackOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSAttackOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 };

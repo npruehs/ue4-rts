@@ -15,28 +15,28 @@ class REALTIMESTRATEGY_API URTSResourceType : public UObject
 	GENERATED_BODY()
 
 public:
-    /** Gets the display name of the resource. */
-    UFUNCTION(BlueprintPure)
-    FText GetResourceName() const;
+	/** Gets the display name of the resource. */
+	UFUNCTION(BlueprintPure)
+	FText GetResourceName() const;
 
-    /** Gets the icon to show next to resource amounts in the UI. */
-    UFUNCTION(BlueprintPure)
-    UTexture2D* GetResourceIcon() const;
+	/** Gets the icon to show next to resource amounts in the UI. */
+	UFUNCTION(BlueprintPure)
+	UTexture2D* GetResourceIcon() const;
 
-    /** Gets the color to use when showing resource amounts in the UI. */
-    UFUNCTION(BlueprintPure)
-    FLinearColor GetResourceColor() const;
+	/** Gets the color to use when showing resource amounts in the UI. */
+	UFUNCTION(BlueprintPure)
+	FLinearColor GetResourceColor() const;
 
 private:
-    /** Display name of the resource. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FText ResourceName;
+	/** Display name of the resource. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FText ResourceName;
 
-    /** Icon to show next to resource amounts in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UTexture2D* ResourceIcon;
+	/** Icon to show next to resource amounts in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UTexture2D* ResourceIcon;
 
-    /** Color to use when showing resource amounts in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FLinearColor ResourceColor;
+	/** Color to use when showing resource amounts in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FLinearColor ResourceColor;
 };

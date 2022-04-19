@@ -11,10 +11,10 @@
 UCLASS()
 class REALTIMESTRATEGY_API URTSReturnResourcesOrder : public URTSOrder
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSReturnResourcesOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSReturnResourcesOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    virtual bool IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const override;
+	virtual bool IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const override;
 };

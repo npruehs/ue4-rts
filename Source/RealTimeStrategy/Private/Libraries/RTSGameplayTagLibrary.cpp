@@ -10,280 +10,292 @@
 
 void URTSGameplayTagLibrary::AddGameplayTag(const AActor* Actor, const FGameplayTag& Tag)
 {
-    URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
+	URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
 
-    if (IsValid(GameplayTagsComponent))
-    {
-        GameplayTagsComponent->AddGameplayTag(Tag);
-    }
+	if (IsValid(GameplayTagsComponent))
+	{
+		GameplayTagsComponent->AddGameplayTag(Tag);
+	}
 }
 
 FGameplayTagContainer URTSGameplayTagLibrary::GetGameplayTags(const AActor* Actor)
 {
-    if (!IsValid(Actor))
-    {
-        return FGameplayTagContainer::EmptyContainer;
-    }
+	if (!IsValid(Actor))
+	{
+		return FGameplayTagContainer::EmptyContainer;
+	}
 
-    URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
+	const URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
 
-    if (!IsValid(GameplayTagsComponent))
-    {
-        return FGameplayTagContainer::EmptyContainer;
-    }
+	if (!IsValid(GameplayTagsComponent))
+	{
+		return FGameplayTagContainer::EmptyContainer;
+	}
 
-    return GameplayTagsComponent->GetCurrentTags();
+	return GameplayTagsComponent->GetCurrentTags();
 }
 
 bool URTSGameplayTagLibrary::HasGameplayTag(const AActor* Actor, const FGameplayTag& Tag)
 {
-    if (!IsValid(Actor))
-    {
-        return false;
-    }
+	if (!IsValid(Actor))
+	{
+		return false;
+	}
 
-    URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
-    return IsValid(GameplayTagsComponent) ? GameplayTagsComponent->GetCurrentTags().HasTag(Tag) : false;
+	const URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
+	return IsValid(GameplayTagsComponent) ? GameplayTagsComponent->GetCurrentTags().HasTag(Tag) : false;
 }
 
 void URTSGameplayTagLibrary::RemoveGameplayTag(const AActor* Actor, const FGameplayTag& Tag)
 {
-    URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
+	URTSGameplayTagsComponent* GameplayTagsComponent = Actor->FindComponentByClass<URTSGameplayTagsComponent>();
 
-    if (IsValid(GameplayTagsComponent))
-    {
-        GameplayTagsComponent->RemoveGameplayTag(Tag);
-    }
+	if (IsValid(GameplayTagsComponent))
+	{
+		GameplayTagsComponent->RemoveGameplayTag(Tag);
+	}
 }
 
 FGameplayTagContainer URTSGameplayTagLibrary::GetActorRelationshipTags(const AActor* Actor, const AActor* Other)
 {
-    FGameplayTagContainer RelationshipTags;
+	FGameplayTagContainer RelationshipTags;
 
-    if (!IsValid(Actor) || !IsValid(Other))
-    {
-        RelationshipTags.AddTag(Relationship_Neutral());
-    }
-    else if (Actor == Other)
-    {
-        RelationshipTags.AddTag(Relationship_Friendly());
-        RelationshipTags.AddTag(Relationship_Self());
-        RelationshipTags.AddTag(Relationship_Visible());
-    }
-    else
-    {
-        const URTSOwnerComponent* ActorOwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
-        const URTSOwnerComponent* OtherOwnerComponent = Other->FindComponentByClass<URTSOwnerComponent>();
+	if (!IsValid(Actor) || !IsValid(Other))
+	{
+		RelationshipTags.AddTag(Relationship_Neutral());
+	}
+	else if (Actor == Other)
+	{
+		RelationshipTags.AddTag(Relationship_Friendly());
+		RelationshipTags.AddTag(Relationship_Self());
+		RelationshipTags.AddTag(Relationship_Visible());
+	}
+	else
+	{
+		const URTSOwnerComponent* ActorOwnerComponent = Actor->FindComponentByClass<URTSOwnerComponent>();
+		const URTSOwnerComponent* OtherOwnerComponent = Other->FindComponentByClass<URTSOwnerComponent>();
 
-        if (!IsValid(ActorOwnerComponent) || !IsValid(OtherOwnerComponent))
-        {
-            RelationshipTags.AddTag(Relationship_Neutral());
-        }
-        else
-        {
-            const ARTSPlayerState* ActorPlayerState = ActorOwnerComponent->GetPlayerOwner();
-            const ARTSPlayerState* OtherPlayerState = OtherOwnerComponent->GetPlayerOwner();
+		if (!IsValid(ActorOwnerComponent) || !IsValid(OtherOwnerComponent))
+		{
+			RelationshipTags.AddTag(Relationship_Neutral());
+		}
+		else
+		{
+			const ARTSPlayerState* ActorPlayerState = ActorOwnerComponent->GetPlayerOwner();
+			const ARTSPlayerState* OtherPlayerState = OtherOwnerComponent->GetPlayerOwner();
 
-            FGameplayTagContainer PlayerRelationshipTags = GetPlayerRelationshipTags(ActorPlayerState, OtherPlayerState);
-            RelationshipTags.AppendTags(PlayerRelationshipTags);
-        }
+			const FGameplayTagContainer PlayerRelationshipTags = GetPlayerRelationshipTags(ActorPlayerState, OtherPlayerState);
+			RelationshipTags.AppendTags(PlayerRelationshipTags);
+		}
 
-        if (!RelationshipTags.HasTag(Relationship_Visible()) && URTSGameplayLibrary::IsVisibleForActor(Actor, Other))
-        {
-            RelationshipTags.AddTag(Relationship_Visible());
-        }
-    }
+		if (!RelationshipTags.HasTag(Relationship_Visible()) && URTSGameplayLibrary::IsVisibleForActor(Actor, Other))
+		{
+			RelationshipTags.AddTag(Relationship_Visible());
+		}
+	}
 
-    return RelationshipTags;
+	return RelationshipTags;
 }
 
 FGameplayTagContainer URTSGameplayTagLibrary::GetPlayerRelationshipTags(const ARTSPlayerState* ActorPlayerState, const ARTSPlayerState* OtherPlayerState)
 {
-    FGameplayTagContainer RelationshipTags;
+	FGameplayTagContainer RelationshipTags;
 
-    if (!IsValid(ActorPlayerState) || !IsValid(OtherPlayerState))
-    {
-        RelationshipTags.AddTag(Relationship_Neutral());
-    }
-    else if (!ActorPlayerState->IsSameTeamAs(OtherPlayerState))
-    {
-        RelationshipTags.AddTag(Relationship_Hostile());
-    }
-    else
-    {
-        RelationshipTags.AddTag(Relationship_Friendly());
-        RelationshipTags.AddTag(Relationship_Visible());
+	if (!IsValid(ActorPlayerState) || !IsValid(OtherPlayerState))
+	{
+		RelationshipTags.AddTag(Relationship_Neutral());
+	}
+	else if (!ActorPlayerState->IsSameTeamAs(OtherPlayerState))
+	{
+		RelationshipTags.AddTag(Relationship_Hostile());
+	}
+	else
+	{
+		RelationshipTags.AddTag(Relationship_Friendly());
+		RelationshipTags.AddTag(Relationship_Visible());
 
-        if (ActorPlayerState->GetPlayerIndex() == OtherPlayerState->GetPlayerIndex())
-        {
-            RelationshipTags.AddTag(Relationship_SamePlayer());
-        }
-    }
+		if (ActorPlayerState->GetPlayerIndex() == OtherPlayerState->GetPlayerIndex())
+		{
+			RelationshipTags.AddTag(Relationship_SamePlayer());
+		}
+	}
 
-    return RelationshipTags;
+	return RelationshipTags;
 }
 
 bool URTSGameplayTagLibrary::MeetsTagRequirements(const FGameplayTagContainer& Tags, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& BlockedTags)
 {
-    if (RequiredTags.Num())
-    {
-        if (!Tags.HasAll(RequiredTags))
-        {
-            return false;
-        }
-    }
+	if (RequiredTags.Num())
+	{
+		if (!Tags.HasAll(RequiredTags))
+		{
+			return false;
+		}
+	}
 
-    if (BlockedTags.Num())
-    {
-        if (Tags.HasAny(BlockedTags))
-        {
-            return false;
-        }
-    }
+	if (BlockedTags.Num())
+	{
+		if (Tags.HasAny(BlockedTags))
+		{
+			return false;
+		}
+	}
 
-    return true;
+	return true;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::Attack_Ranged()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Attack.Ranged")));
+	return Tag;
+}
+
+const FGameplayTag& URTSGameplayTagLibrary::Attack_Cooldown()
+{
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Attack.Cooldown")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Container_ConstructionSite()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Container.ConstructionSite")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Container.ConstructionSite")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Container_ResourceSource()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Container.ResourceSource")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Container.ResourceSource")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::HideReason_Container()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("HideReason.Container")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("HideReason.Container")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_Friendly()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Friendly")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Friendly")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_Neutral()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Neutral")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Neutral")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_Hostile()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Hostile")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Hostile")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_SamePlayer()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.SamePlayer")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.SamePlayer")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_Self()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Self")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Self")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Relationship_Visible()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Visible")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Relationship.Visible")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Alive()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Alive")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Alive")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_CarryingResources()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.CarryingResources")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.CarryingResources")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Constructing()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Constructing")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Constructing")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Immobilized()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Immobilized")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Immobilized")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Invulnerable()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Invulnerable")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Invulnerable")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_Unarmed()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Unarmed")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.Unarmed")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Changing_UnderConstruction()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.UnderConstruction")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Changing.UnderConstruction")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.AcceptsReturnedResources")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.AcceptsReturnedResources")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanAttack()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanAttack")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanAttack")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanBeAttacked()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeAttacked")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeAttacked")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanConstruct()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanConstruct")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanConstruct")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeConstructed")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeConstructed")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanGather()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanGather")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanGather")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanBeGathered()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeGathered")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanBeGathered")));
+	return Tag;
 }
 
 const FGameplayTag& URTSGameplayTagLibrary::Status_Permanent_CanProduce()
 {
-    static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanProduce")));
-    return Tag;
+	static FGameplayTag Tag = FGameplayTag::RequestGameplayTag(FName(TEXT("Status.Permanent.CanProduce")));
+	return Tag;
 }

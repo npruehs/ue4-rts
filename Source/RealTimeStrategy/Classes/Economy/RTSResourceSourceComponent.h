@@ -10,6 +10,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSResourceSourceComponentResourcesChangedSignature, AActor*, ResourceSource, float, OldResources, float, NewResources);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSResourceSourceComponentDepletedSignature, AActor*, ResourceSource);
 
 
@@ -38,29 +39,29 @@ public:
 	virtual bool CanGathererEnter(AActor* Gatherer) const;
 
 
-    /** Gets type of resources to be gathered from the actor. */
-    UFUNCTION(BlueprintPure)
-    TSubclassOf<URTSResourceType> GetResourceType() const;
+	/** Gets type of resources to be gathered from the actor. */
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<URTSResourceType> GetResourceType() const;
 
-    /** Gets the maximum resources available at the actor. */
-    UFUNCTION(BlueprintPure)
-    float GetMaximumResources() const;
+	/** Gets the maximum resources available at the actor. */
+	UFUNCTION(BlueprintPure)
+	float GetMaximumResources() const;
 
-    /** Gets the factor to multiply all gathered resources with (e.g. very abundant resource nodes. */
-    UFUNCTION(BlueprintPure)
-    float GetGatheringFactor() const;
+	/** Gets the factor to multiply all gathered resources with (e.g. very abundant resource nodes. */
+	UFUNCTION(BlueprintPure)
+	float GetGatheringFactor() const;
 
-    /** Whether gatherers must enter the resource source for gathering. */
-    UFUNCTION(BlueprintPure)
-    bool MustGathererEnter() const;
+	/** Whether gatherers must enter the resource source for gathering. */
+	UFUNCTION(BlueprintPure)
+	bool MustGathererEnter() const;
 
-    /** Gets how many gatherers may enter at the same time. */
-    UFUNCTION(BlueprintPure)
-    int32 GetGathererCapacity() const;
+	/** Gets how many gatherers may enter at the same time. */
+	UFUNCTION(BlueprintPure)
+	int32 GetGathererCapacity() const;
 
-    /** Gets the current resources available at the actor. */
-    UFUNCTION(BlueprintPure)
-    float GetCurrentResources() const;
+	/** Gets the current resources available at the actor. */
+	UFUNCTION(BlueprintPure)
+	float GetCurrentResources() const;
 
 
 	/** Event when the amount of available resources has changed. */
@@ -72,27 +73,27 @@ public:
 	FRTSResourceSourceComponentDepletedSignature OnDepleted;
 
 private:
-    /** Type of resources to be gathered from the actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TSubclassOf<URTSResourceType> ResourceType;
+	/** Type of resources to be gathered from the actor. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TSubclassOf<URTSResourceType> ResourceType;
 
-    /** Maximum resources available at the actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
-    float MaximumResources;
+	/** Maximum resources available at the actor. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 0))
+	float MaximumResources;
 
-    /** Factor to multiply all gathered resources with (e.g. very abundant resource nodes. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    float GatheringFactor;
+	/** Factor to multiply all gathered resources with (e.g. very abundant resource nodes. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	float GatheringFactor;
 
-    /** Whether gatherers must enter the resource source for gathering. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    bool bGathererMustEnter;
+	/** Whether gatherers must enter the resource source for gathering. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	bool bGathererMustEnter;
 
-    /** How many gatherers may enter at the same time. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    int32 GathererCapacity;
+	/** How many gatherers may enter at the same time. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	int32 GathererCapacity;
 
-    /** Current resources available at the actor. */
-    UPROPERTY(Replicated)
-    float CurrentResources;
+	/** Current resources available at the actor. */
+	UPROPERTY(Replicated)
+	float CurrentResources;
 };
