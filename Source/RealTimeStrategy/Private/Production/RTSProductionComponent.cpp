@@ -30,7 +30,7 @@ URTSProductionComponent::URTSProductionComponent(const FObjectInitializer& Objec
 	CapacityPerQueue = 5;
 	QueueCount = 1;
 
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanProduce());
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanProduce());
 }
 
 void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -38,8 +38,8 @@ void URTSProductionComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(URTSProductionComponent, ProductionQueues);
-    DOREPLIFETIME(URTSProductionComponent, MostRecentProduct);
-    DOREPLIFETIME(URTSProductionComponent, RallyPoint);
+	DOREPLIFETIME(URTSProductionComponent, MostRecentProduct);
+	DOREPLIFETIME(URTSProductionComponent, RallyPoint);
 }
 
 void URTSProductionComponent::BeginPlay()
@@ -54,34 +54,34 @@ void URTSProductionComponent::BeginPlay()
 	}
 }
 
-void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	UActorComponent::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    // Don't update production progress on clients - will be replicated from server.
-    if (GetNetMode() == NM_Client)
-    {
-        return;
-    }
+	// Don't update production progress on clients - will be replicated from server.
+	if (GetNetMode() == NM_Client)
+	{
+		return;
+	}
 
-    // Check for speed boosts.
-    float SpeedBoostFactor = 1.0f;
-    AActor* OwningActor = GetOwner();
+	// Check for speed boosts.
+	float SpeedBoostFactor = 1.0f;
+	AActor* OwningActor = GetOwner();
 
-    if (OwningActor)
-    {
-        AActor* OwningPlayer = OwningActor->GetOwner();
+	if (OwningActor)
+	{
+		const AActor* OwningPlayer = OwningActor->GetOwner();
 
-        if (OwningPlayer)
-        {
-            URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
+		if (OwningPlayer)
+		{
+			const URTSPlayerAdvantageComponent* PlayerAdvantageComponent = OwningPlayer->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-            if (PlayerAdvantageComponent)
-            {
-                SpeedBoostFactor = PlayerAdvantageComponent->GetSpeedBoostFactor();
-            }
-        }
-    }
+			if (PlayerAdvantageComponent)
+			{
+				SpeedBoostFactor = PlayerAdvantageComponent->GetSpeedBoostFactor();
+			}
+		}
+	}
 
 	// Process all queues.
 	for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
@@ -92,14 +92,14 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 		}
 
 		// Check production costs.
-		auto ProductClass = GetCurrentProduction(QueueIndex);
-		auto ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+		const auto ProductClass = GetCurrentProduction(QueueIndex);
+		const auto ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
 		bool bProductionCostPaid = false;
 
 		if (ProductionCostComponent && ProductionCostComponent->GetProductionCostType() == ERTSPaymentType::PAYMENT_PayOverTime)
 		{
-			auto Owner = GetOwner()->GetOwner();
+			const auto Owner = GetOwner()->GetOwner();
 
 			if (!Owner)
 			{
@@ -107,19 +107,19 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 				continue;
 			}
 
-            auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+			const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-            if (!PlayerResourcesComponent)
-            {
-                UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no PlayerResourcesComponent."), *Owner->GetName());
-                continue;
-            }
+			if (!PlayerResourcesComponent)
+			{
+				UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no PlayerResourcesComponent."), *Owner->GetName());
+				continue;
+			}
 
 			bool bCanPayAllProductionCosts = true;
 
-			for (auto& Resource : ProductionCostComponent->GetResources())
+			for (const auto& Resource : ProductionCostComponent->GetResources())
 			{
-				float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->GetProductionTime();
+				const float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->GetProductionTime();
 
 				if (!PlayerResourcesComponent->CanPayResources(Resource.Key, ResourceAmount))
 				{
@@ -132,10 +132,10 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 			if (bCanPayAllProductionCosts)
 			{
 				// Pay production costs.
-				for (auto& Resource : ProductionCostComponent->GetResources())
+				for (const auto& Resource : ProductionCostComponent->GetResources())
 				{
-					float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->GetProductionTime();
-                    PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
+					const float ResourceAmount = Resource.Value * SpeedBoostFactor * DeltaTime / ProductionCostComponent->GetProductionTime();
+					PlayerResourcesComponent->PayResources(Resource.Key, ResourceAmount);
 				}
 
 				bProductionCostPaid = true;
@@ -159,17 +159,17 @@ void URTSProductionComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 		{
 			FinishProduction(QueueIndex);
 		}
-        else
-        {
-            OnProductionProgressChanged.Broadcast(OwningActor, QueueIndex, GetProgressPercentage(QueueIndex));
-        }
+		else
+		{
+			OnProductionProgressChanged.Broadcast(OwningActor, QueueIndex, GetProgressPercentage(QueueIndex));
+		}
 	}
 
-    // Verify rally points.
-    if (RallyPoint.bIsSet && IsValid(RallyPoint.TargetActor) && !URTSGameplayLibrary::IsVisibleForActor(GetOwner(), RallyPoint.TargetActor))
-    {
-        ClearRallyPoint();
-    }
+	// Verify rally points.
+	if (RallyPoint.bIsSet && IsValid(RallyPoint.TargetActor) && !URTSGameplayLibrary::IsVisibleForActor(GetOwner(), RallyPoint.TargetActor))
+	{
+		ClearRallyPoint();
+	}
 }
 
 bool URTSProductionComponent::CanAssignProduction(TSubclassOf<AActor> ProductClass) const
@@ -211,7 +211,7 @@ TSubclassOf<AActor> URTSProductionComponent::GetCurrentProduction(int32 QueueInd
 
 float URTSProductionComponent::GetProductionTime(int32 QueueIndex /*= 0*/) const
 {
-	TSubclassOf<AActor> CurrentProduction = GetCurrentProduction(QueueIndex);
+	const TSubclassOf<AActor> CurrentProduction = GetCurrentProduction(QueueIndex);
 
 	if (!CurrentProduction)
 	{
@@ -223,21 +223,21 @@ float URTSProductionComponent::GetProductionTime(int32 QueueIndex /*= 0*/) const
 
 float URTSProductionComponent::GetProductionTimeForProduct(TSubclassOf<AActor> ProductClass) const
 {
-	URTSProductionCostComponent* ProductionCostComponent =
+	const URTSProductionCostComponent* ProductionCostComponent =
 		URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 	return ProductionCostComponent ? ProductionCostComponent->GetProductionTime() : 0.0f;
 }
 
 float URTSProductionComponent::GetProgressPercentage(int32 QueueIndex /*= 0*/) const
 {
-	float TotalProductionTime = GetProductionTime(QueueIndex);
+	const float TotalProductionTime = GetProductionTime(QueueIndex);
 
 	if (TotalProductionTime <= 0.0f)
 	{
 		return 1.0f;
 	}
 
-	float RemainingProductionTime = GetRemainingProductionTime(QueueIndex);
+	const float RemainingProductionTime = GetRemainingProductionTime(QueueIndex);
 
 	if (RemainingProductionTime <= 0.0f)
 	{
@@ -268,7 +268,7 @@ bool URTSProductionComponent::IsProducing() const
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -280,29 +280,29 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 		return;
 	}
 
-	int32 QueueIndex = FindQueueForProduct(ProductClass);
+	const int32 QueueIndex = FindQueueForProduct(ProductClass);
 
 	if (QueueIndex < 0)
 	{
 		return;
 	}
 
-    // Check requirements.
-    TSubclassOf<AActor> MissingRequirement;
+	// Check requirements.
+	TSubclassOf<AActor> MissingRequirement;
 
-    if (URTSGameplayLibrary::GetMissingRequirementFor(this, GetOwner(), ProductClass, MissingRequirement))
-    {
-        UE_LOG(LogRTS, Error, TEXT("%s wants to produce %s, but is missing requirement %s."), *GetOwner()->GetName(), *ProductClass->GetName(), *MissingRequirement->GetName());
-        return;
-    }
+	if (URTSGameplayLibrary::GetMissingRequirementFor(this, GetOwner(), ProductClass, MissingRequirement))
+	{
+		UE_LOG(LogRTS, Error, TEXT("%s wants to produce %s, but is missing requirement %s."), *GetOwner()->GetName(), *ProductClass->GetName(), *MissingRequirement->GetName());
+		return;
+	}
 
 	// Check production cost.
-	URTSProductionCostComponent* ProductionCostComponent =
+	const URTSProductionCostComponent* ProductionCostComponent =
 		URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
 	if (ProductionCostComponent && ProductionCostComponent->GetProductionCostType() == ERTSPaymentType::PAYMENT_PayImmediately)
 	{
-		auto Owner = GetOwner()->GetOwner();
+		const auto Owner = GetOwner()->GetOwner();
 
 		if (!Owner)
 		{
@@ -310,26 +310,26 @@ void URTSProductionComponent::StartProduction(TSubclassOf<AActor> ProductClass)
 			return;
 		}
 
-        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+		const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-        if (!PlayerResourcesComponent)
-        {
-            UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no PlayerResourcesComponent."), *Owner->GetName());
-            return;
-        }
+		if (!PlayerResourcesComponent)
+		{
+			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for production, but has no PlayerResourcesComponent."), *Owner->GetName());
+			return;
+		}
 
 		if (!PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources()))
 		{
 			UE_LOG(LogRTS, Error, TEXT("%s needs to pay for producing %s, but does not have enough resources."),
-				*Owner->GetName(),
-				*ProductClass->GetName());
+			       *Owner->GetName(),
+			       *ProductClass->GetName());
 			return;
 		}
 
 		// Pay production costs.
-        PlayerResourcesComponent->PayAllResources(ProductionCostComponent->GetResources());
+		PlayerResourcesComponent->PayAllResources(ProductionCostComponent->GetResources());
 	}
-	
+
 	// Insert into queue.
 	FRTSProductionQueue& Queue = ProductionQueues[QueueIndex];
 	Queue.Add(ProductClass);
@@ -364,23 +364,23 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 		return;
 	}
 
-    TSubclassOf<AActor> ProductClass = Queue[0];
+	const TSubclassOf<AActor> ProductClass = Queue[0];
 
-    // Determine spawn location: Start at producing actor location.
-    FVector SpawnLocation = GetOwner()->GetActorLocation();
+	// Determine spawn location: Start at producing actor location.
+	FVector SpawnLocation = GetOwner()->GetActorLocation();
 
-    // Spawn next to production actor.
-    float SpawnOffset = 0.0f;
-    SpawnOffset += URTSCollisionLibrary::GetActorCollisionSize(GetOwner()) / 2;
-    SpawnOffset += URTSCollisionLibrary::GetCollisionSize(ProductClass) / 2;
-    SpawnOffset *= 1.05f;
-    SpawnLocation.X -= SpawnOffset;
+	// Spawn next to production actor.
+	float SpawnOffset = 0.0f;
+	SpawnOffset += URTSCollisionLibrary::GetActorCollisionSize(GetOwner()) / 2;
+	SpawnOffset += URTSCollisionLibrary::GetCollisionSize(ProductClass) / 2;
+	SpawnOffset *= 1.05f;
+	SpawnLocation.X -= SpawnOffset;
 
-    // Calculate location on the ground.
-    SpawnLocation = URTSCollisionLibrary::GetGroundLocation(this, SpawnLocation);
+	// Calculate location on the ground.
+	SpawnLocation = URTSCollisionLibrary::GetGroundLocation(this, SpawnLocation);
 
-    // Prevent spawn collision or spawning at wrong side of the world.
-    SpawnLocation.Z += URTSCollisionLibrary::GetCollisionHeight(ProductClass) * 1.1f;
+	// Prevent spawn collision or spawning at wrong side of the world.
+	SpawnLocation.Z += URTSCollisionLibrary::GetCollisionHeight(ProductClass) * 1.1f;
 
 	// Spawn product.
 	AActor* Product = GameMode->SpawnActorForPlayer(
@@ -395,10 +395,10 @@ void URTSProductionComponent::FinishProduction(int32 QueueIndex /*= 0*/)
 
 	UE_LOG(LogRTS, Log, TEXT("%s finished producing %s in queue %i."), *GetOwner()->GetName(), *Product->GetName(), QueueIndex);
 
-    MostRecentProduct = Product;
+	MostRecentProduct = Product;
 
-    // Use rally point.
-    IssueRallyPointDependentOrder(Product);
+	// Use rally point.
+	IssueRallyPointDependentOrder(Product);
 
 	// Notify listeners.
 	NotifyOnProductionFinished(GetOwner(), Product, QueueIndex);
@@ -415,7 +415,7 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 		return;
 	}
 
-	FRTSProductionQueue& Queue = ProductionQueues[QueueIndex];
+	const FRTSProductionQueue& Queue = ProductionQueues[QueueIndex];
 
 	// Get product.
 	if (ProductIndex < 0 || ProductIndex >= Queue.Num())
@@ -423,19 +423,19 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 		return;
 	}
 
-	TSubclassOf<AActor> ProductClass = Queue[ProductIndex];
+	const TSubclassOf<AActor> ProductClass = Queue[ProductIndex];
 
 	// Get elapsed production time.
-	float TotalProductionTime = GetProductionTimeForProduct(ProductClass);
-	float RemainingProductionTime = ProductIndex == 0 ? ProductionQueues[QueueIndex].RemainingProductionTime : TotalProductionTime;
-	float ElapsedProductionTime = TotalProductionTime - RemainingProductionTime;
+	const float TotalProductionTime = GetProductionTimeForProduct(ProductClass);
+	const float RemainingProductionTime = ProductIndex == 0 ? ProductionQueues[QueueIndex].RemainingProductionTime : TotalProductionTime;
+	const float ElapsedProductionTime = TotalProductionTime - RemainingProductionTime;
 
 	UE_LOG(LogRTS, Log, TEXT("%s canceled producing product %i of class %s in queue %i after %f seconds."),
-		*GetOwner()->GetName(),
-		ProductIndex,
-		*ProductClass->GetName(),
-		QueueIndex,
-		ElapsedProductionTime);
+	       *GetOwner()->GetName(),
+	       ProductIndex,
+	       *ProductClass->GetName(),
+	       QueueIndex,
+	       ElapsedProductionTime);
 
 	// Notify listeners.
 	OnProductionCanceled.Broadcast(GetOwner(), ProductClass, QueueIndex, ElapsedProductionTime);
@@ -444,24 +444,24 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 	DequeueProduct(QueueIndex, ProductIndex);
 
 	// Refund resources.
-	URTSProductionCostComponent* ProductionCostComponent =
+	const URTSProductionCostComponent* ProductionCostComponent =
 		URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
 	if (ProductionCostComponent)
 	{
-		auto Owner = GetOwner()->GetOwner();
+		const auto Owner = GetOwner()->GetOwner();
 
 		if (!Owner)
 		{
 			return;
 		}
 
-        auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
+		const auto PlayerResourcesComponent = Owner->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-        if (!PlayerResourcesComponent)
-        {
-            return;
-        }
+		if (!PlayerResourcesComponent)
+		{
+			return;
+		}
 
 		float TimeRefundFactor = 0.0f;
 
@@ -474,15 +474,15 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 			TimeRefundFactor = ElapsedProductionTime / TotalProductionTime;
 		}
 
-		float ActualRefundFactor = ProductionCostComponent->GetRefundFactor() * TimeRefundFactor;
+		const float ActualRefundFactor = ProductionCostComponent->GetRefundFactor() * TimeRefundFactor;
 
 		// Refund production costs.
-		for (auto& Resource : ProductionCostComponent->GetResources())
+		for (const auto& Resource : ProductionCostComponent->GetResources())
 		{
 			TSubclassOf<URTSResourceType> ResourceType = Resource.Key;
 			float ResourceAmount = Resource.Value * ActualRefundFactor;
 
-            PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
+			PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
 
 			UE_LOG(LogRTS, Log, TEXT("%f %s of production costs refunded."), ResourceAmount, *ResourceType->GetName());
 
@@ -494,58 +494,58 @@ void URTSProductionComponent::CancelProduction(int32 QueueIndex /*= 0*/, int32 P
 
 void URTSProductionComponent::SetRallyPointToActor(AActor* Target)
 {
-    RallyPoint.TargetActor = Target;
-    RallyPoint.bIsSet = true;
+	RallyPoint.TargetActor = Target;
+	RallyPoint.bIsSet = true;
 }
 
 void URTSProductionComponent::SetRallyPointToLocation(const FVector& TargetLocation)
 {
-    RallyPoint.TargetActor = nullptr;
-    RallyPoint.TargetLocation = TargetLocation;
-    RallyPoint.bIsSet = true;
+	RallyPoint.TargetActor = nullptr;
+	RallyPoint.TargetLocation = TargetLocation;
+	RallyPoint.bIsSet = true;
 }
 
 void URTSProductionComponent::ClearRallyPoint()
 {
-    RallyPoint.TargetActor = nullptr;
-    RallyPoint.bIsSet = false;
+	RallyPoint.TargetActor = nullptr;
+	RallyPoint.bIsSet = false;
 }
 
 TArray<TSubclassOf<AActor>> URTSProductionComponent::GetAvailableProducts() const
 {
-    return AvailableProducts;
+	return AvailableProducts;
 }
 
 int32 URTSProductionComponent::GetQueueCount() const
 {
-    return QueueCount;
+	return QueueCount;
 }
 
 int32 URTSProductionComponent::GetCapacityPerQueue() const
 {
-    return CapacityPerQueue;
+	return CapacityPerQueue;
 }
 
 FRTSProductionRallyPoint URTSProductionComponent::GetRallyPoint() const
 {
-    return RallyPoint;
+	return RallyPoint;
 }
 
 void URTSProductionComponent::NotifyOnProductionFinished(AActor* Actor, AActor* Product, int32 QueueIndex)
 {
-    // Notify listeners.
-    OnProductionFinished.Broadcast(Actor, Product, QueueIndex);
+	// Notify listeners.
+	OnProductionFinished.Broadcast(Actor, Product, QueueIndex);
 
-    // Play sound.
-    if (IsValid(Product) && URTSGameplayLibrary::IsOwnedByLocalPlayer(Actor))
-    {
-        URTSProductionCostComponent* ProductionCostComponent = Product->FindComponentByClass<URTSProductionCostComponent>();
+	// Play sound.
+	if (IsValid(Product) && URTSGameplayLibrary::IsOwnedByLocalPlayer(Actor))
+	{
+		const URTSProductionCostComponent* ProductionCostComponent = Product->FindComponentByClass<URTSProductionCostComponent>();
 
-        if (IsValid(ProductionCostComponent) && IsValid(ProductionCostComponent->GetFinishedSound()))
-        {
-            UGameplayStatics::PlaySound2D(this, ProductionCostComponent->GetFinishedSound());
-        }
-    }
+		if (IsValid(ProductionCostComponent) && IsValid(ProductionCostComponent->GetFinishedSound()))
+		{
+			UGameplayStatics::PlaySound2D(this, ProductionCostComponent->GetFinishedSound());
+		}
+	}
 }
 
 void URTSProductionComponent::DequeueProduct(int32 QueueIndex /*= 0*/, int32 ProductIndex /*= 0*/)
@@ -564,7 +564,7 @@ void URTSProductionComponent::DequeueProduct(int32 QueueIndex /*= 0*/, int32 Pro
 	}
 
 	Queue.RemoveAt(ProductIndex);
-	
+
 	// Check if need to start next production.
 	if (ProductIndex == 0 && Queue.Num() > 0)
 	{
@@ -588,10 +588,10 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 		return;
 	}
 
-	TSubclassOf<AActor> ProductClass = Queue[0];
+	const TSubclassOf<AActor> ProductClass = Queue[0];
 
 	// Start production.
-	float ProductionTime = GetProductionTimeForProduct(ProductClass);
+	const float ProductionTime = GetProductionTimeForProduct(ProductClass);
 	Queue.RemainingProductionTime = ProductionTime;
 
 	UE_LOG(LogRTS, Log, TEXT("%s started producing %s in queue %i."), *GetOwner()->GetName(), *ProductClass->GetName(), QueueIndex);
@@ -602,30 +602,30 @@ void URTSProductionComponent::StartProductionInQueue(int32 QueueIndex /*= 0*/)
 
 void URTSProductionComponent::IssueRallyPointDependentOrder(AActor* ProducedActor)
 {
-    if (!RallyPoint.bIsSet)
-    {
-        return;
-    }
+	if (!RallyPoint.bIsSet)
+	{
+		return;
+	}
 
-    ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(ProducedActor->GetOwner());
+	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(ProducedActor->GetOwner());
 
-    if (!IsValid(PlayerController))
-    {
-        return;
-    }
+	if (!IsValid(PlayerController))
+	{
+		return;
+	}
 
-    PlayerController->IssueDefaultOrderToActor(ProducedActor, RallyPoint.TargetActor, RallyPoint.TargetLocation);
+	PlayerController->IssueDefaultOrderToActor(ProducedActor, RallyPoint.TargetActor, RallyPoint.TargetLocation);
 }
 
 void URTSProductionComponent::ReceivedProductionQueues()
 {
-    for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
-    {
-        OnProductionProgressChanged.Broadcast(GetOwner(), QueueIndex, GetProgressPercentage(QueueIndex));
-    }
+	for (int32 QueueIndex = 0; QueueIndex < QueueCount; ++QueueIndex)
+	{
+		OnProductionProgressChanged.Broadcast(GetOwner(), QueueIndex, GetProgressPercentage(QueueIndex));
+	}
 }
 
 void URTSProductionComponent::ReceivedMostRecentProduct()
 {
-    NotifyOnProductionFinished(GetOwner(), MostRecentProduct, -1);
+	NotifyOnProductionFinished(GetOwner(), MostRecentProduct, -1);
 }

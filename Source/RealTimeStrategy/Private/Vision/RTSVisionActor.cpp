@@ -6,18 +6,18 @@
 
 
 FRTSVisionActor::FRTSVisionActor()
-    : Actor(nullptr),
-    VisionComponent(nullptr)
+	: Actor(nullptr),
+	  VisionComponent(nullptr)
 {
 }
 
 FRTSVisionActor::FRTSVisionActor(AActor* InActor)
-    : Actor(InActor)
+	: Actor(InActor)
 {
-    VisionComponent = InActor->FindComponentByClass<URTSVisionComponent>();
+	VisionComponent = InActor->FindComponentByClass<URTSVisionComponent>();
 }
 
 bool FRTSVisionActor::IsActorValid() const
 {
-    return IsValid(Actor) && IsValid(VisionComponent);
+	return IsValid(Actor) && IsValid(VisionComponent);
 }

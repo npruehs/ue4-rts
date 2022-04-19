@@ -2,10 +2,10 @@
 
 FText URTSDescriptionComponent::GetDescription() const
 {
-    return Description;
+	return Description;
 }
 
 void URTSDescriptionComponent::SetDescription(const FText& NewDescription)
 {
-    Description = NewDescription;
+	Description = NewDescription;
 }

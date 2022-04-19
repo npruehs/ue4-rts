@@ -18,34 +18,34 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainableComponentContainerCh
 UCLASS(meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSContainableComponent : public UActorComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSContainableComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSContainableComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-    virtual void BeginPlay() override;
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void BeginPlay() override;
 
 
-    /** Gets the actor containing this one. */
-    UFUNCTION(BlueprintPure)
-    AActor* GetContainer() const;
+	/** Gets the actor containing this one. */
+	UFUNCTION(BlueprintPure)
+	AActor* GetContainer() const;
 
-    /** Sets the actor containing this one. */
-    void SetContainer(AActor* NewContainer);
+	/** Sets the actor containing this one. */
+	void SetContainer(AActor* NewContainer);
 
-    /** Event when the actor containing the actor has changed. */
-    UPROPERTY(BlueprintAssignable, Category = "RTS")
-    FRTSContainableComponentContainerChangedSignature OnContainerChanged;
-    
+	/** Event when the actor containing the actor has changed. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSContainableComponentContainerChangedSignature OnContainerChanged;
+
 private:
-    /** Actor containing this one. */
-    UPROPERTY(ReplicatedUsing = ReceivedContainer)
-    AActor* Container;
+	/** Actor containing this one. */
+	UPROPERTY(ReplicatedUsing = ReceivedContainer)
+	AActor* Container;
 
-    UFUNCTION()
-    void ReceivedContainer();
+	UFUNCTION()
+	void ReceivedContainer();
 
-    UFUNCTION()
-    void OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser);
+	UFUNCTION()
+	void OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser);
 };

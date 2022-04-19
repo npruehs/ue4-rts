@@ -11,50 +11,50 @@
 
 void URTSSelectableComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    // Calculate decal size.
-    float DecalHeight = URTSCollisionLibrary::GetActorCollisionHeight(Owner);
-    float DecalRadius = URTSCollisionLibrary::GetActorCollisionSize(Owner);
+	// Calculate decal size.
+	const float DecalHeight = URTSCollisionLibrary::GetActorCollisionHeight(Owner);
+	const float DecalRadius = URTSCollisionLibrary::GetActorCollisionSize(Owner);
 
-    // Create selection circle decal.
-    DecalComponent = NewObject<UDecalComponent>(Owner, TEXT("SelectionCircleDecal"));
+	// Create selection circle decal.
+	DecalComponent = NewObject<UDecalComponent>(Owner, TEXT("SelectionCircleDecal"));
 
-    if (!DecalComponent)
-    {
-        return;
-    }
+	if (!DecalComponent)
+	{
+		return;
+	}
 
-    // Set decal size.
-    DecalComponent->RegisterComponent();
-    DecalComponent->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-    DecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
+	// Set decal size.
+	DecalComponent->RegisterComponent();
+	DecalComponent->AttachToComponent(Owner->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	DecalComponent->DecalSize = FVector(DecalHeight, DecalRadius, DecalRadius);
 
-    // Rotate decal to face ground.
-    DecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
+	// Rotate decal to face ground.
+	DecalComponent->SetRelativeRotation(FRotator::MakeFromEuler(FVector(0.0f, -90.0f, 0.0f)));
 
-    // Setup decal material.
-    SelectionCircleMaterialInstance = UMaterialInstanceDynamic::Create(SelectionCircleMaterial, this);
-    DecalComponent->SetDecalMaterial(SelectionCircleMaterialInstance);
+	// Setup decal material.
+	SelectionCircleMaterialInstance = UMaterialInstanceDynamic::Create(SelectionCircleMaterial, this);
+	DecalComponent->SetDecalMaterial(SelectionCircleMaterialInstance);
 
-    DecalComponent->SetHiddenInGame(true);
+	DecalComponent->SetHiddenInGame(true);
 }
 
 void URTSSelectableComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
 {
-    Super::DestroyComponent(bPromoteChildren);
+	Super::DestroyComponent(bPromoteChildren);
 
-    if (IsValid(DecalComponent))
-    {
-        DecalComponent->DestroyComponent();
-    }
+	if (IsValid(DecalComponent))
+	{
+		DecalComponent->DestroyComponent();
+	}
 }
 
 void URTSSelectableComponent::SelectActor()
@@ -66,11 +66,11 @@ void URTSSelectableComponent::SelectActor()
 
 	bSelected = true;
 
-    // Update selection circle.
-    if (IsValid(DecalComponent))
-    {
-        DecalComponent->SetHiddenInGame(false);
-    }
+	// Update selection circle.
+	if (IsValid(DecalComponent))
+	{
+		DecalComponent->SetHiddenInGame(false);
+	}
 
 	// Notify listeners.
 	OnSelected.Broadcast(GetOwner());
@@ -85,11 +85,11 @@ void URTSSelectableComponent::DeselectActor()
 
 	bSelected = false;
 
-    // Update selection circles.
-    if (IsValid(DecalComponent))
-    {
-        DecalComponent->SetHiddenInGame(true);
-    }
+	// Update selection circles.
+	if (IsValid(DecalComponent))
+	{
+		DecalComponent->SetHiddenInGame(true);
+	}
 
 	// Notify listeners.
 	OnDeselected.Broadcast(GetOwner());
@@ -102,41 +102,41 @@ bool URTSSelectableComponent::IsSelected() const
 
 void URTSSelectableComponent::HoverActor()
 {
-    if (bHovered)
-    {
-        return;
-    }
+	if (bHovered)
+	{
+		return;
+	}
 
-    bHovered = true;
+	bHovered = true;
 
-    // Notify listeners.
-    OnHovered.Broadcast(GetOwner());
+	// Notify listeners.
+	OnHovered.Broadcast(GetOwner());
 }
 
 void URTSSelectableComponent::UnhoverActor()
 {
-    if (!bHovered)
-    {
-        return;
-    }
+	if (!bHovered)
+	{
+		return;
+	}
 
-    bHovered = false;
+	bHovered = false;
 
-    // Notify listeners.
-    OnUnhovered.Broadcast(GetOwner());
+	// Notify listeners.
+	OnUnhovered.Broadcast(GetOwner());
 }
 
 bool URTSSelectableComponent::IsHovered() const
 {
-    return bHovered;
+	return bHovered;
 }
 
 int32 URTSSelectableComponent::GetSelectionPriority() const
 {
-    return SelectionPriority;
+	return SelectionPriority;
 }
 
 USoundCue* URTSSelectableComponent::GetSelectedSound() const
 {
-    return SelectedSound;
+	return SelectedSound;
 }

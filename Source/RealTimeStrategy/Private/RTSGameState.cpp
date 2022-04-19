@@ -7,15 +7,15 @@
 
 void ARTSGameState::BeginPlay()
 {
-    // Make sure all actors have begun play.
-    Super::BeginPlay();
+	// Make sure all actors have begun play.
+	Super::BeginPlay();
 
-    // Setup vision.
-    VisionManager = GetWorld()->SpawnActor<ARTSVisionManager>();
-    VisionManager->Initialize();
+	// Setup vision.
+	VisionManager = GetWorld()->SpawnActor<ARTSVisionManager>();
+	VisionManager->Initialize();
 }
 
 ARTSVisionManager* ARTSGameState::GetVisionManager() const
 {
-    return VisionManager;
+	return VisionManager;
 }

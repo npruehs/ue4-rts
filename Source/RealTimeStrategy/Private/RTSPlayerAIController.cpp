@@ -7,6 +7,7 @@
 
 #include "RTSPawnAIController.h"
 #include "RTSLog.h"
+#include "RTSPlayerState.h"
 #include "Construction/RTSBuilderComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
@@ -21,285 +22,273 @@
 
 
 ARTSPlayerAIController::ARTSPlayerAIController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
+	PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
 
-    bWantsPlayerState = true;
+	bWantsPlayerState = true;
 
 	// Set reasonable default values.
-    MaximumBaseBuildingDistance = 1500.0f;
+	MaximumBaseBuildingDistance = 1500.0f;
 }
 
-TSubclassOf<APawn> ARTSPlayerAIController::GetNextPawnToProduce() const
+TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 {
-    // Count own actors.
-    TMap<TSubclassOf<APawn>, int32> OwnPawns;
+	// Count own actors.
+	TMap<TSubclassOf<AActor>, int32> OwnPawns;
 
-    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
-    {
-        APawn* SomePawn = *PawnItr;
+	const ARTSPlayerState* RTSPlayerState = GetPlayerState<ARTSPlayerState>();
+	TArray<AActor*> OwnActors = RTSPlayerState->GetOwnActors();
 
-        if (SomePawn->GetOwner() != this)
-        {
-            continue;
-        }
+	for (const AActor* OwnActor : OwnActors)
+	{
+		if (!IsValid(OwnActor))
+		{
+			continue;
+		}
 
-        int32& NumOwnedPawns = OwnPawns.FindOrAdd(SomePawn->GetClass());
-        ++NumOwnedPawns;
-    }
+		int32& NumOwnedPawns = OwnPawns.FindOrAdd(OwnActor->GetClass());
+		++NumOwnedPawns;
+	}
 
-    // TODO(np): Also count actors already in production/construction.
+	// TODO(np): Also count actors already in production/construction.
 
-    // Check build order.
-    TMap<TSubclassOf<APawn>, int32> BuildOrderPawns;
-    for (TSubclassOf<APawn> PawnClass : BuildOrder)
-    {
-        int32& NumRequiredPawns = BuildOrderPawns.FindOrAdd(PawnClass);
-        ++NumRequiredPawns;
+	// Check build order.
+	TMap<TSubclassOf<AActor>, int32> BuildOrderPawns;
+	for (TSubclassOf<AActor> PawnClass : BuildOrder)
+	{
+		int32& NumRequiredPawns = BuildOrderPawns.FindOrAdd(PawnClass);
+		++NumRequiredPawns;
 
-        if (NumRequiredPawns > OwnPawns.FindRef(PawnClass))
-        {
-            return PawnClass;
-        }
-    }
+		UE_LOG(LogRTS, Log, TEXT("AI %s owns %i of %s and checks for %i"), *GetName(), OwnPawns.FindRef(PawnClass), *PawnClass->GetName(), NumRequiredPawns)
 
-    return APawn::StaticClass();
+		if (NumRequiredPawns > OwnPawns.FindRef(PawnClass))
+		{
+			return PawnClass;
+		}
+	}
+
+	return nullptr;
 }
 
 AActor* ARTSPlayerAIController::GetPrimaryResourceDrain() const
 {
-    APawn* PrimaryResourceDrain = nullptr;
+	APawn* PrimaryResourceDrain = nullptr;
 
-    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
-    {
-        APawn* SomePawn = *PawnItr;
+	for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
+	{
+		APawn* SomePawn = *PawnItr;
 
-        if (SomePawn->GetOwner() != this)
-        {
-            continue;
-        }
+		if (SomePawn->GetOwner() != this)
+		{
+			continue;
+		}
 
-        if (SomePawn->FindComponentByClass<URTSResourceDrainComponent>() == nullptr)
-        {
-            continue;
-        }
+		if (SomePawn->FindComponentByClass<URTSResourceDrainComponent>() == nullptr)
+		{
+			continue;
+		}
 
-        return SomePawn;
-    }
+		return SomePawn;
+	}
 
-    return nullptr;
+	return nullptr;
 }
 
 AActor* ARTSPlayerAIController::GetPrimaryResourceSource() const
 {
-    // Get resource drain.
-    AActor* PrimaryResourceDrain = GetPrimaryResourceDrain();
+	// Get resource drain.
+	const AActor* PrimaryResourceDrain = GetPrimaryResourceDrain();
 
-    if (PrimaryResourceDrain == nullptr)
-    {
-        return nullptr;
-    }
+	if (PrimaryResourceDrain == nullptr)
+	{
+		return nullptr;
+	}
 
-    // Sweep for sources.
-    AActor* ClosestResourceSource = nullptr;
-    float ClosestResourceSourceDistance = 0.0f;
+	// Sweep for sources.
+	AActor* ClosestResourceSource = nullptr;
+	float ClosestResourceSourceDistance = 0.0f;
 
-    for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-    {
-        auto ResourceSource = *ActorItr;
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		const auto ResourceSource = *ActorItr;
 
-        // Check if found resource source.
-        auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
+		// Check if found resource source.
+		const auto ResourceSourceComponent = ResourceSource->FindComponentByClass<URTSResourceSourceComponent>();
 
-        if (!ResourceSourceComponent)
-        {
-            continue;
-        }
+		if (!ResourceSourceComponent)
+		{
+			continue;
+		}
 
-        // Check resource type.
-        if (ResourceSourceComponent->GetResourceType() != PrimaryResourceType)
-        {
-            continue;
-        }
+		// Check resource type.
+		if (ResourceSourceComponent->GetResourceType() != PrimaryResourceType)
+		{
+			continue;
+		}
 
-        // Check distance.
-        float Distance = PrimaryResourceDrain->GetDistanceTo(ResourceSource);
+		// Check distance.
+		const float Distance = PrimaryResourceDrain->GetDistanceTo(ResourceSource);
 
-        if (!ClosestResourceSource || Distance < ClosestResourceSourceDistance)
-        {
-            ClosestResourceSource = ResourceSource;
-            ClosestResourceSourceDistance = Distance;
-        }
-    }
+		if (!ClosestResourceSource || Distance < ClosestResourceSourceDistance)
+		{
+			ClosestResourceSource = ResourceSource;
+			ClosestResourceSourceDistance = Distance;
+		}
+	}
 
-    return ClosestResourceSource;
+	return ClosestResourceSource;
 }
 
-bool ARTSPlayerAIController::CanPayFor(TSubclassOf<APawn> PawnClass) const
+bool ARTSPlayerAIController::CanPayFor(TSubclassOf<AActor> PawnClass) const
 {
-    URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(PawnClass);
+	const URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(PawnClass);
 
-    if (ProductionCostComponent)
-    {
-        return PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources());
-    }
+	if (ProductionCostComponent)
+	{
+		return PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources());
+	}
 
-    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(PawnClass);
+	const URTSConstructionSiteComponent* ConstructionSiteComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(PawnClass);
 
-    if (ConstructionSiteComponent)
-    {
-        return PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts());
-    }
+	if (ConstructionSiteComponent)
+	{
+		return PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts());
+	}
 
-    return true;
+	return true;
 }
 
-bool ARTSPlayerAIController::MeetsAllRequirementsFor(TSubclassOf<APawn> PawnClass) const
+bool ARTSPlayerAIController::MeetsAllRequirementsFor(TSubclassOf<AActor> PawnClass) const
 {
-    AActor* AnyOwnActor = GetPrimaryResourceDrain();
-    return URTSGameplayLibrary::OwnerMeetsAllRequirementsFor(AnyOwnActor, AnyOwnActor, PawnClass);
+	AActor* AnyOwnActor = GetPrimaryResourceDrain();
+	return URTSGameplayLibrary::OwnerMeetsAllRequirementsFor(AnyOwnActor, AnyOwnActor, PawnClass);
 }
 
-bool ARTSPlayerAIController::StartProduction(TSubclassOf<APawn> PawnClass)
+bool ARTSPlayerAIController::StartProduction(TSubclassOf<AActor> PawnClass)
 {
-    // Find suitable factory.
-    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
-    {
-        APawn* SomePawn = *PawnItr;
+	TArray<AActor*> OwnActors = GetPlayerState<ARTSPlayerState>()->GetOwnActors();
 
-        if (SomePawn->GetOwner() != this)
-        {
-            continue;
-        }
+	UE_LOG(LogRTS, Log, TEXT("%s owns %i Actors and wants to produce %s"), *GetName(), OwnActors.Num(), *PawnClass->GetName())
 
-        URTSProductionComponent* ProductionComponent = SomePawn->FindComponentByClass<URTSProductionComponent>();
-        
-        if (!ProductionComponent)
-        {
-            continue;
-        }
+	// Get any own building location.
+	const AActor* OwnBuilding = nullptr;
 
-        if (!ProductionComponent->GetAvailableProducts().Contains(PawnClass))
-        {
-            continue;
-        }
+	for (const AActor* Actor : OwnActors)
+	{
+		if (Actor->GetOwner() != this)
+		{
+			UE_LOG(LogRTS, Log, TEXT("%s is not owned by %s"), *Actor->GetName(), *GetName())
+			continue;
+		}
 
-        // Start production.
-        ProductionComponent->StartProduction(PawnClass);
-        return true;
-    }
+		URTSProductionComponent* ProductionComponent = Actor->FindComponentByClass<URTSProductionComponent>();
 
-    // Get any own building location.
-    APawn* OwnBuilding = nullptr;
+		if (const URTSConstructionSiteComponent* ConstructionSiteComponent = Actor->FindComponentByClass<URTSConstructionSiteComponent>(); !ConstructionSiteComponent && !ProductionComponent)
+		{
+			continue;
+		}
 
-    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
-    {
-        APawn* SomePawn = *PawnItr;
+		OwnBuilding = Actor;
 
-        if (SomePawn->GetOwner() != this)
-        {
-            continue;
-        }
+		if (!ProductionComponent->GetAvailableProducts().Contains(PawnClass))
+		{
+			continue;
+		}
 
-        URTSConstructionSiteComponent* ConstructionSiteComponent = SomePawn->FindComponentByClass<URTSConstructionSiteComponent>();
+		UE_LOG(LogRTS, Log, TEXT("Start Production: %s"), *Actor->GetName())
 
-        if (!ConstructionSiteComponent)
-        {
-            continue;
-        }
+		// Start production.
+		ProductionComponent->StartProduction(PawnClass);
+		return true;
+	}
 
-        OwnBuilding = SomePawn;
-        break;
-    }
+	if (const UWorld* World = GetWorld(); !World)
+	{
+		UE_LOG(LogRTS, Error, TEXT("No World found"))
+		return false;
+	}
 
-    // Find suitable builder.
-    UWorld* World = GetWorld();
+	// Find suitable builder.
+	for (const AActor* Actor : OwnActors)
+	{
+		const APawn* OwnedPawn = Cast<APawn>(Actor);
 
-    if (!World)
-    {
-        return false;
-    }
+		if (!IsValid(OwnedPawn) || OwnedPawn->GetOwner() != this)
+		{
+			continue;
+		}
 
-    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
-    {
-        APawn* SomePawn = *PawnItr;
+		const URTSBuilderComponent* BuilderComponent = OwnedPawn->FindComponentByClass<URTSBuilderComponent>();
 
-        if (SomePawn->GetOwner() != this)
-        {
-            continue;
-        }
+		if (!BuilderComponent)
+		{
+			continue;
+		}
 
-        URTSBuilderComponent* BuilderComponent = SomePawn->FindComponentByClass<URTSBuilderComponent>();
+		if (!BuilderComponent->GetConstructibleBuildingClasses().Contains(PawnClass))
+		{
+			continue;
+		}
 
-        if (!BuilderComponent)
-        {
-            continue;
-        }
+		ARTSPawnAIController* PawnController = Cast<ARTSPawnAIController>(OwnedPawn->GetController());
 
-        if (!BuilderComponent->GetConstructibleBuildingClasses().Contains(PawnClass))
-        {
-            continue;
-        }
+		if (!PawnController)
+		{
+			continue;
+		}
 
-        ARTSPawnAIController* PawnController = Cast<ARTSPawnAIController>(SomePawn->GetController());
+		if (PawnController->HasOrderByClass(URTSBeginConstructionOrder::StaticClass()) ||
+			PawnController->HasOrderByClass(URTSContinueConstructionOrder::StaticClass()))
+		{
+			// Don't take builders away from constructing other buildings.
+			continue;
+		}
 
-        if (!PawnController)
-        {
-            continue;
-        }
+		// Find suitable building location: Get random nearby location.
+		FVector TargetLocation = OwnBuilding != nullptr ? OwnBuilding->GetActorLocation() : OwnedPawn->GetActorLocation();
+		TargetLocation.X += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
+		TargetLocation.Y += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
 
-        if (PawnController->HasOrderByClass(URTSBeginConstructionOrder::StaticClass()) ||
-            PawnController->HasOrderByClass(URTSContinueConstructionOrder::StaticClass()))
-        {
-            // Don't take builders away from constructing other buildings.
-            continue;
-        }
+		TargetLocation = URTSCollisionLibrary::GetGroundLocation(this, TargetLocation);
 
-        // Find suitable building location: Get random nearby location.
-        FVector TargetLocation = OwnBuilding != nullptr ? OwnBuilding->GetActorLocation() : SomePawn->GetActorLocation();
-        TargetLocation.X += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
-        TargetLocation.Y += FMath::FRandRange(-MaximumBaseBuildingDistance, MaximumBaseBuildingDistance);
-        
-        TargetLocation = URTSCollisionLibrary::GetGroundLocation(this, TargetLocation);
+		// If there's a primary resource drain, prevent blocking its path.
+		const AActor* PrimaryResourceSource = GetPrimaryResourceSource();
+		const AActor* PrimaryResourceDrain = GetPrimaryResourceDrain();
 
-        // If there's a primary resource drain, prevent blocking its path.
-        AActor* PrimaryResourceSource = GetPrimaryResourceSource();
-        AActor* PrimaryResourceDrain = GetPrimaryResourceDrain();
+		if (PrimaryResourceSource != nullptr &&
+			PrimaryResourceDrain != nullptr &&
+			FVector::DistSquaredXY(PrimaryResourceSource->GetActorLocation(), TargetLocation) <
+			FVector::DistSquaredXY(PrimaryResourceSource->GetActorLocation(), PrimaryResourceDrain->GetActorLocation()))
+		{
+			continue;
+		}
 
-        if (PrimaryResourceSource != nullptr &&
-            PrimaryResourceDrain != nullptr &&
-            FVector::DistSquaredXY(PrimaryResourceSource->GetActorLocation(), TargetLocation) <
-            FVector::DistSquaredXY(PrimaryResourceSource->GetActorLocation(), PrimaryResourceDrain->GetActorLocation()))
-        {
-            continue;
-        }
+		// Issue construction order.
+		PawnController->IssueBeginConstructionOrder(PawnClass, TargetLocation);
+		return true;
+	}
 
-        // Issue construction order.
-        PawnController->IssueBeginConstructionOrder(PawnClass, TargetLocation);
-        return true;
-    }
-
-    return false;
+	return false;
 }
 
 bool ARTSPlayerAIController::GivesBounty() const
 {
-    return bGivesBounty;
+	return bGivesBounty;
 }
 
 void ARTSPlayerAIController::OnPossess(APawn* InPawn)
 {
-    Super::OnPossess(InPawn);
+	Super::OnPossess(InPawn);
 
-    // Make AI use assigned blackboard.
-    UBlackboardComponent* BlackboardComponent;
+	// Make AI use assigned blackboard.
+	UBlackboardComponent* BlackboardComponent;
 
-    if (!UseBlackboard(PlayerBlackboardAsset, BlackboardComponent))
-    {
-        UE_LOG(LogRTS, Warning, TEXT("Failed to set up blackboard for AI %s."), *GetName());
-    }
+	if (!UseBlackboard(PlayerBlackboardAsset, BlackboardComponent))
+	{
+		UE_LOG(LogRTS, Warning, TEXT("Failed to set up blackboard for AI %s."), *GetName());
+	}
 
-    // Run behavior tree.
-    RunBehaviorTree(PlayerBehaviorTreeAsset);
+	// Run behavior tree.
+	RunBehaviorTree(PlayerBehaviorTreeAsset);
 }

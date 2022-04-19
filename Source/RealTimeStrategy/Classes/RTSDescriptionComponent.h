@@ -14,19 +14,19 @@
 UCLASS(meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSDescriptionComponent : public UActorComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Gets the description of the actor. */
-    UFUNCTION(BlueprintPure)
-    FText GetDescription() const;
+	/** Gets the description of the actor. */
+	UFUNCTION(BlueprintPure)
+	FText GetDescription() const;
 
-    /** Sets the description of the actor. */
-    UFUNCTION(BlueprintCallable)
-    void SetDescription(const FText& NewDescription);
+	/** Sets the description of the actor. */
+	UFUNCTION(BlueprintCallable)
+	void SetDescription(const FText& NewDescription);
 
 private:
-    /** Description of the actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FText Description;
+	/** Description of the actor. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FText Description;
 };

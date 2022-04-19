@@ -2,5 +2,5 @@
 
 void URTSActorComponent::AddGameplayTags(FGameplayTagContainer& InOutTagContainer)
 {
-    InOutTagContainer.AppendTags(InitialGameplayTags);
+	InOutTagContainer.AppendTags(InitialGameplayTags);
 }

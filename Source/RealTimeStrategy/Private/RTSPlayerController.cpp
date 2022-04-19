@@ -54,48 +54,48 @@
 
 
 ARTSPlayerController::ARTSPlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
-    PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
+	PlayerAdvantageComponent = CreateDefaultSubobject<URTSPlayerAdvantageComponent>(TEXT("Player Advantage"));
+	PlayerResourcesComponent = CreateDefaultSubobject<URTSPlayerResourcesComponent>(TEXT("Player Resources"));
 
-  	// Set reasonable default values.
-    CameraSpeed = 1000.0f;
-    CameraZoomSpeed = 4000.0f;
+	// Set reasonable default values.
+	CameraSpeed = 1000.0f;
+	CameraZoomSpeed = 4000.0f;
 
-    MinCameraDistance = 500.0f;
+	MinCameraDistance = 500.0f;
 	MaxCameraDistance = 2500.0f;
 
 	CameraScrollThreshold = 20.0f;
 
-    DoubleGroupSelectionTime = 0.2f;
+	DoubleGroupSelectionTime = 0.2f;
 
-    DefaultOrders.Add(URTSAttackOrder::StaticClass());
-    DefaultOrders.Add(URTSGatherOrder::StaticClass());
-    DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
+	DefaultOrders.Add(URTSAttackOrder::StaticClass());
+	DefaultOrders.Add(URTSGatherOrder::StaticClass());
+	DefaultOrders.Add(URTSContinueConstructionOrder::StaticClass());
 	DefaultOrders.Add(URTSReturnResourcesOrder::StaticClass());
-    DefaultOrders.Add(URTSMoveOrder::StaticClass());
-    DefaultOrders.Add(URTSSetRallyPointToActorOrder::StaticClass());
-    DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
+	DefaultOrders.Add(URTSMoveOrder::StaticClass());
+	DefaultOrders.Add(URTSSetRallyPointToActorOrder::StaticClass());
+	DefaultOrders.Add(URTSSetRallyPointToLocationOrder::StaticClass());
 
-    DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
-    DefaultOrderIgnoreTargetClasses.Add(ARTSVisionVolume::StaticClass());
-    DefaultOrderIgnoreTargetClasses.Add(ARTSMinimapVolume::StaticClass());
+	DefaultOrderIgnoreTargetClasses.Add(ARTSCameraBoundsVolume::StaticClass());
+	DefaultOrderIgnoreTargetClasses.Add(ARTSVisionVolume::StaticClass());
+	DefaultOrderIgnoreTargetClasses.Add(ARTSMinimapVolume::StaticClass());
 }
 
 void ARTSPlayerController::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    // Allow immediate updates for interested listeners.
-    for (int32 Index = 0; Index < PlayerResourcesComponent->GetResourceTypes().Num(); ++Index)
-    {
-        PlayerResourcesComponent->OnResourcesChanged.Broadcast(
-            PlayerResourcesComponent->GetResourceTypes()[Index],
-            0.0f,
-            PlayerResourcesComponent->GetResources(PlayerResourcesComponent->GetResourceTypes()[Index]),
-            true);
-    }
+	// Allow immediate updates for interested listeners.
+	for (int32 Index = 0; Index < PlayerResourcesComponent->GetResourceTypes().Num(); ++Index)
+	{
+		PlayerResourcesComponent->OnResourcesChanged.Broadcast(
+			PlayerResourcesComponent->GetResourceTypes()[Index],
+			0.0f,
+			PlayerResourcesComponent->GetResources(PlayerResourcesComponent->GetResourceTypes()[Index]),
+			true);
+	}
 }
 
 void ARTSPlayerController::SetupInputComponent()
@@ -103,9 +103,9 @@ void ARTSPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	// Enable mouse input.
-	APlayerController::bShowMouseCursor = true;
-	APlayerController::bEnableClickEvents = true;
-	APlayerController::bEnableMouseOverEvents = true;
+	bShowMouseCursor = true;
+	bEnableClickEvents = true;
+	bEnableMouseOverEvents = true;
 
 	// Bind actions.
 	InputComponent->BindAction(TEXT("Select"), IE_Pressed, this, &ARTSPlayerController::StartSelectActors);
@@ -115,8 +115,8 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Pressed, this, &ARTSPlayerController::StartToggleSelection);
 	InputComponent->BindAction(TEXT("ToggleSelection"), IE_Released, this, &ARTSPlayerController::StopToggleSelection);
 
-    InputComponent->BindAction(TEXT("SelectNextSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectNextSubgroup);
-    InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
+	InputComponent->BindAction(TEXT("SelectNextSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectNextSubgroup);
+	InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
 
 	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueDefaultOrderToSelectedActors);
 	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
@@ -145,19 +145,19 @@ void ARTSPlayerController::SetupInputComponent()
 
 	InputComponent->BindAxis(TEXT("MoveCameraLeftRight"), this, &ARTSPlayerController::MoveCameraLeftRight);
 	InputComponent->BindAxis(TEXT("MoveCameraUpDown"), this, &ARTSPlayerController::MoveCameraUpDown);
-    InputComponent->BindAxis(TEXT("ZoomCamera"), this, &ARTSPlayerController::ZoomCamera);
+	InputComponent->BindAxis(TEXT("ZoomCamera"), this, &ARTSPlayerController::ZoomCamera);
 
-    InputComponent->BindAction(TEXT("SaveCameraLocation0"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<0>);
-    InputComponent->BindAction(TEXT("SaveCameraLocation1"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<1>);
-    InputComponent->BindAction(TEXT("SaveCameraLocation2"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<2>);
-    InputComponent->BindAction(TEXT("SaveCameraLocation3"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<3>);
-    InputComponent->BindAction(TEXT("SaveCameraLocation4"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<4>);
+	InputComponent->BindAction(TEXT("SaveCameraLocation0"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<0>);
+	InputComponent->BindAction(TEXT("SaveCameraLocation1"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<1>);
+	InputComponent->BindAction(TEXT("SaveCameraLocation2"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<2>);
+	InputComponent->BindAction(TEXT("SaveCameraLocation3"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<3>);
+	InputComponent->BindAction(TEXT("SaveCameraLocation4"), IE_Pressed, this, &ARTSPlayerController::SaveCameraLocationWithIndex<4>);
 
-    InputComponent->BindAction(TEXT("LoadCameraLocation0"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<0>);
-    InputComponent->BindAction(TEXT("LoadCameraLocation1"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<1>);
-    InputComponent->BindAction(TEXT("LoadCameraLocation2"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<2>);
-    InputComponent->BindAction(TEXT("LoadCameraLocation3"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<3>);
-    InputComponent->BindAction(TEXT("LoadCameraLocation4"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<4>);
+	InputComponent->BindAction(TEXT("LoadCameraLocation0"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<0>);
+	InputComponent->BindAction(TEXT("LoadCameraLocation1"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<1>);
+	InputComponent->BindAction(TEXT("LoadCameraLocation2"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<2>);
+	InputComponent->BindAction(TEXT("LoadCameraLocation3"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<3>);
+	InputComponent->BindAction(TEXT("LoadCameraLocation4"), IE_Released, this, &ARTSPlayerController::LoadCameraLocationWithIndex<4>);
 
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Pressed, this, &ARTSPlayerController::StartShowingConstructionProgressBars);
 	InputComponent->BindAction(TEXT("ShowConstructionProgressBars"), IE_Released, this, &ARTSPlayerController::StopShowingConstructionProgressBars);
@@ -186,7 +186,7 @@ void ARTSPlayerController::SetupInputComponent()
 
 	// Setup control groups and camera locations.
 	ControlGroups.SetNum(10);
-    CameraLocations.SetNum(5);
+	CameraLocations.SetNum(5);
 }
 
 void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -196,29 +196,29 @@ void ARTSPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void ARTSPlayerController::OnPlayerStateAvailable(ARTSPlayerState* NewPlayerState)
 {
-    // Discover own actors.
-    ARTSPlayerState* RTSPlayerState = GetPlayerState();
+	// Discover own actors.
+	ARTSPlayerState* RTSPlayerState = GetPlayerState();
 
-    if (IsValid(RTSPlayerState))
-    {
-        RTSPlayerState->DiscoverOwnActors();
-    }
+	if (IsValid(RTSPlayerState))
+	{
+		RTSPlayerState->DiscoverOwnActors();
+	}
 
-    // Setup fog of war.
-    ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
+	// Setup fog of war.
+	const ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
 
-    if (IsValid(GameState))
-    {
-        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+	if (IsValid(GameState))
+	{
+		ARTSVisionManager* VisionManager = GameState->GetVisionManager();
 
-        if (IsValid(VisionManager))
-        {
-            VisionManager->SetLocalPlayerState(NewPlayerState);
-        }
-    }
+		if (IsValid(VisionManager))
+		{
+			VisionManager->SetLocalPlayerState(NewPlayerState);
+		}
+	}
 
-    // Notify listeners.
-    ReceiveOnPlayerStateAvailable(RTSPlayerState);
+	// Notify listeners.
+	ReceiveOnPlayerStateAvailable(RTSPlayerState);
 }
 
 AActor* ARTSPlayerController::GetHoveredActor() const
@@ -253,8 +253,8 @@ bool ARTSPlayerController::GetObjectsAtScreenPosition(FVector2D ScreenPosition, 
 bool ARTSPlayerController::GetObjectsAtWorldPosition(const FVector& WorldPositionXY, TArray<FHitResult>& OutHitResults) const
 {
 	// Get ray.
-	FVector WorldOrigin = FVector(WorldPositionXY.X, WorldPositionXY.Y, HitResultTraceDistance / 2);
-	FVector WorldDirection = -FVector::UpVector;
+	const FVector WorldOrigin = FVector(WorldPositionXY.X, WorldPositionXY.Y, HitResultTraceDistance / 2);
+	const FVector WorldDirection = -FVector::UpVector;
 
 	// Cast ray.
 	return TraceObjects(WorldOrigin, WorldDirection, OutHitResults);
@@ -276,10 +276,10 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame) const
 		return false;
 	}
 
-    float MinX = FMath::Min(SelectionFrameMouseStartPosition.X, MouseX);
-    float MaxX = FMath::Max(SelectionFrameMouseStartPosition.X, MouseX);
-    float MinY = FMath::Min(SelectionFrameMouseStartPosition.Y, MouseY);
-    float MaxY = FMath::Max(SelectionFrameMouseStartPosition.Y, MouseY);
+	const float MinX = FMath::Min(SelectionFrameMouseStartPosition.X, MouseX);
+	const float MaxX = FMath::Max(SelectionFrameMouseStartPosition.X, MouseX);
+	const float MinY = FMath::Min(SelectionFrameMouseStartPosition.Y, MouseY);
+	const float MaxY = FMath::Max(SelectionFrameMouseStartPosition.Y, MouseY);
 
 	OutSelectionFrame = FIntRect(FIntPoint(MinX, MinY), FIntPoint(MaxX, MaxY));
 
@@ -288,115 +288,115 @@ bool ARTSPlayerController::GetSelectionFrame(FIntRect& OutSelectionFrame) const
 
 ARTSTeamInfo* ARTSPlayerController::GetTeamInfo() const
 {
-	ARTSPlayerState* CurrentPlayerState = Cast<ARTSPlayerState>(PlayerState);
+	const ARTSPlayerState* CurrentPlayerState = Cast<ARTSPlayerState>(PlayerState);
 
 	if (CurrentPlayerState)
 	{
 		return CurrentPlayerState->GetTeam();
 	}
-	
+
 	return nullptr;
 }
 
 bool ARTSPlayerController::IssueOrderToSelectedActors(const FRTSOrderData& Order)
 {
-    ERTSOrderGroupExecutionType GroupExecutionType = URTSOrderLibrary::GetOrderGroupExecutionType(Order.OrderClass);
+	const ERTSOrderGroupExecutionType GroupExecutionType = URTSOrderLibrary::GetOrderGroupExecutionType(Order.OrderClass);
 
-    bool bSuccess = false;
+	bool bSuccess = false;
 
-    for (auto SelectedActor : SelectedActors)
-    {
-        APawn* SelectedPawn = Cast<APawn>(SelectedActor);
+	for (const auto SelectedActor : SelectedActors)
+	{
+		APawn* SelectedPawn = Cast<APawn>(SelectedActor);
 
-        if (!IsValid(SelectedPawn))
-        {
-            continue;
-        }
+		if (!IsValid(SelectedPawn))
+		{
+			continue;
+		}
 
-        if (SelectedPawn->GetOwner() != this)
-        {
-            continue;
-        }
+		if (SelectedPawn->GetOwner() != this)
+		{
+			continue;
+		}
 
-        if (!URTSOrderLibrary::CanObeyOrder(Order.OrderClass, SelectedActor, Order.Index))
-        {
-            continue;
-        }
+		if (!URTSOrderLibrary::CanObeyOrder(Order.OrderClass, SelectedActor, Order.Index))
+		{
+			continue;
+		}
 
-        FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(SelectedActor, Order.TargetActor, Order.TargetLocation);
+		FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(SelectedActor, Order.TargetActor, Order.TargetLocation);
 
-        if (!URTSOrderLibrary::IsValidOrderTarget(Order.OrderClass, SelectedActor, TargetData, Order.Index))
-        {
-            continue;
-        }
+		if (!URTSOrderLibrary::IsValidOrderTarget(Order.OrderClass, SelectedActor, TargetData, Order.Index))
+		{
+			continue;
+		}
 
-        // Send order to server.
-        ServerIssueOrder(SelectedPawn, Order);
+		// Send order to server.
+		ServerIssueOrder(SelectedPawn, Order);
 
-        if (IsNetMode(NM_Client))
-        {
-            // Notify listeners.
-            NotifyOnIssuedOrder(SelectedPawn, Order);
-        }
+		if (IsNetMode(NM_Client))
+		{
+			// Notify listeners.
+			NotifyOnIssuedOrder(SelectedPawn, Order);
+		}
 
-        if (GroupExecutionType == ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any)
-        {
-            // Just send a single actor.
-            return true;
-        }
+		if (GroupExecutionType == ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_Any)
+		{
+			// Just send a single actor.
+			return true;
+		}
 
-        bSuccess = true;
-    }
+		bSuccess = true;
+	}
 
-    return bSuccess;
+	return bSuccess;
 }
 
 void ARTSPlayerController::IssueDefaultOrderToActor(AActor* Actor, AActor* TargetActor, const FVector& TargetLocation)
 {
-    APawn* IssuedPawn = Cast<APawn>(Actor);
+	APawn* IssuedPawn = Cast<APawn>(Actor);
 
-    if (!IsValid(IssuedPawn))
-    {
-        return;
-    }
+	if (!IsValid(IssuedPawn))
+	{
+		return;
+	}
 
-    for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
-    {
-        if (!URTSOrderLibrary::CanObeyOrder(OrderClass, IssuedPawn, 0))
-        {
-            continue;
-        }
+	for (const TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+	{
+		if (!URTSOrderLibrary::CanObeyOrder(OrderClass, IssuedPawn, 0))
+		{
+			continue;
+		}
 
-        FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(IssuedPawn, TargetActor, TargetLocation);
+		FRTSOrderTargetData TargetData = URTSOrderLibrary::GetOrderTargetData(IssuedPawn, TargetActor, TargetLocation);
 
-        if (!URTSOrderLibrary::IsValidOrderTarget(OrderClass, IssuedPawn, TargetData, 0))
-        {
-            continue;
-        }
+		if (!URTSOrderLibrary::IsValidOrderTarget(OrderClass, IssuedPawn, TargetData, 0))
+		{
+			continue;
+		}
 
-        // Send order to server.
-        FRTSOrderData Order;
-        Order.OrderClass = OrderClass;
-        Order.TargetActor = TargetActor;
-        Order.TargetLocation = TargetLocation;
+		// Send order to server.
+		FRTSOrderData Order;
+		Order.OrderClass = OrderClass;
+		Order.TargetActor = TargetActor;
+		Order.TargetLocation = TargetLocation;
 
-        ServerIssueOrder(IssuedPawn, Order);
-        return;
-    }
+		ServerIssueOrder(IssuedPawn, Order);
+		return;
+	}
 }
 
 void ARTSPlayerController::ServerIssueOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
 {
-    if (!Order.OrderClass)
-    {
-        return;
-    }
+	if (!Order.OrderClass)
+	{
+		return;
+	}
 
-    FRTSOrderTargetData OrderTargetData;
-    OrderTargetData.Actor = Order.TargetActor;
-    OrderTargetData.Location = Order.TargetLocation;
+	FRTSOrderTargetData OrderTargetData;
+	OrderTargetData.Actor = Order.TargetActor;
+	OrderTargetData.Location = Order.TargetLocation;
 
-    Order.OrderClass->GetDefaultObject<URTSOrder>()->IssueOrder(OrderedPawn, OrderTargetData, Order.Index);
+	Order.OrderClass->GetDefaultObject<URTSOrder>()->IssueOrder(OrderedPawn, OrderTargetData, Order.Index);
 
     // Notify listeners.
     NotifyOnIssuedOrder(OrderedPawn, Order);
@@ -404,26 +404,26 @@ void ARTSPlayerController::ServerIssueOrder_Implementation(APawn* OrderedPawn, c
 
 bool ARTSPlayerController::ServerIssueOrder_Validate(APawn* OrderedPawn, const FRTSOrderData& Order)
 {
-    // Verify owner to prevent cheating.
-    return OrderedPawn->GetOwner() == this;
+	// Verify owner to prevent cheating.
+	return OrderedPawn->GetOwner() == this;
 }
 
 bool ARTSPlayerController::GetObjectsAtPointerPosition(TArray<FHitResult>& OutHitResults) const
 {
-    // Get local player viewport.
-    ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
+	// Get local player viewport.
+	const ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
 
-    if (!LocalPlayer || !LocalPlayer->ViewportClient)
-    {
-        return false;
-    }
+	if (!LocalPlayer || !LocalPlayer->ViewportClient)
+	{
+		return false;
+	}
 
-    // Get mouse position.
-    FVector2D MousePosition;
-    if (!LocalPlayer->ViewportClient->GetMousePosition(MousePosition))
-    {
-        return false;
-    }
+	// Get mouse position.
+	FVector2D MousePosition;
+	if (!LocalPlayer->ViewportClient->GetMousePosition(MousePosition))
+	{
+		return false;
+	}
 
 	return GetObjectsAtScreenPosition(MousePosition, OutHitResults);
 }
@@ -439,7 +439,7 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 
 	// Get selection frame.
 	FIntRect SelectionFrame;
-	
+
 	if (!GetSelectionFrame(SelectionFrame))
 	{
 		return false;
@@ -475,14 +475,14 @@ bool ARTSPlayerController::GetObjectsInSelectionFrame(TArray<FHitResult>& HitRes
 
 bool ARTSPlayerController::TraceObjects(const FVector& WorldOrigin, const FVector& WorldDirection, TArray<FHitResult>& OutHitResults) const
 {
-	UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
 
 	if (!World)
 	{
 		return false;
 	}
 
-	FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
+	const FCollisionObjectQueryParams Params(FCollisionObjectQueryParams::InitType::AllObjects);
 
 	return World->LineTraceMultiByObjectType(
 		OutHitResults,
@@ -500,7 +500,7 @@ bool ARTSPlayerController::IsSelectableActor(AActor* Actor) const
 	}
 
 	// Check if selectable.
-	auto SelectableComponent = Actor->FindComponentByClass<URTSSelectableComponent>();
+	const auto SelectableComponent = Actor->FindComponentByClass<URTSSelectableComponent>();
 
 	if (!SelectableComponent)
 	{
@@ -512,13 +512,13 @@ bool ARTSPlayerController::IsSelectableActor(AActor* Actor) const
 
 void ARTSPlayerController::IssueDefaultOrderToSelectedActors()
 {
-    // Get objects at pointer position.
-    TArray<FHitResult> HitResults;
+	// Get objects at pointer position.
+	TArray<FHitResult> HitResults;
 
-    if (!GetObjectsAtPointerPosition(HitResults))
-    {
-        return;
-    }
+	if (!GetObjectsAtPointerPosition(HitResults))
+	{
+		return;
+	}
 
 	IssueOrderTargetingObjectsToSelectedActors(HitResults);
 }
@@ -531,345 +531,345 @@ void ARTSPlayerController::IssueOrderTargetingObjectsToSelectedActors(TArray<FHi
 		return;
 	}
 
-    // Try all default orders.
+	// Try all default orders.
 	for (auto& HitResult : HitResults)
 	{
 		if (HitResult.HasValidHitObjectHandle())
 		{
-            bool bIsIgnoredClass = false;
+			bool bIsIgnoredClass = false;
 
-            for (TSubclassOf<AActor> IgnoredClass : DefaultOrderIgnoreTargetClasses)
-            {
-                if (HitResult.GetActor()->IsA(IgnoredClass))
-                {
-                    bIsIgnoredClass = true;
-                    break;
-                }
-            }
+			for (const TSubclassOf<AActor> IgnoredClass : DefaultOrderIgnoreTargetClasses)
+			{
+				if (HitResult.GetActor()->IsA(IgnoredClass))
+				{
+					bIsIgnoredClass = true;
+					break;
+				}
+			}
 
-            if (bIsIgnoredClass)
-            {
-                continue;
-            }
+			if (bIsIgnoredClass)
+			{
+				continue;
+			}
 
-            for (TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
-            {
-                FRTSOrderData Order;
-                Order.OrderClass = OrderClass;
-                Order.TargetActor = HitResult.GetActor();
-                Order.TargetLocation = HitResult.Location;
+			for (const TSubclassOf<URTSOrder> OrderClass : DefaultOrders)
+			{
+				FRTSOrderData Order;
+				Order.OrderClass = OrderClass;
+				Order.TargetActor = HitResult.GetActor();
+				Order.TargetLocation = HitResult.Location;
 
-                if (IssueOrderToSelectedActors(Order))
-                {
-                    return;
-                }
-            }
+				if (IssueOrderToSelectedActors(Order))
+				{
+					return;
+				}
+			}
 		}
 	}
 }
 
 bool ARTSPlayerController::GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex)
 {
-    *OutSelectedSubgroupActor = nullptr;
-    *OutSelectedSubgroupActorIndex = -1;
+	*OutSelectedSubgroupActor = nullptr;
+	*OutSelectedSubgroupActorIndex = -1;
 
-    if (SelectedActors.Num() <= 0)
-    {
-        return false;
-    }
+	if (SelectedActors.Num() <= 0)
+	{
+		return false;
+	}
 
-    for (int32 Index = 0; Index < SelectedActors.Num(); ++Index)
-    {
-        AActor* SelectedActor = SelectedActors[Index];
+	for (int32 Index = 0; Index < SelectedActors.Num(); ++Index)
+	{
+		AActor* SelectedActor = SelectedActors[Index];
 
-        if (!IsValid(SelectedActors[Index]))
-        {
-            continue;
-        }
+		if (!IsValid(SelectedActors[Index]))
+		{
+			continue;
+		}
 
-        if (SelectedActor->GetClass() == GetSelectedSubgroup())
-        {
-            *OutSelectedSubgroupActor = SelectedActor;
-            *OutSelectedSubgroupActorIndex = Index;
-            return true;
-        }
-    }
+		if (SelectedActor->GetClass() == GetSelectedSubgroup())
+		{
+			*OutSelectedSubgroupActor = SelectedActor;
+			*OutSelectedSubgroupActorIndex = Index;
+			return true;
+		}
+	}
 
-    // Selected subgroup invalid.
-    return false;
+	// Selected subgroup invalid.
+	return false;
 }
 
 void ARTSPlayerController::SelectNextSubgroupInDirection(int32 Sign)
 {
-    // Find first actor in selected subgroup.
-    AActor* OldSelectedSubgroupActor = nullptr;
-    int32 OldSelectedSubgroupActorIndex = 0;
+	// Find first actor in selected subgroup.
+	AActor* OldSelectedSubgroupActor = nullptr;
+	int32 OldSelectedSubgroupActorIndex = 0;
 
-    if (!GetSelectedSubgroupActorAndIndex(&OldSelectedSubgroupActor, &OldSelectedSubgroupActorIndex))
-    {
-        SelectFirstSubgroup();
-        return;
-    }
+	if (!GetSelectedSubgroupActorAndIndex(&OldSelectedSubgroupActor, &OldSelectedSubgroupActorIndex))
+	{
+		SelectFirstSubgroup();
+		return;
+	}
 
-    // Iterate all other selected actors, wrapping around.
-    AActor* NewSelectedSubgroupActor = nullptr;
-    int NewSelectedSubgroupActorIndex = OldSelectedSubgroupActorIndex + Sign;
+	// Iterate all other selected actors, wrapping around.
+	const AActor* NewSelectedSubgroupActor = nullptr;
+	int NewSelectedSubgroupActorIndex = OldSelectedSubgroupActorIndex + Sign;
 
-    while (SelectedActors.IsValidIndex(NewSelectedSubgroupActorIndex))
-    {
-        if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
-        {
-            NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
-            break;
-        }
+	while (SelectedActors.IsValidIndex(NewSelectedSubgroupActorIndex))
+	{
+		if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
+		{
+			NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
+			break;
+		}
 
-        NewSelectedSubgroupActorIndex += Sign;
-    }
+		NewSelectedSubgroupActorIndex += Sign;
+	}
 
-    if (!IsValid(NewSelectedSubgroupActor))
-    {
-        NewSelectedSubgroupActorIndex = Sign >= 0 ? 0 : SelectedActors.Num() - 1;
+	if (!IsValid(NewSelectedSubgroupActor))
+	{
+		NewSelectedSubgroupActorIndex = Sign >= 0 ? 0 : SelectedActors.Num() - 1;
 
-        while (NewSelectedSubgroupActorIndex != OldSelectedSubgroupActorIndex)
-        {
-            if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
-            {
-                NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
-                break;
-            }
+		while (NewSelectedSubgroupActorIndex != OldSelectedSubgroupActorIndex)
+		{
+			if (SelectedActors[NewSelectedSubgroupActorIndex]->GetClass() != SelectedSubgroup)
+			{
+				NewSelectedSubgroupActor = SelectedActors[NewSelectedSubgroupActorIndex];
+				break;
+			}
 
-            NewSelectedSubgroupActorIndex += Sign;
-        }
-    }
+			NewSelectedSubgroupActorIndex += Sign;
+		}
+	}
 
-    // Select new subgroup.
-    if (IsValid(NewSelectedSubgroupActor))
-    {
-        SelectSubgroup(NewSelectedSubgroupActor->GetClass());
-    }
+	// Select new subgroup.
+	if (IsValid(NewSelectedSubgroupActor))
+	{
+		SelectSubgroup(NewSelectedSubgroupActor->GetClass());
+	}
 }
 
 bool ARTSPlayerController::IssueAttackOrder(AActor* Target)
 {
-    FRTSOrderData AttackOrder;
-    AttackOrder.OrderClass = URTSAttackOrder::StaticClass();
-    AttackOrder.TargetActor = Target;
+	FRTSOrderData AttackOrder;
+	AttackOrder.OrderClass = URTSAttackOrder::StaticClass();
+	AttackOrder.TargetActor = Target;
 
 	return IssueOrderToSelectedActors(AttackOrder);
 }
 
 bool ARTSPlayerController::IssueBeginConstructionOrder(TSubclassOf<AActor> BuildingClass, const FVector& TargetLocation)
 {
-    // Determine index.
-    int32 BuildingIndex = INDEX_NONE;
+	// Determine index.
+	int32 BuildingIndex = INDEX_NONE;
 
-    for (auto SelectedActor : SelectedActors)
-    {
-        if (!IsValid(SelectedActor) || SelectedActor->GetOwner() != this)
-        {
-            continue;
-        }
+	for (const auto SelectedActor : SelectedActors)
+	{
+		if (!IsValid(SelectedActor) || SelectedActor->GetOwner() != this)
+		{
+			continue;
+		}
 
-        BuildingIndex = URTSConstructionLibrary::GetConstructableBuildingIndex(SelectedActor, BuildingClass);
+		BuildingIndex = URTSConstructionLibrary::GetConstructableBuildingIndex(SelectedActor, BuildingClass);
 
-        if (BuildingIndex != INDEX_NONE)
-        {
-            break;
-        }
-    }
+		if (BuildingIndex != INDEX_NONE)
+		{
+			break;
+		}
+	}
 
-    if (BuildingIndex == INDEX_NONE) 
-    {
-        return false;
-    }
+	if (BuildingIndex == INDEX_NONE)
+	{
+		return false;
+	}
 
-    FRTSOrderData BeginConstructionOrder;
-    BeginConstructionOrder.OrderClass = URTSBeginConstructionOrder::StaticClass();
-    BeginConstructionOrder.TargetLocation = TargetLocation;
-    BeginConstructionOrder.Index = BuildingIndex;
+	FRTSOrderData BeginConstructionOrder;
+	BeginConstructionOrder.OrderClass = URTSBeginConstructionOrder::StaticClass();
+	BeginConstructionOrder.TargetLocation = TargetLocation;
+	BeginConstructionOrder.Index = BuildingIndex;
 
-    return IssueOrderToSelectedActors(BeginConstructionOrder);
+	return IssueOrderToSelectedActors(BeginConstructionOrder);
 }
 
 bool ARTSPlayerController::IssueContinueConstructionOrder(AActor* ConstructionSite)
 {
-    FRTSOrderData ContinueConstructionOrder;
-    ContinueConstructionOrder.OrderClass = URTSContinueConstructionOrder::StaticClass();
-    ContinueConstructionOrder.TargetActor = ConstructionSite;
+	FRTSOrderData ContinueConstructionOrder;
+	ContinueConstructionOrder.OrderClass = URTSContinueConstructionOrder::StaticClass();
+	ContinueConstructionOrder.TargetActor = ConstructionSite;
 
-    return IssueOrderToSelectedActors(ContinueConstructionOrder);
+	return IssueOrderToSelectedActors(ContinueConstructionOrder);
 }
 
 bool ARTSPlayerController::IssueGatherOrder(AActor* ResourceSource)
 {
-    FRTSOrderData GatherOrder;
-    GatherOrder.OrderClass = URTSGatherOrder::StaticClass();
-    GatherOrder.TargetActor = ResourceSource;
+	FRTSOrderData GatherOrder;
+	GatherOrder.OrderClass = URTSGatherOrder::StaticClass();
+	GatherOrder.TargetActor = ResourceSource;
 
-    return IssueOrderToSelectedActors(GatherOrder);
+	return IssueOrderToSelectedActors(GatherOrder);
 }
 
 bool ARTSPlayerController::IssueMoveOrder(const FVector& TargetLocation)
 {
-    FRTSOrderData MoveOrder;
-    MoveOrder.OrderClass = URTSMoveOrder::StaticClass();
-    MoveOrder.TargetLocation = TargetLocation;
+	FRTSOrderData MoveOrder;
+	MoveOrder.OrderClass = URTSMoveOrder::StaticClass();
+	MoveOrder.TargetLocation = TargetLocation;
 
-    return IssueOrderToSelectedActors(MoveOrder);
+	return IssueOrderToSelectedActors(MoveOrder);
 }
 
 AActor* ARTSPlayerController::GetSelectedProductionActorFor(TSubclassOf<AActor> ProductClass) const
 {
-    // Find suitable selected actor.
-    for (auto SelectedActor : SelectedActors)
-    {
-        if (!IsValid(SelectedActor))
-        {
-            continue;
-        }
+	// Find suitable selected actor.
+	for (const auto SelectedActor : SelectedActors)
+	{
+		if (!IsValid(SelectedActor))
+		{
+			continue;
+		}
 
-        // Verify owner.
-        if (SelectedActor->GetOwner() != this)
-        {
-            continue;
-        }
+		// Verify owner.
+		if (SelectedActor->GetOwner() != this)
+		{
+			continue;
+		}
 
-        // Check if production actor.
-        auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+		// Check if production actor.
+		const auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
 
-        if (!ProductionComponent)
-        {
-            continue;
-        }
+		if (!ProductionComponent)
+		{
+			continue;
+		}
 
-        if (!ProductionComponent->GetAvailableProducts().Contains(ProductClass))
-        {
-            continue;
-        }
+		if (!ProductionComponent->GetAvailableProducts().Contains(ProductClass))
+		{
+			continue;
+		}
 
-        return SelectedActor;
-    }
+		return SelectedActor;
+	}
 
-    return nullptr;
+	return nullptr;
 }
 
 bool ARTSPlayerController::CheckCanIssueProductionOrder(TSubclassOf<AActor> ProductClass)
 {
-    AActor* SelectedActor = GetSelectedProductionActorFor(ProductClass);
+	AActor* SelectedActor = GetSelectedProductionActorFor(ProductClass);
 
-    if (!IsValid(SelectedActor))
-    {
-        return true;
-    }
+	if (!IsValid(SelectedActor))
+	{
+		return true;
+	}
 
-    // Check costs.
-    URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
+	// Check costs.
+	const URTSProductionCostComponent* ProductionCostComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSProductionCostComponent>(ProductClass);
 
-    if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources()))
-    {
-        NotifyOnErrorOccurred(TEXT("Not enough resources."));
-        return false;
-    }
+	if (ProductionCostComponent && !PlayerResourcesComponent->CanPayAllResources(ProductionCostComponent->GetResources()))
+	{
+		NotifyOnErrorOccurred(TEXT("Not enough resources."));
+		return false;
+	}
 
-    // Check requirements.
-    TSubclassOf<AActor> MissingRequirement;
+	// Check requirements.
+	TSubclassOf<AActor> MissingRequirement;
 
-    if (URTSGameplayLibrary::GetMissingRequirementFor(this, SelectedActor, ProductClass, MissingRequirement))
-    {
-        URTSNameComponent* NameComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+	if (URTSGameplayLibrary::GetMissingRequirementFor(this, SelectedActor, ProductClass, MissingRequirement))
+	{
+		const URTSNameComponent* NameComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
 
-        if (NameComponent)
-        {
-            FString ErrorMessage = TEXT("Missing requirement: ");
-            ErrorMessage.Append(NameComponent->GetName().ToString());
-            NotifyOnErrorOccurred(ErrorMessage);
-        }
-        else
-        {
-            NotifyOnErrorOccurred("Missing requirement.");
-        }
+		if (NameComponent)
+		{
+			FString ErrorMessage = TEXT("Missing requirement: ");
+			ErrorMessage.Append(NameComponent->GetName().ToString());
+			NotifyOnErrorOccurred(ErrorMessage);
+		}
+		else
+		{
+			NotifyOnErrorOccurred("Missing requirement.");
+		}
 
-        return false;
-    }
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 void ARTSPlayerController::IssueProductionOrder(TSubclassOf<AActor> ProductClass)
 {
-    AActor* SelectedActor = GetSelectedProductionActorFor(ProductClass);
+	AActor* SelectedActor = GetSelectedProductionActorFor(ProductClass);
 
-    if (!IsValid(SelectedActor))
-    {
-        return;
-    }
+	if (!IsValid(SelectedActor))
+	{
+		return;
+	}
 
-    // Begin production.
-    ServerStartProduction(SelectedActor, ProductClass);
+	// Begin production.
+	ServerStartProduction(SelectedActor, ProductClass);
 
-    if (IsNetMode(NM_Client))
-    {
-        UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %s."), *SelectedActor->GetName(), *ProductClass->GetName());
+	if (IsNetMode(NM_Client))
+	{
+		UE_LOG(LogRTS, Log, TEXT("Ordered actor %s to start production %s."), *SelectedActor->GetName(), *ProductClass->GetName());
 
-        // Notify listeners.
-        NotifyOnIssuedProductionOrder(SelectedActor, ProductClass);
-    }
+		// Notify listeners.
+		NotifyOnIssuedProductionOrder(SelectedActor, ProductClass);
+	}
 }
 
 void ARTSPlayerController::IssueStopOrder()
 {
-    FRTSOrderData StopOrder;
-    StopOrder.OrderClass = URTSStopOrder::StaticClass();
-    
-    IssueOrderToSelectedActors(StopOrder);
+	FRTSOrderData StopOrder;
+	StopOrder.OrderClass = URTSStopOrder::StaticClass();
+
+	IssueOrderToSelectedActors(StopOrder);
 }
 
 void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCameraFocusMode CameraFocusMode)
 {
-    // Check for double-selection.
-    UWorld* World = GetWorld();
+	// Check for double-selection.
+	const UWorld* World = GetWorld();
 
-    if (!World)
-    {
-        return;
-    }
+	if (!World)
+	{
+		return;
+	}
 
-    const float CurrentSelectionTime = World->GetRealTimeSeconds();
-    const float SelectionTimeDelta = CurrentSelectionTime - LastSelectionTime;
-    LastSelectionTime = CurrentSelectionTime;
+	const float CurrentSelectionTime = World->GetRealTimeSeconds();
+	const float SelectionTimeDelta = CurrentSelectionTime - LastSelectionTime;
+	LastSelectionTime = CurrentSelectionTime;
 
-    if (CameraFocusMode == ERTSSelectionCameraFocusMode::SELECTIONFOCUS_FocusOnDoubleSelection &&
-        DoubleGroupSelectionTime > 0.0f && SelectionTimeDelta < DoubleGroupSelectionTime)
-    {
-        // Compare groups.
-        if (Actors.Num() == SelectedActors.Num())
-        {
-            bool bSameSelection = true;
+	if (CameraFocusMode == ERTSSelectionCameraFocusMode::SELECTIONFOCUS_FocusOnDoubleSelection &&
+		DoubleGroupSelectionTime > 0.0f && SelectionTimeDelta < DoubleGroupSelectionTime)
+	{
+		// Compare groups.
+		if (Actors.Num() == SelectedActors.Num())
+		{
+			bool bSameSelection = true;
 
-            for (AActor* Actor : Actors)
-            {
-                if (!SelectedActors.Contains(Actor))
-                {
-                    bSameSelection = false;
-                    break;
-                }
-            }
+			for (AActor* Actor : Actors)
+			{
+				if (!SelectedActors.Contains(Actor))
+				{
+					bSameSelection = false;
+					break;
+				}
+			}
 
-            if (bSameSelection)
-            {
-                // Focus selected actors instead.
-                if (SelectedActors.Num() > 0)
-                {
-                    FocusCameraOnActor(SelectedActors[0]);
-                }
+			if (bSameSelection)
+			{
+				// Focus selected actors instead.
+				if (SelectedActors.Num() > 0)
+				{
+					FocusCameraOnActor(SelectedActors[0]);
+				}
 
-                return;
-            }
-        }
-    }
+				return;
+			}
+		}
+	}
 
 	// Clear selection.
-	for (AActor* SelectedActor : SelectedActors)
+	for (const AActor* SelectedActor : SelectedActors)
 	{
 		URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
 
@@ -879,38 +879,39 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCam
 		}
 	}
 
-    // Sort by priority and lifetime.
-    Actors.Sort([=](const AActor& Lhs, const AActor& Rhs) {
-        const URTSSelectableComponent* FirstSelectableComponent = Lhs.FindComponentByClass<URTSSelectableComponent>();
-        const URTSSelectableComponent* SecondSelectableComponent = Rhs.FindComponentByClass<URTSSelectableComponent>();
+	// Sort by priority and lifetime.
+	Actors.Sort([=](const AActor& Lhs, const AActor& Rhs)
+	{
+		const URTSSelectableComponent* FirstSelectableComponent = Lhs.FindComponentByClass<URTSSelectableComponent>();
+		const URTSSelectableComponent* SecondSelectableComponent = Rhs.FindComponentByClass<URTSSelectableComponent>();
 
-        if (!IsValid(FirstSelectableComponent) || !IsValid(SecondSelectableComponent))
-        {
-            return true;
-        }
+		if (!IsValid(FirstSelectableComponent) || !IsValid(SecondSelectableComponent))
+		{
+			return true;
+		}
 
-        if (FirstSelectableComponent->GetSelectionPriority() > SecondSelectableComponent->GetSelectionPriority())
-        {
-            return true;
-        }
+		if (FirstSelectableComponent->GetSelectionPriority() > SecondSelectableComponent->GetSelectionPriority())
+		{
+			return true;
+		}
 
-        if (FirstSelectableComponent->GetSelectionPriority() < SecondSelectableComponent->GetSelectionPriority())
-        {
-            return false;
-        }
+		if (FirstSelectableComponent->GetSelectionPriority() < SecondSelectableComponent->GetSelectionPriority())
+		{
+			return false;
+		}
 
-        if (URTSGameplayLibrary::IsReadyToUse(&Lhs) && !URTSGameplayLibrary::IsReadyToUse(&Rhs))
-        {
-            return true;
-        }
+		if (URTSGameplayLibrary::IsReadyToUse(&Lhs) && !URTSGameplayLibrary::IsReadyToUse(&Rhs))
+		{
+			return true;
+		}
 
-        if (!URTSGameplayLibrary::IsReadyToUse(&Lhs) && URTSGameplayLibrary::IsReadyToUse(&Rhs))
-        {
-            return false;
-        }
+		if (!URTSGameplayLibrary::IsReadyToUse(&Lhs) && URTSGameplayLibrary::IsReadyToUse(&Rhs))
+		{
+			return false;
+		}
 
-        return Lhs.CreationTime < Rhs.CreationTime;
-    });
+		return Lhs.CreationTime < Rhs.CreationTime;
+	});
 
 	// Apply new selection.
 	SelectedActors = Actors;
@@ -923,19 +924,19 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCam
 		{
 			SelectableComponent->SelectActor();
 
-            // Play selection sound.
-            if (SelectionSoundCooldownRemaining <= 0.0f &&
-                URTSGameplayLibrary::IsOwnedByLocalPlayer(SelectedActor) &&
-                IsValid(SelectableComponent->GetSelectedSound()))
-            {
-                UGameplayStatics::PlaySound2D(this, SelectableComponent->GetSelectedSound());
-                SelectionSoundCooldownRemaining = SelectableComponent->GetSelectedSound()->GetDuration();
-            }
+			// Play selection sound.
+			if (SelectionSoundCooldownRemaining <= 0.0f &&
+				URTSGameplayLibrary::IsOwnedByLocalPlayer(SelectedActor) &&
+				IsValid(SelectableComponent->GetSelectedSound()))
+			{
+				UGameplayStatics::PlaySound2D(this, SelectableComponent->GetSelectedSound());
+				SelectionSoundCooldownRemaining = SelectableComponent->GetSelectedSound()->GetDuration();
+			}
 		}
 	}
 
-    // Initially, select first subgroup.
-    SelectFirstSubgroup();
+	// Initially, select first subgroup.
+	SelectFirstSubgroup();
 
 	// Notify listeners.
 	NotifyOnSelectionChanged(SelectedActors);
@@ -943,75 +944,76 @@ void ARTSPlayerController::SelectActors(TArray<AActor*> Actors, ERTSSelectionCam
 
 TSubclassOf<AActor> ARTSPlayerController::GetSelectedSubgroup() const
 {
-    return SelectedSubgroup;
+	return SelectedSubgroup;
 }
 
 AActor* ARTSPlayerController::GetSelectedSubgroupActor()
 {
-    AActor* SelectedSubgroupActor;
-    int32 SelectedSubgroupActorIndex;
-    return GetSelectedSubgroupActorAndIndex(&SelectedSubgroupActor, &SelectedSubgroupActorIndex) ? SelectedSubgroupActor
-        : nullptr;
+	AActor* SelectedSubgroupActor;
+	int32 SelectedSubgroupActorIndex;
+	return GetSelectedSubgroupActorAndIndex(&SelectedSubgroupActor, &SelectedSubgroupActorIndex)
+		       ? SelectedSubgroupActor
+		       : nullptr;
 }
 
 void ARTSPlayerController::GetSelectedSubgroupActors(TArray<AActor*>& OutActors) const
 {
-    for (AActor* Actor : SelectedActors)
-    {
-        if (!IsValid(Actor))
-        {
-            continue;
-        }
+	for (AActor* Actor : SelectedActors)
+	{
+		if (!IsValid(Actor))
+		{
+			continue;
+		}
 
-        if (Actor->GetClass() == SelectedSubgroup)
-        {
-            OutActors.Add(Actor);
-        }
-    }
+		if (Actor->GetClass() == SelectedSubgroup)
+		{
+			OutActors.Add(Actor);
+		}
+	}
 }
 
 void ARTSPlayerController::SelectFirstSubgroup()
 {
-    if (SelectedActors.Num() > 0)
-    {
-        SelectSubgroup(SelectedActors[0]->GetClass());
-    }
-    else
-    {
-        SelectSubgroup(nullptr);
-    }
+	if (SelectedActors.Num() > 0)
+	{
+		SelectSubgroup(SelectedActors[0]->GetClass());
+	}
+	else
+	{
+		SelectSubgroup(nullptr);
+	}
 }
 
 void ARTSPlayerController::SelectNextSubgroup()
 {
-    SelectNextSubgroupInDirection(+1);
+	SelectNextSubgroupInDirection(+1);
 }
 
 void ARTSPlayerController::SelectPreviousSubgroup()
 {
-    SelectNextSubgroupInDirection(-1);
+	SelectNextSubgroupInDirection(-1);
 }
 
 void ARTSPlayerController::SelectSubgroup(TSubclassOf<AActor> NewSubgroup)
 {
-    if (SelectedSubgroup == NewSubgroup)
-    {
-        return;
-    }
+	if (SelectedSubgroup == NewSubgroup)
+	{
+		return;
+	}
 
-    SelectedSubgroup = NewSubgroup;
+	SelectedSubgroup = NewSubgroup;
 
-    if (NewSubgroup == nullptr)
-    {
-        UE_LOG(LogRTS, Verbose, TEXT("Cleared selected subgroup."));
-    }
-    else
-    {
-        UE_LOG(LogRTS, Verbose, TEXT("Selected subgroup %s."), *NewSubgroup->GetName());
-    }
+	if (NewSubgroup == nullptr)
+	{
+		UE_LOG(LogRTS, Verbose, TEXT("Cleared selected subgroup."));
+	}
+	else
+	{
+		UE_LOG(LogRTS, Verbose, TEXT("Selected subgroup %s."), *NewSubgroup->GetName());
+	}
 
-    // Notify listeners.
-    NotifyOnSelectedSubgroupChanged(NewSubgroup);
+	// Notify listeners.
+	NotifyOnSelectedSubgroupChanged(NewSubgroup);
 }
 
 void ARTSPlayerController::SaveControlGroup(int32 Index)
@@ -1022,8 +1024,8 @@ void ARTSPlayerController::SaveControlGroup(int32 Index)
 	}
 
 	// Save control group.
-    FRTSControlGroup ControlGroup;
-    ControlGroup.Actors = SelectedActors;
+	FRTSControlGroup ControlGroup;
+	ControlGroup.Actors = SelectedActors;
 	ControlGroups[Index] = ControlGroup;
 
 	UE_LOG(LogRTS, Log, TEXT("Saved selection to control group %d."), Index);
@@ -1065,103 +1067,103 @@ void ARTSPlayerController::LoadControlGroup9() { LoadControlGroup(9); }
 
 void ARTSPlayerController::FocusCameraOnLocation(FVector2D NewCameraLocation)
 {
-    APawn* PlayerPawn = GetPawnOrSpectator();
+	APawn* PlayerPawn = GetPawnOrSpectator();
 
-    if (!IsValid(PlayerPawn))
-    {
-        return;
-    }
+	if (!IsValid(PlayerPawn))
+	{
+		return;
+	}
 
-    // Calculate where to put the camera, considering its angle, to center on the specified location.
-    FVector FinalCameraLocation = FVector(NewCameraLocation.X - GetCameraDistance(), NewCameraLocation.Y, 0.0f);
+	// Calculate where to put the camera, considering its angle, to center on the specified location.
+	FVector FinalCameraLocation = FVector(NewCameraLocation.X - GetCameraDistance(), NewCameraLocation.Y, 0.0f);
 
-    // Enforce camera bounds.
-    if (IsValid(CameraBoundsVolume) && !CameraBoundsVolume->EncompassesPoint(FinalCameraLocation))
-    {
-        UBrushComponent* CameraBoundsBrushComponent = CameraBoundsVolume->GetBrushComponent();
-        FTransform CameraBoundsBrushTransform = CameraBoundsBrushComponent->GetComponentTransform();
-        FBoxSphereBounds Bounds = CameraBoundsBrushComponent->CalcBounds(CameraBoundsBrushTransform);
+	// Enforce camera bounds.
+	if (IsValid(CameraBoundsVolume) && !CameraBoundsVolume->EncompassesPoint(FinalCameraLocation))
+	{
+		const UBrushComponent* CameraBoundsBrushComponent = CameraBoundsVolume->GetBrushComponent();
+		const FTransform CameraBoundsBrushTransform = CameraBoundsBrushComponent->GetComponentTransform();
+		const FBoxSphereBounds Bounds = CameraBoundsBrushComponent->CalcBounds(CameraBoundsBrushTransform);
 
-        FinalCameraLocation.X = FMath::Clamp(FinalCameraLocation.X, Bounds.GetBox().Min.X, Bounds.GetBox().Max.X);
-        FinalCameraLocation.Y = FMath::Clamp(FinalCameraLocation.Y, Bounds.GetBox().Min.Y, Bounds.GetBox().Max.Y);
-    }
+		FinalCameraLocation.X = FMath::Clamp(FinalCameraLocation.X, Bounds.GetBox().Min.X, Bounds.GetBox().Max.X);
+		FinalCameraLocation.Y = FMath::Clamp(FinalCameraLocation.Y, Bounds.GetBox().Min.Y, Bounds.GetBox().Max.Y);
+	}
 
-    // Keep camera height.
-    FinalCameraLocation.Z = PlayerPawn->GetActorLocation().Z;
+	// Keep camera height.
+	FinalCameraLocation.Z = PlayerPawn->GetActorLocation().Z;
 
-    // Update camera location.
-    PlayerPawn->SetActorLocation(FinalCameraLocation);
+	// Update camera location.
+	PlayerPawn->SetActorLocation(FinalCameraLocation);
 }
 
 void ARTSPlayerController::FocusCameraOnActor(AActor* Actor)
 {
-    TArray<AActor*> Actors;
-    Actors.Add(Actor);
-    FocusCameraOnActors(Actors);
+	TArray<AActor*> Actors;
+	Actors.Add(Actor);
+	FocusCameraOnActors(Actors);
 }
 
 void ARTSPlayerController::FocusCameraOnActors(TArray<AActor*> Actors)
 {
-    // Get center of group.
-    FVector2D Locations = FVector2D::ZeroVector;
-    int32 NumActors = 0;
+	// Get center of group.
+	FVector2D Locations = FVector2D::ZeroVector;
+	int32 NumActors = 0;
 
-    for (auto Actor : Actors)
-    {
-        if (!IsValid(Actor))
-        {
-            continue;
-        }
+	for (const auto Actor : Actors)
+	{
+		if (!IsValid(Actor))
+		{
+			continue;
+		}
 
-        FVector ActorLocation = Actor->GetActorLocation();
-        Locations.X += ActorLocation.X;
-        Locations.Y += ActorLocation.Y;
+		const FVector ActorLocation = Actor->GetActorLocation();
+		Locations.X += ActorLocation.X;
+		Locations.Y += ActorLocation.Y;
 
-        ++NumActors;
-    }
+		++NumActors;
+	}
 
-    FVector2D Location = Locations / NumActors;
-    FocusCameraOnLocation(Location);
+	const FVector2D Location = Locations / NumActors;
+	FocusCameraOnLocation(Location);
 }
 
 void ARTSPlayerController::SaveCameraLocation(int32 Index)
 {
-    APawn* PlayerPawn = GetPawnOrSpectator();
+	const APawn* PlayerPawn = GetPawnOrSpectator();
 
-    if (!IsValid(PlayerPawn))
-    {
-        return;
-    }
+	if (!IsValid(PlayerPawn))
+	{
+		return;
+	}
 
-    if (!CameraLocations.IsValidIndex(Index))
-    {
-        return;
-    }
+	if (!CameraLocations.IsValidIndex(Index))
+	{
+		return;
+	}
 
-    // Save camera location.
-    CameraLocations[Index] = PlayerPawn->GetActorLocation();
+	// Save camera location.
+	CameraLocations[Index] = PlayerPawn->GetActorLocation();
 
-    UE_LOG(LogRTS, Log, TEXT("Saved camera location to index %d."), Index);
+	UE_LOG(LogRTS, Log, TEXT("Saved camera location to index %d."), Index);
 }
 
 void ARTSPlayerController::LoadCameraLocation(int32 Index)
 {
-    APawn* PlayerPawn = GetPawnOrSpectator();
+	APawn* PlayerPawn = GetPawnOrSpectator();
 
-    if (!IsValid(PlayerPawn))
-    {
-        return;
-    }
+	if (!IsValid(PlayerPawn))
+	{
+		return;
+	}
 
-    if (!CameraLocations.IsValidIndex(Index))
-    {
-        return;
-    }
+	if (!CameraLocations.IsValidIndex(Index))
+	{
+		return;
+	}
 
-    // Restore camera.
-    PlayerPawn->SetActorLocation(CameraLocations[Index]);
+	// Restore camera.
+	PlayerPawn->SetActorLocation(CameraLocations[Index]);
 
-    UE_LOG(LogRTS, Log, TEXT("Loaded camera location with index %d."), Index);
+	UE_LOG(LogRTS, Log, TEXT("Loaded camera location with index %d."), Index);
 }
 
 bool ARTSPlayerController::IsConstructionProgressBarHotkeyPressed() const
@@ -1181,40 +1183,40 @@ bool ARTSPlayerController::IsProductionProgressBarHotkeyPressed() const
 
 bool ARTSPlayerController::CheckCanBeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
 {
-    // Check resources.
-    URTSConstructionSiteComponent* ConstructionSiteComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
+	// Check resources.
+	const URTSConstructionSiteComponent* ConstructionSiteComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSConstructionSiteComponent>(BuildingClass);
 
-    if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts()))
-    {
-        NotifyOnErrorOccurred(TEXT("Not enough resources."));
-        return false;
-    }
+	if (ConstructionSiteComponent && !PlayerResourcesComponent->CanPayAllResources(ConstructionSiteComponent->GetConstructionCosts()))
+	{
+		NotifyOnErrorOccurred(TEXT("Not enough resources."));
+		return false;
+	}
 
-    // Check requirements.
-    if (SelectedActors.Num() > 0)
-    {
-        TSubclassOf<AActor> MissingRequirement;
+	// Check requirements.
+	if (SelectedActors.Num() > 0)
+	{
+		TSubclassOf<AActor> MissingRequirement;
 
-        if (URTSGameplayLibrary::GetMissingRequirementFor(this, SelectedActors[0], BuildingClass, MissingRequirement))
-        {
-            URTSNameComponent* NameComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
+		if (URTSGameplayLibrary::GetMissingRequirementFor(this, SelectedActors[0], BuildingClass, MissingRequirement))
+		{
+			const URTSNameComponent* NameComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSNameComponent>(MissingRequirement);
 
-            if (NameComponent)
-            {
-                FString ErrorMessage = TEXT("Missing requirement: ");
-                ErrorMessage.Append(NameComponent->GetName().ToString());
-                NotifyOnErrorOccurred(ErrorMessage);
-            }
-            else
-            {
-                NotifyOnErrorOccurred("Missing requirement.");
-            }
+			if (NameComponent)
+			{
+				FString ErrorMessage = TEXT("Missing requirement: ");
+				ErrorMessage.Append(NameComponent->GetName().ToString());
+				NotifyOnErrorOccurred(ErrorMessage);
+			}
+			else
+			{
+				NotifyOnErrorOccurred("Missing requirement.");
+			}
 
-            return false;
-        }
-    }
-    
-    return true;
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingClass)
@@ -1223,17 +1225,17 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 	{
 		BuildingCursor->Destroy();
 	}
-	
-    // Spawn preview building.
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
+	// Spawn preview building.
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-    if (IsValid(BuildingCursor))
-    {
-        BuildingCursor->SetupForBuilding(BuildingClass);
-    }
+	BuildingCursor = GetWorld()->SpawnActor<ARTSBuildingCursor>(BuildingCursorClass, SpawnParams);
+
+	if (IsValid(BuildingCursor))
+	{
+		BuildingCursor->SetupForBuilding(BuildingClass);
+	}
 
 	BuildingBeingPlacedClass = BuildingClass;
 
@@ -1245,33 +1247,33 @@ void ARTSPlayerController::BeginBuildingPlacement(TSubclassOf<AActor> BuildingCl
 
 bool ARTSPlayerController::CanPlaceBuilding_Implementation(TSubclassOf<AActor> BuildingClass, const FVector& Location) const
 {
-    if (IsValid(BuildingCursor) && BuildingCursor->HasGrid())
-    {
-        return BuildingCursor->AreAllCellsValid();
-    }
+	if (IsValid(BuildingCursor) && BuildingCursor->HasGrid())
+	{
+		return BuildingCursor->AreAllCellsValid();
+	}
 
-    UWorld* World = GetWorld();
-    return URTSCollisionLibrary::IsSuitableLocationForActor(World, BuildingClass, Location);
+	UWorld* World = GetWorld();
+	return URTSCollisionLibrary::IsSuitableLocationForActor(World, BuildingClass, Location);
 }
 
 void ARTSPlayerController::Surrender()
 {
-    if (IsNetMode(NM_Client))
-    {
-        UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
-    }
+	if (IsNetMode(NM_Client))
+	{
+		UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
+	}
 
-    ServerSurrender();
+	ServerSurrender();
 }
 
 void ARTSPlayerController::GameHasEnded(class AActor* EndGameFocus /*= NULL*/, bool bIsWinner /*= false*/)
 {
-    ClientGameHasEnded(bIsWinner);
+	ClientGameHasEnded(bIsWinner);
 }
 
 void ARTSPlayerController::ClientGameHasEnded_Implementation(bool bIsWinner)
 {
-    NotifyOnGameHasEnded(bIsWinner);
+	NotifyOnGameHasEnded(bIsWinner);
 }
 
 void ARTSPlayerController::StartSelectActors()
@@ -1295,16 +1297,16 @@ void ARTSPlayerController::StartSelectActors()
 
 void ARTSPlayerController::FinishSelectActors()
 {
-    // Get objects at pointer position.
-    TArray<FHitResult> HitResults;
-    
-    if (!GetObjectsInSelectionFrame(HitResults))
-    {
-		bCreatingSelectionFrame = false;
-        return;
-    }
+	// Get objects at pointer position.
+	TArray<FHitResult> HitResults;
 
-    // Check results.
+	if (!GetObjectsInSelectionFrame(HitResults))
+	{
+		bCreatingSelectionFrame = false;
+		return;
+	}
+
+	// Check results.
 	TArray<AActor*> ActorsToSelect;
 
 	if (bAddSelectionHotkeyPressed || bToggleSelectionHotkeyPressed)
@@ -1312,13 +1314,12 @@ void ARTSPlayerController::FinishSelectActors()
 		ActorsToSelect = SelectedActors;
 	}
 
-  for (auto& HitResult : HitResults)
-  {
-
-    if (!HitResult.HasValidHitObjectHandle())
-    {
-      continue;
-    }
+	for (auto& HitResult : HitResults)
+	{
+		if (!HitResult.HasValidHitObjectHandle())
+		{
+			continue;
+		}
 		if (!IsSelectableActor(HitResult.GetActor()))
 		{
 			continue;
@@ -1354,7 +1355,7 @@ void ARTSPlayerController::FinishSelectActors()
 
 			UE_LOG(LogRTS, Log, TEXT("Selected actor %s."), *HitResult.GetActor()->GetName());
 		}
-  }
+	}
 
 	SelectActors(ActorsToSelect, ERTSSelectionCameraFocusMode::SELECTIONFOCUS_DoNothing);
 
@@ -1459,10 +1460,10 @@ void ARTSPlayerController::CancelBuildingPlacement()
 
 void ARTSPlayerController::CancelConstruction()
 {
-	for (auto SelectedActor : SelectedActors)
+	for (const auto SelectedActor : SelectedActors)
 	{
 		// Verify construction site and owner.
-		auto ConstructionSiteComponent = SelectedActor->FindComponentByClass<URTSConstructionSiteComponent>();
+		const auto ConstructionSiteComponent = SelectedActor->FindComponentByClass<URTSConstructionSiteComponent>();
 
 		if (!ConstructionSiteComponent)
 		{
@@ -1484,7 +1485,7 @@ void ARTSPlayerController::CancelConstruction()
 
 void ARTSPlayerController::ServerCancelConstruction_Implementation(AActor* ConstructionSite)
 {
-	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
+	const auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	if (!ConstructionSiteComponent)
 	{
@@ -1503,10 +1504,10 @@ bool ARTSPlayerController::ServerCancelConstruction_Validate(AActor* Constructio
 
 void ARTSPlayerController::CancelProduction()
 {
-	for (auto SelectedActor : SelectedActors)
+	for (const auto SelectedActor : SelectedActors)
 	{
 		// Verify production actor.
-		auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
+		const auto ProductionComponent = SelectedActor->FindComponentByClass<URTSProductionComponent>();
 
 		if (!ProductionComponent)
 		{
@@ -1533,7 +1534,7 @@ void ARTSPlayerController::CancelProduction()
 
 void ARTSPlayerController::ServerCancelProduction_Implementation(AActor* ProductionActor)
 {
-	auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
+	const auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
 
 	if (!ProductionComponent)
 	{
@@ -1552,7 +1553,7 @@ bool ARTSPlayerController::ServerCancelProduction_Validate(AActor* ProductionAct
 
 void ARTSPlayerController::ServerStartProduction_Implementation(AActor* ProductionActor, TSubclassOf<AActor> ProductClass)
 {
-	auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
+	const auto ProductionComponent = ProductionActor->FindComponentByClass<URTSProductionComponent>();
 
 	if (!IsValid(ProductionComponent))
 	{
@@ -1570,64 +1571,64 @@ bool ARTSPlayerController::ServerStartProduction_Validate(AActor* ProductionActo
 
 void ARTSPlayerController::ServerSurrender_Implementation()
 {
-    UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
+	UE_LOG(LogRTS, Log, TEXT("%s surrenders the game."), *GetName());
 
-    // Notify game mode.
-    ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
+	// Notify game mode.
+	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(this));
 
-    if (GameMode != nullptr)
-    {
-        GameMode->NotifyOnPlayerDefeated(this);
-    }
+	if (GameMode != nullptr)
+	{
+		GameMode->NotifyOnPlayerDefeated(this);
+	}
 }
 
 bool ARTSPlayerController::ServerSurrender_Validate()
 {
-    return true;
+	return true;
 }
 
 void ARTSPlayerController::MoveCameraLeftRight(float Value)
 {
-    CameraLeftRightAxisValue = Value;
+	CameraLeftRightAxisValue = Value;
 }
 
 void ARTSPlayerController::MoveCameraUpDown(float Value)
 {
-    CameraUpDownAxisValue = Value;
+	CameraUpDownAxisValue = Value;
 }
 
 void ARTSPlayerController::ZoomCamera(float Value)
 {
-    CameraZoomAxisValue = Value;
+	CameraZoomAxisValue = Value;
 }
 
 float ARTSPlayerController::GetCameraDistance() const
 {
-    APawn* PlayerPawn = GetPawnOrSpectator();
+	const APawn* PlayerPawn = GetPawnOrSpectator();
 
-    if (!IsValid(PlayerPawn))
-    {
-        return 0.0f;
-    }
+	if (!IsValid(PlayerPawn))
+	{
+		return 0.0f;
+	}
 
-    UCameraComponent* Camera = PlayerPawn->FindComponentByClass<UCameraComponent>();
+	const UCameraComponent* Camera = PlayerPawn->FindComponentByClass<UCameraComponent>();
 
-    if (!IsValid(Camera))
-    {
-        return 0.0f;
-    }
+	if (!IsValid(Camera))
+	{
+		return 0.0f;
+	}
 
-    // Get camera angle.
-    float CameraAngle = Camera->GetRelativeRotation().Pitch;
+	// Get camera angle.
+	float CameraAngle = Camera->GetRelativeRotation().Pitch;
 
-    if (CameraAngle < 0.0f)
-    {
-        CameraAngle += 90.0f;
-    }
+	if (CameraAngle < 0.0f)
+	{
+		CameraAngle += 90.0f;
+	}
 
-    // Get camera distance using trigonometry.
-    // We are assuming that the terrain is flat, centered at the origin, and the camera has no roll or yaw.
-    return Camera->GetRelativeLocation().Z * FMath::Tan(FMath::DegreesToRadians(CameraAngle));
+	// Get camera distance using trigonometry.
+	// We are assuming that the terrain is flat, centered at the origin, and the camera has no roll or yaw.
+	return Camera->GetRelativeLocation().Z * FMath::Tan(FMath::DegreesToRadians(CameraAngle));
 }
 
 void ARTSPlayerController::NotifyOnActorOwnerChanged(AActor* Actor)
@@ -1657,43 +1658,43 @@ void ARTSPlayerController::NotifyOnBuildingPlacementCancelled(TSubclassOf<AActor
 
 void ARTSPlayerController::NotifyOnErrorOccurred(const FString& ErrorMessage)
 {
-    ReceiveOnErrorOccurred(ErrorMessage);
+	ReceiveOnErrorOccurred(ErrorMessage);
 }
 
 void ARTSPlayerController::NotifyOnGameHasEnded(bool bIsWinner)
 {
-    ReceiveOnGameHasEnded(bIsWinner);
+	ReceiveOnGameHasEnded(bIsWinner);
 }
 
 void ARTSPlayerController::NotifyOnIssuedOrder(APawn* OrderedPawn, const FRTSOrderData& Order)
 {
-    ReceiveOnIssuedOrder(OrderedPawn, Order);
+	ReceiveOnIssuedOrder(OrderedPawn, Order);
 
-    if (Order.OrderClass == URTSAttackOrder::StaticClass())
-    {
-        NotifyOnIssuedAttackOrder(OrderedPawn, Order.TargetActor);
-    }
-    else if (Order.OrderClass == URTSBeginConstructionOrder::StaticClass())
-    {
-        TSubclassOf<AActor> BuildingClass = URTSConstructionLibrary::GetConstructableBuildingClass(OrderedPawn, Order.Index);
-        NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, Order.TargetLocation);
-    }
-    else if (Order.OrderClass == URTSContinueConstructionOrder::StaticClass())
-    {
-        NotifyOnIssuedContinueConstructionOrder(OrderedPawn, Order.TargetActor);
-    }
-    else if (Order.OrderClass == URTSGatherOrder::StaticClass())
-    {
-        NotifyOnIssuedGatherOrder(OrderedPawn, Order.TargetActor);
-    }
-    else if (Order.OrderClass == URTSMoveOrder::StaticClass())
-    {
-        NotifyOnIssuedMoveOrder(OrderedPawn, Order.TargetLocation);
-    }
-    else if (Order.OrderClass == URTSStopOrder::StaticClass())
-    {
-        NotifyOnIssuedStopOrder(OrderedPawn);
-    }
+	if (Order.OrderClass == URTSAttackOrder::StaticClass())
+	{
+		NotifyOnIssuedAttackOrder(OrderedPawn, Order.TargetActor);
+	}
+	else if (Order.OrderClass == URTSBeginConstructionOrder::StaticClass())
+	{
+		const TSubclassOf<AActor> BuildingClass = URTSConstructionLibrary::GetConstructableBuildingClass(OrderedPawn, Order.Index);
+		NotifyOnIssuedBeginConstructionOrder(OrderedPawn, BuildingClass, Order.TargetLocation);
+	}
+	else if (Order.OrderClass == URTSContinueConstructionOrder::StaticClass())
+	{
+		NotifyOnIssuedContinueConstructionOrder(OrderedPawn, Order.TargetActor);
+	}
+	else if (Order.OrderClass == URTSGatherOrder::StaticClass())
+	{
+		NotifyOnIssuedGatherOrder(OrderedPawn, Order.TargetActor);
+	}
+	else if (Order.OrderClass == URTSMoveOrder::StaticClass())
+	{
+		NotifyOnIssuedMoveOrder(OrderedPawn, Order.TargetLocation);
+	}
+	else if (Order.OrderClass == URTSStopOrder::StaticClass())
+	{
+		NotifyOnIssuedStopOrder(OrderedPawn);
+	}
 }
 
 void ARTSPlayerController::NotifyOnIssuedAttackOrder(APawn* OrderedPawn, AActor* Target)
@@ -1718,12 +1719,12 @@ void ARTSPlayerController::NotifyOnIssuedGatherOrder(APawn* OrderedPawn, AActor*
 
 void ARTSPlayerController::NotifyOnIssuedMoveOrder(APawn* OrderedPawn, const FVector& TargetLocation)
 {
-    ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
+	ReceiveOnIssuedMoveOrder(OrderedPawn, TargetLocation);
 }
 
 void ARTSPlayerController::NotifyOnIssuedProductionOrder(AActor* OrderedActor, TSubclassOf<AActor> ProductClass)
 {
-    ReceiveOnIssuedProductionOrder(OrderedActor, ProductClass);
+	ReceiveOnIssuedProductionOrder(OrderedActor, ProductClass);
 }
 
 void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)
@@ -1733,7 +1734,7 @@ void ARTSPlayerController::NotifyOnIssuedStopOrder(APawn* OrderedPawn)
 
 void ARTSPlayerController::NotifyOnSelectionChanged(const TArray<AActor*>& Selection)
 {
-    ReceiveOnSelectionChanged(Selection);
+	ReceiveOnSelectionChanged(Selection);
 }
 
 void ARTSPlayerController::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
@@ -1743,10 +1744,10 @@ void ARTSPlayerController::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 		// Notify listeners that new vision info is available now.
 		ARTSVisionInfo* VisionInfo = ARTSVisionInfo::GetVisionInfoForTeam(GetWorld(), NewTeam->GetTeamIndex());
 
-        if (IsValid(VisionInfo))
-        {
-            NotifyOnVisionInfoAvailable(VisionInfo);
-        }
+		if (IsValid(VisionInfo))
+		{
+			NotifyOnVisionInfoAvailable(VisionInfo);
+		}
 	}
 }
 
@@ -1760,23 +1761,23 @@ void ARTSPlayerController::NotifyOnVisionInfoAvailable(ARTSVisionInfo* VisionInf
 		return;
 	}
 
-    if (!IsValid(VisionInfo))
-    {
-        return;
-    }
+	if (!IsValid(VisionInfo))
+	{
+		return;
+	}
 
 	// Setup fog of war.
-    ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
+	const ARTSGameState* GameState = Cast<ARTSGameState>(GetWorld()->GetGameState());
 
-    if (IsValid(GameState))
-    {
-        ARTSVisionManager* VisionManager = GameState->GetVisionManager();
+	if (IsValid(GameState))
+	{
+		ARTSVisionManager* VisionManager = GameState->GetVisionManager();
 
-        if (IsValid(VisionManager))
-        {
-            VisionManager->SetLocalVisionInfo(VisionInfo);
-        }
-    }
+		if (IsValid(VisionManager))
+		{
+			VisionManager->SetLocalVisionInfo(VisionInfo);
+		}
+	}
 
 	// Allow others to setup vision.
 	ReceiveOnVisionInfoAvailable(VisionInfo);
@@ -1794,7 +1795,7 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
 		// Move camera.
-		FVector NewCameraLocation = FVector(WorldPosition.X, WorldPosition.Y, PlayerPawn->GetActorLocation().Z);
+		const FVector NewCameraLocation = FVector(WorldPosition.X, WorldPosition.Y, PlayerPawn->GetActorLocation().Z);
 		PlayerPawn->SetActorLocation(NewCameraLocation);
 	}
 	else if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
@@ -1809,90 +1810,90 @@ void ARTSPlayerController::NotifyOnMinimapClicked(const FPointerEvent& InMouseEv
 
 		IssueOrderTargetingObjectsToSelectedActors(HitResults);
 	}
-	
+
 	// Notify listeners.
 	ReceiveOnMinimapClicked(InMouseEvent, MinimapPosition, WorldPosition);
 }
 
 void ARTSPlayerController::NotifyOnSelectedSubgroupChanged(TSubclassOf<AActor> Subgroup)
 {
-    ReceiveOnSelectedSubgroupChanged(Subgroup);
+	ReceiveOnSelectedSubgroupChanged(Subgroup);
 }
 
 void ARTSPlayerController::PlayerTick(float DeltaTime)
 {
-    Super::PlayerTick(DeltaTime);
+	Super::PlayerTick(DeltaTime);
 
-    // Update sound cooldowns.
-    if (SelectionSoundCooldownRemaining > 0.0f)
-    {
-        SelectionSoundCooldownRemaining -= DeltaTime;
-    }
+	// Update sound cooldowns.
+	if (SelectionSoundCooldownRemaining > 0.0f)
+	{
+		SelectionSoundCooldownRemaining -= DeltaTime;
+	}
 
-    APawn* PlayerPawn = GetPawnOrSpectator();
+	APawn* PlayerPawn = GetPawnOrSpectator();
 
-    if (!PlayerPawn)
-    {
-        return;
-    }
+	if (!PlayerPawn)
+	{
+		return;
+	}
 
-    // Get mouse input.
-    float MouseX;
-    float MouseY;
+	// Get mouse input.
+	float MouseX;
+	float MouseY;
 
-    const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 
-    const float ScrollBorderRight = ViewportSize.X - CameraScrollThreshold;
-    const float ScrollBorderTop = ViewportSize.Y - CameraScrollThreshold;
+	const float ScrollBorderRight = ViewportSize.X - CameraScrollThreshold;
+	const float ScrollBorderTop = ViewportSize.Y - CameraScrollThreshold;
 
-    if (GetMousePosition(MouseX, MouseY))
-    {
-        if (MouseX <= CameraScrollThreshold)
-        {
-            CameraLeftRightAxisValue -= 1 - (MouseX / CameraScrollThreshold);
-        }
-        else if (MouseX >= ScrollBorderRight)
-        {
-            CameraLeftRightAxisValue += (MouseX - ScrollBorderRight) / CameraScrollThreshold;
-        }
+	if (GetMousePosition(MouseX, MouseY))
+	{
+		if (MouseX <= CameraScrollThreshold)
+		{
+			CameraLeftRightAxisValue -= 1 - (MouseX / CameraScrollThreshold);
+		}
+		else if (MouseX >= ScrollBorderRight)
+		{
+			CameraLeftRightAxisValue += (MouseX - ScrollBorderRight) / CameraScrollThreshold;
+		}
 
-        if (MouseY <= CameraScrollThreshold)
-        {
-            CameraUpDownAxisValue += 1 - (MouseY / CameraScrollThreshold);
-        }
-        else if (MouseY >= ScrollBorderTop)
-        {
-            CameraUpDownAxisValue -= (MouseY - ScrollBorderTop) / CameraScrollThreshold;
-        }
-    }
+		if (MouseY <= CameraScrollThreshold)
+		{
+			CameraUpDownAxisValue += 1 - (MouseY / CameraScrollThreshold);
+		}
+		else if (MouseY >= ScrollBorderTop)
+		{
+			CameraUpDownAxisValue -= (MouseY - ScrollBorderTop) / CameraScrollThreshold;
+		}
+	}
 
-    // Apply input.
-    CameraLeftRightAxisValue = FMath::Clamp(CameraLeftRightAxisValue, -1.0f, +1.0f);
-    CameraUpDownAxisValue = FMath::Clamp(CameraUpDownAxisValue, -1.0f, +1.0f);
+	// Apply input.
+	CameraLeftRightAxisValue = FMath::Clamp(CameraLeftRightAxisValue, -1.0f, +1.0f);
+	CameraUpDownAxisValue = FMath::Clamp(CameraUpDownAxisValue, -1.0f, +1.0f);
 
-    FVector Location = PlayerPawn->GetActorLocation();
-    Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
-    Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
+	FVector Location = PlayerPawn->GetActorLocation();
+	Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
+	Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
 
-    // Enforce camera bounds.
-    if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))
-    {
-        PlayerPawn->SetActorLocation(Location);
-    }
+	// Enforce camera bounds.
+	if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))
+	{
+		PlayerPawn->SetActorLocation(Location);
+	}
 
-    // Apply zoom input.
-    UCameraComponent* PlayerPawnCamera = PlayerPawn->FindComponentByClass<UCameraComponent>();
+	// Apply zoom input.
+	UCameraComponent* PlayerPawnCamera = PlayerPawn->FindComponentByClass<UCameraComponent>();
 
-    if (IsValid(PlayerPawnCamera))
-    {
-        FVector CameraLocation = PlayerPawnCamera->GetRelativeLocation();
-        CameraLocation.Z += CameraZoomSpeed * CameraZoomAxisValue * DeltaTime;
-        CameraLocation.Z = FMath::Clamp(CameraLocation.Z, MinCameraDistance, MaxCameraDistance);
-        PlayerPawnCamera->SetRelativeLocation(CameraLocation);
-    }
+	if (IsValid(PlayerPawnCamera))
+	{
+		FVector CameraLocation = PlayerPawnCamera->GetRelativeLocation();
+		CameraLocation.Z += CameraZoomSpeed * CameraZoomAxisValue * DeltaTime;
+		CameraLocation.Z = FMath::Clamp(CameraLocation.Z, MinCameraDistance, MaxCameraDistance);
+		PlayerPawnCamera->SetRelativeLocation(CameraLocation);
+	}
 
 	// Get hovered actors.
-    AActor* OldHoveredActor = HoveredActor;
+	const AActor* OldHoveredActor = HoveredActor;
 	HoveredActor = nullptr;
 
 	TArray<FHitResult> HitResults;
@@ -1901,17 +1902,17 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	{
 		for (auto& HitResult : HitResults)
 		{
-            // Store hovered world position.
-            HoveredWorldPosition = HitResult.Location;
+			// Store hovered world position.
+			HoveredWorldPosition = HitResult.Location;
 
-            // Update position of building being placed.
-            if (BuildingCursor)
-            {
-                BuildingCursor->SetCursorLocation(HoveredWorldPosition);
+			// Update position of building being placed.
+			if (BuildingCursor)
+			{
+				BuildingCursor->SetCursorLocation(HoveredWorldPosition);
 
-                bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
-                BuildingCursor->SetLocationValid(bLocationValid);
-            }
+				const bool bLocationValid = CanPlaceBuilding(BuildingBeingPlacedClass, HoveredWorldPosition);
+				BuildingCursor->SetLocationValid(bLocationValid);
+			}
 
 			// Check if hit any actor.
 			if (!HitResult.HasValidHitObjectHandle() || Cast<ALandscape>(HitResult.GetActor()) != nullptr)
@@ -1920,7 +1921,7 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 			}
 
 			// Check if hit selectable actor.
-			auto SelectableComponent = HitResult.GetActor()->FindComponentByClass<URTSSelectableComponent>();
+			const auto SelectableComponent = HitResult.GetActor()->FindComponentByClass<URTSSelectableComponent>();
 
 			if (!SelectableComponent)
 			{
@@ -1933,99 +1934,99 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	}
 
 	// Verify selection.
-    int32 OldNumSelectedActors = SelectedActors.Num();
+	const int32 OldNumSelectedActors = SelectedActors.Num();
 
-    for (int32 SelectedActorIndex = SelectedActors.Num() - 1; SelectedActorIndex >= 0; --SelectedActorIndex)
-    {
-        AActor* SelectedActor = SelectedActors[SelectedActorIndex];
+	for (int32 SelectedActorIndex = SelectedActors.Num() - 1; SelectedActorIndex >= 0; --SelectedActorIndex)
+	{
+		const AActor* SelectedActor = SelectedActors[SelectedActorIndex];
 
-        if (!IsValid(SelectedActor))
-        {
-            // Remove invalid actors.
-            SelectedActors.RemoveAt(SelectedActorIndex);
-            continue;
-        }
+		if (!IsValid(SelectedActor))
+		{
+			// Remove invalid actors.
+			SelectedActors.RemoveAt(SelectedActorIndex);
+			continue;
+		}
 
-        if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(SelectedActor))
-        {
-            // Remove invisible actors.
-            SelectedActors.RemoveAt(SelectedActorIndex);
+		if (!URTSGameplayLibrary::IsFullyVisibleForLocalClient(SelectedActor))
+		{
+			// Remove invisible actors.
+			SelectedActors.RemoveAt(SelectedActorIndex);
 
-            // Update selection effects.
-            URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
+			// Update selection effects.
+			URTSSelectableComponent* SelectableComponent = SelectedActor->FindComponentByClass<URTSSelectableComponent>();
 
-            if (IsValid(SelectableComponent))
-            {
-                SelectableComponent->DeselectActor();
-            }
+			if (IsValid(SelectableComponent))
+			{
+				SelectableComponent->DeselectActor();
+			}
 
-            continue;
-        }
-    }
+			continue;
+		}
+	}
 
-    if (SelectedActors.Num() != OldNumSelectedActors)
-    {
-        // Notify listeners.
-        NotifyOnSelectionChanged(SelectedActors);
+	if (SelectedActors.Num() != OldNumSelectedActors)
+	{
+		// Notify listeners.
+		NotifyOnSelectionChanged(SelectedActors);
 
-        // Verify subgroup.
-        if (SelectedActors.Num() > 0 && !IsValid(GetSelectedSubgroupActor()))
-        {
-            SelectFirstSubgroup();
-        }
-    }
+		// Verify subgroup.
+		if (SelectedActors.Num() > 0 && !IsValid(GetSelectedSubgroupActor()))
+		{
+			SelectFirstSubgroup();
+		}
+	}
 
-    // Notify listeners.
-    if (OldHoveredActor != HoveredActor)
-    {
-        if (IsValid(OldHoveredActor))
-        {
-            auto OldHoveredSelectableComponent = OldHoveredActor->FindComponentByClass<URTSSelectableComponent>();
+	// Notify listeners.
+	if (OldHoveredActor != HoveredActor)
+	{
+		if (IsValid(OldHoveredActor))
+		{
+			const auto OldHoveredSelectableComponent = OldHoveredActor->FindComponentByClass<URTSSelectableComponent>();
 
-            if (OldHoveredSelectableComponent)
-            {
-                OldHoveredSelectableComponent->UnhoverActor();
-            }
-        }
+			if (OldHoveredSelectableComponent)
+			{
+				OldHoveredSelectableComponent->UnhoverActor();
+			}
+		}
 
-        if (IsValid(HoveredActor))
-        {
-            auto HoveredSelectableComponent = HoveredActor->FindComponentByClass<URTSSelectableComponent>();
+		if (IsValid(HoveredActor))
+		{
+			const auto HoveredSelectableComponent = HoveredActor->FindComponentByClass<URTSSelectableComponent>();
 
-            if (HoveredSelectableComponent)
-            {
-                HoveredSelectableComponent->HoverActor();
-            }
-        }
-    }
+			if (HoveredSelectableComponent)
+			{
+				HoveredSelectableComponent->HoverActor();
+			}
+		}
+	}
 }
 
 void ARTSPlayerController::InitPlayerState()
 {
-    Super::InitPlayerState();
+	Super::InitPlayerState();
 
-    if (!IsValid(PlayerState))
-    {
-        return;
-    }
+	if (!IsValid(PlayerState))
+	{
+		return;
+	}
 
-    UE_LOG(LogRTS, Log, TEXT("Player %s set up player state %s (%s)."), *GetName(), *PlayerState->GetName(),
-        *PlayerState->GetPlayerName());
+	UE_LOG(LogRTS, Log, TEXT("Player %s set up player state %s (%s)."), *GetName(), *PlayerState->GetName(),
+	       *PlayerState->GetPlayerName());
 
-    OnPlayerStateAvailable(GetPlayerState());
+	OnPlayerStateAvailable(GetPlayerState());
 }
 
 void ARTSPlayerController::OnRep_PlayerState()
 {
-    Super::OnRep_PlayerState();
+	Super::OnRep_PlayerState();
 
-    if (!IsValid(PlayerState))
-    {
-        return;
-    }
+	if (!IsValid(PlayerState))
+	{
+		return;
+	}
 
-    UE_LOG(LogRTS, Log, TEXT("Player %s received player state %s (%s)."), *GetName(), *PlayerState->GetName(),
-        *PlayerState->GetPlayerName());
+	UE_LOG(LogRTS, Log, TEXT("Player %s received player state %s (%s)."), *GetName(), *PlayerState->GetName(),
+	       *PlayerState->GetPlayerName());
 
-    OnPlayerStateAvailable(GetPlayerState());
+	OnPlayerStateAvailable(GetPlayerState());
 }

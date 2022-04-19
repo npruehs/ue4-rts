@@ -8,7 +8,7 @@
 
 
 ARTSTeamInfo::ARTSTeamInfo(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	bReplicates = true;
 	bAlwaysRelevant = true;
@@ -20,9 +20,9 @@ ARTSTeamInfo::ARTSTeamInfo(const FObjectInitializer& ObjectInitializer /*= FObje
 
 void ARTSTeamInfo::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME_CONDITION(ARTSTeamInfo, TeamIndex, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ARTSTeamInfo, TeamIndex, COND_InitialOnly);
 }
 
 void ARTSTeamInfo::AddToTeam(AController* Player)
@@ -55,7 +55,7 @@ void ARTSTeamInfo::RemoveFromTeam(AController* Player)
 	{
 		return;
 	}
-	
+
 	if (!TeamMembers.Contains(Player))
 	{
 		return;
@@ -74,7 +74,7 @@ void ARTSTeamInfo::RemoveFromTeam(AController* Player)
 
 uint8 ARTSTeamInfo::GetTeamIndex() const
 {
-    return TeamIndex;
+	return TeamIndex;
 }
 
 TArray<AController*> ARTSTeamInfo::GetTeamMembers() const
@@ -84,5 +84,5 @@ TArray<AController*> ARTSTeamInfo::GetTeamMembers() const
 
 void ARTSTeamInfo::SetTeamIndex(uint8 InTeamIndex)
 {
-    TeamIndex = InTeamIndex;
+	TeamIndex = InTeamIndex;
 }

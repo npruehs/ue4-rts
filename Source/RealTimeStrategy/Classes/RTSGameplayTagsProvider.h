@@ -9,15 +9,15 @@
 UINTERFACE(MinimalAPI)
 class URTSGameplayTagsProvider : public UInterface
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 };
 
 /** Provides initial gameplay tags for actors. */
 class REALTIMESTRATEGY_API IRTSGameplayTagsProvider
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Adds gameplay tags to the specified tag container. */
-    virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer);
+	/** Adds gameplay tags to the specified tag container. */
+	virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer);
 };

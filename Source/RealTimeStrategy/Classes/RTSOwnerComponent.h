@@ -37,9 +37,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPlayerOwner(AController* Controller);
 
-    /** Sets the player owning the actor. */
-    UFUNCTION(BlueprintCallable)
-    void SetPlayerStateOwner(ARTSPlayerState* PlayerState);
+	/** Sets the player owning the actor. */
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerStateOwner(ARTSPlayerState* PlayerState);
 
 
 	/** Checks whether the actor belongs to the same team as the specified one. */
@@ -50,8 +50,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsSameTeamAsController(AController* C) const;
 
-    /** Gets the index of the player that should initially own the actor. */
-    uint8 GetInitialOwnerPlayerIndex();
+	/** Gets the index of the player that should initially own the actor. */
+	uint8 GetInitialOwnerPlayerIndex();
 
 
 	/** Event when the actor is owned by a different player. */
@@ -60,17 +60,17 @@ public:
 
 
 private:
-    /** Index of the player that should initially own the actor. */
-    UPROPERTY(EditInstanceOnly, Category = "RTS")
-    uint8 InitialOwnerPlayerIndex;
+	/** Index of the player that should initially own the actor. */
+	UPROPERTY(EditInstanceOnly, Category = "RTS")
+	uint8 InitialOwnerPlayerIndex;
 
 	/** Player owning this actor. */
 	UPROPERTY(ReplicatedUsing=ReceivedPlayerOwner)
 	ARTSPlayerState* PlayerOwner;
 
 
-    UFUNCTION()
-    void ReceivedPlayerOwner(ARTSPlayerState* PreviousOwner);
+	UFUNCTION()
+	void ReceivedPlayerOwner(ARTSPlayerState* PreviousOwner);
 
-    void NotifyOnOwnerChanged(ARTSPlayerState* PreviousOwner, ARTSPlayerState* NewOwner);
+	void NotifyOnOwnerChanged(ARTSPlayerState* PreviousOwner, ARTSPlayerState* NewOwner);
 };

@@ -13,10 +13,10 @@
 UCLASS(Blueprintable)
 class REALTIMESTRATEGY_API URTSHoveredActorWidgetComponent : public URTSActorWidgetComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Event when the actor was hovered. */
-    UFUNCTION(BlueprintImplementableEvent, Category = "RTS")
-    void UpdateData(AActor* Actor);
+	/** Event when the actor was hovered. */
+	UFUNCTION(BlueprintImplementableEvent, Category = "RTS")
+	void UpdateData(AActor* Actor);
 };

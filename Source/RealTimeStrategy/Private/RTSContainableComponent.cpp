@@ -9,89 +9,89 @@
 
 
 URTSContainableComponent::URTSContainableComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    SetIsReplicatedByDefault(true);
+	SetIsReplicatedByDefault(true);
 }
 
 void URTSContainableComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(URTSContainableComponent, Container);
+	DOREPLIFETIME(URTSContainableComponent, Container);
 }
 
 void URTSContainableComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	const AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
     URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
 
-    if (!IsValid(HealthComponent))
-    {
-        return;
-    }
+	if (!IsValid(HealthComponent))
+	{
+		return;
+	}
 
-    HealthComponent->OnKilled.AddDynamic(this, &URTSContainableComponent::OnKilled);
+	HealthComponent->OnKilled.AddDynamic(this, &URTSContainableComponent::OnKilled);
 }
 
 AActor* URTSContainableComponent::GetContainer() const
 {
-    return Container;
+	return Container;
 }
 
 void URTSContainableComponent::SetContainer(AActor* NewContainer)
 {
-    if (Container == NewContainer)
-    {
-        return;
-    }
+	if (Container == NewContainer)
+	{
+		return;
+	}
 
-    Container = NewContainer;
+	Container = NewContainer;
 
-    // Notify listeners.
-    OnContainerChanged.Broadcast(GetOwner(), NewContainer);
+	// Notify listeners.
+	OnContainerChanged.Broadcast(GetOwner(), NewContainer);
 }
 
 void URTSContainableComponent::ReceivedContainer()
 {
-    // Notify listeners.
-    OnContainerChanged.Broadcast(GetOwner(), Container);
+	// Notify listeners.
+	OnContainerChanged.Broadcast(GetOwner(), Container);
 }
 
 void URTSContainableComponent::OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser)
 {
-    if (!IsValid(Container))
-    {
-        return;
-    }
+	if (!IsValid(Container))
+	{
+		return;
+	}
 
-    AActor* Owner = GetOwner();
+	AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    // Unload from all containers.
-    TArray<URTSContainerComponent*> ContainerComponents;
-    Container->GetComponents(ContainerComponents);
+	// Unload from all containers.
+	TArray<URTSContainerComponent*> ContainerComponents;
+	Container->GetComponents(ContainerComponents);
 
-    for (URTSContainerComponent* ContainerComponent : ContainerComponents)
-    {
-        if (ContainerComponent->ContainsActor(Owner))
-        {
-            UE_LOG(LogRTS, Log, TEXT("Unloading actor %s from container %s because it was killed while being inside."),
-                *Owner->GetName(), *Container->GetName());
+	for (URTSContainerComponent* ContainerComponent : ContainerComponents)
+	{
+		if (ContainerComponent->ContainsActor(Owner))
+		{
+			UE_LOG(LogRTS, Log, TEXT("Unloading actor %s from container %s because it was killed while being inside."),
+			       *Owner->GetName(), *Container->GetName());
 
-            ContainerComponent->UnloadActor(Owner);
-        }
-    }
+			ContainerComponent->UnloadActor(Owner);
+		}
+	}
 }

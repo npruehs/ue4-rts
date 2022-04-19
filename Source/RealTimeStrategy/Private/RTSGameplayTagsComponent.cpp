@@ -8,113 +8,113 @@
 
 
 URTSGameplayTagsComponent::URTSGameplayTagsComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    SetIsReplicatedByDefault(true);
+	SetIsReplicatedByDefault(true);
 }
 
 void URTSGameplayTagsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    DOREPLIFETIME(URTSGameplayTagsComponent, CurrentTags);
+	DOREPLIFETIME(URTSGameplayTagsComponent, CurrentTags);
 }
 
 void URTSGameplayTagsComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	AActor* Owner = GetOwner();
 
-    if (!IsValid(Owner))
-    {
-        return;
-    }
+	if (!IsValid(Owner))
+	{
+		return;
+	}
 
-    IRTSGameplayTagsProvider* GameplayTagsProvider = Cast<IRTSGameplayTagsProvider>(Owner);
+	IRTSGameplayTagsProvider* GameplayTagsProvider = Cast<IRTSGameplayTagsProvider>(Owner);
 
-    if (GameplayTagsProvider)
-    {
-        GameplayTagsProvider->AddGameplayTags(InitialTags);
-    }
+	if (GameplayTagsProvider)
+	{
+		GameplayTagsProvider->AddGameplayTags(InitialTags);
+	}
 
-    for (UActorComponent* Component : Owner->GetComponents())
-    {
-        GameplayTagsProvider = Cast<IRTSGameplayTagsProvider>(Component);
+	for (UActorComponent* Component : Owner->GetComponents())
+	{
+		GameplayTagsProvider = Cast<IRTSGameplayTagsProvider>(Component);
 
-        if (GameplayTagsProvider)
-        {
-            GameplayTagsProvider->AddGameplayTags(InitialTags);
-        }
-    }
+		if (GameplayTagsProvider)
+		{
+			GameplayTagsProvider->AddGameplayTags(InitialTags);
+		}
+	}
 
-    for (const FGameplayTag& Tag : InitialTags)
-    {
-        CurrentTags.AddTagFast(Tag);
+	for (const FGameplayTag& Tag : InitialTags)
+	{
+		CurrentTags.AddTagFast(Tag);
 
-        UE_LOG(LogRTS, Log, TEXT("Added initial gameplay tag %s for %s."), *Tag.ToString(), *GetOwner()->GetName());
-    }
+		UE_LOG(LogRTS, Log, TEXT("Added initial gameplay tag %s for %s."), *Tag.ToString(), *GetOwner()->GetName());
+	}
 }
 
 void URTSGameplayTagsComponent::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
-    TagContainer.AppendTags(CurrentTags);
+	TagContainer.AppendTags(CurrentTags);
 }
 
 FGameplayTagContainer URTSGameplayTagsComponent::GetCurrentTags() const
 {
-    FGameplayTagContainer GameplayTagContainer;
-    GetOwnedGameplayTags(GameplayTagContainer);
-    return GameplayTagContainer;
+	FGameplayTagContainer GameplayTagContainer;
+	GetOwnedGameplayTags(GameplayTagContainer);
+	return GameplayTagContainer;
 }
 
 void URTSGameplayTagsComponent::AddGameplayTag(const FGameplayTag& NewTag)
 {
-    CurrentTags.AddTag(NewTag);
+	CurrentTags.AddTag(NewTag);
 
-    UE_LOG(LogRTS, Log, TEXT("Added gameplay tag %s for %s."), *NewTag.ToString(), *GetOwner()->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Added gameplay tag %s for %s."), *NewTag.ToString(), *GetOwner()->GetName());
 
-    NotifyOnCurrentTagsChanged();
+	NotifyOnCurrentTagsChanged();
 }
 
 void URTSGameplayTagsComponent::AddGameplayTags(const FGameplayTagContainer& NewTags)
 {
-    CurrentTags.AppendTags(NewTags);
+	CurrentTags.AppendTags(NewTags);
 
-    UE_LOG(LogRTS, Log, TEXT("Added gameplay tags %s for %s."), *NewTags.ToString(), *GetOwner()->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Added gameplay tags %s for %s."), *NewTags.ToString(), *GetOwner()->GetName());
 
-    NotifyOnCurrentTagsChanged();
+	NotifyOnCurrentTagsChanged();
 }
 
 bool URTSGameplayTagsComponent::RemoveGameplayTag(const FGameplayTag& TagToRemove)
 {
-    bool bRemoved = CurrentTags.RemoveTag(TagToRemove);
+	const bool bRemoved = CurrentTags.RemoveTag(TagToRemove);
 
-    if (bRemoved)
-    {
-        UE_LOG(LogRTS, Log, TEXT("Removed gameplay tag %s from %s."), *TagToRemove.ToString(), *GetOwner()->GetName());
+	if (bRemoved)
+	{
+		UE_LOG(LogRTS, Log, TEXT("Removed gameplay tag %s from %s."), *TagToRemove.ToString(), *GetOwner()->GetName());
 
-        NotifyOnCurrentTagsChanged();
-    }
+		NotifyOnCurrentTagsChanged();
+	}
 
-    return bRemoved;
+	return bRemoved;
 }
 
 void URTSGameplayTagsComponent::RemoveGameplayTags(const FGameplayTagContainer& TagsToRemove)
 {
-    CurrentTags.RemoveTags(TagsToRemove);
+	CurrentTags.RemoveTags(TagsToRemove);
 
-    UE_LOG(LogRTS, Log, TEXT("Removed gameplay tags %s from %s."), *TagsToRemove.ToString(), *GetOwner()->GetName());
+	UE_LOG(LogRTS, Log, TEXT("Removed gameplay tags %s from %s."), *TagsToRemove.ToString(), *GetOwner()->GetName());
 
-    NotifyOnCurrentTagsChanged();
+	NotifyOnCurrentTagsChanged();
 }
 
 void URTSGameplayTagsComponent::NotifyOnCurrentTagsChanged()
 {
-    CurrentTagsChanged.Broadcast(GetOwner(), CurrentTags);
+	CurrentTagsChanged.Broadcast(GetOwner(), CurrentTags);
 }
 
 void URTSGameplayTagsComponent::ReceivedCurrentTags()
 {
-    NotifyOnCurrentTagsChanged();
+	NotifyOnCurrentTagsChanged();
 }

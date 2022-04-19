@@ -3,17 +3,17 @@
 
 float ARTSRangeIndicator::GetRange() const
 {
-    return Range;
+	return Range;
 }
 
 void ARTSRangeIndicator::SetRange(float InRange)
 {
-    Range = InRange;
+	Range = InRange;
 
-    NotifyOnRangeChanged(Range);
+	NotifyOnRangeChanged(Range);
 }
 
 void ARTSRangeIndicator::NotifyOnRangeChanged(float NewRange)
 {
-    ReceiveOnRangeChanged(NewRange);
+	ReceiveOnRangeChanged(NewRange);
 }

@@ -23,69 +23,69 @@ class URTSPlayerResourcesComponent;
 UCLASS()
 class REALTIMESTRATEGY_API ARTSPlayerAIController : public AAIController
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    ARTSPlayerAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ARTSPlayerAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
-    /** Checks the build order and returns the class of the next pawn to produce, or the Pawn class if nothing needs to be produced. */
-    UFUNCTION(BlueprintPure)
-    TSubclassOf<APawn> GetNextPawnToProduce() const;
+	/** Checks the build order and returns the class of the next pawn to produce, or the Pawn class if nothing needs to be produced. */
+	UFUNCTION(BlueprintPure)
+	TSubclassOf<AActor> GetNextPawnToProduce() const;
 
-    /** Gets the primary resource drain of the AI. */
-    UFUNCTION(BlueprintPure)
-    virtual AActor* GetPrimaryResourceDrain() const;
+	/** Gets the primary resource drain of the AI. */
+	UFUNCTION(BlueprintPure)
+	virtual AActor* GetPrimaryResourceDrain() const;
 
-    /** Gets the closest resource source of the primary resource type around the first resource drain of the AI. */
-    UFUNCTION(BlueprintPure)
-    virtual AActor* GetPrimaryResourceSource() const;
+	/** Gets the closest resource source of the primary resource type around the first resource drain of the AI. */
+	UFUNCTION(BlueprintPure)
+	virtual AActor* GetPrimaryResourceSource() const;
 
-    /** Checks the available resources for the AI and whether it can pay for a pawn of the specified class. */
-    UFUNCTION(BlueprintPure)
-    bool CanPayFor(TSubclassOf<APawn> PawnClass) const;
+	/** Checks the available resources for the AI and whether it can pay for a pawn of the specified class. */
+	UFUNCTION(BlueprintPure)
+	bool CanPayFor(TSubclassOf<AActor> PawnClass) const;
 
-    /** Checks whether the AI meets all tech tree requirements for a pawn of the specified class. */
-    UFUNCTION(BlueprintPure)
-    bool MeetsAllRequirementsFor(TSubclassOf<APawn> PawnClass) const;
+	/** Checks whether the AI meets all tech tree requirements for a pawn of the specified class. */
+	UFUNCTION(BlueprintPure)
+	bool MeetsAllRequirementsFor(TSubclassOf<AActor> PawnClass) const;
 
-    /** Selects an arbitrary production actor for producing a pawn of the specified class and starts production. */
-    UFUNCTION(BlueprintCallable)
-    bool StartProduction(TSubclassOf<APawn> PawnClass);
+	/** Selects an arbitrary production actor for producing a pawn of the specified class and starts production. */
+	UFUNCTION(BlueprintCallable)
+	bool StartProduction(TSubclassOf<AActor> PawnClass);
 
-    /** Whether killing an actor owned by this player yields a reward for the attacking player. */
-    bool GivesBounty() const;
+	/** Whether killing an actor owned by this player yields a reward for the attacking player. */
+	bool GivesBounty() const;
 
 protected:
-    virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 
 private:
-    /** Behavior tree to use for driving the player AI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UBehaviorTree* PlayerBehaviorTreeAsset;
+	/** Behavior tree to use for driving the player AI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UBehaviorTree* PlayerBehaviorTreeAsset;
 
-    /** Blackboard to use for holding all data relevant to the player AI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UBlackboardData* PlayerBlackboardAsset;
+	/** Blackboard to use for holding all data relevant to the player AI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UBlackboardData* PlayerBlackboardAsset;
 
-    /** Units and buildings the AI should produce, in order. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<TSubclassOf<APawn>> BuildOrder;
+	/** Units and buildings the AI should produce, in order. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<TSubclassOf<APawn>> BuildOrder;
 
-    /** Maximum distance of a new building to an existing one, in cm. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    float MaximumBaseBuildingDistance;
+	/** Maximum distance of a new building to an existing one, in cm. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	float MaximumBaseBuildingDistance;
 
-    /** Type of the primary resource for the AI to gather (e.g. used for placing resource drains). */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TSubclassOf<URTSResourceType> PrimaryResourceType;
+	/** Type of the primary resource for the AI to gather (e.g. used for placing resource drains). */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TSubclassOf<URTSResourceType> PrimaryResourceType;
 
-    /** Whether killing an actor owned by this player yields a reward for the attacking player. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    bool bGivesBounty;
+	/** Whether killing an actor owned by this player yields a reward for the attacking player. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	bool bGivesBounty;
 
-    /** Stores the resources available for this player. */
-    UPROPERTY(VisibleAnywhere, Category = "RTS")
-    URTSPlayerResourcesComponent* PlayerResourcesComponent;
+	/** Stores the resources available for this player. */
+	UPROPERTY(VisibleAnywhere, Category = "RTS")
+	URTSPlayerResourcesComponent* PlayerResourcesComponent;
 };

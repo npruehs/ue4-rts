@@ -17,28 +17,28 @@ URTSContainerComponent::URTSContainerComponent(const FObjectInitializer& ObjectI
 
 void URTSContainerComponent::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
-    AActor* Owner = GetOwner();
+	const AActor* Owner = GetOwner();
 
-    if (Owner == nullptr)
-    {
-        return;
-    }
+	if (Owner == nullptr)
+	{
+		return;
+	}
 
     URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
 
-    if (HealthComponent == nullptr)
-    {
-        return;
-    }
+	if (HealthComponent == nullptr)
+	{
+		return;
+	}
 
-    HealthComponent->OnKilled.AddDynamic(this, &URTSContainerComponent::OnKilled);
+	HealthComponent->OnKilled.AddDynamic(this, &URTSContainerComponent::OnKilled);
 }
 
 bool URTSContainerComponent::ContainsActor(const AActor* Actor) const
 {
-    return ContainedActors.Contains(Actor);
+	return ContainedActors.Contains(Actor);
 }
 
 bool URTSContainerComponent::CanLoadActor(AActor* Actor) const
@@ -61,25 +61,25 @@ void URTSContainerComponent::LoadActor(AActor* Actor)
 	// Add to container.
 	ContainedActors.Add(Actor);
 
-    URTSContainableComponent* ContainableComponent = Actor->FindComponentByClass<URTSContainableComponent>();
+	URTSContainableComponent* ContainableComponent = Actor->FindComponentByClass<URTSContainableComponent>();
 
-    if (IsValid(ContainableComponent))
-    {
-        ContainableComponent->SetContainer(GetOwner());
-    }
+	if (IsValid(ContainableComponent))
+	{
+		ContainableComponent->SetContainer(GetOwner());
+	}
 
 	// Hide actor.
-    URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
+	const URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
 
-    if (!IsValid(VisibleComponent))
-    {
-        UE_LOG(LogRTS, Warning, TEXT("%s has a RTSContainerComponent, but no RTSVisibleComponent. "
-            "Actor visibility will be handled by container component itself. "
-            "Add an RTSVisibleComponent and URTSContainableComponent to ensure visibility can be determined by multiple reasons (e.g. containers and fog of war)."),
-            *Actor->GetName());
-        Actor->SetActorHiddenInGame(true);
-    }
-	
+	if (!IsValid(VisibleComponent))
+	{
+		UE_LOG(LogRTS, Warning, TEXT("%s has a RTSContainerComponent, but no RTSVisibleComponent. "
+			       "Actor visibility will be handled by container component itself. "
+			       "Add an RTSVisibleComponent and URTSContainableComponent to ensure visibility can be determined by multiple reasons (e.g. containers and fog of war)."),
+		       *Actor->GetName());
+		Actor->SetActorHiddenInGame(true);
+	}
+
 	Actor->SetActorEnableCollision(false);
 
 	// Notify listeners.
@@ -98,20 +98,20 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
 	// Remove from container.
 	ContainedActors.Remove(Actor);
 
-    URTSContainableComponent* ContainableComponent = Actor->FindComponentByClass<URTSContainableComponent>();
+	URTSContainableComponent* ContainableComponent = Actor->FindComponentByClass<URTSContainableComponent>();
 
-    if (IsValid(ContainableComponent))
-    {
-        ContainableComponent->SetContainer(nullptr);
-    }
+	if (IsValid(ContainableComponent))
+	{
+		ContainableComponent->SetContainer(nullptr);
+	}
 
 	// Show actor.
-    URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
+	const URTSVisibleComponent* VisibleComponent = Actor->FindComponentByClass<URTSVisibleComponent>();
 
-    if (!IsValid(VisibleComponent))
-    {
-        Actor->SetActorHiddenInGame(false);
-    }
+	if (!IsValid(VisibleComponent))
+	{
+		Actor->SetActorHiddenInGame(false);
+	}
 
 	Actor->SetActorEnableCollision(true);
 
@@ -123,30 +123,30 @@ void URTSContainerComponent::UnloadActor(AActor* Actor)
 
 void URTSContainerComponent::UnloadAll()
 {
-    TArray<AActor*> ActorsToUnload(ContainedActors);
+	TArray<AActor*> ActorsToUnload(ContainedActors);
 
-    for (AActor* Actor : ActorsToUnload)
-    {
-        UnloadActor(Actor);
-    }
+	for (AActor* Actor : ActorsToUnload)
+	{
+		UnloadActor(Actor);
+	}
 }
 
 int32 URTSContainerComponent::GetCapacity() const
 {
-    return Capacity;
+	return Capacity;
 }
 
 void URTSContainerComponent::SetCapacity(int32 InCapacity)
 {
-    Capacity = InCapacity;
+	Capacity = InCapacity;
 }
 
 TArray<AActor*> URTSContainerComponent::GetContainedActors() const
 {
-    return ContainedActors;
+	return ContainedActors;
 }
 
 void URTSContainerComponent::OnKilled(AActor* Actor, AController* PreviousOwner, AActor* DamageCauser)
 {
-    UnloadAll();
+	UnloadAll();
 }

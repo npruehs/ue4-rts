@@ -9,44 +9,44 @@
 
 
 URTSReturnResourcesOrder::URTSReturnResourcesOrder(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    TargetType = ERTSOrderTargetType::ORDERTARGET_Actor;
-    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
+	TargetType = ERTSOrderTargetType::ORDERTARGET_Actor;
+	GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
 
-    IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanGather());
-    IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Changing_CarryingResources());
+	IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanGather());
+	IssueTagRequirements.SourceRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Changing_CarryingResources());
 
-    IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
-    IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
+	IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
+	IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
 
-    IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Alive());
-    IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Relationship_SamePlayer());
-    IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources());
+	IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Alive());
+	IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Relationship_SamePlayer());
+	IssueTagRequirements.TargetRequiredTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_AcceptsReturnedResources());
 
-    IssueTagRequirements.TargetBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
+	IssueTagRequirements.TargetBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_UnderConstruction());
 }
 
 bool URTSReturnResourcesOrder::IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const
 {
-    URTSGathererComponent* GathererComponent = OrderedActor->FindComponentByClass<URTSGathererComponent>();
+	const URTSGathererComponent* GathererComponent = OrderedActor->FindComponentByClass<URTSGathererComponent>();
 
-    if (!IsValid(GathererComponent))
-    {
-        return false;
-    }
+	if (!IsValid(GathererComponent))
+	{
+		return false;
+	}
 
-    URTSResourceDrainComponent* ResourceDrainComponent = TargetData.Actor->FindComponentByClass<URTSResourceDrainComponent>();
+	const URTSResourceDrainComponent* ResourceDrainComponent = TargetData.Actor->FindComponentByClass<URTSResourceDrainComponent>();
 
-    if (!IsValid(ResourceDrainComponent))
-    {
-        return false;
-    }
+	if (!IsValid(ResourceDrainComponent))
+	{
+		return false;
+	}
 
-    if (!ResourceDrainComponent->GetResourceTypes().Contains(GathererComponent->GetCarriedResourceType()))
-    {
-        return false;
-    }
+	if (!ResourceDrainComponent->GetResourceTypes().Contains(GathererComponent->GetCarriedResourceType()))
+	{
+		return false;
+	}
 
-    return true;
+	return true;
 }

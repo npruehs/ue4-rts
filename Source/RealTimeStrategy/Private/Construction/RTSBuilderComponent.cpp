@@ -15,10 +15,10 @@
 
 
 URTSBuilderComponent::URTSBuilderComponent(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    // Set reasonable default values.
-    InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanConstruct());
+	// Set reasonable default values.
+	InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanConstruct());
 }
 
 void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
@@ -33,7 +33,7 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 		return;
 	}
 
-	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
+	const auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	if (!ConstructionSiteComponent)
 	{
@@ -53,14 +53,14 @@ void URTSBuilderComponent::AssignToConstructionSite(AActor* ConstructionSite)
 
 		if (bEnterConstructionSite)
 		{
-            // Apply tags.
-            URTSGameplayTagLibrary::AddGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_Constructing());
+			// Apply tags.
+			URTSGameplayTagLibrary::AddGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_Constructing());
 
 			// Enter construction site.
-			auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
+			const auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
-			if (ContainerComponent && 
-                URTSGameplayTagLibrary::HasGameplayTag(ConstructionSite, URTSGameplayTagLibrary::Container_ConstructionSite()))
+			if (ContainerComponent &&
+				URTSGameplayTagLibrary::HasGameplayTag(ConstructionSite, URTSGameplayTagLibrary::Container_ConstructionSite()))
 			{
 				ContainerComponent->LoadActor(GetOwner());
 				OnConstructionSiteEntered.Broadcast(GetOwner(), ConstructionSite);
@@ -79,54 +79,54 @@ bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 		return false;
 	}
 
-    auto Pawn = Cast<APawn>(GetOwner());
+	const auto Pawn = Cast<APawn>(GetOwner());
 
-    if (!Pawn)
-    {
-        return false;
-    }
+	if (!Pawn)
+	{
+		return false;
+	}
 
-    auto PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
+	const auto PawnController = Cast<ARTSPawnAIController>(Pawn->GetController());
 
-    if (!PawnController)
-    {
-        return false;
-    }
+	if (!PawnController)
+	{
+		return false;
+	}
 
-    if (BuildingClass == nullptr)
-    {
-        UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build, but no building class was specified."), *GetOwner()->GetName());
-        return false;
-    }
+	if (BuildingClass == nullptr)
+	{
+		UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build, but no building class was specified."), *GetOwner()->GetName());
+		return false;
+	}
 
-    // Check requirements.
-    TSubclassOf<AActor> MissingRequirement;
+	// Check requirements.
+	TSubclassOf<AActor> MissingRequirement;
 
-    if (URTSGameplayLibrary::GetMissingRequirementFor(this, GetOwner(), BuildingClass, MissingRequirement))
-    {
-        UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
+	if (URTSGameplayLibrary::GetMissingRequirementFor(this, GetOwner(), BuildingClass, MissingRequirement))
+	{
+		UE_LOG(LogRTS, Error, TEXT("Builder %s wants to build %s, but is missing requirement %s."), *GetOwner()->GetName(), *BuildingClass->GetName(), *MissingRequirement->GetName());
 
-        NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
+		NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
 
-        // Player is missing a required actor. Stop.
-        PawnController->IssueStopOrder();
-        return false;
-    }
+		// Player is missing a required actor. Stop.
+		PawnController->IssueStopOrder();
+		return false;
+	}
 
-    // Move builder away in order to avoid collision.
-    FVector BuilderLocation = Pawn->GetActorLocation();
-    FVector ToTargetLocation = TargetLocation - BuilderLocation;
-    ToTargetLocation.Z = 0.0f;
-    FVector ToTargetLocationNormalized = ToTargetLocation.GetSafeNormal();
-    float SafetyDistance = 
-        (URTSCollisionLibrary::GetActorCollisionSize(Pawn) / 2 +
-         URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2)
-        + ConstructionSiteOffset;
+	// Move builder away in order to avoid collision.
+	const FVector BuilderLocation = Pawn->GetActorLocation();
+	FVector ToTargetLocation = TargetLocation - BuilderLocation;
+	ToTargetLocation.Z = 0.0f;
+	const FVector ToTargetLocationNormalized = ToTargetLocation.GetSafeNormal();
+	const float SafetyDistance =
+		(URTSCollisionLibrary::GetActorCollisionSize(Pawn) / 2 +
+			URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2)
+		+ ConstructionSiteOffset;
 
-    FVector SafeBuilderLocation = TargetLocation - ToTargetLocationNormalized * SafetyDistance;
-    SafeBuilderLocation.Z = BuilderLocation.Z;
+	FVector SafeBuilderLocation = TargetLocation - ToTargetLocationNormalized * SafetyDistance;
+	SafeBuilderLocation.Z = BuilderLocation.Z;
 
-    Pawn->SetActorLocation(SafeBuilderLocation);
+	Pawn->SetActorLocation(SafeBuilderLocation);
 
 	// Spawn building.
 	AActor* Building = GameMode->SpawnActorForPlayer(
@@ -136,7 +136,7 @@ bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 
 	if (!Building)
 	{
-        NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
+		NotifyOnConstructionFailed(Pawn, BuildingClass, Pawn->GetActorLocation());
 		return false;
 	}
 
@@ -148,7 +148,7 @@ bool URTSBuilderComponent::BeginConstruction(TSubclassOf<AActor> BuildingClass, 
 	// Issue construction order.
 	PawnController->IssueContinueConstructionOrder(Building);
 
-    return true;
+	return true;
 }
 
 bool URTSBuilderComponent::BeginConstructionByIndex(int32 BuildingIndex, const FVector& TargetLocation)
@@ -168,8 +168,8 @@ void URTSBuilderComponent::LeaveConstructionSite()
 		return;
 	}
 
-	auto ConstructionSite = AssignedConstructionSite;
-	auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
+	const auto ConstructionSite = AssignedConstructionSite;
+	const auto ConstructionSiteComponent = ConstructionSite->FindComponentByClass<URTSConstructionSiteComponent>();
 
 	if (!ConstructionSiteComponent)
 	{
@@ -187,13 +187,12 @@ void URTSBuilderComponent::LeaveConstructionSite()
 
 	if (bEnterConstructionSite)
 	{
-        // Remove tags.
-        URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_Constructing());
+		// Remove tags.
+		URTSGameplayTagLibrary::RemoveGameplayTag(GetOwner(), URTSGameplayTagLibrary::Status_Changing_Constructing());
 
 		// Leave construction site.
-		auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>();
 
-		if (ContainerComponent)
+		if (const auto ContainerComponent = ConstructionSite->FindComponentByClass<URTSContainerComponent>())
 		{
 			ContainerComponent->UnloadActor(GetOwner());
 			OnConstructionSiteLeft.Broadcast(GetOwner(), ConstructionSite);
@@ -201,27 +200,32 @@ void URTSBuilderComponent::LeaveConstructionSite()
 	}
 }
 
+float URTSBuilderComponent::GetConstructionRange(const uint8 Index) const
+{
+	return URTSCollisionLibrary::GetCollisionSize(ConstructibleBuildingClasses[Index]) / 2;
+}
+
 TArray<TSubclassOf<AActor>> URTSBuilderComponent::GetConstructibleBuildingClasses() const
 {
-    return ConstructibleBuildingClasses;
+	return ConstructibleBuildingClasses;
 }
 
 bool URTSBuilderComponent::DoesEnterConstructionSite() const
 {
-    return bEnterConstructionSite;
+	return bEnterConstructionSite;
 }
 
 float URTSBuilderComponent::GetConstructionSiteOffset() const
 {
-    return ConstructionSiteOffset;
+	return ConstructionSiteOffset;
 }
 
 AActor* URTSBuilderComponent::GetAssignedConstructionSite() const
 {
-    return AssignedConstructionSite;
+	return AssignedConstructionSite;
 }
 
 void URTSBuilderComponent::NotifyOnConstructionFailed(AActor* Builder, TSubclassOf<AActor> BuildingClass, const FVector& Location)
 {
-    OnConstructionFailed.Broadcast(Builder, BuildingClass, Location);
+	OnConstructionFailed.Broadcast(Builder, BuildingClass, Location);
 }

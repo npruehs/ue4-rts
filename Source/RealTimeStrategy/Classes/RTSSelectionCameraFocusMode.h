@@ -8,9 +8,9 @@
 UENUM(BlueprintType)
 enum class ERTSSelectionCameraFocusMode : uint8
 {
-    /** Do nothing. */
-    SELECTIONFOCUS_DoNothing,
+	/** Do nothing. */
+	SELECTIONFOCUS_DoNothing,
 
-    /** Focus the camera on the selected actor if it's rapidly selected twice. */
-    SELECTIONFOCUS_FocusOnDoubleSelection,
+	/** Focus the camera on the selected actor if it's rapidly selected twice. */
+	SELECTIONFOCUS_FocusOnDoubleSelection,
 };

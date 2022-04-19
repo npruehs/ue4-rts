@@ -29,23 +29,23 @@ public:
 	/** Returns resources to this actor, notifying the owning player. */
 	virtual float ReturnResources(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
-    
-    /** Gets the types of resources that can be returned to the actor. */
-    UFUNCTION(BlueprintPure)
-    TArray<TSubclassOf<URTSResourceType>> GetResourceTypes() const;
 
-    /** Whether gatherers must enter the resource drain for returning resources. */
-    UFUNCTION(BlueprintPure)
-    bool MustGathererEnter() const;
+	/** Gets the types of resources that can be returned to the actor. */
+	UFUNCTION(BlueprintPure)
+	TArray<TSubclassOf<URTSResourceType>> GetResourceTypes() const;
 
-    /** Gets how many gatherers may enter at the same time. */
-    UFUNCTION(BlueprintPure)
-    int32 GetGathererCapacity() const;
+	/** Whether gatherers must enter the resource drain for returning resources. */
+	UFUNCTION(BlueprintPure)
+	bool MustGathererEnter() const;
+
+	/** Gets how many gatherers may enter at the same time. */
+	UFUNCTION(BlueprintPure)
+	int32 GetGathererCapacity() const;
 
 
-    /** Event when resources have been returned to the actor. */
-    UFUNCTION(NetMulticast, reliable)
-    virtual void NotifyOnResourcesReturned(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
+	/** Event when resources have been returned to the actor. */
+	UFUNCTION(NetMulticast, reliable)
+	virtual void NotifyOnResourcesReturned(AActor* Gatherer, TSubclassOf<URTSResourceType> ResourceType, float ResourceAmount);
 
 
 	/** Event when resources have been returned to the actor. */
@@ -53,15 +53,15 @@ public:
 	FRTSResourceDrainComponentResourcesReturnedSignature OnResourcesReturned;
 
 private:
-    /** Types of resources that can be returned to the actor. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
+	/** Types of resources that can be returned to the actor. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	TArray<TSubclassOf<URTSResourceType>> ResourceTypes;
 
-    /** Whether gatherers must enter the resource drain for returning resources. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    bool bGathererMustEnter;
+	/** Whether gatherers must enter the resource drain for returning resources. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	bool bGathererMustEnter;
 
-    /** How many gatherers may enter at the same time. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
-    int32 GathererCapacity;
+	/** How many gatherers may enter at the same time. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS", meta = (ClampMin = 1))
+	int32 GathererCapacity;
 };

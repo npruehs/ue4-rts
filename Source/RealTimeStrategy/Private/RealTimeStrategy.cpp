@@ -12,23 +12,23 @@
 void FRealTimeStrategy::StartupModule()
 {
 #if WITH_GAMEPLAY_DEBUGGER
-    IGameplayDebugger& GameplayDebuggerModule = IGameplayDebugger::Get();
-    GameplayDebuggerModule.RegisterCategory("RTS",
-        IGameplayDebugger::FOnGetCategory::CreateStatic(&FRTSGameplayDebuggerCategory::MakeInstance),
-        EGameplayDebuggerCategoryState::Disabled);
-    GameplayDebuggerModule.NotifyCategoriesChanged();
+	IGameplayDebugger& GameplayDebuggerModule = IGameplayDebugger::Get();
+	GameplayDebuggerModule.RegisterCategory("RTS",
+	                                        IGameplayDebugger::FOnGetCategory::CreateStatic(&FRTSGameplayDebuggerCategory::MakeInstance),
+	                                        EGameplayDebuggerCategoryState::Disabled);
+	GameplayDebuggerModule.NotifyCategoriesChanged();
 #endif
 }
 
 void FRealTimeStrategy::ShutdownModule()
 {
 #if WITH_GAMEPLAY_DEBUGGER
-    if (IGameplayDebugger::IsAvailable())
-    {
-        IGameplayDebugger& GameplayDebuggerModule = IGameplayDebugger::Get();
-        GameplayDebuggerModule.UnregisterCategory("RTS");
-        GameplayDebuggerModule.NotifyCategoriesChanged();
-    }
+	if (IGameplayDebugger::IsAvailable())
+	{
+		IGameplayDebugger& GameplayDebuggerModule = IGameplayDebugger::Get();
+		GameplayDebuggerModule.UnregisterCategory("RTS");
+		GameplayDebuggerModule.NotifyCategoriesChanged();
+	}
 #endif
 }
 

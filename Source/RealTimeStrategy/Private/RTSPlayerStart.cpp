@@ -2,15 +2,15 @@
 
 int32 ARTSPlayerStart::GetTeamIndex() const
 {
-    return TeamIndex;
+	return TeamIndex;
 }
 
 AController* ARTSPlayerStart::GetPlayer() const
 {
-    return Player;
+	return Player;
 }
 
 void ARTSPlayerStart::SetPlayer(AController* InPlayer)
 {
-    Player = InPlayer;
+	Player = InPlayer;
 }

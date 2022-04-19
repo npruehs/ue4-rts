@@ -14,13 +14,13 @@
 UCLASS(meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSActorComponent : public UActorComponent, public IRTSGameplayTagsProvider
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer) override;
+	virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer) override;
 
 protected:
-    /** Gameplay tags to add to the actor on BeginPlay. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FGameplayTagContainer InitialGameplayTags;
+	/** Gameplay tags to add to the actor on BeginPlay. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FGameplayTagContainer InitialGameplayTags;
 };

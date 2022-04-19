@@ -21,28 +21,28 @@ class REALTIMESTRATEGY_API URTSProductionCostComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-    URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSProductionCostComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 
-    /** When to pay resources for production. */
-    UFUNCTION(BlueprintPure)
-    ERTSPaymentType GetProductionCostType() const;
+	/** When to pay resources for production. */
+	UFUNCTION(BlueprintPure)
+	ERTSPaymentType GetProductionCostType() const;
 
-    /** Gets the tme for producing the actor, in seconds. */
-    UFUNCTION(BlueprintPure)
-    float GetProductionTime() const;
+	/** Gets the tme for producing the actor, in seconds. */
+	UFUNCTION(BlueprintPure)
+	float GetProductionTime() const;
 
-    /** Gets the resources to pay for producing the actor. */
-    UFUNCTION(BlueprintPure)
-    TMap<TSubclassOf<URTSResourceType>, float> GetResources() const;
+	/** Gets the resources to pay for producing the actor. */
+	UFUNCTION(BlueprintPure)
+	TMap<TSubclassOf<URTSResourceType>, float> GetResources() const;
 
-    /** Gets the resources to refund when canceling production. */
-    UFUNCTION(BlueprintPure)
-    float GetRefundFactor() const;
+	/** Gets the resources to refund when canceling production. */
+	UFUNCTION(BlueprintPure)
+	float GetRefundFactor() const;
 
-    /** Gets the sound to play when the actor finished production. */
-    UFUNCTION(BlueprintPure)
-    USoundCue* GetFinishedSound() const;
+	/** Gets the sound to play when the actor finished production. */
+	UFUNCTION(BlueprintPure)
+	USoundCue* GetFinishedSound() const;
 
 
 private:
@@ -62,7 +62,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	float RefundFactor;
 
-    /** Sound to play when the actor finished production. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    USoundCue* FinishedSound;
+	/** Sound to play when the actor finished production. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	USoundCue* FinishedSound;
 };

@@ -16,189 +16,189 @@
 
 URTSCheatManager::URTSCheatManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 {
-    // Set reasonable default values.
-    OutgoingDamageFactor = 1000.0f;
-    ResourceAmount = 1000.0f;
-    SpeedBoostFactor = 10.0f;
+	// Set reasonable default values.
+	OutgoingDamageFactor = 1000.0f;
+	ResourceAmount = 1000.0f;
+	SpeedBoostFactor = 10.0f;
 }
 
 void URTSCheatManager::Boost()
 {
-    APlayerController* Player = GetOuterAPlayerController();
+	const APlayerController* Player = GetOuterAPlayerController();
 
-    if (!Player)
-    {
-        return;
-    }
+	if (!Player)
+	{
+		return;
+	}
 
-    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
+	URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-    if (!PlayerAdvantageComponent)
-    {
-        return;
-    }
+	if (!PlayerAdvantageComponent)
+	{
+		return;
+	}
 
-    PlayerAdvantageComponent->SetSpeedBoostFactor(PlayerAdvantageComponent->GetSpeedBoostFactor() * SpeedBoostFactor);
-    UE_LOG(LogRTS, Log, TEXT("Cheat: Set speed boost factor to %f."), PlayerAdvantageComponent->GetSpeedBoostFactor());
+	PlayerAdvantageComponent->SetSpeedBoostFactor(PlayerAdvantageComponent->GetSpeedBoostFactor() * SpeedBoostFactor);
+	UE_LOG(LogRTS, Log, TEXT("Cheat: Set speed boost factor to %f."), PlayerAdvantageComponent->GetSpeedBoostFactor());
 }
 
 void URTSCheatManager::Damage()
 {
-    APlayerController* Player = GetOuterAPlayerController();
+	const APlayerController* Player = GetOuterAPlayerController();
 
-    if (!Player)
-    {
-        return;
-    }
+	if (!Player)
+	{
+		return;
+	}
 
-    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
+	URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-    if (!PlayerAdvantageComponent)
-    {
-        return;
-    }
+	if (!PlayerAdvantageComponent)
+	{
+		return;
+	}
 
-    if (PlayerAdvantageComponent->GetOutgoingDamageFactor() > 1.0f)
-    {
-        PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f);
-    }
+	if (PlayerAdvantageComponent->GetOutgoingDamageFactor() > 1.0f)
+	{
+		PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f);
+	}
 
-    else
-    {
-        PlayerAdvantageComponent->SetOutgoingDamageFactor(OutgoingDamageFactor);
-    }
+	else
+	{
+		PlayerAdvantageComponent->SetOutgoingDamageFactor(OutgoingDamageFactor);
+	}
 
-    UE_LOG(LogRTS, Log, TEXT("Cheat: Set outgoing damage factor to %f."), PlayerAdvantageComponent->GetOutgoingDamageFactor());
+	UE_LOG(LogRTS, Log, TEXT("Cheat: Set outgoing damage factor to %f."), PlayerAdvantageComponent->GetOutgoingDamageFactor());
 }
 
 void URTSCheatManager::God()
 {
-    Super::God();
+	Super::God();
 
-    APlayerController* Player = GetOuterAPlayerController();
+	const APlayerController* Player = GetOuterAPlayerController();
 
-    if (!Player)
-    {
-        return;
-    }
+	if (!Player)
+	{
+		return;
+	}
 
-    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
+	URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-    if (!PlayerAdvantageComponent)
-    {
-        return;
-    }
+	if (!PlayerAdvantageComponent)
+	{
+		return;
+	}
 
-    // Toggle god mode.
-    PlayerAdvantageComponent->SetGodModeEnabled(!PlayerAdvantageComponent->IsGodModeEnabled());
+	// Toggle god mode.
+	PlayerAdvantageComponent->SetGodModeEnabled(!PlayerAdvantageComponent->IsGodModeEnabled());
 
-    for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
-    {
-        APawn* Pawn = *PawnItr;
+	for (TActorIterator<APawn> PawnItr(GetWorld()); PawnItr; ++PawnItr)
+	{
+		APawn* Pawn = *PawnItr;
 
-        if (!IsValid(Pawn) || Pawn->GetOwner() != Player)
-        {
-            continue;
-        }
+		if (!IsValid(Pawn) || Pawn->GetOwner() != Player)
+		{
+			continue;
+		}
 
-        Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
-    }
+		Pawn->SetCanBeDamaged(!PlayerAdvantageComponent->IsGodModeEnabled());
+	}
 }
 
 void URTSCheatManager::Money()
 {
-    APlayerController* Player = GetOuterAPlayerController();
+	const APlayerController* Player = GetOuterAPlayerController();
 
-    if (!Player)
-    {
-        return;
-    }
+	if (!Player)
+	{
+		return;
+	}
 
-    URTSPlayerResourcesComponent* PlayerResourcesComponent = Player->FindComponentByClass<URTSPlayerResourcesComponent>();
+	URTSPlayerResourcesComponent* PlayerResourcesComponent = Player->FindComponentByClass<URTSPlayerResourcesComponent>();
 
-    if (!PlayerResourcesComponent)
-    {
-        return;
-    }
+	if (!PlayerResourcesComponent)
+	{
+		return;
+	}
 
-    for (TSubclassOf<URTSResourceType> ResourceType : ResourceTypes)
-    {
-        PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
-        UE_LOG(LogRTS, Log, TEXT("Cheat: Added %f %s."), ResourceAmount, *ResourceType->GetName());
-    }
+	for (const TSubclassOf<URTSResourceType> ResourceType : ResourceTypes)
+	{
+		PlayerResourcesComponent->AddResources(ResourceType, ResourceAmount);
+		UE_LOG(LogRTS, Log, TEXT("Cheat: Added %f %s."), ResourceAmount, *ResourceType->GetName());
+	}
 }
 
 void URTSCheatManager::NoFog()
 {
-    for (TActorIterator<ARTSVisionInfo> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-    {
-        ARTSVisionInfo* VisionInfo = *ActorItr;
-        VisionInfo->SetRevealed(!VisionInfo->IsRevealed());
+	for (TActorIterator<ARTSVisionInfo> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		ARTSVisionInfo* VisionInfo = *ActorItr;
+		VisionInfo->SetRevealed(!VisionInfo->IsRevealed());
 
-        UE_LOG(LogRTS, Log, TEXT("Cheat: Set vision to %s."), VisionInfo->IsRevealed() ? TEXT("revealed") : TEXT("not revealed"));
-    }
+		UE_LOG(LogRTS, Log, TEXT("Cheat: Set vision to %s."), VisionInfo->IsRevealed() ? TEXT("revealed") : TEXT("not revealed"));
+	}
 }
 
 void URTSCheatManager::Victory()
 {
-    APlayerController* Player = GetOuterAPlayerController();
+	const APlayerController* Player = GetOuterAPlayerController();
 
-    if (!Player)
-    {
-        return;
-    }
+	if (!Player)
+	{
+		return;
+	}
 
-    ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(Player));
+	ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(Player));
 
-    if (!GameMode)
-    {
-        return;
-    }
+	if (!GameMode)
+	{
+		return;
+	}
 
-    for (TActorIterator<AController> ControllerItr(GetWorld()); ControllerItr; ++ControllerItr)
-    {
-        AController* Controller = *ControllerItr;
+	for (TActorIterator<AController> ControllerItr(GetWorld()); ControllerItr; ++ControllerItr)
+	{
+		AController* Controller = *ControllerItr;
 
-        if (!IsValid(Controller) || Controller == Player)
-        {
-            continue;
-        }
+		if (!IsValid(Controller) || Controller == Player)
+		{
+			continue;
+		}
 
-        if (Cast<ARTSPlayerController>(Controller) == nullptr &&
-            Cast <ARTSPlayerAIController>(Controller) == nullptr)
-        {
-            continue;
-        }
+		if (Cast<ARTSPlayerController>(Controller) == nullptr &&
+			Cast<ARTSPlayerAIController>(Controller) == nullptr)
+		{
+			continue;
+		}
 
-        GameMode->NotifyOnPlayerDefeated(Controller);
-    }
+		GameMode->NotifyOnPlayerDefeated(Controller);
+	}
 }
 
 void URTSCheatManager::Weak()
 {
-    APlayerController* Player = GetOuterAPlayerController();
+	const APlayerController* Player = GetOuterAPlayerController();
 
-    if (!Player)
-    {
-        return;
-    }
+	if (!Player)
+	{
+		return;
+	}
 
-    URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
+	URTSPlayerAdvantageComponent* PlayerAdvantageComponent = Player->FindComponentByClass<URTSPlayerAdvantageComponent>();
 
-    if (!PlayerAdvantageComponent)
-    {
-        return;
-    }
+	if (!PlayerAdvantageComponent)
+	{
+		return;
+	}
 
-    if (PlayerAdvantageComponent->GetOutgoingDamageFactor() < 1.0f)
-    {
-        PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f);
-    }
+	if (PlayerAdvantageComponent->GetOutgoingDamageFactor() < 1.0f)
+	{
+		PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f);
+	}
 
-    else
-    {
-        PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f / OutgoingDamageFactor);
-    }
+	else
+	{
+		PlayerAdvantageComponent->SetOutgoingDamageFactor(1.0f / OutgoingDamageFactor);
+	}
 
-    UE_LOG(LogRTS, Log, TEXT("Cheat: Set outgoing damage factor to %f."), PlayerAdvantageComponent->GetOutgoingDamageFactor());
+	UE_LOG(LogRTS, Log, TEXT("Cheat: Set outgoing damage factor to %f."), PlayerAdvantageComponent->GetOutgoingDamageFactor());
 }

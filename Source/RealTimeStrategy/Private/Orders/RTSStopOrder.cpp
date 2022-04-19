@@ -5,10 +5,10 @@
 
 
 URTSStopOrder::URTSStopOrder(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-    TargetType = ERTSOrderTargetType::ORDERTARGET_None;
-    GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
+	TargetType = ERTSOrderTargetType::ORDERTARGET_None;
+	GroupExecutionType = ERTSOrderGroupExecutionType::ORDERGROUPEXECUTION_All;
 
-    IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
+	IssueTagRequirements.SourceBlockedTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Constructing());
 }

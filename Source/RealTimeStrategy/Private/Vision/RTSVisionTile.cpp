@@ -5,15 +5,15 @@
 
 void FRTSVisionTile::AddActor(AActor* Actor)
 {
-    ++NumActors;
+	++NumActors;
 }
 
 void FRTSVisionTile::RemoveActor(AActor* Actor)
 {
-    --NumActors;
+	--NumActors;
 }
 
 bool FRTSVisionTile::IsVisible() const
 {
-    return NumActors > 0;
+	return NumActors > 0;
 }

@@ -8,22 +8,22 @@
 
 
 FRTSVisibleActor::FRTSVisibleActor()
-    : Actor(nullptr),
-    OwnerComponent(nullptr),
-    VisibleComponent(nullptr),
-    VisionComponent(nullptr)
+	: Actor(nullptr),
+	  OwnerComponent(nullptr),
+	  VisibleComponent(nullptr),
+	  VisionComponent(nullptr)
 {
 }
 
 FRTSVisibleActor::FRTSVisibleActor(AActor* InActor)
-    : Actor(InActor)
+	: Actor(InActor)
 {
-    OwnerComponent = InActor->FindComponentByClass<URTSOwnerComponent>();
-    VisibleComponent = InActor->FindComponentByClass<URTSVisibleComponent>();
-    VisionComponent = InActor->FindComponentByClass<URTSVisionComponent>();
+	OwnerComponent = InActor->FindComponentByClass<URTSOwnerComponent>();
+	VisibleComponent = InActor->FindComponentByClass<URTSVisibleComponent>();
+	VisionComponent = InActor->FindComponentByClass<URTSVisionComponent>();
 }
 
 bool FRTSVisibleActor::IsActorValid() const
 {
-    return IsValid(Actor) && IsValid(OwnerComponent) && IsValid(VisibleComponent);
+	return IsValid(Actor) && IsValid(OwnerComponent) && IsValid(VisibleComponent);
 }

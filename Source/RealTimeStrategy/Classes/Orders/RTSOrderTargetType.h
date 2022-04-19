@@ -9,12 +9,12 @@
 UENUM(BlueprintType)
 enum class ERTSOrderTargetType : uint8
 {
-    /** No specific target (e.g. aura or automatically applied to self). */
-    ORDERTARGET_None,
+	/** No specific target (e.g. aura or automatically applied to self). */
+	ORDERTARGET_None,
 
-    /** Order needs an actor as target. */
-    ORDERTARGET_Actor,
+	/** Order needs an actor as target. */
+	ORDERTARGET_Actor,
 
-    /** Order needs a vector location as target. */
-    ORDERTARGET_Location
+	/** Order needs a vector location as target. */
+	ORDERTARGET_Location
 };

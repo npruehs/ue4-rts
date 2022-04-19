@@ -5,10 +5,10 @@
 
 UTexture2D* URTSPortraitComponent::GetPortrait() const
 {
-    return Portrait;
+	return Portrait;
 }
 
 void URTSPortraitComponent::SetPortrait(UTexture2D* NewPortrait)
 {
-    Portrait = NewPortrait;
+	Portrait = NewPortrait;
 }

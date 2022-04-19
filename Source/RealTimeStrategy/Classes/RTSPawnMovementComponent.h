@@ -11,15 +11,15 @@
 UCLASS(meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSPawnMovementComponent : public UFloatingPawnMovement
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSPawnMovementComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSPawnMovementComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    virtual void UpdateComponentVelocity() override;
+	virtual void UpdateComponentVelocity() override;
 
 private:
-    /** Whether to automatically update the pawn rotation to match its velocity. */
+	/** Whether to automatically update the pawn rotation to match its velocity. */
 	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	bool bUpdateRotation;
 };
