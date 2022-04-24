@@ -1916,8 +1916,9 @@ void ARTSPlayerController::PlayerTick(float DeltaTime)
 	CameraUpDownAxisValue = FMath::Clamp(CameraUpDownAxisValue, -1.0f, +1.0f);
 
 	FVector Location = PlayerPawn->GetActorLocation();
-	Location += FVector::RightVector * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
-	Location += FVector::ForwardVector * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
+
+	Location += PlayerPawn->GetActorRightVector() * CameraSpeed * CameraLeftRightAxisValue * DeltaTime;
+	Location += PlayerPawn->GetActorForwardVector() * CameraSpeed * CameraUpDownAxisValue * DeltaTime;
 
 	// Enforce camera bounds.
 	if (!CameraBoundsVolume || CameraBoundsVolume->EncompassesPoint(Location))
