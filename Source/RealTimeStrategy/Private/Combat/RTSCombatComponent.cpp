@@ -2,6 +2,7 @@
 #include "RTSGameMode.h"
 #include "RTSLog.h"
 #include "RTSPlayerAdvantageComponent.h"
+#include "RTSPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Libraries/RTSGameplayLibrary.h"
 #include "Libraries/RTSGameplayTagLibrary.h"
@@ -95,6 +96,8 @@ void URTSCombatComponent::KillActor(AActor* DamageCauser)
 		break;
 	default: ;
 	}
+
+	OwningPlayer->GetPlayerState<ARTSPlayerState>()->Remove(Owner);
 
 	if (IsValid(DeathSound))
 	{
