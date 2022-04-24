@@ -57,6 +57,9 @@ protected:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
+	UPROPERTY(EditAnywhere, Category="RTS|Units")
+	bool bUsePlayerColors;
+
 private:
 	/** Brush for drawing the background of the current map. */
 	UPROPERTY(EditAnywhere, Category = "RTS|Background")

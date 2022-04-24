@@ -42,6 +42,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetRace(URTSRace* NewRace) { Race = NewRace; }
 
+	UFUNCTION(BlueprintPure)
+	FLinearColor GetColor() const { return PlayerColor; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetColor(FLinearColor Color) { PlayerColor = Color; }
+
 	/** Sets the index of the player. */
 	void SetPlayerIndex(uint8 InPlayerIndex);
 
@@ -72,6 +78,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	URTSRace* Race;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor PlayerColor;
 
 private:
 	/** Index of the player. */

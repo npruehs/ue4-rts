@@ -210,6 +210,8 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 
 	APlayerController* Player = GetOwningPlayer();
 
+	ARTSPlayerState* PlayerState = Player->GetPlayerState<ARTSPlayerState>();
+
 	for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
 	{
 		AActor* Actor = *ActorIt;
@@ -232,24 +234,30 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 		// Draw on minimap.
 		if (bDrawUnitsWithTeamColors && OwnerComponent)
 		{
-			if (OwnerComponent->GetPlayerOwner() == Player->PlayerState)
+			if (OwnerComponent->GetPlayerOwner() == PlayerState)
 			{
-                // Check if the unit has been taking damage lately.
-                URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
-                float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
+				// Check if the unit has been taking damage lately.
+				URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
+				float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
+
+				FSlateBrush UnitSlateBrush = OwnUnitsBrush;
+				if (bUsePlayerColors)
+				{
+					UnitSlateBrush.TintColor = PlayerState->GetColor();
+				}
 
 				if (!IsValid(HealthComponent) ||
 					HealthComponent->GetLastTimeDamageTaken() <= 0.0f ||
 					HealthComponent->GetLastTimeDamageTaken() + DamagedUnitBlinkTimeSeconds < RealTimeSeconds)
 				{
-					DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+					DrawBoxWithBrush(InContext, ActorLocationMinimap, UnitSlateBrush);
 				}
 				else
 				{
 					// Have unit blink while taking damage.
 					if (RealTimeSeconds - FMath::FloorToFloat(RealTimeSeconds) <= 0.5)
 					{
-						DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
+						DrawBoxWithBrush(InContext, ActorLocationMinimap, UnitSlateBrush);
 					}
 					else
 					{
@@ -259,7 +267,14 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 			}
 			else if (OwnerComponent->GetPlayerOwner() != nullptr && !OwnerComponent->IsSameTeamAsController(Player))
 			{
-				DrawBoxWithBrush(InContext, ActorLocationMinimap, EnemyUnitsBrush);
+				
+				FSlateBrush UnitSlateBrush = EnemyUnitsBrush;
+				if (bUsePlayerColors)
+				{
+					UnitSlateBrush.TintColor = OwnerComponent->GetPlayerOwner()->GetColor();
+				}
+				
+				DrawBoxWithBrush(InContext, ActorLocationMinimap, UnitSlateBrush);
 			}
 			else
 			{
