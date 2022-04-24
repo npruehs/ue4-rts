@@ -8,12 +8,11 @@
 
 
 /** Actor or location to send new actors to. */
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSProductionRallyPoint
 {
 	GENERATED_BODY()
 
-public:
 	/** Location to send new actors to. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	FVector TargetLocation;

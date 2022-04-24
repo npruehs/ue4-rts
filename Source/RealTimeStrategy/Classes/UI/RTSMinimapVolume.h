@@ -13,7 +13,7 @@ class UTexture2D;
 /**
 * Volume that defines the size and resolution of the minimap.
 */
-UCLASS(Blueprintable)
+UCLASS(Category="RTS", Blueprintable)
 class REALTIMESTRATEGY_API ARTSMinimapVolume : public AVolume
 {
 	GENERATED_BODY()

@@ -12,7 +12,7 @@ class AActor;
 
 
 /** Adds tech tree requirements to the actor. */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSRequirementsComponent : public UActorComponent
 {
 	GENERATED_BODY()

@@ -13,7 +13,7 @@ class ARTSVisionManager;
 /**
 * Game state with RTS features.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSGameState : public AGameStateBase
 {
 	GENERATED_BODY()

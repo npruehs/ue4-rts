@@ -8,7 +8,7 @@
 
 
 /** Orders the actor to attack another actor. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSAttackOrder : public URTSOrder
 {
 	GENERATED_BODY()

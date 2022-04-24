@@ -10,7 +10,7 @@ class URTSVisionComponent;
 
 
 /** Performance optimization. Caches an actor that can update team vision, along with relevant components. */
-USTRUCT()
+USTRUCT(Category="RTS")
 struct REALTIMESTRATEGY_API FRTSVisionActor
 {
 	GENERATED_BODY()

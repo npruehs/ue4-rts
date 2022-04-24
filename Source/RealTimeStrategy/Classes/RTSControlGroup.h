@@ -7,12 +7,11 @@
 #include "RTSControlGroup.generated.h"
 
 /** Group of actors. */
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSControlGroup
 {
 	GENERATED_BODY()
 
-public:
 	/** Actors of this control group. */
 	UPROPERTY()
 	TArray<AActor*> Actors;

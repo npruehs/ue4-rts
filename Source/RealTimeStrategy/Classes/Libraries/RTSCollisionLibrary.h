@@ -17,7 +17,7 @@ class UShapeComponent;
 /**
 * Utility functions for calculating actor collisions.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSCollisionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

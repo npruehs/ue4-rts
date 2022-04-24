@@ -5,7 +5,7 @@
 #include "RTSRangeIndicator.generated.h"
 
 /** Previews the range of an action.*/
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSRangeIndicator : public AActor
 {
 	GENERATED_BODY()

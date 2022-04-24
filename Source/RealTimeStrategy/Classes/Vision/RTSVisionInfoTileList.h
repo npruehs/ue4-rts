@@ -7,12 +7,11 @@
 class ARTSVisionInfo;
 
 /** Tiles associated with a specific vision info. */
-USTRUCT()
+USTRUCT(Category="RTS")
 struct REALTIMESTRATEGY_API FRTSVisionInfoTileList
 {
 	GENERATED_BODY()
 
-public:
 	UPROPERTY()
 	ARTSVisionInfo* VisionInfo;
 

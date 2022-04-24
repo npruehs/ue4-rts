@@ -5,7 +5,7 @@
 #include "RTSConstructionState.generated.h"
 
 
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSConstructionState : uint8
 {
 	/** Construction has not yet started. */

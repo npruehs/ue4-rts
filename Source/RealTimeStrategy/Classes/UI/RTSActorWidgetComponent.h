@@ -10,7 +10,7 @@
 /**
 * Adds a customizable UI widget to the actor.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSActorWidgetComponent : public UWidgetComponent
 {
     GENERATED_BODY()

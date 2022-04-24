@@ -11,7 +11,7 @@ class AActor;
 
 
 /** Target data (actor, location) for an order. */
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSOrderTargetData
 {
 	GENERATED_BODY()

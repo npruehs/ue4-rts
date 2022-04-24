@@ -5,7 +5,7 @@
 #include "RTSSelectionCameraFocusMode.generated.h"
 
 /** How to handle camera focus for selected actors. */
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSSelectionCameraFocusMode : uint8
 {
 	/** Do nothing. */

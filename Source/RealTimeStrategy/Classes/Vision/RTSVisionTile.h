@@ -9,12 +9,11 @@ class AActor;
 
 
 /** Tile of the vision grid. */
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSVisionTile
 {
 	GENERATED_BODY()
 
-public:
 	/** Adds the specified actor as having vision on this tile. */
 	void AddActor(AActor* Actor);
 

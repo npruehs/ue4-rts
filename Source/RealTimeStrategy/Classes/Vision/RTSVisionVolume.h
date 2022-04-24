@@ -12,7 +12,7 @@
 /**
 * Volume that defines the size and resolution of vision provided by units.
 */
-UCLASS(Blueprintable)
+UCLASS(Category="RTS", Blueprintable)
 class REALTIMESTRATEGY_API ARTSVisionVolume : public AVolume
 {
 	GENERATED_BODY()

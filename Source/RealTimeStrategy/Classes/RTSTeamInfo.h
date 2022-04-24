@@ -10,7 +10,7 @@
 /**
 * Team that consists of multiple players.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSTeamInfo : public AInfo
 {
 	GENERATED_BODY()

@@ -13,7 +13,7 @@
 /**
 * Utility functions for gameplay calculations.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSGameplayLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

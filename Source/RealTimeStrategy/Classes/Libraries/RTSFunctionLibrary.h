@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

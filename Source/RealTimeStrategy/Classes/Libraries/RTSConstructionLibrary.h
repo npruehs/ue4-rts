@@ -11,7 +11,7 @@
 
 
 /** Utility functions for real-time strategy building construction. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSConstructionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

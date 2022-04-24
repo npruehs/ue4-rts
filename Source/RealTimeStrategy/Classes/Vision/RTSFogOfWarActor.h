@@ -18,7 +18,7 @@ class ARTSVisionVolume;
 
 
 /** Renders fog of war in 3D space. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSFogOfWarActor : public AActor
 {
 	GENERATED_BODY()

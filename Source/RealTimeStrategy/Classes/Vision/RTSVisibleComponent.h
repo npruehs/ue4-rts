@@ -14,7 +14,7 @@ class AController;
 
 
 /** Allows the actor to be hidden by fog of war or other effects. */
-UCLASS(meta=(BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta=(BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSVisibleComponent : public UActorComponent
 {
 	GENERATED_BODY()

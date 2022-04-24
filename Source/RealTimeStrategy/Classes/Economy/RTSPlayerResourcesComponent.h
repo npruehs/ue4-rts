@@ -16,7 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSPlayerResourcesComponentResour
 /**
 * Attach to player or AI controllers. Allows the controller to store resources.
 */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSPlayerResourcesComponent : public UActorComponent
 {
 	GENERATED_BODY()

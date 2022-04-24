@@ -11,7 +11,7 @@
 class URTSResourceType;
 
 
-UCLASS(Blueprintable, Within = PlayerController)
+UCLASS(Category="RTS", Blueprintable, Within = PlayerController)
 class REALTIMESTRATEGY_API URTSCheatManager : public UCheatManager
 {
 	GENERATED_BODY()

@@ -5,7 +5,7 @@
 #include "RTSPaymentType.generated.h"
 
 
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSPaymentType : uint8
 {
 	/** Pay whole production cost as soon as production starts. */

@@ -8,7 +8,7 @@
 
 
 /** Orders the actor to move to the specified location. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSMoveOrder : public URTSOrder
 {
 	GENERATED_BODY()

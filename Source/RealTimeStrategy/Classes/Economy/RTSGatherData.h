@@ -9,7 +9,7 @@
 #include "RTSGatherData.generated.h"
 
 
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSGatherData
 {
 	GENERATED_BODY()

@@ -5,7 +5,7 @@
 #include "RTSVisionState.generated.h"
 
 
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSVisionState : uint8
 {
 	/** Area has never been visited before. */

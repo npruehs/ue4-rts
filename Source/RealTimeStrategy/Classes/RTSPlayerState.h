@@ -15,7 +15,7 @@ class ARTSTeamInfo;
 /**
 * Player state with RTS features, such as teams.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSPlayerState : public APlayerState
 {
 	GENERATED_BODY()

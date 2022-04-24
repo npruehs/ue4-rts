@@ -26,7 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSBuilderComponentConstructionF
 /**
  * Allows the actor to construct buildings.
  */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSBuilderComponent : public URTSActorComponent
 {
 	GENERATED_BODY()

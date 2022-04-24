@@ -8,7 +8,7 @@
 
 
 /** Orders the actor to gather resources from another actor. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSGatherOrder : public URTSOrder
 {
 	GENERATED_BODY()

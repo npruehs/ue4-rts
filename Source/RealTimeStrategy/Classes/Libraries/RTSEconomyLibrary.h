@@ -13,7 +13,7 @@
 /**
 * Utility functions for real-time strategy economy.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSEconomyLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

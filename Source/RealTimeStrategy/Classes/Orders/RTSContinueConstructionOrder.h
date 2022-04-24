@@ -8,7 +8,7 @@
 
 
 /** Orders the actor to continue constructing a building. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSContinueConstructionOrder : public URTSOrder
 {
 	GENERATED_BODY()

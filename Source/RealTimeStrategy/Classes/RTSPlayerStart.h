@@ -10,7 +10,7 @@
 /**
 * Player start with RTS features, such as which player has been spawned at this start.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSPlayerStart : public APlayerStart
 {
 	GENERATED_BODY()

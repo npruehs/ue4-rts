@@ -9,7 +9,7 @@ class UTexture2D;
 
 
 /** Resource that can be gathered and spent for construction, production and research. */
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(Category="RTS", Blueprintable, BlueprintType)
 class REALTIMESTRATEGY_API URTSResourceType : public UObject
 {
 	GENERATED_BODY()
