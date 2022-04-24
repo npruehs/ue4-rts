@@ -38,7 +38,7 @@ class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public URTSActorCompo
 public:
 	URTSConstructionSiteComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void AddGameplayTags(FGameplayTagContainer& InOutTagContainer) override;
 
 	virtual void BeginPlay() override;

@@ -26,7 +26,7 @@ class REALTIMESTRATEGY_API URTSOwnerComponent : public UActorComponent
 public:
 	URTSOwnerComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
 	/** Gets the player owning the actor. */

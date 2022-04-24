@@ -24,7 +24,7 @@ class REALTIMESTRATEGY_API URTSGameplayTagsComponent : public UActorComponent, p
 public:
 	URTSGameplayTagsComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay() override;
 

@@ -25,7 +25,7 @@ public:
 
     ARTSPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     /** Gets the index of the player. */
     UFUNCTION(BlueprintPure)

@@ -26,7 +26,7 @@ class REALTIMESTRATEGY_API ARTSVisionInfo : public AInfo
 public:
 	ARTSVisionInfo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Prepares this actor for gameplay. */
 	void Initialize(ARTSVisionVolume* InVisionVolume);
