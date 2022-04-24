@@ -295,7 +295,6 @@ void ARTSPawnAIController::ObtainNextOrder()
 
 	Blackboard->SetValueAsClass(TEXT("OrderClass"), OrderData->OrderClass);
 	Blackboard->SetValueAsEnum(TEXT("OrderType"), (uint8)OrderData->GetOrderType());
-	Blackboard->SetValueAsClass(TEXT("OrderClass"), OrderData->OrderClass);
 	Blackboard->SetValueAsObject(TEXT("TargetActor"), OrderData->TargetActor);
 	Blackboard->SetValueAsVector(TEXT("TargetLocation"), OrderData->TargetLocation);
 
