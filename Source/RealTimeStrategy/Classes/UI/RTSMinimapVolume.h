@@ -19,12 +19,35 @@ class REALTIMESTRATEGY_API ARTSMinimapVolume : public AVolume
 	GENERATED_BODY()
 
 public:
+	explicit ARTSMinimapVolume(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+#if WITH_EDITOR
+	virtual void PostEditMove(bool bFinished) override;
+#endif
+	
 	/** Gets the Background image of the minimap. */
 	UFUNCTION(BlueprintPure)
-	UTexture2D* GetMinimapImage() const;
+	UTexture* GetMinimapImage() const;
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void GenerateSnapshot();
+
+protected:
+	// Actors of these classes are hidden from the generated background
+	UPROPERTY(EditAnywhere, Category = "RTS|Generation")
+	TArray<TSubclassOf<AActor>> HiddenActorClasses;
+	// These actors in the level are hidden from the generated backgrounds
+	UPROPERTY(EditAnywhere, Category = "RTS|Generation")
+	TArray<AActor*> HiddenActors;
 
 private:
 	/** Background image of the minimap. */
 	UPROPERTY(EditInstanceOnly, Category = "RTS")
-	UTexture2D* MinimapImage;
+	UTexture2D* MinimapImage = nullptr;
+
+	// Used to capture the level if no MinimapImage is set
+	UPROPERTY(VisibleAnywhere, Category = "RTS|Generation")
+	USceneCaptureComponent2D* CaptureComponent2D;
 };
