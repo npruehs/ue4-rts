@@ -119,7 +119,7 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("SelectPreviousSubgroup"), IE_Pressed, this, &ARTSPlayerController::SelectPreviousSubgroup);
 
 	InputComponent->BindAction(TEXT("IssueOrder"), IE_Released, this, &ARTSPlayerController::IssueDefaultOrderToSelectedActors);
-	InputComponent->BindAction("AddOrder", IE_Released, this, &ARTSPlayerController::AddDefaultOrderToSelectedActors);
+	InputComponent->BindAction(TEXT("AddOrder"), IE_Released, this, &ARTSPlayerController::AddDefaultOrderToSelectedActors);
 	InputComponent->BindAction(TEXT("IssueStopOrder"), IE_Released, this, &ARTSPlayerController::IssueStopOrder);
 
 	InputComponent->BindAction(TEXT("SaveControlGroup0"), IE_Released, this, &ARTSPlayerController::SaveControlGroup0);
