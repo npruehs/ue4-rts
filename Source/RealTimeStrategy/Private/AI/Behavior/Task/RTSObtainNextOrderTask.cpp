@@ -12,14 +12,7 @@ URTSObtainNextOrderTask::URTSObtainNextOrderTask(const FObjectInitializer& Objec
 }
 
 EBTNodeResult::Type URTSObtainNextOrderTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
-{
-	const UClass* Class = OwnerComp.GetBlackboardComponent()->GetValueAsClass(TEXT("orderClass"));
-
-	if (Class != URTSStopOrder::StaticClass())
-	{
-		return EBTNodeResult::Failed;
-	}
-
+{	
 	ARTSPawnAIController* Controller = Cast<ARTSPawnAIController>(OwnerComp.GetOwner());
 	if (!IsValid(Controller))
 	{
