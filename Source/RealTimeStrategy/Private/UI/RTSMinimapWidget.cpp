@@ -11,11 +11,10 @@
 #include "RTSPlayerController.h"
 #include "RTSPlayerState.h"
 #include "Combat/RTSHealthComponent.h"
+#include "Economy/RTSResourceSourceComponent.h"
+#include "Libraries/RTSEconomyLibrary.h"
 #include "UI/RTSMinimapVolume.h"
 #include "Vision/RTSFogOfWarActor.h"
-#include "Vision/RTSVisionInfo.h"
-#include "Vision/RTSVisionState.h"
-#include "Vision/RTSVisionVolume.h"
 
 
 URTSMinimapWidget::URTSMinimapWidget(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -263,7 +262,20 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 			}
 			else
 			{
-				DrawBoxWithBrush(InContext, ActorLocationMinimap, NeutralUnitsBrush);
+				if (const URTSResourceSourceComponent* ResourceSourceComponent = Actor->FindComponentByClass<URTSResourceSourceComponent>())
+				{
+					FSlateBrush ResourceBrush = ResourcesBrush;
+					if(bOverrideResourceColor)
+					{
+						ResourceBrush.TintColor = URTSEconomyLibrary::GetResourceColor(ResourceSourceComponent->GetResourceType());
+					}
+					
+					DrawBoxWithBrush(InContext, ActorLocationMinimap, ResourceBrush);
+				}
+				else
+				{
+					DrawBoxWithBrush(InContext, ActorLocationMinimap, NeutralUnitsBrush);
+				}
 			}
 		}
 

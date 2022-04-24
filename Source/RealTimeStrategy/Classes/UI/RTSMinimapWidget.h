@@ -74,6 +74,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "RTS|Units")
 	FSlateBrush NeutralUnitsBrush;
 
+	/** Brush for drawing neutral units on the minimap. */
+	UPROPERTY(EditAnywhere, Category = "RTS|Units")
+	FSlateBrush ResourcesBrush;
+	/** Brush for drawing neutral units on the minimap. */
+	UPROPERTY(EditAnywhere, Category = "RTS|Units")
+	bool bOverrideResourceColor = true;
+
 	/** Brush for drawing blinking damaged units on the minimap. */
 	UPROPERTY(EditAnywhere, Category = "RTS|Units")
 	FSlateBrush DamagedUnitsBlinkBrush;
