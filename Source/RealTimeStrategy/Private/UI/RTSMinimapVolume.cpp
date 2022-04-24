@@ -50,7 +50,6 @@ void ARTSMinimapVolume::BeginPlay()
 
 void ARTSMinimapVolume::GenerateSnapshot()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ARTSMinimapVolume::GenerateSnapshot"))
 	// Undo any scale inherited from root component
 	CaptureComponent2D->SetWorldScale3D(FVector(1.0f));
 
@@ -64,7 +63,6 @@ void ARTSMinimapVolume::GenerateSnapshot()
 
 	CaptureComponent2D->HiddenActors.Empty();
 	CaptureComponent2D->HiddenComponents.Empty();
-
 
 	HiddenActorClasses.Remove(nullptr);
 	for (const TSubclassOf<AActor> HiddenActorClass : HiddenActorClasses)
