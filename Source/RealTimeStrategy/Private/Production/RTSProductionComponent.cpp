@@ -197,6 +197,19 @@ int32 URTSProductionComponent::FindQueueForProduct(TSubclassOf<AActor> ProductCl
 	return QueueWithLeastProducts;
 }
 
+void URTSProductionComponent::GetProduction(TMap<TSubclassOf<AActor>, int32> &Production) const
+{	
+	for (FRTSProductionQueue ProductionQueue : ProductionQueues)
+	{
+		const int32 Amount = ProductionQueue.Num();
+		for(int32 Index = 0; Index < Amount; Index++)
+		{
+			int32& Count = Production.FindOrAdd(ProductionQueue[Index]);
+			++Count;
+		}
+	}
+}
+
 TSubclassOf<AActor> URTSProductionComponent::GetCurrentProduction(int32 QueueIndex /*= 0*/) const
 {
 	if (QueueIndex < 0 || QueueIndex >= QueueCount)

@@ -51,6 +51,10 @@ public:
 
 	/** Gets the product currently being produced in the specified queue. */
 	UFUNCTION(BlueprintPure)
+	void GetProduction(TMap<TSubclassOf<AActor>, int32>& Production) const;
+
+	/** Gets the product currently being produced in the specified queue. */
+	UFUNCTION(BlueprintPure)
 	TSubclassOf<AActor> GetCurrentProduction(int32 QueueIndex = 0) const;
 
 	/** Gets the required time for producing the current product in the specified queue. */
