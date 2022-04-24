@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool HasOrder(ERTSOrderType OrderType) const;
 
+	UFUNCTION(BlueprintPure)
+	bool HasOrderQueue() const { return !Orders.IsEmpty(); }
+
 	/** Checks whether the pawn has an order of the specified type. */
 	UFUNCTION(BlueprintPure)
 	bool HasOrderByClass(TSubclassOf<URTSOrder> OrderClass) const;
@@ -82,7 +85,7 @@ public:
 	/** Makes the pawn gather resources from the specified source. */
 	UFUNCTION(BlueprintCallable)
 	void IssueGatherOrder(AActor* ResourceSource);
-	
+
 	UFUNCTION(BlueprintCallable)
 	void InsertContinueGathersOrder();
 
@@ -101,7 +104,7 @@ public:
 	/** Makes the pawn stop all actions immediately. */
 	UFUNCTION(BlueprintCallable)
 	void IssueStopOrder();
-	
+
 	UFUNCTION(BlueprintCallable)
 	void ObtainNextOrder();
 
@@ -116,7 +119,7 @@ public:
 
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
-	
+
 	TQueue<FRTSOrderData> Orders;
 
 private:
