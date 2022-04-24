@@ -224,7 +224,6 @@ void ARTSHUD::DrawHealthBar(AActor* Actor)
 	}
 
 	const FVector2D Size = GetActorSizeOnScreen(Actor);
-	UE_LOG(LogRTS, Log, TEXT("Draw Health bar"))
 
 	HealthBarWidgetComponent->UpdatePositionAndSize(Size);
 	HealthBarWidgetComponent->SetVisibility(true);
