@@ -70,6 +70,11 @@ TArray<AActor*> ARTSPlayerState::GetOwnActors() const
 	return OwnActors;
 }
 
+void ARTSPlayerState::Remove(AActor* Actor)
+{
+	OwnActors.Remove(Actor);
+}
+
 void ARTSPlayerState::DiscoverOwnActors()
 {
 	OwnActors.Empty();
