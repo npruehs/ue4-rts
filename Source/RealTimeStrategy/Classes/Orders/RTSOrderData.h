@@ -14,7 +14,7 @@ class AActor;
 
 
 /** Order to be issued to an actor. */
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSOrderData
 {
 	GENERATED_BODY()

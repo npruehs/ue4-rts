@@ -24,7 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSPawnAIControllerCurrentOrderCha
 /**
 * AI controller that drives RTS unit movement and orders.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSPawnAIController : public AAIController
 {
 	GENERATED_BODY()

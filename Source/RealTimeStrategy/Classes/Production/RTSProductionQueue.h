@@ -8,12 +8,11 @@
 #include "RTSProductionQueue.generated.h"
 
 
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSProductionQueue
 {
 	GENERATED_BODY()
 
-public:
 	/** Products queued for production. */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "RTS")
 	TArray<TSubclassOf<AActor>> Queue;

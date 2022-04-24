@@ -20,7 +20,7 @@ class AActor;
 /**
 * Utility functions for real-time strategy orders.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSOrderLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

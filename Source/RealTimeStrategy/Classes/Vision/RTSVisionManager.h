@@ -17,7 +17,7 @@ class ARTSVisionVolume;
 
 
 /** Updates actor vision and visibility. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSVisionManager : public AActor
 {
 	GENERATED_BODY()

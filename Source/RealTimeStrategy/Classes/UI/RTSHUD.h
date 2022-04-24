@@ -10,7 +10,7 @@
 /**
 * HUD with RTS features, such as showing a selection frame.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSHUD : public AHUD
 {
 	GENERATED_BODY()

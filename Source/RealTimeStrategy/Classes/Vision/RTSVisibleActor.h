@@ -12,7 +12,7 @@ class URTSOwnerComponent;
 
 
 /** Performance optimization. Caches an actor that can be visible or hidden, along with relevant components. */
-USTRUCT()
+USTRUCT(Category="RTS")
 struct REALTIMESTRATEGY_API FRTSVisibleActor
 {
 	GENERATED_BODY()

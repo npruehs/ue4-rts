@@ -11,7 +11,7 @@
 
 
 /** Base class for actor components with additional functionality, e.g. initial gameplay tags. */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSActorComponent : public UActorComponent, public IRTSGameplayTagsProvider
 {
 	GENERATED_BODY()

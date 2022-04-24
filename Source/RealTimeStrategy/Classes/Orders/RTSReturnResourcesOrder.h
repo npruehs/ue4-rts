@@ -8,7 +8,7 @@
 
 
 /** Orders the actor to return resources to another actor. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSReturnResourcesOrder : public URTSOrder
 {
 	GENERATED_BODY()

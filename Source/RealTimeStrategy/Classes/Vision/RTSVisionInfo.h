@@ -18,7 +18,7 @@ class ARTSVisionVolume;
 /**
 * Defines the visible areas for a player or team.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSVisionInfo : public AInfo
 {
 	GENERATED_BODY()

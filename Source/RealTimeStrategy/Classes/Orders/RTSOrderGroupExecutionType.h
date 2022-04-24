@@ -5,7 +5,7 @@
 #include "RTSOrderGroupExecutionType.generated.h"
 
 /** How many and which of the selected actors an order should be issued to. */
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSOrderGroupExecutionType : uint8
 {
 	/** Order is simply issued to all selected actors. */

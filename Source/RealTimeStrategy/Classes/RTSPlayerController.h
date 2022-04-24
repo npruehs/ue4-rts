@@ -28,7 +28,7 @@ class ARTSVisionInfo;
 /**
  * Player controller with RTS features, such as selection and mouse camera movement.
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSPlayerController : public APlayerController
 {
 	GENERATED_BODY()

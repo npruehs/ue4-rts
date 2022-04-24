@@ -18,7 +18,7 @@ class ARTSVisionVolume;
 /**
 * Widget for drawing a high-level overview of unit positions.
 */
-UCLASS(Blueprintable)
+UCLASS(Category="RTS", Blueprintable)
 class REALTIMESTRATEGY_API URTSMinimapWidget : public UUserWidget
 {
 	GENERATED_BODY()

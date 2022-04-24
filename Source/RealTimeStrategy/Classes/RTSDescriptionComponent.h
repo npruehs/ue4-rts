@@ -11,7 +11,7 @@
 /**
 * Adds a localizable description to the actor.
 */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSDescriptionComponent : public UActorComponent
 {
 	GENERATED_BODY()

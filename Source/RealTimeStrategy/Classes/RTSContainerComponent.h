@@ -13,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainerComponentActorLeftSign
 
 
 /** Can hold one or more actors. */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSContainerComponent : public UActorComponent
 {
 	GENERATED_BODY()

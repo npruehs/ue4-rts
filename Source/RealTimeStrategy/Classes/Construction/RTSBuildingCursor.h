@@ -17,7 +17,7 @@ class UTexture2D;
 
 
 /** 3D cursor for selecting a location for a building. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSBuildingCursor : public AActor
 {
 	GENERATED_BODY()

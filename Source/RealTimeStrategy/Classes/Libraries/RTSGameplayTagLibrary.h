@@ -16,7 +16,7 @@ class ARTSPlayerState;
 /**
 * Utility functions for adding, checking and removing gameplay tags.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSGameplayTagLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()

@@ -20,7 +20,7 @@ class URTSPlayerResourcesComponent;
 /**
 * AI controller that drives strategic RTS player AI.
 */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSPlayerAIController : public AAIController
 {
 	GENERATED_BODY()

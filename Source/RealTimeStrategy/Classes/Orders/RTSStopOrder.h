@@ -8,7 +8,7 @@
 
 
 /** Orders the actor to stop whatever they're currently doing. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSStopOrder : public URTSOrder
 {
 	GENERATED_BODY()

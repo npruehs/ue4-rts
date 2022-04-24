@@ -5,7 +5,7 @@
 #include "RTSOrderType.generated.h"
 
 
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSOrderType : uint8
 {
 	/** Idle. */

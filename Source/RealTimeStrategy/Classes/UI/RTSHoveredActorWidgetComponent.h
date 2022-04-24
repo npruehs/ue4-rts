@@ -10,7 +10,7 @@
 /**
 * Adds a widget for showing hovered actor data to the actor.
 */
-UCLASS(Blueprintable)
+UCLASS(Category="RTS", Blueprintable)
 class REALTIMESTRATEGY_API URTSHoveredActorWidgetComponent : public URTSActorWidgetComponent
 {
 	GENERATED_BODY()

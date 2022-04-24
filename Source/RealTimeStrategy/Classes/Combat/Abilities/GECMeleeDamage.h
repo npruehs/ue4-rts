@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API UGECMeleeDamage : public UGameplayEffectExecutionCalculation
 {
 	GENERATED_BODY()

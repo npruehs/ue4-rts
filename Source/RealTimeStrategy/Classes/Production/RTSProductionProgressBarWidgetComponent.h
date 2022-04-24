@@ -10,7 +10,7 @@
 /**
 * Adds a production progress bar widget to the actor.
 */
-UCLASS(Blueprintable)
+UCLASS(Category="RTS", Blueprintable)
 class REALTIMESTRATEGY_API URTSProductionProgressBarWidgetComponent : public URTSActorWidgetComponent
 {
 	GENERATED_BODY()

@@ -16,7 +16,7 @@ class UTexture2D;
 
 
 /** Order that can be issued to an actor. */
-UCLASS(BlueprintType, Blueprintable)
+UCLASS(Category="RTS", BlueprintType, Blueprintable)
 class REALTIMESTRATEGY_API URTSOrder : public UObject
 {
 	GENERATED_BODY()

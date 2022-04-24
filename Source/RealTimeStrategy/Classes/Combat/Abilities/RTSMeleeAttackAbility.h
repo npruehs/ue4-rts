@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSMeleeAttackAbility : public UGameplayAbility
 {
 	GENERATED_BODY()

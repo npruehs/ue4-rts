@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "UObject/TextProperty.h"
 
 #include "RTSNameComponent.generated.h"
 
@@ -11,7 +10,7 @@
 /**
 * Adds a localizable name to the actor.
 */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSNameComponent : public UActorComponent
 {
 	GENERATED_BODY()

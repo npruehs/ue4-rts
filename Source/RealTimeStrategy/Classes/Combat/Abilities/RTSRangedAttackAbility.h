@@ -11,7 +11,7 @@ class ARTSAbilityProjectile;
 /**
  * 
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSRangedAttackAbility : public UGameplayAbility
 {
 	GENERATED_BODY()

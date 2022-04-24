@@ -12,7 +12,7 @@
 /**
 * Stores floating texts to be displayed above the actor.
 */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSFloatingCombatTextComponent : public UActorComponent
 {
 	GENERATED_BODY()

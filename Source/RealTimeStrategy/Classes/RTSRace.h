@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSRace : public UDataAsset
 {
 	GENERATED_BODY()

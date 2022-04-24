@@ -6,7 +6,7 @@
 
 
 /** Possible target types of an order. */
-UENUM(BlueprintType)
+UENUM(Category="RTS", BlueprintType)
 enum class ERTSOrderTargetType : uint8
 {
 	/** No specific target (e.g. aura or automatically applied to self). */

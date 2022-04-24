@@ -8,12 +8,11 @@
 
 
 /** Tag requirements for ordered actors and order targets. */
-USTRUCT(BlueprintType)
+USTRUCT(Category="RTS", BlueprintType)
 struct REALTIMESTRATEGY_API FRTSOrderTagRequirements
 {
 	GENERATED_BODY()
 
-public:
 	/** Gameplay tags required by the ordered actor. */
 	UPROPERTY(EditDefaultsOnly, Category = "RTS")
 	FGameplayTagContainer SourceRequiredTags;

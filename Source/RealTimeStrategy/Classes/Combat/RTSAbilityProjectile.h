@@ -14,7 +14,7 @@ class UProjectileMovementComponent;
 /**
  * 
  */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API ARTSAbilityProjectile : public AActor, public IAbilitySystemInterface
 {
 	GENERATED_BODY()

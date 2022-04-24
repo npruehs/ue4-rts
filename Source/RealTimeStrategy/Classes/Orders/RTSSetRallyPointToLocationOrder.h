@@ -8,7 +8,7 @@
 
 
 /** Orders a production actor to set its rally point to a specific target location. */
-UCLASS()
+UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSSetRallyPointToLocationOrder : public URTSOrder
 {
 	GENERATED_BODY()

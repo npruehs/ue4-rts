@@ -8,7 +8,7 @@
 
 
 /** Simple pawn movement that also updates rotation. */
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSPawnMovementComponent : public UFloatingPawnMovement
 {
 	GENERATED_BODY()
