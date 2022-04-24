@@ -44,9 +44,14 @@ TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 	{
 		int32& NumOwnedPawns = OwnPawns.FindOrAdd(OwnActor->GetClass());
 		++NumOwnedPawns;
+
+		if (const URTSProductionComponent* ProductionComponent = OwnActor->FindComponentByClass<URTSProductionComponent>(); IsValid(ProductionComponent))
+		{
+			ProductionComponent->GetProduction(OwnPawns);
+		}
 	}
 
-	// TODO(np): Also count actors already in production/construction.
+	// TODO(np): Also count actors already in construction.
 
 	// Check build order.
 	TMap<TSubclassOf<AActor>, int32> BuildOrderPawns;
@@ -162,8 +167,6 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<AActor> PawnClass)
 {
 	TArray<AActor*> OwnActors = GetPlayerState<ARTSPlayerState>()->GetOwnActors();
 
-	UE_LOG(LogRTS, Log, TEXT("%s owns %i Actors and wants to produce %s"), *GetName(), OwnActors.Num(), *PawnClass->GetName())
-
 	// Get any own building location.
 	const AActor* OwnBuilding = nullptr;
 
@@ -171,7 +174,6 @@ bool ARTSPlayerAIController::StartProduction(TSubclassOf<AActor> PawnClass)
 	{
 		if (Actor->GetOwner() != this)
 		{
-			UE_LOG(LogRTS, Log, TEXT("%s is not owned by %s"), *Actor->GetName(), *GetName())
 			continue;
 		}
 
