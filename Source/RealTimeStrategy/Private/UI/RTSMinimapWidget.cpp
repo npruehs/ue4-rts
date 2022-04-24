@@ -10,6 +10,7 @@
 #include "RTSOwnerComponent.h"
 #include "RTSPlayerController.h"
 #include "RTSPlayerState.h"
+#include "Combat/RTSCombatComponent.h"
 #include "Combat/RTSHealthComponent.h"
 #include "Economy/RTSResourceSourceComponent.h"
 #include "Libraries/RTSEconomyLibrary.h"
@@ -237,9 +238,11 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 				const URTSHealthComponent* HealthComponent = Actor->FindComponentByClass<URTSHealthComponent>();
 				const float RealTimeSeconds = Actor->GetWorld()->GetRealTimeSeconds();
 
-				if (!IsValid(HealthComponent) ||
-					HealthComponent->GetLastTimeDamageTaken() <= 0.0f ||
-					HealthComponent->GetLastTimeDamageTaken() + DamagedUnitBlinkTimeSeconds < RealTimeSeconds)
+				const URTSCombatComponent* CombatComponent = Actor->FindComponentByClass<URTSCombatComponent>();
+
+				const float LastTimeDamageTaken = IsValid(CombatComponent) ? CombatComponent->GetLastTimeDamageTaken() : IsValid(HealthComponent) ? HealthComponent->GetLastTimeDamageTaken() : 0.0F;
+
+				if (LastTimeDamageTaken <= 0.0f || LastTimeDamageTaken + DamagedUnitBlinkTimeSeconds < RealTimeSeconds)
 				{
 					DrawBoxWithBrush(InContext, ActorLocationMinimap, OwnUnitsBrush);
 				}
@@ -265,11 +268,11 @@ void URTSMinimapWidget::DrawUnits(FPaintContext& InContext) const
 				if (const URTSResourceSourceComponent* ResourceSourceComponent = Actor->FindComponentByClass<URTSResourceSourceComponent>())
 				{
 					FSlateBrush ResourceBrush = ResourcesBrush;
-					if(bOverrideResourceColor)
+					if (bOverrideResourceColor)
 					{
 						ResourceBrush.TintColor = URTSEconomyLibrary::GetResourceColor(ResourceSourceComponent->GetResourceType());
 					}
-					
+
 					DrawBoxWithBrush(InContext, ActorLocationMinimap, ResourceBrush);
 				}
 				else

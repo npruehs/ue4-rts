@@ -52,13 +52,10 @@ void UGECMeleeDamage::Execute_Implementation(const FGameplayEffectCustomExecutio
 	float Defense = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(MeleeDamageStatics().EnduranceDef, EvaluateParameters, Defense);
 
-	UE_LOG(LogTemp, Warning, TEXT("BaseDamage: %f, Strength: %f, Defense: %f"), BaseDamage, Strength, Defense)
-
 	Strength = FMath::Max(1.f, Strength);
 	Defense = FMath::Max(1.f, Defense);
 
 	const float DamageDone = FMath::Max(1.0f, BaseDamage * Strength / Defense) * -1;
-	UE_LOG(LogTemp, Warning, TEXT("DamageDone: %f"), DamageDone)
 
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(MeleeDamageStatics().HealthProperty, EGameplayModOp::Additive, DamageDone));
 }

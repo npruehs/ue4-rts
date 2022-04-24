@@ -12,7 +12,7 @@
  * 
  */
 UCLASS(Category = "RTS")
-class REALTIMESTRATEGY_API URTSAttributeSet : public UAttributeSet, public ITickableAttributeSetInterface
+class REALTIMESTRATEGY_API URTSAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 public:
@@ -71,8 +71,4 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed);
-
-	virtual void Tick(float DeltaTime) override;
-
-	virtual bool ShouldTick() const override { return IsValid(GetOuter()); }
 };

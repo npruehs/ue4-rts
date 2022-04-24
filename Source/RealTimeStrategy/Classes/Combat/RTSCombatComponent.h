@@ -17,6 +17,7 @@ class ARTSAbilityProjectile;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSCombatComponentKilledSignature, AActor*, Actor, AController*, PreviousOwner, AActor*, DamageCauser);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSCombatComponentAttackUsedSignature, AActor*, Actor, const AActor*, Target, ARTSAbilityProjectile*, Projectile);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSCombatComponentHealthChanegedSignature, AActor*, Actor, float, OldHealth, float, NewHealth, AActor*, DamageCauser);
 
 /**
  * 
@@ -64,8 +65,18 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetCurrentHealth() const { return AttributeSet->GetHealth(); }
 
+	/** Gets the last time the actor has taken damage. */
+	float GetLastTimeDamageTaken() const { return LastTimeDamageTaken; }
+
 	/** Kills the actor immediately. */
-	void KillActor(AActor* DamageCauser = nullptr);
+	void KillActor(AActor* DamageCauser = nullptr) const;
+
+	/** Event when the current health of the actor has changed. */
+	virtual void NotifyOnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser);
+	
+	/** Event when the current health of the actor has changed. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSCombatComponentHealthChanegedSignature OnHealthChanged;
 
 	/** Event when the actor has been killed. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
@@ -112,4 +123,7 @@ protected:
 
 	UPROPERTY()
 	TArray<FGameplayAbilitySpecHandle> AbilitySpecs;
+	
+	UPROPERTY()
+	float LastTimeDamageTaken;
 };

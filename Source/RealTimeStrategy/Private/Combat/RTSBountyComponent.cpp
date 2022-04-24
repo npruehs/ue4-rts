@@ -6,6 +6,7 @@
 #include "RTSLog.h"
 #include "RTSPlayerAIController.h"
 #include "RTSPlayerState.h"
+#include "Combat/RTSCombatComponent.h"
 #include "Combat/RTSHealthComponent.h"
 #include "Economy/RTSPlayerResourcesComponent.h"
 
@@ -20,11 +21,20 @@ void URTSBountyComponent::BeginPlay()
 		return;
 	}
 
-	URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
+	URTSCombatComponent* CombatComponent = Owner->FindComponentByClass<URTSCombatComponent>();
 
-	if (IsValid(HealthComponent))
+	if (IsValid(CombatComponent))
 	{
-		HealthComponent->OnKilled.AddDynamic(this, &URTSBountyComponent::OnKilled);
+		CombatComponent->OnKilled.AddDynamic(this, &URTSBountyComponent::OnKilled);
+	}
+	else
+	{
+		URTSHealthComponent* HealthComponent = Owner->FindComponentByClass<URTSHealthComponent>();
+
+		if (IsValid(HealthComponent))
+		{
+			HealthComponent->OnKilled.AddDynamic(this, &URTSBountyComponent::OnKilled);
+		}
 	}
 }
 

@@ -10,15 +10,6 @@
 
 URTSCombatComponent::URTSCombatComponent(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
-	OnActiveGameplayEffectAddedDelegateToSelf.AddLambda([this](UAbilitySystemComponent* Component, const FGameplayEffectSpec& Spec, FActiveGameplayEffectHandle Handle)
-	{
-		AActor* Instigator = Spec.GetEffectContext().GetInstigator();
-
-		if (IsValid(Instigator))
-		{
-			UE_LOG(LogRTS, Log, TEXT("Instigator was %s"), *Instigator->GetActorLabel())
-		}
-	});
 }
 
 void URTSCombatComponent::UseAttack(int32 AttackIndex, AActor* Target)
@@ -69,7 +60,7 @@ void URTSCombatComponent::AddGameplayTags(FGameplayTagContainer& InOutTagContain
 	InOutTagContainer.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanAttack());
 }
 
-void URTSCombatComponent::KillActor(AActor* DamageCauser)
+void URTSCombatComponent::KillActor(AActor* DamageCauser) const
 {
 	AActor* Owner = GetOwner();
 
@@ -109,5 +100,19 @@ void URTSCombatComponent::KillActor(AActor* DamageCauser)
 	if (ARTSGameMode* GameMode = Cast<ARTSGameMode>(UGameplayStatics::GetGameMode(GetWorld())); GameMode != nullptr)
 	{
 		GameMode->NotifyOnActorKilled(Owner, OwningPlayer);
+	}
+}
+
+void URTSCombatComponent::NotifyOnHealthChanged(AActor* Actor, float OldHealth, float NewHealth, AActor* DamageCauser)
+{
+	// Notify listeners.
+	OnHealthChanged.Broadcast(Actor, OldHealth, NewHealth, DamageCauser);
+
+	LastTimeDamageTaken = GetWorld()->GetRealTimeSeconds();
+
+	// Play sound.
+	if (NewHealth <= 0.0f)
+	{
+		KillActor(DamageCauser);
 	}
 }
