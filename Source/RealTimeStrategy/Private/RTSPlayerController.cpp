@@ -174,7 +174,7 @@ void ARTSPlayerController::SetupInputComponent()
 	InputComponent->BindAction(TEXT("CancelProduction"), IE_Released, this, &ARTSPlayerController::CancelProduction);
 
 	// Get camera bounds.
-	for (TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	for (const TActorIterator<ARTSCameraBoundsVolume> ActorItr(GetWorld()); ActorItr;)
 	{
 		CameraBoundsVolume = *ActorItr;
 		break;
@@ -416,7 +416,7 @@ bool ARTSPlayerController::ServerIssueOrder_Validate(APawn* OrderedPawn, const F
 	return OrderedPawn->GetOwner() == this;
 }
 
- void ARTSPlayerController::ServerAddOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
+void ARTSPlayerController::ServerAddOrder_Implementation(APawn* OrderedPawn, const FRTSOrderData& Order)
 {
 	if (!Order.OrderClass)
 	{
@@ -433,7 +433,7 @@ bool ARTSPlayerController::ServerIssueOrder_Validate(APawn* OrderedPawn, const F
 	NotifyOnIssuedOrder(OrderedPawn, Order);
 }
 
- bool ARTSPlayerController::ServerAddOrder_Validate(APawn* OrderedPawn, const FRTSOrderData& Order)
+bool ARTSPlayerController::ServerAddOrder_Validate(APawn* OrderedPawn, const FRTSOrderData& Order)
 {
 	// Verify owner to prevent cheating.
 	return OrderedPawn->GetOwner() == this;

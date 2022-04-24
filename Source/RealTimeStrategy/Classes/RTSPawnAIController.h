@@ -87,7 +87,7 @@ public:
 	void IssueGatherOrder(AActor* ResourceSource);
 
 	UFUNCTION(BlueprintCallable)
-	void InsertContinueGathersOrder();
+	bool InsertContinueGathersOrder();
 
 	/** Makes the pawn move towards the specified location. */
 	UFUNCTION(BlueprintCallable)

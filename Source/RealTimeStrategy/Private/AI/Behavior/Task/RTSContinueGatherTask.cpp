@@ -29,7 +29,10 @@ EBTNodeResult::Type URTSContinueGatherTask::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Failed;
 	}
 
-	Controller->InsertContinueGathersOrder();
+	if (Controller->InsertContinueGathersOrder())
+	{
+		return EBTNodeResult::Succeeded;
+	}
 
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
