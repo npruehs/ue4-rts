@@ -347,7 +347,7 @@ void URTSMinimapWidget::DrawViewFrustum(FPaintContext& InContext) const
 		InContext.OutDrawElements,
 		InContext.MaxLayer,
 		InContext.AllottedGeometry.ToPaintGeometry(),
-		Points);
+		Points, ESlateDrawEffect::None, ViewFrustumTint);
 }
 
 void URTSMinimapWidget::DrawBoxWithBrush(FPaintContext& InContext, const FVector2D& Position, const FSlateBrush& Brush) const
