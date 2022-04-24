@@ -18,7 +18,7 @@ class REALTIMESTRATEGY_API ARTSTeamInfo : public AInfo
 public:
 	ARTSTeamInfo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/** Adds the specified player to this team. */
 	UFUNCTION(BlueprintCallable, Category = "Team")

@@ -24,8 +24,8 @@ class REALTIMESTRATEGY_API URTSPlayerResourcesComponent : public UActorComponent
 public:
 	URTSPlayerResourcesComponent(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void BeginPlay() override;
 
 
 	/** Gets the amount of resources in stock of this player. */

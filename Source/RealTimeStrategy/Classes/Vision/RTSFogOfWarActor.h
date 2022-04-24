@@ -29,7 +29,7 @@ public:
 	/** Prepares this actor for gameplay. */
 	void Initialize(ARTSVisionVolume* InVisionVolume);
 
-	void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
 	/** Gets the texture containing visibility information. */
 	UTexture2D* GetFogOfWarTexture() const;
