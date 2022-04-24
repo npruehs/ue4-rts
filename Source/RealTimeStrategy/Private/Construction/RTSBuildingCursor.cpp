@@ -8,6 +8,7 @@
 #include "NavFilters/RecastFilter_UseDefaultArea.h"
 
 #include "Combat/RTSAttackComponent.h"
+#include "Combat/RTSCombatComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Libraries/RTSCollisionLibrary.h"
 #include "Libraries/RTSGameplayLibrary.h"
@@ -150,7 +151,23 @@ void ARTSBuildingCursor::SetupForBuilding(TSubclassOf<AActor> BuildingClass)
 			}
 			else
 			{
-				bPreviewAttackRange = false;
+				const URTSCombatComponent* CombatComponent = URTSGameplayLibrary::FindDefaultComponentByClass<URTSCombatComponent>(BuildingClass); 
+				if (IsValid(CombatComponent))
+				{
+					for (const FRTSAttackData& Attack : CombatComponent->GetAttacks())
+					{
+						if (Attack.Range > AttackRange)
+						{
+							AttackRange = Attack.Range;
+						}
+					}
+
+					AttackRange += URTSCollisionLibrary::GetCollisionSize(BuildingClass) / 2.0f;
+				}
+				else
+				{
+					bPreviewAttackRange = false;
+				}
 			}
 		}
 	}

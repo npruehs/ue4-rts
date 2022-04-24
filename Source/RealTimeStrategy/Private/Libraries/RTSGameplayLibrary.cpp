@@ -13,6 +13,7 @@
 #include "RTSRequirementsComponent.h"
 #include "RTSSelectableComponent.h"
 #include "Combat/RTSAttackComponent.h"
+#include "Combat/RTSCombatComponent.h"
 #include "Construction/RTSConstructionSiteComponent.h"
 #include "Economy/RTSGathererComponent.h"
 #include "Vision/RTSVisibleComponent.h"
@@ -104,6 +105,7 @@ void URTSGameplayLibrary::StopGameplayFor(AActor* Actor)
 
 	DestroyComponentByClass<URTSSelectableComponent>(Actor);
 	DestroyComponentByClass<URTSAttackComponent>(Actor);
+	DestroyComponentByClass<URTSCombatComponent>(Actor);
 	DestroyComponentByClass<URTSGathererComponent>(Actor);
 	DestroyComponentByClass<URTSConstructionSiteComponent>(Actor);
 }
