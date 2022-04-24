@@ -53,6 +53,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	TArray<AActor*> GetOwnActors() const;
 
+	/** Gets the list of actors currently owned by this player. */
+	UFUNCTION(BlueprintCallable)
+	void Remove(AActor* Actor);
+
 	/** Looks for all actors currently owned by this player and caches their references. */
 	void DiscoverOwnActors();
 
