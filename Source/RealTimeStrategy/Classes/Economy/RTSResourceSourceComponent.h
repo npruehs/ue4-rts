@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSResourceSourceComponentDepletedS
 /**
 * Adds resources to be gathered from the actor.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSResourceSourceComponent : public URTSActorComponent
 {
 	GENERATED_BODY()

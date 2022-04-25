@@ -12,7 +12,7 @@
 /**
 * Allows the actor to reveal areas covered by fog of war.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSVisionComponent : public UActorComponent
 {
 	GENERATED_BODY()

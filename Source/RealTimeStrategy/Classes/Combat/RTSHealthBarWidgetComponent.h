@@ -13,7 +13,7 @@ class URTSHealthComponent;
 /**
 * Adds a health bar widget to the actor.
 */
-UCLASS(Blueprintable)
+UCLASS(ClassGroup="RTS", Category = "RTS", Blueprintable)
 class REALTIMESTRATEGY_API URTSHealthBarWidgetComponent : public URTSActorWidgetComponent
 {
     GENERATED_BODY()

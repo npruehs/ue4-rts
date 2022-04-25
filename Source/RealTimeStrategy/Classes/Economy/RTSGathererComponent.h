@@ -23,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSGathererComponentResourcesRetu
 /**
 * Allows the actor to gather resources.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSGathererComponent : public URTSActorComponent
 {
 	GENERATED_BODY()

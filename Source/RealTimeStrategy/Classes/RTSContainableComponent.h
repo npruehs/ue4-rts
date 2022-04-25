@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSContainableComponentContainerCh
 
 
 /** Allows the actor to be contained by other actors. */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSContainableComponent : public UActorComponent
 {
 	GENERATED_BODY()

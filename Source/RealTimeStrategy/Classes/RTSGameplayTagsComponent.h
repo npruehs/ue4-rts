@@ -16,7 +16,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSGameplayTagsComponentCurrentTag
 /**
 * Allows tagging an actor with various properties.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSGameplayTagsComponent : public UActorComponent, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
