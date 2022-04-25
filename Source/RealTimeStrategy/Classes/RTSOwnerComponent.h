@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSOwnerComponentOwnerChangedSigna
 /**
 * Specifies the owning player of the actor.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSOwnerComponent : public UActorComponent
 {
 	GENERATED_BODY()

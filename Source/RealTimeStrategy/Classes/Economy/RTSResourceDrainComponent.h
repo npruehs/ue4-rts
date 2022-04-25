@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSResourceDrainComponentResource
 /**
 * Allows resources to be returned to the actor.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSResourceDrainComponent : public URTSActorComponent
 {
 	GENERATED_BODY()

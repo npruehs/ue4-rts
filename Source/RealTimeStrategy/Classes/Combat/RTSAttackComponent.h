@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSAttackComponentAttackedUsedSig
 * Adds one or more attacks to the actor.
 * These can also be used for healing.
 */
-UCLASS(meta = (BlueprintSpawnableComponent), Category = "RTS")
+UCLASS(ClassGroup="RTS", Category = "RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSAttackComponent : public URTSActorComponent
 {
 	GENERATED_BODY()

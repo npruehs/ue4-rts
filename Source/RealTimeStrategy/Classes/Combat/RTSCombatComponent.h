@@ -22,7 +22,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSCombatComponentHealthChanegedS
 /**
  * 
  */
-UCLASS(Category = "RTS")
+UCLASS(ClassGroup="RTS", Category = "RTS")
 class REALTIMESTRATEGY_API URTSCombatComponent : public UAbilitySystemComponent, public IRTSGameplayTagsProvider
 {
 	GENERATED_BODY()

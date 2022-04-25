@@ -11,7 +11,7 @@ class UMeshComponent;
 
 
 /** Specifies valid locations to fire projectiles at. */
-UCLASS(meta = (BlueprintSpawnableComponent), Category = "RTS")
+UCLASS(ClassGroup="RTS", Category = "RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSProjectileTargetComponent : public UActorComponent
 {
 	GENERATED_BODY()

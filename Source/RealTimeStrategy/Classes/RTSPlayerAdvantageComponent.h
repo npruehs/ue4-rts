@@ -10,7 +10,7 @@
 /**
 * Attach to player or AI controllers. Provides bonuses for various gameplay elements.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSPlayerAdvantageComponent : public UActorComponent
 {
 	GENERATED_BODY()

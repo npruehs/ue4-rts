@@ -24,7 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRTSSelectableComponentUnhoveredSign
 /**
  * Allows selecting the actor, e.g. by left-click.
  */
-UCLASS(Category="RTS", meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta=(BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSSelectableComponent : public UActorComponent
 {
 	GENERATED_BODY()

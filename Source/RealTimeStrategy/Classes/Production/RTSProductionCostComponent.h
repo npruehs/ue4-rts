@@ -15,7 +15,7 @@ class USoundCue;
 
 
 /** Specifies the time and resources required to construct the actor. */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSProductionCostComponent : public UActorComponent
 {
 	GENERATED_BODY()

@@ -13,7 +13,7 @@ class UTexture2D;
 /**
 * Adds a portrait to the actor that can be shown in the UI.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSPortraitComponent : public UActorComponent
 {
 	GENERATED_BODY()

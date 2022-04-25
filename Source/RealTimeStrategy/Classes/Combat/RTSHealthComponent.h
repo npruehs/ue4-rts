@@ -21,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSHealthComponentKilledSignatur
 /**
 * Adds health to the actor, e.g. for taking damage and dying.
 */
-UCLASS(meta = (BlueprintSpawnableComponent), Category = "RTS")
+UCLASS(ClassGroup="RTS", Category = "RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSHealthComponent : public URTSActorComponent
 {
 	GENERATED_BODY()

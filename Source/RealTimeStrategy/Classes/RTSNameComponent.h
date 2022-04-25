@@ -10,7 +10,7 @@
 /**
 * Adds a localizable name to the actor.
 */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSNameComponent : public UActorComponent
 {
 	GENERATED_BODY()

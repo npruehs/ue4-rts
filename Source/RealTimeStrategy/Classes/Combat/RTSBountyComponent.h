@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSBountyComponentBountyCollected
 
 
 /** Grants players resources when killing the actor. */
-UCLASS(meta = (BlueprintSpawnableComponent), Category = "RTS")
+UCLASS(ClassGroup="RTS", Category = "RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSBountyComponent : public UActorComponent
 {
 	GENERATED_BODY()

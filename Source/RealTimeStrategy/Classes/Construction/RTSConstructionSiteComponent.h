@@ -30,7 +30,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSConstructionSiteComponentCons
 
 
 /** Allows constructing the actor over time. */
-UCLASS(Category="RTS", meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
 class REALTIMESTRATEGY_API URTSConstructionSiteComponent : public URTSActorComponent
 {
 	GENERATED_BODY()
