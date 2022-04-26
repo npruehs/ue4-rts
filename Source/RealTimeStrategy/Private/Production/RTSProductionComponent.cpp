@@ -2,7 +2,6 @@
 
 #include "GameFramework/Actor.h"
 #include "GameFramework/Controller.h"
-#include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -197,12 +196,12 @@ int32 URTSProductionComponent::FindQueueForProduct(TSubclassOf<AActor> ProductCl
 	return QueueWithLeastProducts;
 }
 
-void URTSProductionComponent::GetProduction(TMap<TSubclassOf<AActor>, int32> &Production) const
-{	
+void URTSProductionComponent::GetProduction(TMap<TSubclassOf<AActor>, int32>& Production) const
+{
 	for (FRTSProductionQueue ProductionQueue : ProductionQueues)
 	{
 		const int32 Amount = ProductionQueue.Num();
-		for(int32 Index = 0; Index < Amount; Index++)
+		for (int32 Index = 0; Index < Amount; Index++)
 		{
 			int32& Count = Production.FindOrAdd(ProductionQueue[Index]);
 			++Count;
@@ -509,6 +508,8 @@ void URTSProductionComponent::SetRallyPointToActor(AActor* Target)
 {
 	RallyPoint.TargetActor = Target;
 	RallyPoint.bIsSet = true;
+	
+	OnRallyPointSet.Broadcast(RallyPoint.TargetActor, RallyPoint.TargetLocation);
 }
 
 void URTSProductionComponent::SetRallyPointToLocation(const FVector& TargetLocation)
@@ -516,12 +517,16 @@ void URTSProductionComponent::SetRallyPointToLocation(const FVector& TargetLocat
 	RallyPoint.TargetActor = nullptr;
 	RallyPoint.TargetLocation = TargetLocation;
 	RallyPoint.bIsSet = true;
+
+	OnRallyPointSet.Broadcast(RallyPoint.TargetActor, RallyPoint.TargetLocation);
 }
 
 void URTSProductionComponent::ClearRallyPoint()
 {
 	RallyPoint.TargetActor = nullptr;
 	RallyPoint.bIsSet = false;
+
+	OnClearRallyPoint.Broadcast();
 }
 
 TArray<TSubclassOf<AActor>> URTSProductionComponent::GetAvailableProducts() const
