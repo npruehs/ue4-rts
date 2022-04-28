@@ -46,6 +46,18 @@ private:
 	UPROPERTY(EditInstanceOnly, Category = "RTS")
 	UMaterialInterface* FogOfWarMaterial;
 
+	/** Material to instance for rendering the fog of war effect. */
+	UPROPERTY(EditInstanceOnly, Category = "RTS")
+	FLinearColor UnknownColor = FLinearColor::Black;
+
+	/** Material to instance for rendering the fog of war effect. */
+	UPROPERTY(EditInstanceOnly, Category = "RTS")
+	FLinearColor VisitedColor = {0.08F,0.08F,0.08F,0};
+	
+	/** Material to instance for rendering the fog of war effect. */
+	UPROPERTY(EditInstanceOnly, Category = "RTS")
+	float DesaturateVisited = 1.0F;
+
 	/** Provides visibility information for how to render the fog of war. */
 	UPROPERTY()
 	ARTSVisionInfo* VisionInfo;
