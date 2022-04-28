@@ -59,6 +59,9 @@ void ARTSFogOfWarActor::Initialize(ARTSVisionVolume* InVisionVolume)
 	FogOfWarMaterialInstance->SetTextureParameterValue(FName("VisibilityMask"), FogOfWarTexture);
 	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverWorldSize"), 1.0f / SizeInWorld.X);
 	FogOfWarMaterialInstance->SetScalarParameterValue(FName("OneOverTileSize"), 1.0f / SizeInTiles);
+	FogOfWarMaterialInstance->SetVectorParameterValue(FName("UnknownColor"), UnknownColor);
+	FogOfWarMaterialInstance->SetVectorParameterValue(FName("VisitedColor"), VisitedColor);
+	FogOfWarMaterialInstance->SetScalarParameterValue(FName("DesaturateVisited"), DesaturateVisited);
 
 	// Setup fog of war post-process volume.
 	FogOfWarVolume->AddOrUpdateBlendable(FogOfWarMaterialInstance);
