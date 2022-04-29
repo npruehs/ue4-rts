@@ -198,26 +198,28 @@ void ARTSPawnAIController::IssueGatherOrder(AActor* ResourceSource)
 	IssueOrder(Order);
 }
 
-void ARTSPawnAIController::InsertContinueGathersOrder()
+bool ARTSPawnAIController::InsertContinueGathersOrder()
 {
 	const URTSGathererComponent* GathererComponent = GetPawn()->FindComponentByClass<URTSGathererComponent>();
 
 	if (!GathererComponent)
 	{
-		return;
+		return false;
 	}
 
 	AActor* ResourceSource = GathererComponent->GetPreferredResourceSource();
 
 	if (!ResourceSource)
 	{
-		return;
+		return false;
 	}
 
 	FRTSOrderData Order;
-	Order.OrderClass = URTSGatherOrder::StaticClass();
+	Order.OrderClass  = URTSGatherOrder::StaticClass();
 	Order.TargetActor = ResourceSource;
 	InsertOrder(Order);
+
+	return true;
 }
 
 void ARTSPawnAIController::IssueMoveOrder(const FVector& Location)

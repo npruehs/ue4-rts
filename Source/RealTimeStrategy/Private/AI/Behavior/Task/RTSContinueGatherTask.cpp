@@ -30,13 +30,10 @@ EBTNodeResult::Type URTSContinueGatherTask::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Failed;
 	}
 
-	AActor* PreferredResourceSource = GathererComponent->GetPreferredResourceSource();
-	if (!IsValid(PreferredResourceSource))
+	if (Controller->InsertContinueGathersOrder())
 	{
-		return EBTNodeResult::Failed;
+		return EBTNodeResult::Succeeded;
 	}
 
-	Controller->IssueGatherOrder(PreferredResourceSource);
-
-	return EBTNodeResult::Succeeded;
+	return EBTNodeResult::Failed;
 }
