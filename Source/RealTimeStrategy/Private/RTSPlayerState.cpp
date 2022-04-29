@@ -67,17 +67,7 @@ bool ARTSPlayerState::IsSameTeamAs(const ARTSPlayerState* Other) const
 
 TArray<AActor*> ARTSPlayerState::GetOwnActors() const
 {
-	TArray<AActor*> Actors;
-
-	for (TWeakObjectPtr<AActor> WeakObjectPtr : OwnActors)
-	{
-		if (WeakObjectPtr.IsValid())
-		{
-			Actors.Add(WeakObjectPtr.Get());
-		}
-	}
-
-	return Actors;
+	return OwnActors;
 }
 
 void ARTSPlayerState::DiscoverOwnActors()
@@ -117,8 +107,9 @@ void ARTSPlayerState::NotifyOnTeamChanged(ARTSTeamInfo* NewTeam)
 	ReceiveOnTeamChanged(NewTeam);
 
 	// Notify player.
+	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner());
 
-	if (ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner()); IsValid(PlayerController))
+	if (PlayerController)
 	{
 		PlayerController->NotifyOnTeamChanged(NewTeam);
 	}
@@ -137,8 +128,9 @@ void ARTSPlayerState::NotifyOnActorOwnerChanged(AActor* Actor, ARTSPlayerState* 
 	}
 
 	// Notify listeners.
+	ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner());
 
-	if (ARTSPlayerController* PlayerController = Cast<ARTSPlayerController>(GetOwner()); IsValid(PlayerController))
+	if (IsValid(PlayerController))
 	{
 		PlayerController->NotifyOnActorOwnerChanged(Actor);
 	}

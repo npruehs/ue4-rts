@@ -50,7 +50,7 @@ TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 
 	// Check build order.
 	TMap<TSubclassOf<AActor>, int32> BuildOrderPawns;
-	for (TSubclassOf<AActor> PawnClass : BuildOrder)
+	for (TSubclassOf<AActor> PawnClass : RTSPlayerState->GetRace()->GetBuildOrder())
 	{
 		int32& NumRequiredPawns = BuildOrderPawns.FindOrAdd(PawnClass);
 		++NumRequiredPawns;
