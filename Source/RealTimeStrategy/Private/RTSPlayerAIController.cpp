@@ -42,11 +42,6 @@ TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 
 	for (const AActor* OwnActor : OwnActors)
 	{
-		if (!IsValid(OwnActor))
-		{
-			continue;
-		}
-
 		int32& NumOwnedPawns = OwnPawns.FindOrAdd(OwnActor->GetClass());
 		++NumOwnedPawns;
 	}
@@ -59,8 +54,6 @@ TSubclassOf<AActor> ARTSPlayerAIController::GetNextPawnToProduce() const
 	{
 		int32& NumRequiredPawns = BuildOrderPawns.FindOrAdd(PawnClass);
 		++NumRequiredPawns;
-
-		UE_LOG(LogRTS, Log, TEXT("AI %s owns %i of %s and checks for %i"), *GetName(), OwnPawns.FindRef(PawnClass), *PawnClass->GetName(), NumRequiredPawns)
 
 		if (NumRequiredPawns > OwnPawns.FindRef(PawnClass))
 		{

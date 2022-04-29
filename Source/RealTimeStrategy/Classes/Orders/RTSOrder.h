@@ -19,83 +19,90 @@ class UTexture2D;
 UCLASS(Category="RTS", BlueprintType, Blueprintable)
 class REALTIMESTRATEGY_API URTSOrder : public UObject
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    /** Whether the specified actor can obey this order. */
-    virtual bool CanObeyOrder(const AActor* OrderedActor, int32 Index) const;
+	/** Whether the specified actor can obey this order. */
+	virtual bool CanObeyOrder(const AActor* OrderedActor, int32 Index) const;
 
-    /** Whether the specified actor and/or location is a valid target for this order. */
-    virtual bool IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
+	/** Whether the specified actor and/or location is a valid target for this order. */
+	virtual bool IsValidTarget(const AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
 
-    /** Issues this order to the specified actor. */
-    virtual void IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
 
-    /** Gets the target required by this order. */
-    ERTSOrderTargetType GetTargetType() const;
+	/** Adds this order to the specified actor. */
+	virtual void AddOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
+	/** Issues this order to the specified actor. */
+	virtual void SetOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const;
 
-    /** Gets how many and which of the selected actors the order should be issued to. */
-    ERTSOrderGroupExecutionType GetGroupExecutionType() const;
+	/** Gets the target required by this order. */
+	ERTSOrderTargetType GetTargetType() const;
 
-    /** Gets the tag requirements that must be fulfilled to issue the order. */
-    FRTSOrderTagRequirements GetIssueTagRequirements() const;
+	/** Gets how many and which of the selected actors the order should be issued to. */
+	ERTSOrderGroupExecutionType GetGroupExecutionType() const;
 
-    /** Gets the normal icon of the order. */
-    UTexture2D* GetNormalIcon() const;
+	/** Gets the tag requirements that must be fulfilled to issue the order. */
+	FRTSOrderTagRequirements GetIssueTagRequirements() const;
 
-    /** Gets the hovered icon of the order. */
-    UTexture2D* GetHoveredIcon() const;
+	/** Gets the normal icon of the order. */
+	UTexture2D* GetNormalIcon() const;
 
-    /** Gets the pressed icon of the order. */
-    UTexture2D* GetPressedIcon() const;
+	/** Gets the hovered icon of the order. */
+	UTexture2D* GetHoveredIcon() const;
 
-    /** Gets the disabled icon of the order. */
-    UTexture2D* GetDisabledIcon() const;
+	/** Gets the pressed icon of the order. */
+	UTexture2D* GetPressedIcon() const;
 
-    /** Gets the name of the order. */
-    FText GetName() const;
+	/** Gets the disabled icon of the order. */
+	UTexture2D* GetDisabledIcon() const;
 
-    /** Gets the description of the order. */
-    virtual FText GetDescription(const AActor* OrderedActor, int32 Index) const;
+	/** Gets the name of the order. */
+	FText GetName() const;
+
+	/** Gets the description of the order. */
+	virtual FText GetDescription(const AActor* OrderedActor, int32 Index) const;
 
 protected:
-    /** Target required by this order. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    ERTSOrderTargetType TargetType;
+	/** Target required by this order. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	ERTSOrderTargetType TargetType;
 
-    /** How many and which of the selected actors the order should be issued to. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    ERTSOrderGroupExecutionType GroupExecutionType;
+	/** How many and which of the selected actors the order should be issued to. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	ERTSOrderGroupExecutionType GroupExecutionType;
 
-    /** Tag requirements that must be fulfilled to issue the order. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FRTSOrderTagRequirements IssueTagRequirements;
+	/** Tag requirements that must be fulfilled to issue the order. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FRTSOrderTagRequirements IssueTagRequirements;
 
-    /** Tag requirements that must be fulfilled for the order to be successful. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FRTSOrderTagRequirements SuccessTagRequirements;
+	/** Tag requirements that must be fulfilled for the order to be successful. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FRTSOrderTagRequirements SuccessTagRequirements;
 
-    /** Normal icon of the order. Can be shown in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UTexture2D* NormalIcon;
+	/** Normal icon of the order. Can be shown in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UTexture2D* NormalIcon;
 
-    /** Hovered icon of the order. Can be shown in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UTexture2D* HoveredIcon;
+	/** Hovered icon of the order. Can be shown in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UTexture2D* HoveredIcon;
 
-    /** Pressed icon of the order. Can be shown in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UTexture2D* PressedIcon;
+	/** Pressed icon of the order. Can be shown in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UTexture2D* PressedIcon;
 
-    /** Disabled icon of the order. Can be shown in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    UTexture2D* DisabledIcon;
+	/** Disabled icon of the order. Can be shown in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	UTexture2D* DisabledIcon;
 
-    /** Name of the order. Can be shown in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FText Name;
+	/** Name of the order. Can be shown in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FText Name;
 
-    /** Default description of the order. Can be shown in the UI. */
-    UPROPERTY(EditDefaultsOnly, Category = "RTS")
-    FText Description;
+	/** Default description of the order. Can be shown in the UI. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS")
+	FText Description;
+
+private:
+	/** Issues this order to the specified actor. */
+	virtual void IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index, bool bAdd) const;
 };

@@ -68,7 +68,7 @@ public:
 
 	/** Issues the specified order to all selected units. */
 	UFUNCTION(BlueprintCallable)
-	bool IssueOrderToSelectedActors(const FRTSOrderData& Order);
+	bool IssueOrderToSelectedActors(const FRTSOrderData& Order, bool bAdd);
 
 	/** Issues the first successful default order for the specified targets to the passed actor. */
 	void IssueDefaultOrderToActor(AActor* Actor, AActor* TargetActor, const FVector& TargetLocation);
@@ -547,8 +547,12 @@ private:
 	UFUNCTION()
 	void IssueDefaultOrderToSelectedActors();
 
+	/** Automatically chains the most reasonable order for the current pointer position. */
+	UFUNCTION()
+	void AddDefaultOrderToSelectedActors();
+
 	/** Automatically issues the most reasonable order for the specified targets. */
-	void IssueOrderTargetingObjectsToSelectedActors(TArray<FHitResult>& HitResults);
+	void IssueOrderTargetingObjectsToSelectedActors(TArray<FHitResult>& HitResults, bool bAdd);
 
 	/** Gets any member of the currently selected subgroup of selected actors. */
 	bool GetSelectedSubgroupActorAndIndex(AActor** OutSelectedSubgroupActor, int32* OutSelectedSubgroupActorIndex);
@@ -563,6 +567,10 @@ private:
 	/** Issues the specified order to the passed pawn. */
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerIssueOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
+
+	/** Issues the specified order to the passed pawn. */
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerAddOrder(APawn* OrderedPawn, const FRTSOrderData& Order);
 
 	/** Start producing the specified product at the specified actor. */
 	UFUNCTION(Reliable, Server, WithValidation)

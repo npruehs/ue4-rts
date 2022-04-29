@@ -68,7 +68,7 @@ void URTSOrderLibrary::IssueOrder(TSubclassOf<URTSOrder> OrderClass, AActor* Ord
 		return;
 	}
 
-	OrderClass->GetDefaultObject<URTSOrder>()->IssueOrder(OrderedActor, TargetData, Index);
+	OrderClass->GetDefaultObject<URTSOrder>()->AddOrder(OrderedActor, TargetData, Index);
 }
 
 void URTSOrderLibrary::IssueOrder(AActor* OrderedActor, const FRTSOrderData& Order)

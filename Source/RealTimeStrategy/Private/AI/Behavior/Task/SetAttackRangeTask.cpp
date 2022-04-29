@@ -26,16 +26,13 @@ EBTNodeResult::Type USetAttackRangeTask::ExecuteTask(UBehaviorTreeComponent& Own
 		return EBTNodeResult::Failed;
 	}
 
-	const URTSAttackComponent* AttackComponent = Pawn->FindComponentByClass<URTSAttackComponent>();
+	const URTSAttackComponent* AttackComponent = Controller->GetPawn()->FindComponentByClass<URTSAttackComponent>();
 	if (!IsValid(AttackComponent))
 	{
-		UE_LOG(LogRTS, Error, TEXT("For %s was no RTSCombatComponent found"), *Pawn->GetName())
 		return EBTNodeResult::Failed;
 	}
 
 	const float Range = AttackComponent->GetAttacks()[0].Range;
-
-	UE_LOG(LogRTS, Log, TEXT("Set range to %f"), Range)
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsFloat(GetSelectedBlackboardKey(), Range);
 

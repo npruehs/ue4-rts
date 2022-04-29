@@ -8,7 +8,7 @@
 #include "Construction/RTSBuilderComponent.h"
 #include "GameFramework/Controller.h"
 
-URTSSetConstructionRangeTask::URTSSetConstructionRangeTask(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
+URTSSetConstructionRangeTask::URTSSetConstructionRangeTask(const FObjectInitializer& ObjectInitializer)
 {
 	NodeName = "Set Construction Range";
 }

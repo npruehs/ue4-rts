@@ -11,10 +11,11 @@
 UCLASS(Category="RTS")
 class REALTIMESTRATEGY_API URTSSetRallyPointToActorOrder : public URTSOrder
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-    URTSSetRallyPointToActorOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	URTSSetRallyPointToActorOrder(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-    virtual void IssueOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const override;
+	virtual void AddOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const override;
+	virtual void SetOrder(AActor* OrderedActor, const FRTSOrderTargetData& TargetData, int32 Index) const override;
 };
