@@ -78,14 +78,30 @@ bool URTSGathererComponent::CanGatherFrom(AActor* ResourceSource) const
 		return false;
 	}
 
-	// Check capacity.
+	// Check presence of resource type.
 	FRTSGatherData GatherData;
 	if (!GetGatherDataForResourceSource(ResourceSource, &GatherData))
 	{
 		return false;
 	}
 
-	return CarriedResourceAmount < GatherData.Capacity;
+	return true;
+}
+
+bool URTSGathererComponent::IsCapacityFull() const
+{
+	if (!IsValid(CarriedResourceType))
+	{
+		return false;
+	}
+
+	FRTSGatherData GatherData;
+	if (!GetGatherDataForResourceType(CarriedResourceType, &GatherData))
+	{
+		return false;
+	}
+
+	return CarriedResourceAmount >= GatherData.Capacity;
 }
 
 AActor* URTSGathererComponent::FindClosestResourceDrain() const

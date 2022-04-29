@@ -39,7 +39,7 @@ bool URTSCanGatherFromDecorator::CalculateRawConditionValue(UBehaviorTreeCompone
 		return false;
 	}
 
-	return GathererComponent->CanGatherFrom(Target);
+	return GathererComponent->CanGatherFrom(Target) && !GathererComponent->IsCapacityFull();
 }
 
 FString URTSCanGatherFromDecorator::GetStaticDescription() const

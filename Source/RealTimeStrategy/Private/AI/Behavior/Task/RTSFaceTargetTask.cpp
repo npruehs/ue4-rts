@@ -24,7 +24,7 @@ EBTNodeResult::Type URTSFaceTargetTask::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	if (!IsValid(Pawn) || !IsValid(Target))
 	{
-		return EBTNodeResult::Aborted;
+		return EBTNodeResult::Failed;
 	}
 
 	Pawn->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(Pawn->GetActorLocation(), Target->GetActorLocation()));

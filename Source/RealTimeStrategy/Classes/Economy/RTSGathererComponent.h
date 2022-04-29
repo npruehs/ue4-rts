@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual bool CanGatherFrom(AActor* ResourceSource) const;
 
+	UFUNCTION(BlueprintPure)
+	virtual bool IsCapacityFull() const;
+
 	/** Finds the closest resource drain for returning currently carried resources. */
 	UFUNCTION(BlueprintPure)
 	virtual AActor* FindClosestResourceDrain() const;
