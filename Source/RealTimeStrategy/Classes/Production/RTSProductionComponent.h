@@ -24,6 +24,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FRTSProductionComponentProductionC
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FRTSProductionComponentProductionCostRefundedSignature, AActor*, Actor, TSubclassOf<URTSResourceType>, ResourceType, float, ResourceAmount);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRTSProductionComponentRallyPointSetSignature, AActor*, Actor, FVector, Vector);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRTSProductionComponentClearRallyPointSignature);
+
 
 /** Allows producing actors over time. */
 UCLASS(ClassGroup="RTS", Category="RTS", meta = (BlueprintSpawnableComponent))
@@ -143,6 +146,14 @@ public:
 	/** Event when any production costs have been refunded. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSProductionComponentProductionCostRefundedSignature OnProductionCostRefunded;
+	
+	/** Event when the rally point was set. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSProductionComponentRallyPointSetSignature OnRallyPointSet;
+	
+	/** Event when the rally point was removed. */
+	UPROPERTY(BlueprintAssignable, Category = "RTS")
+	FRTSProductionComponentClearRallyPointSignature OnClearRallyPoint;
 
 private:
 	/** Types of actors the actor can produce. */
