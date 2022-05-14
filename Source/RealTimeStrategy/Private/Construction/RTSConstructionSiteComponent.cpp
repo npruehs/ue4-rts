@@ -36,6 +36,10 @@ URTSConstructionSiteComponent::URTSConstructionSiteComponent(const FObjectInitia
     InitialHealthPercentage = 0.1f;
 	RefundFactor = 0.5f;
 	bStartImmediately = true;
+	
+	bCheckCollision = true;
+	BuildingLocationDetectionChannels.Add(ObjectTypeQuery2); // WorldDynamic
+	BuildingLocationDetectionChannels.Add(ObjectTypeQuery3); // Pawn
 
     InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Permanent_CanBeConstructed());
     InitialGameplayTags.AddTag(URTSGameplayTagLibrary::Status_Changing_Immobilized());
@@ -386,6 +390,16 @@ void URTSConstructionSiteComponent::CancelConstruction()
 
 	// Notify listeners.
 	OnConstructionCanceled.Broadcast(GetOwner());
+}
+
+bool URTSConstructionSiteComponent::GetCheckCollision() const
+{
+	return bCheckCollision;
+}
+
+TArray<TEnumAsByte<EObjectTypeQuery>> URTSConstructionSiteComponent::GetBuildingLocationDetectionChannels() const
+{
+	return BuildingLocationDetectionChannels;
 }
 
 ERTSPaymentType URTSConstructionSiteComponent::GetConstructionCostType() const

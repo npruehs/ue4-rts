@@ -79,14 +79,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void CancelConstruction();
 
+	UFUNCTION(BlueprintPure)
+	bool GetCheckCollision() const;
+
+	UFUNCTION(BlueprintPure)
+	TArray<TEnumAsByte<EObjectTypeQuery>> GetBuildingLocationDetectionChannels() const;
+
 
 	/** When to pay resources for construction. */
 	UFUNCTION(BlueprintPure)
 	ERTSPaymentType GetConstructionCostType() const;
 
-    /** Gets the resources to pay for constructing the actor. */
-    UFUNCTION(BlueprintPure)
-    TMap<TSubclassOf<URTSResourceType>, float> GetConstructionCosts() const;
+	/** Gets the resources to pay for constructing the actor. */
+	UFUNCTION(BlueprintPure)
+	TMap<TSubclassOf<URTSResourceType>, float> GetConstructionCosts() const;
 
 	/** Gets the time for constructing the actor, in seconds. */
 	UFUNCTION(BlueprintPure)
@@ -108,9 +114,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetProgressMadePerBuilder() const;
 
-    /** Gets the resources to refund when canceling construction. */
-    UFUNCTION(BlueprintPure)
-    float GetRefundFactor() const;
+	/** Gets the resources to refund when canceling construction. */
+	UFUNCTION(BlueprintPure)
+	float GetRefundFactor() const;
 
 	/** Whether to start construction immediately after spawn, or not. */
 	UFUNCTION(BlueprintPure)
@@ -161,6 +167,15 @@ public:
 	/** Event when any construction costs have been refunded. */
 	UPROPERTY(BlueprintAssignable, Category = "RTS")
 	FRTSConstructionSiteComponentConstructionCostRefundedSignature OnConstructionCostRefunded;
+
+protected:
+	/** Whether to check collision for each grid cell. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS|Grid")
+	bool bCheckCollision;
+
+	/** Collision object types to detect obstacles that block the placement of a building. */
+	UPROPERTY(EditDefaultsOnly, Category = "RTS|Grid", meta = (EditCondition = "bCheckCollision"))
+	TArray<TEnumAsByte<EObjectTypeQuery>> BuildingLocationDetectionChannels;
 
 private:
 	/** When to pay resources for construction. */

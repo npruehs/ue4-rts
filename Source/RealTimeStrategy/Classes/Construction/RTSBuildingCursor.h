@@ -82,11 +82,11 @@ private:
 	float GridCellSize;
 
 	/** Whether to check collision for each grid cell. */
-	UPROPERTY(EditDefaultsOnly, Category = "RTS|Grid")
+	UPROPERTY()
 	bool bCheckCollision;
 
 	/** Collision object types to detect obstacles that block the placement of a building. */
-	UPROPERTY(EditDefaultsOnly, Category = "RTS|Grid", meta = (EditCondition = "bCheckCollision"))
+	UPROPERTY()
 	TArray<TEnumAsByte<EObjectTypeQuery>> BuildingLocationDetectionChannels;
 
 	/** Whether to check navigation for each grid cell. You should enable Allow Client Side Navigation in your project settings when using this. */
