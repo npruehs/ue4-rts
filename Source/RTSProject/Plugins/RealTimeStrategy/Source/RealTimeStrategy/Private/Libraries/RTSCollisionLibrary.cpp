@@ -155,9 +155,9 @@ FVector URTSCollisionLibrary::GetGroundLocation(UObject* WorldContextObject, FVe
 
     for (auto& HitResult : HitResults)
     {
-        if (HitResult.Actor != nullptr)
+        if (HitResult.HasValidHitObjectHandle())
         {
-            ALandscape* Landscape = Cast<ALandscape>(HitResult.Actor.Get());
+            ALandscape* Landscape = Cast<ALandscape>(HitResult.GetActor());
 
             if (Landscape != nullptr)
             {
